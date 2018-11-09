@@ -1,11 +1,13 @@
 package com.forteach.quiz.config;
 
 import com.forteach.quiz.common.WebResult;
+import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
@@ -19,10 +21,27 @@ import reactor.core.publisher.Mono;
 public class ExceptionHandlers {
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<WebResult> serverExceptionHandler(Exception ex) {
-        log.error(ex.getMessage(),ex);
+    public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, Exception e) {
+        log.error("全局异常拦截器  {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono();
+    }
+
+    @ExceptionHandler(RedisException.class)
+    public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, RedisException e) {
+        log.error("全局异常拦截器  redis 异常 {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return WebResult.failResultMono();
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public Mono<WebResult> methodArgumentNotValidException(ServerWebExchange exchange, MethodArgumentNotValidException e) {
+        log.error("全局异常拦截器 参数校验不正确  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return WebResult.failResultMono(9000);
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, HttpMessageNotReadableException e) {
+        log.error("全局异常拦截器 请求参数格式不正确  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return WebResult.failResultMono(9100);
     }
 
 }
