@@ -10,4 +10,8 @@ public class Dic {
 
     public static final int DEFAULT_ERROR_CODE = 9999;
 
+    public static final String MONGDB_ID = "_id";
+
+    public static final String MONGDB_COLUMN_QUESTION_BANK_TEACHER = "teachers";
+
 }

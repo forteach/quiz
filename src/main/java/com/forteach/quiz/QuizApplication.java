@@ -2,7 +2,7 @@ package com.forteach.quiz;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 /**
  * @Description:
@@ -10,7 +10,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @version: V1.0
  * @date: 2018/11/9 10:52
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
+@EnableReactiveMongoRepositories
 public class QuizApplication {
 
     public static void main(String[] args) {
