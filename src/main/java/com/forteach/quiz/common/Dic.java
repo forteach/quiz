@@ -14,4 +14,5 @@ public class Dic {
 
     public static final String MONGDB_COLUMN_QUESTION_BANK_TEACHER = "teachers";
 
+    public static final String STATUS_SUCCESS= "0";
 }

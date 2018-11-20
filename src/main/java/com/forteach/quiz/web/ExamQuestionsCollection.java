@@ -9,10 +9,7 @@ import com.forteach.quiz.service.ExamQuestionsService;
 import com.forteach.quiz.web.vo.QuestionBankVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 /**
@@ -65,10 +62,16 @@ public class ExamQuestionsCollection extends BaseController {
         return examQuestionsService.editChoiceQst(bigQuestion).map(WebResult::okResult);
     }
 
+    @GetMapping("/delete/{id}")
+    public Mono<WebResult> delQuestions(@PathVariable String id) {
+        return Mono.just(WebResult.okResult(examQuestionsService.delQuestions(id)));
+    }
+
 
     @PostMapping("/association/add")
     public Mono<WebResult> associationAdd(@RequestBody QuestionBankVo questionBankVo) {
         return examQuestionsService.questionBankAssociationAdd(questionBankVo.getId(), questionBankVo.getTeacher()).map(WebResult::okResult);
     }
+
 
 }

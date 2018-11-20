@@ -15,13 +15,16 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Document(collection = "bigQuestion")
-public class BigQuestion<T> extends AbstractExam {
+public class BigQuestion<T> extends AbstractExamEntity {
 
-    private String paperInfo;
+    protected String paperInfo;
 
-    private List<T> examChildren;
+    protected List<T> examChildren;
 
-    private String type;
+    protected String type;
+
+    protected int index;
+
 
     public BigQuestion() {
     }

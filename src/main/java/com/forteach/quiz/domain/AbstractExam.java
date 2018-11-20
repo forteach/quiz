@@ -1,7 +1,6 @@
 package com.forteach.quiz.domain;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 /**
  * @Description:
@@ -12,7 +11,6 @@ import org.springframework.data.annotation.Id;
 @Data
 public abstract class AbstractExam {
 
-    @Id
     protected String id;
 
     protected Double score;
@@ -21,4 +19,9 @@ public abstract class AbstractExam {
      * 创作老师
      */
     protected String teacherId;
+
+    /**
+     * 考生答案
+     */
+    protected String examineeAnsw;
 }

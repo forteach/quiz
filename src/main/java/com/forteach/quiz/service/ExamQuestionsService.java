@@ -3,13 +3,18 @@ package com.forteach.quiz.service;
 import com.forteach.quiz.domain.*;
 import com.forteach.quiz.exceptions.ExamQuestionsExceptions;
 import com.forteach.quiz.repository.BigQuestionRepository;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.List;
 
 import static com.forteach.quiz.common.Dic.MONGDB_COLUMN_QUESTION_BANK_TEACHER;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
@@ -27,7 +32,7 @@ public class ExamQuestionsService {
 
     private BigQuestionRepository bigQuestionRepository;
 
-    public ExamQuestionsService(ReactiveMongoTemplate reactiveMongoTemplate,BigQuestionRepository bigQuestionRepository) {
+    public ExamQuestionsService(ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionRepository bigQuestionRepository) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionRepository = bigQuestionRepository;
     }
@@ -40,6 +45,7 @@ public class ExamQuestionsService {
      * @return
      */
     public Mono<BigQuestion> editDesign(final BigQuestion<Design> bigQuestion) {
+
         return bigQuestionRepository.save(bigQuestion).flatMap(t -> {
             Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
             return questionBankMono.flatMap(
@@ -97,13 +103,34 @@ public class ExamQuestionsService {
         });
     }
 
+    public Flux<BigQuestion> editBigQuestion(final List<BigQuestion> questionList){
+        return bigQuestionRepository.saveAll(questionList);
+    }
+
+    /**
+     * 删除单道题
+     *
+     * @param id
+     * @return
+     */
+    public Mono<Void> delQuestions(final String id){
+        return bigQuestionRepository.deleteById(id).and(delBankAssociation(Collections.singletonList(id)));
+    }
 
     private Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId) {
         return reactiveMongoTemplate.upsert(Query.query(Criteria.where(MONGDB_ID).is(questionBankId)), new Update().addToSet(MONGDB_COLUMN_QUESTION_BANK_TEACHER, teacherId), QuestionBank.class);
     }
 
+    private Mono<DeleteResult> delBankAssociation(final List<String> id){
+        return reactiveMongoTemplate.remove(Query.query(Criteria.where(MONGDB_ID).is(id)),BigQuestion.class);
+    }
+
     public Mono<Boolean> questionBankAssociationAdd(final String questionBankId, final String teacherId) {
         return questionBankAssociation(questionBankId, teacherId).map(UpdateResult::isModifiedCountAvailable);
+    }
+
+    public Flux<BigQuestion> findBigQuestionInId(final List<String> ids) {
+        return reactiveMongoTemplate.find(Query.query(Criteria.where(MONGDB_ID).in(ids)), BigQuestion.class);
     }
 
 
