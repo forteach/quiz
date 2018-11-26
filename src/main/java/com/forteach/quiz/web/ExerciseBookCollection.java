@@ -1,18 +1,15 @@
 package com.forteach.quiz.web;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.service.ProblemSetService;
-import com.forteach.quiz.web.vo.ExerciseBookAttributeVo;
-import com.forteach.quiz.web.vo.ExerciseBookQuestionVo;
-import com.forteach.quiz.web.vo.ExerciseBookVo;
+import com.forteach.quiz.web.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 /**
- * @Description:
+ * @Description: 练习册相关
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/19  10:21
@@ -64,19 +61,47 @@ public class ExerciseBookCollection extends BaseController {
     /**
      * 修改答案
      *
-     * @param exerciseBookSheet
+     * @param exerciseBookSheetVo
      * @return
      */
     @PostMapping("/edit/answ")
-    public Mono<WebResult> editExerciseBookSheet(@RequestBody ExerciseBookSheet exerciseBookSheet) {
-        return problemSetService.editExerciseBookSheet(exerciseBookSheet).map(WebResult::okResult);
+    public Mono<WebResult> editExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
+        return problemSetService.editExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
     }
 
+    /**
+     * 提交答案
+     *
+     * @param exerciseBookSheetVo
+     * @return
+     */
+    @PostMapping("/commit/answ")
+    public Mono<WebResult> commitExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
+        return problemSetService.commitExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 删除练习册
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/delete/{id}")
     public Mono<WebResult> delExerciseBook(@PathVariable String id) {
         return Mono.just(WebResult.okResult(problemSetService.delExerciseBook(id)));
     }
 
+    @PostMapping("/edit/homework")
+    public Mono<WebResult> editProblemSetBackup(@RequestBody ProblemSetBackupVo problemSetBackupVo) {
+        return problemSetService.editProblemSetBackup(problemSetBackupVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 更改练习册的题目 并修改到题库中
+     *
+     * @param exerciseBookQuestionVo
+     * @return
+     */
     @PostMapping("/edit/questions")
     public Mono<WebResult> changeExerciseBookQuestions(@RequestBody ExerciseBookQuestionVo exerciseBookQuestionVo) {
         return problemSetService.changeExerciseBookQuestions(exerciseBookQuestionVo).map(WebResult::okResult);

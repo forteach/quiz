@@ -2,6 +2,8 @@ package com.forteach.quiz.domain;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -11,10 +13,11 @@ import lombok.Data;
 @Data
 public class Answ {
 
+    List<AnswChildren> childrenList;
+    /**
+     * 大题id
+     */
     private String bigQuestionId;
-
-    private String childrenId;
-
-    private String answer;
+    private Double score;
 
 }

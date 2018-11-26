@@ -21,6 +21,9 @@ public class ChoiceQst extends AbstractExam {
 
     private String choiceQstAnalysis;
 
+    /**
+     *
+     */
     private String choiceType;
 
     private List<ChoiceQstOption> optChildren;

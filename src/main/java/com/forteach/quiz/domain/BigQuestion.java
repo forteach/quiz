@@ -29,6 +29,13 @@ public class BigQuestion<T> extends AbstractExamEntity {
     public BigQuestion() {
     }
 
+    public BigQuestion(String paperInfo, List<T> examChildren, String type, int index) {
+        this.paperInfo = paperInfo;
+        this.examChildren = examChildren;
+        this.type = type;
+        this.index = index;
+    }
+
     public BigQuestion(String teacherId, List<T> examChildren, Double score) {
         this.score = score;
         this.teacherId = teacherId;
@@ -50,5 +57,13 @@ public class BigQuestion<T> extends AbstractExamEntity {
         this.examChildren = examChildren;
     }
 
-
+    public BigQuestion(int index, BigQuestion bigQuestion) {
+        this.id = bigQuestion.getId();
+        this.score = bigQuestion.getScore();
+        this.teacherId = bigQuestion.getTeacherId();
+        this.paperInfo = bigQuestion.getPaperInfo();
+        this.examChildren = bigQuestion.getExamChildren();
+        this.type = bigQuestion.getType();
+        this.index = index;
+    }
 }

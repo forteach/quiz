@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Document(collection = "exerciseBook")
-public class ExerciseBook extends BaseEntity {
+public class ExerciseBook<T> extends BaseEntity {
 
     protected int exeBookType;
 
@@ -23,12 +23,12 @@ public class ExerciseBook extends BaseEntity {
 
     protected String exeBookName;
 
-    protected List questionChildren;
+    protected List<T> questionChildren;
 
     public ExerciseBook() {
     }
 
-    public ExerciseBook(int exeBookType, String teacherId, String exeBookName, List questionChildren) {
+    public ExerciseBook(int exeBookType, String teacherId, String exeBookName, List<T> questionChildren) {
         this.exeBookType = exeBookType;
         this.teacherId = teacherId;
         this.exeBookName = exeBookName;

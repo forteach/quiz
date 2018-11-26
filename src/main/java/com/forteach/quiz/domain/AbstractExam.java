@@ -21,7 +21,8 @@ public abstract class AbstractExam {
     protected String teacherId;
 
     /**
-     * 考生答案
+     * 考题类型   choice   trueOrFalse    design
      */
-    protected String examineeAnsw;
+    protected String examType;
+
 }

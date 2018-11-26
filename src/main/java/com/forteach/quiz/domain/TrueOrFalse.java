@@ -16,7 +16,7 @@ public class TrueOrFalse extends AbstractExam {
 
     private String trueOrFalseInfo;
 
-    private boolean trueOrFalseAnsw;
+    private Boolean trueOrFalseAnsw;
 
     private String trueOrFalseAnalysis;
 
