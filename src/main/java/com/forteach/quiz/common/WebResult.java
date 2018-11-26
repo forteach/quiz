@@ -116,21 +116,8 @@ public class WebResult implements Serializable {
         return wr;
     }
 
-    /**
-     * Note:新的失败弹窗提示
-     * <p></p>
-     *
-     * @param code       错误码
-     * @param windowCode 弹窗码 用于确认后跳转位置
-     * @param data       返回对象
-     * @return WebResult    返回类型
-     * @author WangKai
-     */
-    private static WebResult failResult(int code, String windowCode, Object data, String[] params) {
-        return backResult(code, windowCode, data, params);
-    }
 
-    private static WebResult backResult(int code, String windowCode, Object data, String[] params) {
+    private static WebResult backResult(int code, Object data) {
         Map<String, String> map = PropertiesUtil.getMapForProperties();
         WebResult wr = new WebResult();
         wr.setRet(code);
