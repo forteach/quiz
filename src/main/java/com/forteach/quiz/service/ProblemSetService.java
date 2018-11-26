@@ -2,7 +2,7 @@ package com.forteach.quiz.service;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.domain.*;
-import com.forteach.quiz.exceptions.ProblemSetExceptions;
+import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
@@ -136,7 +136,7 @@ public class ProblemSetService {
     public Mono<ExerciseBookSheet> commitExerciseBookSheet(final ExerciseBookSheetVo exerciseBookSheetVo) {
         return exerciseBookSheetRepository
                 .findById(exerciseBookSheetVo.getId())
-                .switchIfEmpty(Mono.error(new ProblemSetExceptions("未找到练习册")))
+                .switchIfEmpty(Mono.error(new ProblemSetException("未找到练习册")))
                 .filterWhen(this::verifyExerciseBookSheetCommit)
                 .map(obj -> {
                     obj.setAnsw(exerciseBookSheetVo.getAnsw());
@@ -181,7 +181,7 @@ public class ProblemSetService {
         if (COMMIT_EXERCISE_BOOK_SHEET_MODIFY.equals(sheetMono.getCommit())) {
             return Mono.just(true);
         } else {
-            return Mono.error(new ProblemSetExceptions("练习册已提交或已批改"));
+            return Mono.error(new ProblemSetException("练习册已提交或已批改"));
         }
     }
 

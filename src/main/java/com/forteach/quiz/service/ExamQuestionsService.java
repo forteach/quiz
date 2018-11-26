@@ -1,7 +1,7 @@
 package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.*;
-import com.forteach.quiz.exceptions.ExamQuestionsExceptions;
+import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.repository.BigQuestionRepository;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -57,7 +57,7 @@ public class ExamQuestionsService {
                         if (updateResult.isModifiedCountAvailable()) {
                             return Mono.just(t);
                         } else {
-                            return Mono.error(new ExamQuestionsExceptions("保存 简答思考题 作者失败"));
+                            return Mono.error(new ExamQuestionsException("保存 简答思考题 作者失败"));
                         }
                     }
             );
@@ -78,7 +78,7 @@ public class ExamQuestionsService {
                         if (updateResult.isModifiedCountAvailable()) {
                             return Mono.just(t);
                         } else {
-                            return Mono.error(new ExamQuestionsExceptions("保存 判断题 作者失败"));
+                            return Mono.error(new ExamQuestionsException("保存 判断题 作者失败"));
                         }
                     }
             );
@@ -99,7 +99,7 @@ public class ExamQuestionsService {
                         if (updateResult.isModifiedCountAvailable()) {
                             return Mono.just(t);
                         } else {
-                            return Mono.error(new ExamQuestionsExceptions("保存 选择题 作者失败"));
+                            return Mono.error(new ExamQuestionsException("保存 选择题 作者失败"));
                         }
                     }
             );

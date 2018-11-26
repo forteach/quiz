@@ -1,7 +1,7 @@
 package com.forteach.quiz.config;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.exceptions.ProblemSetExceptions;
+import com.forteach.quiz.exceptions.ProblemSetException;
 import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -27,8 +27,8 @@ public class ExceptionHandlers {
         return WebResult.failResultMono();
     }
 
-    @ExceptionHandler(ProblemSetExceptions.class)
-    public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, ProblemSetExceptions e) {
+    @ExceptionHandler(ProblemSetException.class)
+    public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, ProblemSetException e) {
         log.error("全局异常拦截器  练习册异常 {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
         return Mono.just(WebResult.failResult(9200, e.getMessage()));
     }

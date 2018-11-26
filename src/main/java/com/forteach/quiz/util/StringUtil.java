@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class StringUtil {
 
-    public static ObjectMapper objectMapper;
+    private static ObjectMapper objectMapper;
 
     /**
      * @return

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.forteach.quiz.domain.*;
-import com.forteach.quiz.exceptions.ExamQuestionsExceptions;
+import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -89,7 +89,7 @@ public class CorrectService {
                         //简答主观题 人工手动批改
                         break;
                     default:
-                        throw new ExamQuestionsExceptions("非法参数 错误的题目类型");
+                        throw new ExamQuestionsException("非法参数 错误的题目类型");
                 }
             }
         });
@@ -102,7 +102,7 @@ public class CorrectService {
             case QUESTION_CHOICE_MULTIPLE_SINGLE:
                 return multiple(choiceQst, answChildren);
             default:
-                throw new ExamQuestionsExceptions("非法参数 错误的选择题选项类型");
+                throw new ExamQuestionsException("非法参数 错误的选择题选项类型");
         }
     }
 

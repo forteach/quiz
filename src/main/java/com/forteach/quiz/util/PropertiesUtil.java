@@ -9,8 +9,15 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
+/**
+ * @Description:
+ * @author: liu zhenming
+ * @version: V1.0
+ * @date: 2018/6/15  0:15
+ */
 @Slf4j
 public class PropertiesUtil {
 
@@ -27,8 +34,10 @@ public class PropertiesUtil {
 
     public static Map<String, String> getMapForProperties() {
         Properties prop = new Properties();
+        InputStreamReader inputStream = new InputStreamReader(Objects.requireNonNull(WebResult.class.getClassLoader().getResourceAsStream("webResult.properties")), StandardCharsets.UTF_8);
         try {
-            prop.load(new InputStreamReader(WebResult.class.getClassLoader().getResourceAsStream("webResult.properties"), StandardCharsets.UTF_8));
+            prop.load(inputStream);
+            inputStream.close();
         } catch (IOException e) {
             log.error("返回信息时，获取配置文件出错", e.getMessage(), e);
         }
