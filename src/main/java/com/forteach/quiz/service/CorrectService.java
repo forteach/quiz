@@ -2,10 +2,12 @@ package com.forteach.quiz.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.forteach.quiz.domain.*;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
+import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +37,7 @@ public class CorrectService {
      * @param sheetMono
      * @return
      */
-    public Mono<ExerciseBookSheet> exerciseBookCorrect(final Mono<ExerciseBookSheet> sheetMono) {
+    Mono<ExerciseBookSheet> exerciseBookCorrect(final Mono<ExerciseBookSheet> sheetMono) {
         return sheetMono.flatMap(seet -> problemSetBackupRepository.findById(seet.getBackupId())
                 .map(b -> JSON.parseObject(b.getBackup(), new TypeReference<ExerciseBook<BigQuestion>>() {
                 }))
@@ -50,6 +52,19 @@ public class CorrectService {
                         return Mono.empty();
                     }
                 }));
+    }
+
+    Mono<ExerciseBookSheet> subjectiveCorrect(final ExerciseBookSheet sheet, final ExerciseBookSheetVo correctVo) {
+        JSONObject json = JSON.parseObject(JSON.toJSONString(correctVo));
+        sheet.setEvaluation(correctVo.getEvaluation());
+        sheet.setAnsw(
+                sheet.getAnsw().parallelStream().peek(answ ->
+                        answ.setChildrenList(answ.getChildrenList().parallelStream().peek(answChildren ->
+                                answChildren.setEvaluation(String.valueOf(JSONPath.eval(json, "$.answ.childrenList[questionId = '" + answChildren.getQuestionId() + "'].evaluation[0]")))
+                        ).collect(toList()))
+                ).collect(toList())
+        );
+        return Mono.just(sheet);
     }
 
     /**
@@ -67,7 +82,6 @@ public class CorrectService {
 
         answ.setScore(answ.getChildrenList().parallelStream().filter(answChildren -> answChildren.getScore() != null).mapToDouble(AnswChildren::getScore).sum());
     }
-
 
     private void correcting(final AnswChildren answChildren, final BigQuestion question) {
 
@@ -158,6 +172,5 @@ public class CorrectService {
         }
         return answChildren.getScore();
     }
-
 
 }

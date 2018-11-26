@@ -14,8 +14,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.forteach.quiz.common.Dic.COMMIT_EXERCISE_BOOK_SHEET_COMMIT;
-import static com.forteach.quiz.common.Dic.COMMIT_EXERCISE_BOOK_SHEET_MODIFY;
+import static com.forteach.quiz.common.Dic.*;
 
 /**
  * @Description: 练习册相关
@@ -153,18 +152,17 @@ public class ProblemSetService {
      * @return
      */
     public Mono<ExerciseBook> changeExerciseBookQuestions(final ExerciseBookQuestionVo exerciseBookQuestionVo) {
-        return examQuestionsService.editBigQuestion(exerciseBookQuestionVo.getBigQuestions())
+
+        return examQuestionsService.editExerciseBookQuestion(exerciseBookQuestionVo.getRelate(), exerciseBookQuestionVo.getBigQuestions())
                 .collectList()
-                .flatMap(questionList -> {
-                    return exerciseBookRepository
-                            .findById(exerciseBookQuestionVo.getExerciseBookId())
-                            .map(obj -> {
-                                obj.setCDate(obj.getCDate());
-                                obj.setQuestionChildren(questionList);
-                                return obj;
-                            })
-                            .flatMap(exerciseBookRepository::save);
-                });
+                .flatMap(questionList -> exerciseBookRepository
+                        .findById(exerciseBookQuestionVo.getExerciseBookId())
+                        .map(obj -> {
+                            obj.setCDate(obj.getCDate());
+                            obj.setQuestionChildren(questionList);
+                            return obj;
+                        })
+                        .flatMap(exerciseBookRepository::save));
     }
 
     /**
@@ -175,6 +173,18 @@ public class ProblemSetService {
     public Mono<ProblemSetBackup> editProblemSetBackup(final ProblemSetBackupVo problemSetBackupVo) {
         return getExerciseBook(problemSetBackupVo.getExerciseBookId())
                 .flatMap(exerciseBook -> problemSetBackupRepository.save(new ProblemSetBackup(problemSetBackupVo.getType(), JSON.toJSONString(exerciseBook))));
+    }
+
+    public Mono<ExerciseBookSheet> correctExerciseBookSheet(final ExerciseBookSheetVo exerciseBookSheetVo) {
+        return exerciseBookSheetRepository
+                .findById(exerciseBookSheetVo.getId())
+                .switchIfEmpty(Mono.error(new ProblemSetException("未找到练习册")))
+                .flatMap(obj -> {
+                    obj.setBackupId(exerciseBookSheetVo.getBackupId());
+                    obj.setCommit(COMMIT_EXERCISE_BOOK_SHEET_CORRECT);
+                    return correctService.subjectiveCorrect(obj, exerciseBookSheetVo);
+                })
+                .flatMap(exerciseBookSheetRepository::save);
     }
 
     private Mono<Boolean> verifyExerciseBookSheetCommit(final ExerciseBookSheet sheetMono) {

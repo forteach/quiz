@@ -14,11 +14,13 @@ public class Dic {
 
     public static final String MONGDB_COLUMN_QUESTION_BANK_TEACHER = "teachers";
 
-    public static final String STATUS_SUCCESS= "0";
+    public static final String STATUS_SUCCESS = "0";
 
     public static final String COMMIT_EXERCISE_BOOK_SHEET_COMMIT = "commit";
 
     public static final String COMMIT_EXERCISE_BOOK_SHEET_MODIFY = "modify";
+
+    public static final String COMMIT_EXERCISE_BOOK_SHEET_CORRECT = "correct";
 
     public static final String ID = "id";
 
@@ -44,5 +46,8 @@ public class Dic {
 
     public static final String QUESTION_ACCURACY_HALFOF = "halfOf";
 
+    public static final int COVER_QUESTION_BANK = 1;
+
+    public static final int UN_COVER_QUESTION_BANK = 0;
 
 }

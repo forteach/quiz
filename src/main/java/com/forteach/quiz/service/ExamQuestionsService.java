@@ -17,8 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.forteach.quiz.common.Dic.MONGDB_COLUMN_QUESTION_BANK_TEACHER;
-import static com.forteach.quiz.common.Dic.MONGDB_ID;
+import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.util.StringUtil.getRandomUUID;
 import static com.forteach.quiz.util.StringUtil.isEmpty;
 
@@ -106,8 +105,15 @@ public class ExamQuestionsService {
         });
     }
 
-    public Flux<BigQuestion> editBigQuestion(final List<BigQuestion> questionList) {
+    private Flux<BigQuestion> editBigQuestion(final List<BigQuestion> questionList) {
         return bigQuestionRepository.saveAll(questionList);
+    }
+
+    public Flux<BigQuestion> editExerciseBookQuestion(int relate, final List<BigQuestion> questionList) {
+        if (relate == COVER_QUESTION_BANK) {
+            return editBigQuestion(questionList);
+        }
+        return Flux.fromIterable(questionList);
     }
 
     /**

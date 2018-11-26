@@ -43,4 +43,9 @@ public class ExerciseBookSheetVo {
      * 提交状态  modify   commit   correct
      */
     private String commit;
+
+    /**
+     * 评价
+     */
+    private String evaluation;
 }

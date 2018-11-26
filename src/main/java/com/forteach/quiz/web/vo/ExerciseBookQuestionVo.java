@@ -18,4 +18,10 @@ public class ExerciseBookQuestionVo {
 
     private List<BigQuestion> bigQuestions;
 
+    /**
+     * 是否修改应用到所有的题库
+     * 1 : 应用到所有题库    0  :  只修改到本练习册的题目
+     */
+    private int relate;
+
 }

@@ -81,6 +81,17 @@ public class ExerciseBookCollection extends BaseController {
     }
 
     /**
+     * 提交练习册 主观题 批改
+     *
+     * @param exerciseBookSheetVo
+     * @return
+     */
+    @PostMapping("/correct/subjective")
+    public Mono<WebResult> correctExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
+        return problemSetService.correctExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
+    }
+
+    /**
      * 删除练习册
      *
      * @param id
@@ -91,6 +102,12 @@ public class ExerciseBookCollection extends BaseController {
         return Mono.just(WebResult.okResult(problemSetService.delExerciseBook(id)));
     }
 
+    /**
+     * 生成作业册
+     *
+     * @param problemSetBackupVo
+     * @return
+     */
     @PostMapping("/edit/homework")
     public Mono<WebResult> editProblemSetBackup(@RequestBody ProblemSetBackupVo problemSetBackupVo) {
         return problemSetService.editProblemSetBackup(problemSetBackupVo).map(WebResult::okResult);
