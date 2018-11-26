@@ -2,6 +2,7 @@ package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.*;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.BigQuestionRepository;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -35,10 +36,47 @@ public class ExamQuestionsService {
     private final BigQuestionRepository bigQuestionRepository;
 
 
-
     public ExamQuestionsService(ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionRepository bigQuestionRepository) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionRepository = bigQuestionRepository;
+    }
+
+    private Mono<BigQuestion> editQuestionsCover(final BigQuestion bigQuestion) {
+
+        Query query = Query.query(Criteria.where(QUESTION_CHILDREN + "." + MONGDB_ID).is(bigQuestion.getId()));
+        Update update = new Update();
+        update.set("questionChildren.$.paperInfo", bigQuestion.getPaperInfo());
+        update.set("questionChildren.$.examChildren", bigQuestion.getExamChildren());
+        update.set("questionChildren.$.type", bigQuestion.getType());
+        update.set("questionChildren.$.index", bigQuestion.getIndex());
+        update.set("questionChildren.$.score", bigQuestion.getScore());
+        return reactiveMongoTemplate.updateMulti(query, update, ExerciseBook.class).map(UpdateResult::getMatchedCount).flatMap(obj -> {
+            if (obj != -1) {
+                return bigQuestionRepository.save(bigQuestion);
+            } else {
+                return Mono.error(new ProblemSetException("更新失败"));
+            }
+        });
+
+    }
+
+
+    private Mono<BigQuestion> editQuestions(final BigQuestion bigQuestion) {
+        if (bigQuestion.getRelate() == COVER_QUESTION_BANK) {
+            return editQuestionsCover(bigQuestion);
+        }
+        return bigQuestionRepository.save(bigQuestion);
+    }
+
+    private Flux<BigQuestion> editBigQuestion(final List<BigQuestion> questionList) {
+        return bigQuestionRepository.saveAll(questionList);
+    }
+
+    public Flux<BigQuestion> editExerciseBookQuestion(int relate, final List<BigQuestion> questionList) {
+        if (relate == COVER_QUESTION_BANK) {
+            return editBigQuestion(questionList);
+        }
+        return Flux.fromIterable(questionList);
     }
 
     /**
@@ -49,7 +87,7 @@ public class ExamQuestionsService {
      */
     public Mono<BigQuestion> editDesign(final BigQuestion<Design> bigQuestion) {
 
-        return bigQuestionRepository.save(setExamDesignUUID(bigQuestion)).flatMap(t -> {
+        return editQuestions(setExamDesignUUID(bigQuestion)).flatMap(t -> {
             Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
             return questionBankMono.flatMap(
                     updateResult -> {
@@ -70,7 +108,7 @@ public class ExamQuestionsService {
      * @return
      */
     public Mono<BigQuestion> editTrueOrFalse(final BigQuestion<TrueOrFalse> bigQuestion) {
-        return bigQuestionRepository.save(setExamTrueOrFalseUUID(bigQuestion)).flatMap(t -> {
+        return editQuestions(setExamTrueOrFalseUUID(bigQuestion)).flatMap(t -> {
             Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
             return questionBankMono.flatMap(
                     updateResult -> {
@@ -91,7 +129,7 @@ public class ExamQuestionsService {
      * @return
      */
     public Mono<BigQuestion> editChoiceQst(final BigQuestion<ChoiceQst> bigQuestion) {
-        return bigQuestionRepository.save(setExamChoiceQstUUID(bigQuestion)).flatMap(t -> {
+        return editQuestions(setExamChoiceQstUUID(bigQuestion)).flatMap(t -> {
             Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
             return questionBankMono.flatMap(
                     updateResult -> {
@@ -105,16 +143,6 @@ public class ExamQuestionsService {
         });
     }
 
-    private Flux<BigQuestion> editBigQuestion(final List<BigQuestion> questionList) {
-        return bigQuestionRepository.saveAll(questionList);
-    }
-
-    public Flux<BigQuestion> editExerciseBookQuestion(int relate, final List<BigQuestion> questionList) {
-        if (relate == COVER_QUESTION_BANK) {
-            return editBigQuestion(questionList);
-        }
-        return Flux.fromIterable(questionList);
-    }
 
     /**
      * 删除单道题

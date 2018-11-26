@@ -50,4 +50,8 @@ public class Dic {
 
     public static final int UN_COVER_QUESTION_BANK = 0;
 
+    public static final String BIG_QUESTION_EXAM_CHILDREN = "examChildren";
+
+    public static final String QUESTION_CHILDREN = "questionChildren";
+
 }

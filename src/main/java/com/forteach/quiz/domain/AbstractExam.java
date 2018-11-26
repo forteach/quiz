@@ -25,4 +25,10 @@ public abstract class AbstractExam {
      */
     protected String examType;
 
+    /**
+     * 是否修改应用到所有的练习册
+     * 1 : 应用到所有练习册    0  :  只修改本题
+     */
+    private int relate;
+
 }

@@ -25,6 +25,12 @@ public class BigQuestion<T> extends AbstractExamEntity {
 
     protected int index;
 
+    /**
+     * 是否修改应用到所有的练习册
+     * 1 : 应用到所有练习册    0  :  只修改本题
+     */
+    private int relate;
+
 
     public BigQuestion() {
     }
