@@ -54,4 +54,8 @@ public class Dic {
 
     public static final String QUESTION_CHILDREN = "questionChildren";
 
+    public static final int BOOK_REWRITE = 1;
+
+    public static final int BOOK_UN_REWRITE = 0;
+
 }

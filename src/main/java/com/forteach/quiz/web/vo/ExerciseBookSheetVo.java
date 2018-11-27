@@ -48,4 +48,9 @@ public class ExerciseBookSheetVo {
      * 评价
      */
     private String evaluation;
+
+    /**
+     * 是否老师让学生撤回
+     */
+    private int rewrite;
 }
