@@ -1,19 +1,20 @@
 package com.forteach.quiz.web;
 
-import com.forteach.quiz.domain.Design;
+import com.forteach.quiz.common.WebResult;
+import com.forteach.quiz.domain.BigQuestion;
+import com.forteach.quiz.service.ClassInteractService;
+import com.forteach.quiz.web.vo.AchieveVo;
+import com.forteach.quiz.web.vo.GiveVo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @Description:
@@ -27,48 +28,28 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequestMapping("/interact")
 public class InteractCollection extends BaseController {
 
-    /**
-     * 模拟数据库数据
-     */
-    private static Map<Integer, Design> dataMap;
+    private final ClassInteractService classInteractService;
 
-    static {
-        dataMap = new HashMap();
-        dataMap.put(1, new Design("最终幻想12前身是什么", "123", "", 3D));
-        dataMap.put(2, new Design("最终幻想13前身是什么", "456", "", 3D));
-        dataMap.put(3, new Design("最终幻想14前身是什么", "789", "", 3D));
-        dataMap.put(4, new Design("最终幻想15前身是什么", "123", "", 3D));
+    public InteractCollection(ClassInteractService classInteractService) {
+        this.classInteractService = classInteractService;
     }
 
-    @GetMapping(value = "/typeOne", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux interactResponse() {
-        return Flux.fromIterable(dataMap.values()).delayElements(Duration.ofSeconds(1));
-    }
+    @GetMapping(value = "/achieve", produces = "text/event-stream;charset=UTF-8")
+    public Flux<ServerSentEvent<BigQuestion>> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
 
-    @PostMapping(value = "/add")
-    public Mono sseResponse(@RequestBody Aa aa) {
-        dataMap.put(dataMap.size() + 1, new Design(aa.getDq(), aa.getDa(), aa.getDas(), aa.getS()));
-        return Mono.just(dataMap);
-    }
-
-    @RequestMapping(value = "/retrieve",produces = "text/event-stream;charset=UTF-8")
-    public Flux<ServerSentEvent<Integer>> randomNumbers() {
         return Flux.interval(Duration.ofSeconds(1))
-                .map(seq -> Tuples.of(seq, ThreadLocalRandom.current().nextInt()))
-                .map(data -> ServerSentEvent.<Integer>builder()
-                        .event(String.valueOf(dataMap.size()))
-                        .id(Long.toString(data.getT1()))
-                        .data(data.getT2())
+                .map(seq -> Tuples.of(
+                        seq, classInteractService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
+                ))
+                .flatMap(Tuple2::getT2)
+                .map(data -> ServerSentEvent.<BigQuestion>builder()
+                        .data(data)
                         .build());
     }
 
+    @PostMapping("/send/question")
+    public Mono<WebResult> sendQuestion(@RequestBody GiveVo giveVo) {
+        return classInteractService.sendQuestion(giveVo).map(WebResult::okResult);
+    }
 
-
-}
-@Data
-class Aa {
-    String dq;
-    String da;
-    String das;
-    double s;
 }

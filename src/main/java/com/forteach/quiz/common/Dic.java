@@ -58,4 +58,18 @@ public class Dic {
 
     public static final int BOOK_UN_REWRITE = 0;
 
+    public static final String CATEGORY_PEOPLE = "people";
+
+    public static final String CATEGORY_TEAM = "team";
+
+    public static final String ASK_INTERACTIVE = "interactive";
+
+    public static final String ASK_INTERACTIVE_RACE = "race";
+
+    public static final String ASK_INTERACTIVE_RAISE = "raise";
+
+    public static final String ASK_INTERACTIVE_SELECT = "select";
+
+    public static final String ASK_INTERACTIVE_VOTE = "vote";
+
 }
