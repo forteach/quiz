@@ -7,6 +7,11 @@ import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
 import com.forteach.quiz.web.vo.*;
+import com.mongodb.client.result.UpdateResult;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -33,17 +38,20 @@ public class ProblemSetService {
 
     private final ExerciseBookSheetRepository exerciseBookSheetRepository;
 
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
+
     private final CorrectService correctService;
 
 
     public ProblemSetService(ExamQuestionsService examQuestionsService, ExerciseBookRepository exerciseBookRepository,
                              ExerciseBookSheetRepository exerciseBookSheetRepository, ProblemSetBackupRepository problemSetBackupRepository,
-                             CorrectService correctService) {
+                             CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
         this.examQuestionsService = examQuestionsService;
         this.exerciseBookRepository = exerciseBookRepository;
         this.problemSetBackupRepository = problemSetBackupRepository;
         this.exerciseBookSheetRepository = exerciseBookSheetRepository;
         this.correctService = correctService;
+        this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
 
     /**
@@ -181,7 +189,7 @@ public class ProblemSetService {
                 .switchIfEmpty(Mono.error(new ProblemSetException("未找到练习册")))
                 .flatMap(obj -> {
                     obj.setBackupId(exerciseBookSheetVo.getBackupId());
-                    obj.setCommit(COMMIT_EXERCISE_BOOK_SHEET_CORRECT);
+                    obj.setCommit(submitState(exerciseBookSheetVo.getRewrite()));
                     return correctService.subjectiveCorrect(obj, exerciseBookSheetVo);
                 })
                 .flatMap(exerciseBookSheetRepository::save);
@@ -193,6 +201,24 @@ public class ProblemSetService {
         } else {
             return Mono.error(new ProblemSetException("练习册已提交或已批改"));
         }
+    }
+
+    private String submitState(int rewrite) {
+        if (rewrite == BOOK_REWRITE) {
+            return COMMIT_EXERCISE_BOOK_SHEET_MODIFY;
+        } else {
+            return COMMIT_EXERCISE_BOOK_SHEET_CORRECT;
+        }
+    }
+
+    public Mono<UpdateResult> sheetRewrite(final RewriteVo rewriteVo) {
+
+        Query query = Query.query(Criteria.where(MONGDB_ID).in(rewriteVo.getSheetId()));
+
+        Update update = new Update();
+        update.set("commit", COMMIT_EXERCISE_BOOK_SHEET_MODIFY);
+
+        return reactiveMongoTemplate.updateMulti(query, update, ExerciseBookSheet.class);
     }
 
 }

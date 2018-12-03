@@ -1,7 +1,9 @@
 package com.forteach.quiz;
 
+import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.Design;
+import com.forteach.quiz.domain.ExerciseBook;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
+import static com.forteach.quiz.common.Dic.QUESTION_CHILDREN;
 
 /**
  * @Description:
@@ -75,6 +79,51 @@ public class MongoTemplateTest {
         Flux<Design> flux = template.find(Query.query(Criteria.where("designQuestion").is("1+1= ?")), Design.class);
         Mono<Long> count = flux.count();
         StepVerifier.create(count).expectNext(1L).verifyComplete();
+    }
+
+    @Test
+    public void editQuestionsCover() {
+        String json = "{\n" +
+                "    \"id\": \"5bf7695edc623b41b00627ac\",\n" +
+                "    \"score\": 31,\n" +
+                "    \"teacherId\": \"001\",\n" +
+                "    \"paperInfo\": \"史可威尔0 问题\",\n" +
+                "    \"type\": \"design\",\n" +
+                "    \"index\": \"3\",\n" +
+                "    \"examChildren\": [\n" +
+                "        {\n" +
+                "            \"id\": \"7b08be81fa80443884cc107573d01f1a\",\n" +
+                "            \"relate\": \"1\",\n" +
+                "            \"score\": 7,\n" +
+                "            \"teacherId\": \"001\",\n" +
+                "            \"designQuestion\": \"ff14前身是什么\",\n" +
+                "            \"designAnsw\": \"最终幻想 14 1.0\",\n" +
+                "            \"designAnalysis\": \"最终幻想14重置过\",\n" +
+                "            \"examType\": \"design\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+
+        BigQuestion obj = JSON.parseObject(json, BigQuestion.class);
+
+//        Flux<ExerciseBook> mono= template.find(Query.query(Criteria.where(MONGDB_ID).is("5bf79d11dc623b1cfc3a5eb1")),ExerciseBook.class).doOnNext(System.out::println);
+
+//                StepVerifier.create(mono).expectNext().verifyComplete();
+
+
+        Query query = Query.query(Criteria.where(QUESTION_CHILDREN + "." + MONGDB_ID).is("5bf7695edc623b41b00627ac"));
+        Update update = new Update();
+        update.set("questionChildren.$.paperInfo", obj.getPaperInfo());
+        update.set("questionChildren.$.examChildren", obj.getExamChildren());
+        update.set("questionChildren.$.type", obj.getType());
+        update.set("questionChildren.$.index", obj.getIndex());
+        update.set("questionChildren.$.score", obj.getScore());
+        update.set("questionChildren.$.teacherId", obj.getTeacherId());
+//        Update update = Update.update("examChildren.$.score",5).set("teacherId",123);
+//
+        Mono<ExerciseBook> exerciseBookMono = template.findAndModify(query, update, ExerciseBook.class).doOnNext(System.out::println);
+//
+        StepVerifier.create(exerciseBookMono).expectNext().verifyComplete();
     }
 
 //    public Flux<BigQuestion> findBigQuestionInId(final List<String> ids) {
