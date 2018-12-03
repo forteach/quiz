@@ -124,4 +124,9 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.changeExerciseBookQuestions(exerciseBookQuestionVo).map(WebResult::okResult);
     }
 
+    @PostMapping("/rewrite")
+    public Mono<WebResult> associationAdd(@RequestBody RewriteVo rewriteVo) {
+        return problemSetService.sheetRewrite(rewriteVo).map(WebResult::okResult);
+    }
+
 }
