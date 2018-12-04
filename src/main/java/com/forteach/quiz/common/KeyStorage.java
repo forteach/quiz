@@ -12,4 +12,6 @@ public class KeyStorage {
 
     public static final String CLASSROOM_ASK_QUESTIONS_DISTINCT = "distinctAsk";
 
+    public static final String CLASSROOM_ASK_QUESTIONS_RACE = "askRace";
+
 }

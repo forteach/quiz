@@ -1,10 +1,10 @@
 package com.forteach.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.web.vo.BigQuestionView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 
@@ -18,12 +18,11 @@ import java.util.Date;
 public abstract class BaseEntity {
 
     @Id
+    @JsonView(BigQuestionView.Summary.class)
     protected String id;
 
-    @CreatedDate
     protected Date cDate;
 
-    @LastModifiedDate
     protected Date uDate;
 
 }

@@ -2,6 +2,8 @@ package com.forteach.quiz.web.vo;
 
 import lombok.Data;
 
+import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -43,4 +45,16 @@ public class GiveVo {
      * 选中人员  [逗号 分割]
      */
     private String selected;
+
+    /**
+     * 切换
+     * 当老师重复提问问题时  但是两次的提问类型不一样  如第一次抢答 第二次提问
+     * 需要传送切换标识
+     * 0 : 原题目   非0 : 切题
+     */
+    private int cut;
+
+    public String getRaceAnswerFlag() {
+        return CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
+    }
 }

@@ -16,6 +16,8 @@ public class Dic {
 
     public static final String STATUS_SUCCESS = "0";
 
+    public static final String ASK_DISTINCT_INITIAL = "initial";
+
     public static final String COMMIT_EXERCISE_BOOK_SHEET_COMMIT = "commit";
 
     public static final String COMMIT_EXERCISE_BOOK_SHEET_MODIFY = "modify";

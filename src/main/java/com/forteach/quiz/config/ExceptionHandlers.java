@@ -1,6 +1,7 @@
 package com.forteach.quiz.config;
 
 import com.forteach.quiz.common.WebResult;
+import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,12 @@ public class ExceptionHandlers {
     public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, HttpMessageNotReadableException e) {
         log.error("全局异常拦截器 请求参数格式不正确  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono(9100);
+    }
+
+    @ExceptionHandler(value = AskException.class)
+    public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, AskException e) {
+        log.error("全局异常拦截器 课堂交互请求拦截  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return WebResult.okCustomResultMono(2000, e.getMessage());
     }
 
 }

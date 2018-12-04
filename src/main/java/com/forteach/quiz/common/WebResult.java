@@ -51,6 +51,10 @@ public class WebResult implements Serializable {
         return okResult(getOkCode(), String.valueOf(code), data);
     }
 
+    public static WebResult okCustomResult(int code, String msg) {
+        return customResult(code, msg, "");
+    }
+
     /**
      * 内部使用
      **/
@@ -90,7 +94,7 @@ public class WebResult implements Serializable {
         return failResult(getFailCode(), String.valueOf(code), data);
     }
 
-    public static WebResult failResult(int code,String windowCode, Object object) {
+    public static WebResult failResult(int code, String windowCode, Object object) {
         return getWebResult(code, windowCode, object);
     }
 
@@ -129,7 +133,7 @@ public class WebResult implements Serializable {
     /**
      * 成功操作 操作码默认为0   无参
      **/
-    public static Mono<WebResult> okResultMono(){
+    public static Mono<WebResult> okResultMono() {
         return Mono.just(okResult(getOkCode(), ""));
     }
 
@@ -137,7 +141,7 @@ public class WebResult implements Serializable {
      * 成功操作 操作码默认为0   只有提示码
      **/
     public static Mono<WebResult> okResultMono(int code) {
-        return  Mono.just(okResult(getOkCode(), String.valueOf(code), ""));
+        return Mono.just(okResult(getOkCode(), String.valueOf(code), ""));
     }
 
     /**
@@ -150,14 +154,14 @@ public class WebResult implements Serializable {
     /**
      * 成功操作 有提示码 和 数据
      **/
-    public static Mono<WebResult> okResultMono(int code,Mono<Object> objectMono) {
+    public static Mono<WebResult> okResultMono(int code, Mono<Object> objectMono) {
         return objectMono.flatMap(o -> Mono.just(okResult(code, String.valueOf(code), o)));
     }
 
     /**
      * 操作失败 操作码默认为9999   无参
      **/
-    public static Mono<WebResult> failResultMono(){
+    public static Mono<WebResult> failResultMono() {
         return Mono.just(failResult(getFailCode(), ""));
     }
 
@@ -165,7 +169,7 @@ public class WebResult implements Serializable {
      * 操作失败 操作码默认为9999   只有提示码
      **/
     public static Mono<WebResult> failResultMono(int code) {
-        return  Mono.just(failResult(getFailCode(), String.valueOf(code), ""));
+        return Mono.just(failResult(getFailCode(), String.valueOf(code), ""));
     }
 
     /**
@@ -178,9 +182,20 @@ public class WebResult implements Serializable {
     /**
      * 成功操作 有提示码 和 数据
      **/
-    public static Mono<WebResult> failResultMono(int code,Mono<Object> objectMono) {
+    public static Mono<WebResult> failResultMono(int code, Mono<Object> objectMono) {
         return objectMono.flatMap(o -> Mono.just(failResult(code, String.valueOf(code), o)));
     }
 
+    public static Mono<WebResult> okCustomResultMono(int code, String msg) {
+        return Mono.just(customResult(code, msg, ""));
+    }
+
+    public static WebResult customResult(int code, String msg, Object obj) {
+        WebResult wr = new WebResult();
+        wr.setRet(code);
+        wr.setMsg(msg);
+        wr.setData(obj);
+        return wr;
+    }
 
 }

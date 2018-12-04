@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,5 +119,21 @@ public class JsonTest {
 
     }
 
+    @Test
+    public void zipTest() {
+        Flux.just("a", "b")
+                .zipWith(Flux.just("c", "d"), (s1, s2) -> String.format("%s-%s", s1, s2))
+                .subscribe(System.out::println);
+
+        Mono<Tuple2<String, String>> result = Mono.just("a").zipWhen(obj -> zt("b"));
+
+        result.map(objects -> objects.getT1().concat(objects.getT2())).subscribe(System.out::println);
+
+
+    }
+
+    public Mono<String> zt(final String a) {
+        return Mono.just(a.concat("c"));
+    }
 
 }

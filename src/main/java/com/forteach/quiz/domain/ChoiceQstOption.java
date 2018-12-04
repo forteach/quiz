@@ -1,5 +1,7 @@
 package com.forteach.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.web.vo.BigQuestionView;
 import lombok.Data;
 
 /**
@@ -11,10 +13,13 @@ import lombok.Data;
 @Data
 public class ChoiceQstOption {
 
+    @JsonView(BigQuestionView.Summary.class)
     private String id;
 
+    @JsonView(BigQuestionView.Summary.class)
     private String optTxt;
 
+    @JsonView(BigQuestionView.Summary.class)
     private String optValue;
 
 }

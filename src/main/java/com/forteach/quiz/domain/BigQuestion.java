@@ -1,5 +1,7 @@
 package com.forteach.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.web.vo.BigQuestionView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,12 +19,16 @@ import java.util.List;
 @Document(collection = "bigQuestion")
 public class BigQuestion<T> extends AbstractExamEntity {
 
+    @JsonView(BigQuestionView.Summary.class)
     protected String paperInfo;
 
+    @JsonView(BigQuestionView.Summary.class)
     protected List<T> examChildren;
 
+    @JsonView(BigQuestionView.Summary.class)
     protected String type;
 
+    @JsonView(BigQuestionView.SummaryWithDetail.class)
     protected int index;
 
     /**

@@ -1,5 +1,7 @@
 package com.forteach.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.web.vo.BigQuestionView;
 import lombok.Data;
 
 /**
@@ -11,6 +13,7 @@ import lombok.Data;
 @Data
 public abstract class AbstractExam {
 
+    @JsonView(BigQuestionView.Summary.class)
     protected String id;
 
     protected Double score;
@@ -23,6 +26,7 @@ public abstract class AbstractExam {
     /**
      * 考题类型   choice   trueOrFalse    design
      */
+    @JsonView(BigQuestionView.Summary.class)
     protected String examType;
 
     /**
