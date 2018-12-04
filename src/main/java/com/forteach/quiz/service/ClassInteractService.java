@@ -6,10 +6,7 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.repository.AskAnswerRepository;
 import com.forteach.quiz.repository.BigQuestionRepository;
-import com.forteach.quiz.web.vo.AchieveVo;
-import com.forteach.quiz.web.vo.AskQuestionVo;
-import com.forteach.quiz.web.vo.GiveVo;
-import com.forteach.quiz.web.vo.InteractAnswerVo;
+import com.forteach.quiz.web.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -144,6 +141,32 @@ public class ClassInteractService {
     }
 
     /**
+     * 发起提问举手
+     * 清空老师端显示的举手学生
+     *
+     * @param
+     * @return
+     */
+    public Mono<Long> launchRaise(final AskLaunchVo askLaunchVo) {
+        return reactiveHashOperations.remove(askLaunchVo.getRaiseKey(), "examinee");
+    }
+
+
+    /**
+     * 学生进行举手
+     *
+     * @return
+     */
+    public Mono<Boolean> raiseHand(final RaisehandVo raisehandVo) {
+        return reactiveHashOperations.put(raisehandVo.getRaiseKey(), "examineeId", raisehandVo.getExamineeId());
+    }
+
+//    public Mono achieveRaise(final AchieveRaiseVo achieveRaiseVo){
+//        return reactiveHashOperations.get(achieveRaiseVo.getRaiseKey(),"examinee")
+//                .flatMap()
+//    }
+
+    /**
      * 验证提交的答案信息
      *
      * @return
@@ -179,6 +202,9 @@ public class ClassInteractService {
 
     /**
      * 判断是否已经推送过该题
+     * 如果没有拉取过 给予正确 存入课堂题目的cut
+     * 如果一致 代表已经拉取过 不再给予
+     * 如果不一致 代表同题但是不同提问方式 重新发送
      *
      * @param redisKey
      * @return true 没有推送过该题   false  有推送过该题
@@ -189,13 +215,10 @@ public class ClassInteractService {
                 .zipWhen(origin -> askQuestionCut(askKey))
                 .flatMap(tuple2 -> {
                     if (ASK_DISTINCT_INITIAL.equals(tuple2.getT1())) {
-                        //如果没有拉取过 给予正确 存入课堂题目的cut
                         return saveCut(redisKey, tuple2.getT2());
                     } else if (tuple2.getT1().equals(tuple2.getT2())) {
-                        //如果一致 代表已经拉取过 不再给予
                         return Mono.just(false).filterWhen(flag -> saveCut(redisKey, tuple2.getT2()));
                     } else {
-                        //如果不一致 代表同题但是不同提问方式 重新发送
                         return saveCut(redisKey, tuple2.getT2());
                     }
                 });
@@ -286,7 +309,6 @@ public class ClassInteractService {
                         ASK_INTERACTIVE_RACE,
                         interactAnswerVo.getAnswer(),
                         interactAnswerVo.getQuestionId(),
-                        new Date(),
                         new Date())
                 );
     }

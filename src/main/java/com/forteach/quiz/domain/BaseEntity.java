@@ -2,6 +2,7 @@ package com.forteach.quiz.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.web.vo.BigQuestionView;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
@@ -19,10 +20,10 @@ public abstract class BaseEntity {
 
     @Id
     @JsonView(BigQuestionView.Summary.class)
+    @ApiModelProperty(value = "id", name = "id", example = "5c06d23sz8737b1dc8068da8", notes = "传入id为修改  不穿id为新增")
     protected String id;
 
-    protected Date cDate;
-
+    @ApiModelProperty(value = "更新时间", name = "uDate", example = "1543950907881", notes = "时间戳")
     protected Date uDate;
 
 }
@@ -31,10 +32,12 @@ public abstract class BaseEntity {
 @Data
 class AbstractExamEntity extends BaseEntity{
 
+    @ApiModelProperty(value = "题目分数", name = "score", example = "5")
     protected Double score;
 
     /**
      * 创作老师
      */
+    @ApiModelProperty(value = "创建人id", name = "teacherId", example = "5c06d23sz8737b1dc8068da8")
     protected String teacherId;
 }

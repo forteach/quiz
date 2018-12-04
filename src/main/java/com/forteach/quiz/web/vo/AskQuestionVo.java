@@ -16,7 +16,7 @@ import lombok.Data;
 public class AskQuestionVo {
 
     /**
-     * 提交答案所需随机数
+     * 提交答案所需cut值
      */
     @JsonView(BigQuestionView.Summary.class)
     private String cut;

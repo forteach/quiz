@@ -38,7 +38,7 @@ public class InteractCollection extends BaseController {
      * @return
      */
     @JsonView(BigQuestionView.Summary.class)
-    @GetMapping(value = "/achieve", produces = "text/event-stream;charset=UTF-8")
+    @GetMapping(value = "/achieve/questions", produces = "text/event-stream;charset=UTF-8")
     public Flux<ServerSentEvent<AskQuestionVo>> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
 
         return Flux.interval(Duration.ofSeconds(1))
@@ -51,8 +51,41 @@ public class InteractCollection extends BaseController {
                         .build());
     }
 
+//    @GetMapping(value = "/achieve/raise", produces = "text/event-stream;charset=UTF-8")
+//    public Flux<ServerSentEvent<Object>> achieveRaise(@RequestParam String circleId, @RequestParam String random){
+//
+//        return Flux.interval(Duration.ofSeconds(1))
+//                .map(seq -> Tuples.of(
+//                        seq, classInteractService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
+//                ))
+//
+//    }
+
+    /**
+     * 课堂提问
+     * 发起举手
+     *
+     * @return
+     */
+    @PostMapping("/launch/raise")
+    public Mono<WebResult> launchRaise(@RequestBody AskLaunchVo askLaunchVo) {
+        return classInteractService.launchRaise(askLaunchVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 课堂提问
+     * 学生举手
+     *
+     * @return
+     */
+    @PostMapping("/raise")
+    public Mono<WebResult> raiseHand(@RequestBody RaisehandVo raisehandVo) {
+        return classInteractService.raiseHand(raisehandVo).map(WebResult::okResult);
+    }
+
     /**
      * 发布问题
+     *
      * @param giveVo
      * @return
      */

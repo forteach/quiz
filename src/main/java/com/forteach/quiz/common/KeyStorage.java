@@ -14,4 +14,6 @@ public class KeyStorage {
 
     public static final String CLASSROOM_ASK_QUESTIONS_RACE = "askRace";
 
+    public static final String STUDENT_ADO = "studentADO";
+
 }

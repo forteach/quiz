@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,7 @@ public class ExamQuestionsService {
 
 
     private Mono<BigQuestion> editQuestions(final BigQuestion bigQuestion) {
+        bigQuestion.setUDate(new Date());
         if (bigQuestion.getRelate() == COVER_QUESTION_BANK) {
             return editQuestionsCover(bigQuestion);
         }
@@ -179,7 +181,6 @@ public class ExamQuestionsService {
     private BigQuestion<Design> setExamDesignUUID(final BigQuestion<Design> bigQuestion) {
         bigQuestion.setExamChildren(bigQuestion.getExamChildren()
                 .stream()
-                .parallel()
                 .peek(design -> {
                     if (isEmpty(design.getId())) {
                         design.setId(getRandomUUID());
@@ -192,7 +193,6 @@ public class ExamQuestionsService {
     private BigQuestion<TrueOrFalse> setExamTrueOrFalseUUID(final BigQuestion<TrueOrFalse> bigQuestion) {
         bigQuestion.setExamChildren(bigQuestion.getExamChildren()
                 .stream()
-                .parallel()
                 .peek(trueOrFalse -> {
                     if (isEmpty(trueOrFalse.getId())) {
                         trueOrFalse.setId(getRandomUUID());
@@ -205,13 +205,11 @@ public class ExamQuestionsService {
     private BigQuestion<ChoiceQst> setExamChoiceQstUUID(final BigQuestion<ChoiceQst> bigQuestion) {
         bigQuestion.setExamChildren(bigQuestion.getExamChildren()
                 .stream()
-                .parallel()
                 .peek(choiceQst -> {
                     if (isEmpty(choiceQst.getId())) {
                         choiceQst.setId(getRandomUUID());
                         choiceQst.setOptChildren(choiceQst.getOptChildren()
                                 .stream()
-                                .parallel()
                                 .peek(choiceQstOption -> {
                                     if (isEmpty(choiceQstOption.getId())) {
                                         choiceQstOption.setId(getRandomUUID());

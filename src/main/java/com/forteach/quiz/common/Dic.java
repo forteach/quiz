@@ -74,4 +74,6 @@ public class Dic {
 
     public static final String ASK_INTERACTIVE_VOTE = "vote";
 
+    public static final String ASK_RAISE_HAND = "askRaiseHand";
+
 }
