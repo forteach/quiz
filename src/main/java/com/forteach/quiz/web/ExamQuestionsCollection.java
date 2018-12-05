@@ -7,6 +7,7 @@ import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.TrueOrFalse;
 import com.forteach.quiz.service.ExamQuestionsService;
 import com.forteach.quiz.web.vo.QuestionBankVo;
+import com.forteach.quiz.web.vo.SortVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -85,5 +86,34 @@ public class ExamQuestionsCollection extends BaseController {
     public Mono<WebResult> associationAdd(@Valid @RequestBody QuestionBankVo questionBankVo) {
         return examQuestionsService.questionBankAssociationAdd(questionBankVo.getId(), questionBankVo.getTeacher()).map(WebResult::okResult);
     }
+
+    @ApiOperation(value = "题目详细 分页信息", notes = "分页查询题目 详细")
+    @PostMapping("/findAll/detailed")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
+            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
+            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
+    })
+    public Mono<WebResult> findAllDetailed(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody SortVo sortVo) {
+        return examQuestionsService.findAllDetailed(sortVo).collectList().map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "根据id获取题目详细", notes = "详细")
+    @PostMapping("/findOne/{id}")
+    public Mono<WebResult> findAllDetailed(@Valid @ApiParam(name = "根据BigQuestionId查出详细信息", value = "根据id查出详细信息", required = true) @PathVariable String id) {
+        return examQuestionsService.findOneDetailed(id).map(WebResult::okResult);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 }

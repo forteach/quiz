@@ -1,11 +1,15 @@
 package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.*;
+import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.web.vo.SortVo;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -155,6 +159,21 @@ public class ExamQuestionsService {
     public Mono<Void> delQuestions(final String id) {
         return bigQuestionRepository.deleteById(id).and(delBankAssociation(Collections.singletonList(id)));
     }
+
+    public Flux<BigQuestion> findAllDetailed(final SortVo sortVo) {
+
+        Sort sort = new Sort(Sort.Direction.DESC, sortVo.getSorting());
+
+        return bigQuestionRepository.findAllDetailedPage(sortVo.getOperatorId(), PageRequest.of(sortVo.getPage(), sortVo.getSize(), sort));
+    }
+
+    public Mono<BigQuestion> findOneDetailed(final String id) {
+        return bigQuestionRepository.findById(id).switchIfEmpty(Mono.error(new CustomException("没有找到考题")));
+    }
+
+
+
+
 
     private Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId) {
         return reactiveMongoTemplate.upsert(Query.query(Criteria.where(MONGDB_ID).is(questionBankId)), new Update().addToSet(MONGDB_COLUMN_QUESTION_BANK_TEACHER, teacherId), QuestionBank.class);
