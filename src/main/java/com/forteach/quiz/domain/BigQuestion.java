@@ -39,6 +39,10 @@ public class BigQuestion<T> extends AbstractExamEntity {
     @JsonView(BigQuestionView.SummaryWithDetail.class)
     protected int index;
 
+    @JsonView(BigQuestionView.Summary.class)
+    @ApiModelProperty(value = "章节id", name = "chapter", example = "463bcd8e5fed4a33883850c14f877271")
+    protected String chapter;
+
     /**
      * 是否修改应用到所有的练习册
      * 1 : 应用到所有练习册    0  :  只修改本题
