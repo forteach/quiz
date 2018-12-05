@@ -68,7 +68,7 @@ public class ProblemSetService {
                 .findBigQuestionInId(
                         exerciseBookVo
                                 .getQuestionIds()
-                                .parallelStream()
+                                .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
                 .map(bigQuestion -> {
@@ -94,7 +94,6 @@ public class ProblemSetService {
         return exerciseBookRepository
                 .findById(exerciseBookAttributeVo.getId())
                 .map(obj -> {
-                    obj.setCDate(obj.getCDate());
                     obj.setExeBookName(exerciseBookAttributeVo.getExeBookName());
                     obj.setExeBookType(exerciseBookAttributeVo.getExeBookType());
                     return obj;
@@ -166,7 +165,6 @@ public class ProblemSetService {
                 .flatMap(questionList -> exerciseBookRepository
                         .findById(exerciseBookQuestionVo.getExerciseBookId())
                         .map(obj -> {
-                            obj.setCDate(obj.getCDate());
                             obj.setQuestionChildren(questionList);
                             return obj;
                         })

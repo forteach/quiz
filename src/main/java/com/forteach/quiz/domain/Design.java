@@ -1,5 +1,9 @@
 package com.forteach.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.web.vo.BigQuestionView;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,10 +16,19 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@ApiModel(value = "简答思考题", description = "BigQuestion的子项")
 public class Design extends AbstractExam {
 
+    @JsonView(BigQuestionView.Summary.class)
+    @ApiModelProperty(value = "题目题干", name = "examChildren", required = true, example = "亚特兰蒂斯是否存在")
     private String designQuestion;
+
+    @JsonView(BigQuestionView.SummaryWithDetail.class)
+    @ApiModelProperty(value = "题目答案", name = "designAnsw", required = true, example = "存在")
     private String designAnsw;
+
+    @JsonView(BigQuestionView.SummaryWithDetail.class)
+    @ApiModelProperty(value = "题目解析", name = "designAnalysis", required = true, example = "历史存在 现与海底")
     private String designAnalysis;
 
     public Design() {

@@ -43,7 +43,7 @@ public class CorrectService {
                 }))
                 .map(exerciseBook -> {
                     //遍历答案 批改客观题
-                    seet.setAnsw(seet.getAnsw().parallelStream().peek(answ -> answCorrect(answ, exerciseBook)).collect(Collectors.toList()));
+                    seet.setAnsw(seet.getAnsw().stream().peek(answ -> answCorrect(answ, exerciseBook)).collect(Collectors.toList()));
                     return exerciseBook;
                 }).flatMap(exerciseBook -> {
                     if (exerciseBook != null) {
@@ -58,8 +58,8 @@ public class CorrectService {
         JSONObject json = JSON.parseObject(JSON.toJSONString(correctVo));
         sheet.setEvaluation(correctVo.getEvaluation());
         sheet.setAnsw(
-                sheet.getAnsw().parallelStream().peek(answ ->
-                        answ.setChildrenList(answ.getChildrenList().parallelStream().peek(answChildren ->
+                sheet.getAnsw().stream().peek(answ ->
+                        answ.setChildrenList(answ.getChildrenList().stream().peek(answChildren ->
                                 answChildren.setEvaluation(String.valueOf(JSONPath.eval(json, "$.answ.childrenList[questionId = '" + answChildren.getQuestionId() + "'].evaluation[0]")))
                         ).collect(toList()))
                 ).collect(toList())
@@ -73,19 +73,19 @@ public class CorrectService {
      */
     private void answCorrect(final Answ answ, final ExerciseBook<BigQuestion> exerciseBook) {
 
-        BigQuestion question = exerciseBook.getQuestionChildren().parallelStream()
+        BigQuestion question = exerciseBook.getQuestionChildren().stream()
                 .filter(bigQuestion -> bigQuestion.getId().equals(answ.getBigQuestionId()))
                 .findFirst()
                 .get();
 
-        answ.setChildrenList(answ.getChildrenList().parallelStream().peek(answChildren -> correcting(answChildren, question)).collect(Collectors.toList()));
+        answ.setChildrenList(answ.getChildrenList().stream().peek(answChildren -> correcting(answChildren, question)).collect(Collectors.toList()));
 
-        answ.setScore(answ.getChildrenList().parallelStream().filter(answChildren -> answChildren.getScore() != null).mapToDouble(AnswChildren::getScore).sum());
+        answ.setScore(answ.getChildrenList().stream().filter(answChildren -> answChildren.getScore() != null).mapToDouble(AnswChildren::getScore).sum());
     }
 
     private void correcting(final AnswChildren answChildren, final BigQuestion question) {
 
-        question.getExamChildren().parallelStream().forEach(obj -> {
+        question.getExamChildren().stream().forEach(obj -> {
             JSONObject jsonObject = (JSONObject) obj;
             if (jsonObject.getString(ID).equals(answChildren.getQuestionId())) {
                 String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);

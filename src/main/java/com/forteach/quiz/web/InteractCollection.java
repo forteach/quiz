@@ -1,19 +1,17 @@
 package com.forteach.quiz.web;
 
-import com.forteach.quiz.domain.Design;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.springframework.http.MediaType;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.common.WebResult;
+import com.forteach.quiz.service.ClassInteractService;
+import com.forteach.quiz.web.vo.*;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @Description:
@@ -21,54 +19,91 @@ import java.util.concurrent.ThreadLocalRandom;
  * @version: V1.0
  * @date: 2018/11/19  14:46
  */
-@Data
 @RestController
-@EqualsAndHashCode(callSuper = true)
 @RequestMapping("/interact")
 public class InteractCollection extends BaseController {
 
+    private final ClassInteractService classInteractService;
+
+    public InteractCollection(ClassInteractService classInteractService) {
+        this.classInteractService = classInteractService;
+    }
+
     /**
-     * 模拟数据库数据
+     * 主动推送问题
+     *
+     * @param examineeId
+     * @param circleId
+     * @param random
+     * @return
      */
-    private static Map<Integer, Design> dataMap;
+    @JsonView(BigQuestionView.Summary.class)
+    @GetMapping(value = "/achieve/questions", produces = "text/event-stream;charset=UTF-8")
+    public Flux<ServerSentEvent<AskQuestionVo>> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
 
-    static {
-        dataMap = new HashMap();
-        dataMap.put(1, new Design("最终幻想12前身是什么", "123", "", 3D));
-        dataMap.put(2, new Design("最终幻想13前身是什么", "456", "", 3D));
-        dataMap.put(3, new Design("最终幻想14前身是什么", "789", "", 3D));
-        dataMap.put(4, new Design("最终幻想15前身是什么", "123", "", 3D));
-    }
-
-    @GetMapping(value = "/typeOne", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux interactResponse() {
-        return Flux.fromIterable(dataMap.values()).delayElements(Duration.ofSeconds(1));
-    }
-
-    @PostMapping(value = "/add")
-    public Mono sseResponse(@RequestBody Aa aa) {
-        dataMap.put(dataMap.size() + 1, new Design(aa.getDq(), aa.getDa(), aa.getDas(), aa.getS()));
-        return Mono.just(dataMap);
-    }
-
-    @RequestMapping(value = "/retrieve",produces = "text/event-stream;charset=UTF-8")
-    public Flux<ServerSentEvent<Integer>> randomNumbers() {
         return Flux.interval(Duration.ofSeconds(1))
-                .map(seq -> Tuples.of(seq, ThreadLocalRandom.current().nextInt()))
-                .map(data -> ServerSentEvent.<Integer>builder()
-                        .event(String.valueOf(dataMap.size()))
-                        .id(Long.toString(data.getT1()))
-                        .data(data.getT2())
+                .map(seq -> Tuples.of(
+                        seq, classInteractService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
+                ))
+                .flatMap(Tuple2::getT2)
+                .map(data -> ServerSentEvent.<AskQuestionVo>builder()
+                        .data(data)
                         .build());
     }
 
+//    @GetMapping(value = "/achieve/raise", produces = "text/event-stream;charset=UTF-8")
+//    public Flux<ServerSentEvent<Object>> achieveRaise(@RequestParam String circleId, @RequestParam String random){
+//
+//        return Flux.interval(Duration.ofSeconds(1))
+//                .map(seq -> Tuples.of(
+//                        seq, classInteractService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
+//                ))
+//
+//    }
+
+    /**
+     * 课堂提问
+     * 发起举手
+     *
+     * @return
+     */
+    @PostMapping("/launch/raise")
+    public Mono<WebResult> launchRaise(@RequestBody AskLaunchVo askLaunchVo) {
+        return classInteractService.launchRaise(askLaunchVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 课堂提问
+     * 学生举手
+     *
+     * @return
+     */
+    @PostMapping("/raise")
+    public Mono<WebResult> raiseHand(@RequestBody RaisehandVo raisehandVo) {
+        return classInteractService.raiseHand(raisehandVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 发布问题
+     *
+     * @param giveVo
+     * @return
+     */
+    @PostMapping("/send/question")
+    public Mono<WebResult> sendQuestion(@RequestBody GiveVo giveVo) {
+        return classInteractService.sendQuestion(giveVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 提交答案
+     *
+     * @param interactAnswerVo
+     * @return
+     */
+    @PostMapping("/send/answer")
+    public Mono<WebResult> sendAnswer(@RequestBody InteractAnswerVo interactAnswerVo) {
+        return classInteractService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
+    }
 
 
-}
-@Data
-class Aa {
-    String dq;
-    String da;
-    String das;
-    double s;
 }
