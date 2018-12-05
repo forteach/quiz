@@ -35,6 +35,18 @@ public class ExamQuestionsCollection extends BaseController {
     }
 
     /**
+     * 编辑大题
+     *
+     * @param bigQuestion
+     * @return BigQuestion
+     */
+    @PostMapping("/bigQuestion/edit")
+    @ApiOperation(value = "编辑大题", notes = "新增数据时 不添加id 修改时数据添加id")
+    public Mono<WebResult> editBigQuestion(@Valid @RequestBody @ApiParam(value = "编辑大题", required = true) BigQuestion bigQuestion) {
+        return examQuestionsService.editBigQuestion(bigQuestion).map(WebResult::okResult);
+    }
+
+    /**
      * 编辑简答思考题
      *
      * @param design
@@ -61,6 +73,7 @@ public class ExamQuestionsCollection extends BaseController {
     public Mono<WebResult> editTrueOrFalse(@Valid @RequestBody BigQuestion<TrueOrFalse> trueOrFalse) {
         return examQuestionsService.editTrueOrFalse(trueOrFalse).map(WebResult::okResult);
     }
+
 
     /**
      * 编辑选择题

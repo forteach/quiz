@@ -47,7 +47,7 @@ public class BigQuestion<T> extends AbstractExamEntity {
      * 是否修改应用到所有的练习册
      * 1 : 应用到所有练习册    0  :  只修改本题
      */
-    @ApiModelProperty(value = "大题用题干", name = "paperInfo", example = "0")
+    @ApiModelProperty(value = "是否修改应用到所有的练习册", name = "relate", example = "0")
     private int relate;
 
     /**

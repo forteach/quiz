@@ -129,6 +129,27 @@ public class ExamQuestionsService {
     }
 
     /**
+     * 修改新增大题
+     *
+     * @param bigQuestion
+     * @return
+     */
+    public Mono<BigQuestion> editBigQuestion(final BigQuestion bigQuestion) {
+        return editQuestions(setExamTrueOrFalseUUID(bigQuestion)).flatMap(t -> {
+            Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
+            return questionBankMono.flatMap(
+                    updateResult -> {
+                        if (updateResult.isModifiedCountAvailable()) {
+                            return Mono.just(t);
+                        } else {
+                            return Mono.error(new ExamQuestionsException("保存 大题 作者失败"));
+                        }
+                    }
+            );
+        });
+    }
+
+    /**
      * 修改新增选择题
      *
      * @param bigQuestion
