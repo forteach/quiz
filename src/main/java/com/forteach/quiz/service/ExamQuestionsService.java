@@ -1,5 +1,7 @@
 package com.forteach.quiz.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.forteach.quiz.domain.*;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
@@ -20,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -135,7 +138,7 @@ public class ExamQuestionsService {
      * @return
      */
     public Mono<BigQuestion> editBigQuestion(final BigQuestion bigQuestion) {
-        return editQuestions(setExamTrueOrFalseUUID(bigQuestion)).flatMap(t -> {
+        return editQuestions(setBigQuestionUUID(bigQuestion)).flatMap(t -> {
             Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
             return questionBankMono.flatMap(
                     updateResult -> {
@@ -237,6 +240,40 @@ public class ExamQuestionsService {
                     if (isEmpty(trueOrFalse.getId())) {
                         trueOrFalse.setId(getRandomUUID());
                     }
+                })
+                .collect(Collectors.toList()));
+        return bigQuestion;
+    }
+
+    private BigQuestion setBigQuestionUUID(final BigQuestion bigQuestion) {
+        bigQuestion.setExamChildren((List) bigQuestion.getExamChildren()
+                .stream()
+                .map(obj -> {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString((LinkedHashMap) obj));
+                    String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
+                    switch (type) {
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:
+                            ChoiceQst choiceQst = JSON.parseObject(jsonObject.toJSONString(), ChoiceQst.class);
+                            if (isEmpty(choiceQst.getId())) {
+                                choiceQst.setId(getRandomUUID());
+                            }
+                            return choiceQst;
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
+                            TrueOrFalse trueOrFalse = JSON.parseObject(jsonObject.toJSONString(), TrueOrFalse.class);
+                            if (isEmpty(trueOrFalse.getId())) {
+                                trueOrFalse.setId(getRandomUUID());
+                            }
+                            return trueOrFalse;
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
+                            Design design = JSON.parseObject(jsonObject.toJSONString(), Design.class);
+                            if (isEmpty(design.getId())) {
+                                design.setId(getRandomUUID());
+                            }
+                            return design;
+                        default:
+                            throw new ExamQuestionsException("非法参数 错误的题目类型");
+                    }
+
                 })
                 .collect(Collectors.toList()));
         return bigQuestion;

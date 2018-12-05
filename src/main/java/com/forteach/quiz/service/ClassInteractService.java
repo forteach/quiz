@@ -126,7 +126,7 @@ public class ClassInteractService {
                             case ASK_INTERACTIVE_RACE:
                                 return sendRace(answerVo);
                             case ASK_INTERACTIVE_RAISE:
-                                return Mono.empty();
+                                return sendSelect(answerVo);
                             case ASK_INTERACTIVE_SELECT:
                                 return sendSelect(answerVo);
                             case ASK_INTERACTIVE_VOTE:
@@ -302,6 +302,13 @@ public class ClassInteractService {
                             });
                 });
     }
+
+//    public Mono achieveAnswer(final AskAnswerVo askAnswerVo){
+//
+//
+//
+//
+//    }
 
     private Mono<AskAnswer> sendSelect(final InteractAnswerVo interactAnswerVo) {
         return askAnswerRepository
