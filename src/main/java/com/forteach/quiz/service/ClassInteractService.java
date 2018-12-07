@@ -120,6 +120,7 @@ public class ClassInteractService {
         return reactiveHashOperations.get(askKey, "cut");
     }
 
+
     /**
      * 提交答案
      * 提交答案前判断题目id 是否与当前id一致
@@ -130,7 +131,7 @@ public class ClassInteractService {
     public Mono<String> sendAnswer(final InteractAnswerVo answerVo) {
 
         return Mono.just(answerVo)
-                .filterWhen(answer -> selectVerify(answer.getAskKey(), answer.getExamineeId()))
+                .transform(this::filterSelectVerify)
                 .flatMap(answer -> askInteractiveType(answer.getAskKey()))
                 .zipWhen(type -> sendAnswerVerify(answerVo.getAskKey(), answerVo.getQuestionId(), answerVo.getCut()))
                 .flatMap(tuple2 -> {
@@ -151,7 +152,7 @@ public class ClassInteractService {
                         return Mono.error(new AskException("请重新刷新获取最新题目"));
                     }
                 })
-                .map(obj -> obj.getRight());
+                .map(AskAnswer::getRight);
     }
 
     /**
@@ -323,9 +324,14 @@ public class ClassInteractService {
      */
     private Mono<Boolean> selectVerify(final String askKey, final String examineeId) {
         return reactiveHashOperations.get(askKey, "selected")
-                .flatMap(selectId -> {
-                    if (isSelected(selectId, examineeId)) {
-                        return Mono.just(true);
+                .map(selectId -> isSelected(selectId, examineeId));
+    }
+
+    private Mono<InteractAnswerVo> filterSelectVerify(final Mono<InteractAnswerVo> answerVo) {
+        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(), answer.getExamineeId()))
+                .flatMap(tuple2 -> {
+                    if (tuple2.getT2()) {
+                        return Mono.just(tuple2.getT1());
                     } else {
                         return Mono.error(new AskException("该题未被选中 不能答题"));
                     }
