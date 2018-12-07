@@ -42,6 +42,12 @@ public class InteractCollection extends BaseController {
      * @return
      */
     @JsonView(BigQuestionView.Summary.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "examineeId", value = "学生id", paramType = "get", dataType = "string", required = true),
+            @ApiImplicitParam(name = "circleId", value = "课堂id", paramType = "get", dataType = "string", required = true),
+            @ApiImplicitParam(name = "random", value = "随机数 每次访问需要", paramType = "get", dataType = "string", required = true)
+    })
+    @ApiOperation(value = "学生获取推送的题目", notes = "学生链接接口时 每有新题目 则接收")
     @GetMapping(value = "/achieve/questions", produces = "text/event-stream;charset=UTF-8")
     public Flux<ServerSentEvent<AskQuestionVo>> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
 
