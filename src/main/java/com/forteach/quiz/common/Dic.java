@@ -16,6 +16,8 @@ public class Dic {
 
     public static final String STATUS_SUCCESS = "0";
 
+    public static final String DISTINCT_INITIAL = "initial";
+
     public static final String COMMIT_EXERCISE_BOOK_SHEET_COMMIT = "commit";
 
     public static final String COMMIT_EXERCISE_BOOK_SHEET_MODIFY = "modify";
@@ -57,5 +59,21 @@ public class Dic {
     public static final int BOOK_REWRITE = 1;
 
     public static final int BOOK_UN_REWRITE = 0;
+
+    public static final String CATEGORY_PEOPLE = "people";
+
+    public static final String CATEGORY_TEAM = "team";
+
+    public static final String ASK_INTERACTIVE = "interactive";
+
+    public static final String ASK_INTERACTIVE_RACE = "race";
+
+    public static final String ASK_INTERACTIVE_RAISE = "raise";
+
+    public static final String ASK_INTERACTIVE_SELECT = "select";
+
+    public static final String ASK_INTERACTIVE_VOTE = "vote";
+
+    public static final String ASK_RAISE_HAND = "askRaiseHand";
 
 }

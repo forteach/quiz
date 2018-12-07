@@ -3,13 +3,19 @@ package com.forteach.quiz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.forteach.quiz.domain.BigQuestion;
+import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.TrueOrFalse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,6 +120,38 @@ public class JsonTest {
         }
 
 
+    }
+
+    @Test
+    public void zipTest() {
+        Flux.just("a", "b")
+                .zipWith(Flux.just("c", "d"), (s1, s2) -> String.format("%s-%s", s1, s2))
+                .subscribe(System.out::println);
+
+        Mono<Tuple2<String, String>> result = Mono.just("a").zipWhen(obj -> zt("b"));
+
+        result.map(objects -> objects.getT1().concat(objects.getT2())).subscribe(System.out::println);
+
+
+    }
+
+    public Mono<String> zt(final String a) {
+        return Mono.just(a.concat("c"));
+    }
+
+    private List<String> list;
+
+    @Test
+    public void classTest() throws NoSuchFieldException {
+        BigQuestion<Design> bigQuestion = new BigQuestion<>();
+
+        Type t = bigQuestion.getClass().getDeclaredField("examChildren").getGenericType();
+        if (ParameterizedType.class.isAssignableFrom(t.getClass())) {
+            for (Type t1 : ((ParameterizedType) t).getActualTypeArguments()) {
+                System.out.print(t1.getTypeName() + ",");
+            }
+            System.out.println();
+        }
     }
 
 

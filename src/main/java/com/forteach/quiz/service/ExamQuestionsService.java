@@ -1,11 +1,17 @@
 package com.forteach.quiz.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.forteach.quiz.domain.*;
+import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.web.vo.SortVo;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +69,7 @@ public class ExamQuestionsService {
 
 
     private Mono<BigQuestion> editQuestions(final BigQuestion bigQuestion) {
+        bigQuestion.setUDate(new Date());
         if (bigQuestion.getRelate() == COVER_QUESTION_BANK) {
             return editQuestionsCover(bigQuestion);
         }
@@ -123,6 +131,27 @@ public class ExamQuestionsService {
     }
 
     /**
+     * 修改新增大题
+     *
+     * @param bigQuestion
+     * @return
+     */
+    public Mono<BigQuestion> editBigQuestion(final BigQuestion bigQuestion) {
+        return editQuestions(setBigQuestionUUID(bigQuestion)).flatMap(t -> {
+            Mono<UpdateResult> questionBankMono = questionBankAssociation(t.getId(), t.getTeacherId());
+            return questionBankMono.flatMap(
+                    updateResult -> {
+                        if (updateResult.isModifiedCountAvailable()) {
+                            return Mono.just(t);
+                        } else {
+                            return Mono.error(new ExamQuestionsException("保存 大题 作者失败"));
+                        }
+                    }
+            );
+        });
+    }
+
+    /**
      * 修改新增选择题
      *
      * @param bigQuestion
@@ -154,6 +183,21 @@ public class ExamQuestionsService {
         return bigQuestionRepository.deleteById(id).and(delBankAssociation(Collections.singletonList(id)));
     }
 
+    public Flux<BigQuestion> findAllDetailed(final SortVo sortVo) {
+
+        Sort sort = new Sort(Sort.Direction.DESC, sortVo.getSorting());
+
+        return bigQuestionRepository.findAllDetailedPage(sortVo.getOperatorId(), PageRequest.of(sortVo.getPage(), sortVo.getSize(), sort));
+    }
+
+    public Mono<BigQuestion> findOneDetailed(final String id) {
+        return bigQuestionRepository.findById(id).switchIfEmpty(Mono.error(new CustomException("没有找到考题")));
+    }
+
+
+
+
+
     private Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId) {
         return reactiveMongoTemplate.upsert(Query.query(Criteria.where(MONGDB_ID).is(questionBankId)), new Update().addToSet(MONGDB_COLUMN_QUESTION_BANK_TEACHER, teacherId), QuestionBank.class);
     }
@@ -179,7 +223,6 @@ public class ExamQuestionsService {
     private BigQuestion<Design> setExamDesignUUID(final BigQuestion<Design> bigQuestion) {
         bigQuestion.setExamChildren(bigQuestion.getExamChildren()
                 .stream()
-                .parallel()
                 .peek(design -> {
                     if (isEmpty(design.getId())) {
                         design.setId(getRandomUUID());
@@ -192,7 +235,6 @@ public class ExamQuestionsService {
     private BigQuestion<TrueOrFalse> setExamTrueOrFalseUUID(final BigQuestion<TrueOrFalse> bigQuestion) {
         bigQuestion.setExamChildren(bigQuestion.getExamChildren()
                 .stream()
-                .parallel()
                 .peek(trueOrFalse -> {
                     if (isEmpty(trueOrFalse.getId())) {
                         trueOrFalse.setId(getRandomUUID());
@@ -202,16 +244,48 @@ public class ExamQuestionsService {
         return bigQuestion;
     }
 
+    private BigQuestion setBigQuestionUUID(final BigQuestion bigQuestion) {
+        bigQuestion.setExamChildren((List) bigQuestion.getExamChildren()
+                .stream()
+                .map(obj -> {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(obj));
+                    String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
+                    switch (type) {
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:
+                            ChoiceQst choiceQst = JSON.parseObject(jsonObject.toJSONString(), ChoiceQst.class);
+                            if (isEmpty(choiceQst.getId())) {
+                                choiceQst.setId(getRandomUUID());
+                            }
+                            return choiceQst;
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
+                            TrueOrFalse trueOrFalse = JSON.parseObject(jsonObject.toJSONString(), TrueOrFalse.class);
+                            if (isEmpty(trueOrFalse.getId())) {
+                                trueOrFalse.setId(getRandomUUID());
+                            }
+                            return trueOrFalse;
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
+                            Design design = JSON.parseObject(jsonObject.toJSONString(), Design.class);
+                            if (isEmpty(design.getId())) {
+                                design.setId(getRandomUUID());
+                            }
+                            return design;
+                        default:
+                            throw new ExamQuestionsException("非法参数 错误的题目类型");
+                    }
+
+                })
+                .collect(Collectors.toList()));
+        return bigQuestion;
+    }
+
     private BigQuestion<ChoiceQst> setExamChoiceQstUUID(final BigQuestion<ChoiceQst> bigQuestion) {
         bigQuestion.setExamChildren(bigQuestion.getExamChildren()
                 .stream()
-                .parallel()
                 .peek(choiceQst -> {
                     if (isEmpty(choiceQst.getId())) {
                         choiceQst.setId(getRandomUUID());
                         choiceQst.setOptChildren(choiceQst.getOptChildren()
                                 .stream()
-                                .parallel()
                                 .peek(choiceQstOption -> {
                                     if (isEmpty(choiceQstOption.getId())) {
                                         choiceQstOption.setId(getRandomUUID());
