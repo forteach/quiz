@@ -2,6 +2,7 @@ package com.forteach.quiz.web.vo;
 
 import lombok.Data;
 
+import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
 
@@ -50,5 +51,9 @@ public class InteractAnswerVo {
 
     public String getRaceAnswerFlag() {
         return CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
+    }
+
+    public String getRaiseKey() {
+        return ASK_RAISE_HAND.concat(circleId);
     }
 }

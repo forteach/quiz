@@ -3,6 +3,7 @@ package com.forteach.quiz.web.vo;
 import lombok.Data;
 
 import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
+import static com.forteach.quiz.common.KeyStorage.RAISE_HAND_STUDENT_DISTINCT;
 
 /**
  * @Description:
@@ -21,6 +22,10 @@ public class AskLaunchVo {
 
     public String getRaiseKey() {
         return ASK_RAISE_HAND.concat(circleId);
+    }
+
+    public String getRaiseDistinctKey() {
+        return RAISE_HAND_STUDENT_DISTINCT.concat(circleId);
     }
 
 }

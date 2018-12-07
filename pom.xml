@@ -113,10 +113,8 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
                     <skip>true</skip>
                 </configuration>
             </plugin>
