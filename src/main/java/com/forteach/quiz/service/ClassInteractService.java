@@ -8,7 +8,12 @@ import com.forteach.quiz.repository.AskAnswerRepository;
 import com.forteach.quiz.repository.BigQuestionRepository;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
+import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -47,15 +52,19 @@ public class ClassInteractService {
 
     private final CorrectService correctService;
 
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
+
+
     public ClassInteractService(ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                 BigQuestionRepository bigQuestionRepository, AskAnswerRepository askAnswerRepository,
-                                StudentsService studentsService, CorrectService correctService) {
+                                StudentsService studentsService, CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository = bigQuestionRepository;
         this.askAnswerRepository = askAnswerRepository;
         this.studentsService = studentsService;
         this.correctService = correctService;
+        this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
 
     /**
@@ -128,7 +137,7 @@ public class ClassInteractService {
      *
      * @return
      */
-    public Mono<String> sendAnswer(final InteractAnswerVo answerVo) {
+    public Mono<Long> sendAnswer(final InteractAnswerVo answerVo) {
 
         return Mono.just(answerVo)
                 .transform(this::filterSelectVerify)
@@ -152,7 +161,7 @@ public class ClassInteractService {
                         return Mono.error(new AskException("请重新刷新获取最新题目"));
                     }
                 })
-                .map(AskAnswer::getRight);
+                .map(UpdateResult::getModifiedCount);
     }
 
     /**
@@ -343,7 +352,7 @@ public class ClassInteractService {
      *
      * @return
      */
-    private Mono<AskAnswer> sendRace(final InteractAnswerVo interactAnswerVo) {
+    private Mono<UpdateResult> sendRace(final InteractAnswerVo interactAnswerVo) {
         return stringRedisTemplate.hasKey(interactAnswerVo.getRaceAnswerFlag())
                 .flatMap(flag -> {
                     if (flag) {
@@ -363,7 +372,7 @@ public class ClassInteractService {
     /**
      * 举手 回答
      */
-    private Mono<AskAnswer> sendRaise(final InteractAnswerVo interactVo) {
+    private Mono<UpdateResult> sendRaise(final InteractAnswerVo interactVo) {
         return Mono.just(interactVo).flatMap(interactAnswerVo -> sendSelect(interactAnswerVo, ASK_INTERACTIVE_RAISE));
     }
 
@@ -376,17 +385,22 @@ public class ClassInteractService {
      *
      * @return
      */
-    private Mono<AskAnswer> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
+    private Mono<UpdateResult> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
 
         return correctService.correcting(interactAnswerVo.getQuestionId(), interactAnswerVo.getAnswer())
-                .flatMap(f -> askAnswerRepository
-                        .save(new AskAnswer(interactAnswerVo.getExamineeId(),
-                                type,
-                                interactAnswerVo.getAnswer(),
-                                interactAnswerVo.getQuestionId(),
-                                new Date(),
-                                String.valueOf(f))
-                        ));
+                .flatMap(f -> {
+                    Query query = Query.query(
+                            Criteria.where("circleId").is(interactAnswerVo.getCircleId())
+                                    .and("questionId").is(interactAnswerVo.getQuestionId())
+                                    .and("examineeId").is(interactAnswerVo.getExamineeId()));
+
+                    Update update = Update.update("answer", interactAnswerVo.getAnswer());
+                    update.set("participate", type);
+                    update.set("right", String.valueOf(f));
+                    update.set("uDate", new Date());
+
+                    return reactiveMongoTemplate.upsert(query, update, AskAnswer.class);
+                });
     }
 
     private Mono<BigQuestion> findBigQuestion(final String askKey) {

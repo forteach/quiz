@@ -49,17 +49,23 @@ public class AskAnswer extends BaseEntity {
      */
     private String evaluate;
 
+    /**
+     * 课堂id
+     */
+    private String circleId;
+
 
     public AskAnswer() {
     }
 
-    public AskAnswer(String examineeId, String participate, String answ, String questionId, Date uDate, String right) {
+    public AskAnswer(String examineeId, String participate, String answ, String questionId, Date uDate, String right, String circleId) {
         this.examineeId = examineeId;
         this.participate = participate;
         this.answ = answ;
         this.questionId = questionId;
         this.uDate = uDate;
         this.right = right;
+        this.circleId = circleId;
     }
 
 }
