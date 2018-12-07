@@ -22,7 +22,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -249,7 +248,7 @@ public class ExamQuestionsService {
         bigQuestion.setExamChildren((List) bigQuestion.getExamChildren()
                 .stream()
                 .map(obj -> {
-                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString((LinkedHashMap) obj));
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(obj));
                     String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
                     switch (type) {
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:

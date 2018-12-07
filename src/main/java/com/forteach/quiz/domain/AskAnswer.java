@@ -34,15 +34,33 @@ public class AskAnswer extends BaseEntity {
      */
     private String questionId;
 
+    /**
+     * 答案对错
+     */
+    private String right;
+
+    /**
+     * 答案分数
+     */
+    private String score;
+
+    /**
+     * 答案评价
+     */
+    private String evaluate;
+
+
     public AskAnswer() {
     }
 
-    public AskAnswer(String examineeId, String participate, String answ, String questionId, Date uDate) {
+    public AskAnswer(String examineeId, String participate, String answ, String questionId, Date uDate, String right) {
         this.examineeId = examineeId;
         this.participate = participate;
         this.answ = answ;
         this.questionId = questionId;
         this.uDate = uDate;
+        this.right = right;
     }
+
 }
 

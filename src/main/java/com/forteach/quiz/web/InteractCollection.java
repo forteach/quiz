@@ -3,6 +3,7 @@ package com.forteach.quiz.web;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.service.ClassInteractService;
+import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @Description:
@@ -51,19 +53,22 @@ public class InteractCollection extends BaseController {
                         .build());
     }
 
-//    @GetMapping(value = "/achieve/raise", produces = "text/event-stream;charset=UTF-8")
-//    public Flux<ServerSentEvent<Object>> achieveRaise(@RequestParam String circleId, @RequestParam String random){
-//
-//        return Flux.interval(Duration.ofSeconds(1))
-//                .map(seq -> Tuples.of(
-//                        seq, classInteractService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
-//                ))
-//
-//    }
+    @GetMapping(value = "/achieve/raise", produces = "text/event-stream;charset=UTF-8")
+    public Flux<ServerSentEvent<List<Students>>> achieveRaise(@RequestParam String circleId, @RequestParam String random, @RequestParam String teacher) {
+
+        return Flux.interval(Duration.ofSeconds(1))
+                .map(seq -> Tuples.of(
+                        seq, classInteractService.achieveRaise(AchieveRaiseVo.builder().circleId(circleId).random(random).teacher(teacher).build())
+                )).flatMap(Tuple2::getT2)
+                .map(data -> ServerSentEvent.<List<Students>>builder()
+                        .data(data)
+                        .build());
+
+    }
 
     /**
      * 课堂提问
-     * 发起举手
+     * 重新发起举手
      *
      * @return
      */

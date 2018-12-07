@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.forteach.quiz.domain.*;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.repository.BigQuestionRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
 import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
 import org.springframework.stereotype.Component;
@@ -29,8 +30,11 @@ public class CorrectService {
 
     private final ProblemSetBackupRepository problemSetBackupRepository;
 
-    public CorrectService(ProblemSetBackupRepository problemSetBackupRepository) {
+    private final BigQuestionRepository bigQuestionRepository;
+
+    public CorrectService(ProblemSetBackupRepository problemSetBackupRepository, BigQuestionRepository bigQuestionRepository) {
         this.problemSetBackupRepository = problemSetBackupRepository;
+        this.bigQuestionRepository = bigQuestionRepository;
     }
 
     /**
@@ -109,6 +113,29 @@ public class CorrectService {
         });
     }
 
+    public Mono<String> correcting(final String questionId, final String answer) {
+        return bigQuestionRepository.findById(questionId)
+                .flatMap(bigQuestion -> {
+
+                    JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
+
+                    switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:
+                            ChoiceQst choiceQst = (ChoiceQst) bigQuestion.getExamChildren().get(0);
+                            return Mono.just(String.valueOf(choice(choiceQst, answer)));
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
+                            TrueOrFalse trueOrFalse = (TrueOrFalse) bigQuestion.getExamChildren().get(0);
+                            return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
+                            //简答主观题 人工手动批改
+                            return Mono.just("");
+                        default:
+                            throw new ExamQuestionsException("非法参数 错误的题目类型");
+                    }
+                });
+
+    }
+
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {
         switch (choiceQst.getChoiceType()) {
             case QUESTION_CHOICE_OPTIONS_SINGLE:
@@ -117,6 +144,45 @@ public class CorrectService {
                 return multiple(choiceQst, answChildren);
             default:
                 throw new ExamQuestionsException("非法参数 错误的选择题选项类型");
+        }
+    }
+
+    private boolean choice(final ChoiceQst choiceQst, final String answer) {
+        switch (choiceQst.getChoiceType()) {
+            case QUESTION_CHOICE_OPTIONS_SINGLE:
+                return radio(choiceQst, answer);
+            case QUESTION_CHOICE_MULTIPLE_SINGLE:
+                return multiple(choiceQst, answer);
+            default:
+                throw new ExamQuestionsException("非法参数 错误的选择题选项类型");
+        }
+    }
+
+    private boolean radio(final ChoiceQst choiceQst, final String answer) {
+        return answer.equals(choiceQst.getChoiceQstAnsw());
+    }
+
+    private boolean multiple(final ChoiceQst choiceQst, final String solution) {
+        //正确答案集
+        List<String> answer = Arrays.asList(",".split(choiceQst.getChoiceQstAnsw()));
+        //回答集
+        List<String> exAnswer = Arrays.asList(",".split(solution));
+        //交集
+        List<String> intersection = answer.stream().filter(exAnswer::contains).collect(Collectors.toList());
+        //差集
+        List<String> reduce1 = exAnswer.stream().filter(item -> !answer.contains(item)).collect(toList());
+
+        //交集与正确集与答案集一致  满分
+        if (answer.size() == intersection.size() && exAnswer.size() == intersection.size()) {
+            return true;
+        } else if (exAnswer.size() <= answer.size()) {
+            if (reduce1.size() >= 1 || exAnswer.size() == 1) {
+                return false;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 
@@ -171,6 +237,14 @@ public class CorrectService {
             answChildren.setEvaluation(QUESTION_ACCURACY_FALSE);
         }
         return answChildren.getScore();
+    }
+
+    private boolean trueOrFalse(final TrueOrFalse trueOrFalse, final String answer) {
+        if (trueOrFalse.getTrueOrFalseAnsw().equals(Boolean.valueOf(answer))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
