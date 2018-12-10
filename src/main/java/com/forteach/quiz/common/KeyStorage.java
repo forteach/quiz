@@ -18,4 +18,6 @@ public class KeyStorage {
 
     public static final String RAISE_HAND_STUDENT_DISTINCT = "distinctRaiseHand";
 
+    public static final String EXAMINEE_IS_REPLY_KEY = "askExamineeIsReply";
+
 }

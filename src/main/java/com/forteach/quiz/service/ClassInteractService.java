@@ -6,6 +6,7 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.repository.AskAnswerRepository;
 import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
 import com.mongodb.client.result.UpdateResult;
@@ -19,6 +20,7 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -87,8 +89,41 @@ public class ClassInteractService {
         //删除抢答答案
         Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag());
 
-        return Flux.concat(set, time, removeRace
-        ).filter(flag -> !flag).count();
+        return Flux.concat(set, time, removeRace).filter(flag -> !flag).count();
+    }
+
+    /**
+     * 主动推送给教师 当前问题的回答情况
+     *
+     * @return
+     */
+    public Mono<List<CircleAnswer>> achieveAnswer(final AchieveAnswerVo achieves) {
+
+        return Mono.just(achieves)
+                .flatMap(achieve -> askSelected(askQuestionsId(achieve.getCircleId())))
+                .map(ids -> (Arrays.asList(ids.split(","))))
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(id -> isRedisEmpty(achieves.getExamineeIsReplyKey(id))
+                        .flatMap(flag -> {
+                            if (flag) {
+                                return askQuestionId(achieves.getAskKey())
+                                        .flatMap(questionid -> findAskAnswer(achieves.getCircleId(), id, questionid)
+                                                .zipWhen(answ -> Mono.just(new CircleAnswer(ASK_CIRCLE_ANSWER_ALREADY, answ))))
+                                        .map(Tuple2::getT2);
+                            }
+                            return Mono.just(new CircleAnswer(ASK_CIRCLE_ANSWER_DID, AskAnswer.builder().build()));
+                        })).collectList();
+
+    }
+
+    private Mono<AskAnswer> findAskAnswer(final String circleId, final String examineeId, final String questionId) {
+
+        Query query = Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("questionId").is(examineeId)
+                        .and("examineeId").is(questionId));
+
+        return reactiveMongoTemplate.findOne(query, AskAnswer.class);
     }
 
     /**
@@ -118,15 +153,6 @@ public class ClassInteractService {
                                         .map(interactive ->
                                                 new AskQuestionVo(cut, bigQuestion, interactive))
                         ));
-    }
-
-    /**
-     * 获取课堂提问的切换值
-     *
-     * @return
-     */
-    private Mono<String> askQuestionCut(final String askKey) {
-        return reactiveHashOperations.get(askKey, "cut");
     }
 
 
@@ -247,7 +273,7 @@ public class ClassInteractService {
      * @param redisKey
      * @return
      */
-    private Mono<String> distinct(final String redisKey) {
+    private Mono<String> redisGet(final String redisKey) {
         return stringRedisTemplate.opsForValue().get(redisKey);
     }
 
@@ -262,7 +288,7 @@ public class ClassInteractService {
      * @return true 没有推送过该题   false  有推送过该题
      */
     private Mono<Boolean> distinctKeyIsEmpty(final String redisKey, final String askKey) {
-        return distinct(redisKey)
+        return redisGet(redisKey)
                 .switchIfEmpty(Mono.just(DISTINCT_INITIAL))
                 .zipWhen(origin -> askQuestionCut(askKey))
                 .flatMap(tuple2 -> {
@@ -277,7 +303,7 @@ public class ClassInteractService {
     }
 
     private Mono<Boolean> raiseIsDistinct(final String redisKey, final int size) {
-        return distinct(redisKey)
+        return redisGet(redisKey)
                 .switchIfEmpty(Mono.just(DISTINCT_INITIAL))
                 .flatMap(origin -> {
                     if (DISTINCT_INITIAL.equals(origin)) {
@@ -395,7 +421,7 @@ public class ClassInteractService {
                                     .and("examineeId").is(interactAnswerVo.getExamineeId()));
 
                     Update update = Update.update("answer", interactAnswerVo.getAnswer());
-                    update.set("participate", type);
+                    update.set("interactive", type);
                     update.set("right", String.valueOf(f));
                     update.set("uDate", new Date());
 
@@ -461,5 +487,23 @@ public class ClassInteractService {
         return stringRedisTemplate.opsForValue().set(redisKey, value, Duration.ofSeconds(60 * 60));
     }
 
+    private Mono<Boolean> isRedisEmpty(final String redisKey) {
+        return stringRedisTemplate.hasKey(redisKey);
+    }
 
+    /**
+     * 获取课堂提问的切换值
+     *
+     * @return
+     */
+    private Mono<String> askQuestionCut(final String askKey) {
+        return reactiveHashOperations.get(askKey, "cut");
+    }
+
+    /**
+     * 获得课堂的提问id
+     */
+    private Mono<String> askQuestionId(final String askKey) {
+        return reactiveHashOperations.get(askKey, "questionId");
+    }
 }
