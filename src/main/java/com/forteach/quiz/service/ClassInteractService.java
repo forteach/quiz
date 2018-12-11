@@ -542,8 +542,7 @@ public class ClassInteractService {
     private Mono<String> askQuestionId(final String askKey) {
         return reactiveHashOperations.get(askKey, "questionId");
     }
-
-
+  
     private Mono<AskAnswer> findAskAnswer(final String circleId, final String examineeId, final String questionId) {
 
         Query query = Query.query(
