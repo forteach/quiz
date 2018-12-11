@@ -5,8 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
+import static com.forteach.quiz.common.KeyStorage.*;
 
 /**
  * @Description:
@@ -63,5 +62,9 @@ public class InteractAnswerVo {
 
     public String getRaiseKey() {
         return ASK_RAISE_HAND.concat(circleId);
+    }
+
+    public String getExamineeIsReplyKey() {
+        return EXAMINEE_IS_REPLY_KEY.concat(circleId);
     }
 }

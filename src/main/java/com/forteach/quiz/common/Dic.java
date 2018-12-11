@@ -76,8 +76,14 @@ public class Dic {
 
     public static final String ASK_RAISE_HAND = "askRaiseHand";
 
+    /**
+     * 已回答
+     */
     public static final String ASK_CIRCLE_ANSWER_DID = "2";
 
+    /**
+     * 未回答
+     */
     public static final String ASK_CIRCLE_ANSWER_ALREADY = "1";
 
 }

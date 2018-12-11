@@ -39,8 +39,8 @@ public class AskAnswer extends BaseEntity {
     /**
      * 答案
      */
-    @ApiModelProperty(value = "答案", name = "answ")
-    private String answ;
+    @ApiModelProperty(value = "答案", name = "answer")
+    private String answer;
     /**
      * 问题id
      */
@@ -75,10 +75,10 @@ public class AskAnswer extends BaseEntity {
     public AskAnswer() {
     }
 
-    public AskAnswer(String examineeId, String interactive, String answ, String questionId, Date uDate, String right, String circleId) {
+    public AskAnswer(String examineeId, String interactive, String answer, String questionId, Date uDate, String right, String circleId) {
         this.examineeId = examineeId;
         this.interactive = interactive;
-        this.answ = answ;
+        this.answer = answer;
         this.questionId = questionId;
         this.uDate = uDate;
         this.right = right;

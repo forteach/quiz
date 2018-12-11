@@ -20,7 +20,6 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -69,6 +68,7 @@ public class ClassInteractService {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
 
+
     /**
      * 课堂提问发题
      *
@@ -84,12 +84,28 @@ public class ClassInteractService {
         map.put("selected", giveVo.getSelected());
         map.put("cut", String.valueOf(giveVo.getCut()));
 
+        //如果本题和redis里的题目id不一致 视为换题 进行清理
+        Mono<Boolean> clearCut = clearCut(giveVo);
+
         Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(giveVo.getCircleId()), map);
         Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+
         //删除抢答答案
         Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag());
 
-        return Flux.concat(set, time, removeRace).filter(flag -> !flag).count();
+        return Flux.concat(set, time, removeRace, clearCut).filter(flag -> !flag).count();
+    }
+
+    private Mono<Boolean> clearCut(final GiveVo giveVo) {
+        return reactiveHashOperations.get(askQuestionsId(giveVo.getCircleId()), "questionId")
+                .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
+                .flatMap(flag -> {
+                    if (flag) {
+                        //清除提问标识
+                        return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey());
+                    }
+                    return Mono.just(false);
+                });
     }
 
     /**
@@ -98,32 +114,23 @@ public class ClassInteractService {
      * @return
      */
     public Mono<List<CircleAnswer>> achieveAnswer(final AchieveAnswerVo achieves) {
-
         return Mono.just(achieves)
                 .flatMap(achieve -> askSelected(askQuestionsId(achieve.getCircleId())))
                 .map(ids -> (Arrays.asList(ids.split(","))))
                 .flatMapMany(Flux::fromIterable)
-                .flatMap(id -> isRedisEmpty(achieves.getExamineeIsReplyKey(id))
-                        .flatMap(flag -> {
-                            if (flag) {
-                                return askQuestionId(achieves.getAskKey())
-                                        .flatMap(questionid -> findAskAnswer(achieves.getCircleId(), id, questionid)
-                                                .zipWhen(answ -> Mono.just(new CircleAnswer(ASK_CIRCLE_ANSWER_ALREADY, answ))))
-                                        .map(Tuple2::getT2);
-                            }
-                            return Mono.just(new CircleAnswer(ASK_CIRCLE_ANSWER_DID, AskAnswer.builder().build()));
-                        })).collectList();
-
-    }
-
-    private Mono<AskAnswer> findAskAnswer(final String circleId, final String examineeId, final String questionId) {
-
-        Query query = Query.query(
-                Criteria.where("circleId").is(circleId)
-                        .and("questionId").is(examineeId)
-                        .and("examineeId").is(questionId));
-
-        return reactiveMongoTemplate.findOne(query, AskAnswer.class);
+                .flatMap(id -> isMember(achieves.getExamineeIsReplyKey(), id)
+                        .flatMap(flag -> askQuestionId(achieves.getAskKey())
+                                .flatMap(qid -> findAskAnswer(achieves.getCircleId(), id, qid))
+                                .zipWith(studentsService.findStudentsBrief(id), (answ, student) -> {
+                                    if (flag) {
+                                        return new CircleAnswer(student, ASK_CIRCLE_ANSWER_DID, answ);
+                                    } else {
+                                        return new CircleAnswer(student, ASK_CIRCLE_ANSWER_ALREADY, new AskAnswer());
+                                    }
+                                }))
+                )
+                .collectList()
+                .filterWhen(obj -> answerDistinct(achieves.getAnswDistinctKey(), achieves.getExamineeIsReplyKey()));
     }
 
     /**
@@ -160,6 +167,7 @@ public class ClassInteractService {
      * 提交答案
      * 提交答案前判断题目id 是否与当前id一致
      * 提交后判断对错
+     * 提交后在当前课堂里添加是否回答
      *
      * @return
      */
@@ -187,7 +195,8 @@ public class ClassInteractService {
                         return Mono.error(new AskException("请重新刷新获取最新题目"));
                     }
                 })
-                .map(UpdateResult::getModifiedCount);
+                .map(UpdateResult::getModifiedCount)
+                .filterWhen(monoLong -> setRedis(answerVo.getExamineeIsReplyKey(), answerVo.getExamineeId()));
     }
 
     /**
@@ -277,6 +286,25 @@ public class ClassInteractService {
         return stringRedisTemplate.opsForValue().get(redisKey);
     }
 
+    /**
+     * 老师请求实时的题目去重
+     *
+     * @return
+     */
+    private Mono<Boolean> answerDistinct(final String distinctKey, final String setKey) {
+
+        return redisGet(distinctKey)
+                .switchIfEmpty(Mono.just(DISTINCT_INITIAL))
+                .zipWith(stringRedisTemplate.opsForSet().size(setKey), (origin, size) -> {
+                    if (origin.equals(String.valueOf(size))) {
+                        //如果等于 排除
+                        return Mono.just(false);
+                    }
+                    //如果去重结果无数据 代表 第一次 返回
+                    //如果上次推送长度与本次不一致 进行推送
+                    return saveRedis(distinctKey, String.valueOf(size));
+                }).flatMap(flag -> flag);
+    }
 
     /**
      * 判断是否已经推送过该题
@@ -491,6 +519,13 @@ public class ClassInteractService {
         return stringRedisTemplate.hasKey(redisKey);
     }
 
+    private Mono<Boolean> setRedis(final String redisKey, final String value) {
+        Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);
+        Mono<Boolean> time = stringRedisTemplate.expire(redisKey, Duration.ofSeconds(60 * 60 * 10));
+        return set.zipWith(time, (c, t) -> t ? c : -1).map(monoLong -> monoLong != -1);
+    }
+
+
     /**
      * 获取课堂提问的切换值
      *
@@ -505,5 +540,16 @@ public class ClassInteractService {
      */
     private Mono<String> askQuestionId(final String askKey) {
         return reactiveHashOperations.get(askKey, "questionId");
+    }
+
+
+    private Mono<AskAnswer> findAskAnswer(final String circleId, final String examineeId, final String questionId) {
+
+        Query query = Query.query(
+                Criteria.where("circleId").in(circleId)
+                        .and("questionId").in(questionId)
+                        .and("examineeId").in(examineeId));
+
+        return reactiveMongoTemplate.findOne(query, AskAnswer.class);
     }
 }

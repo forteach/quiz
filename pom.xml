@@ -93,6 +93,15 @@
             <artifactId>springfox-spring-webflux</artifactId>
             <version>3.0.0-SNAPSHOT</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.3</version>
+        </dependency>
+
+
     </dependencies>
 
     <!-- 配置远程仓库 -->

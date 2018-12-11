@@ -5,11 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
+import static com.forteach.quiz.common.KeyStorage.*;
 
 /**
- * @Description:
+ * @Description: 实时获取学生回答情况
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/7  15:13
@@ -46,6 +45,14 @@ public class AchieveAnswerVo {
      */
     public String getAskKey() {
         return CLASSROOM_ASK_QUESTIONS_ID.concat(circleId);
+    }
+
+    public String getExamineeIsReplyKey() {
+        return EXAMINEE_IS_REPLY_KEY.concat(circleId);
+    }
+
+    public String getAnswDistinctKey() {
+        return ANSW_HAND_STUDENT_DISTINCT.concat(circleId).concat(teacher).concat(random);
     }
 
 

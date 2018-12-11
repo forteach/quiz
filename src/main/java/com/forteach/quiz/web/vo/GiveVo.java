@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
+import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
 
 /**
  * @Description:
@@ -68,5 +69,9 @@ public class GiveVo {
 
     public String getRaceAnswerFlag() {
         return CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
+    }
+
+    public String getExamineeIsReplyKey() {
+        return EXAMINEE_IS_REPLY_KEY.concat(circleId);
     }
 }
