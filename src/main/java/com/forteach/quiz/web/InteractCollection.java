@@ -3,6 +3,7 @@ package com.forteach.quiz.web;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.service.ClassInteractService;
+import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
 import io.swagger.annotations.*;
@@ -77,7 +78,24 @@ public class InteractCollection extends BaseController {
                 .map(data -> ServerSentEvent.<List<Students>>builder()
                         .data(data)
                         .build());
+    }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "circleId", value = "课堂id", paramType = "get", dataType = "string", required = true),
+            @ApiImplicitParam(name = "random", value = "随机数 每次访问需要", paramType = "get", dataType = "string", required = true),
+            @ApiImplicitParam(name = "teacher", value = "教师id", paramType = "get", dataType = "string", required = true)
+    })
+    @ApiOperation(value = "老师获取实时学生的答题情况", notes = "每次有新的学生答案 则接收到推送")
+    @GetMapping(value = "/achieve/answer", produces = "text/event-stream;charset=UTF-8")
+    public Flux<ServerSentEvent<List<CircleAnswer>>> achieveQuestion(@RequestParam String circleId, @RequestParam String random, @RequestParam String teacher) {
+
+        return Flux.interval(Duration.ofSeconds(1))
+                .map(seq -> Tuples.of(
+                        seq, classInteractService.achieveAnswer(AchieveAnswerVo.builder().circleId(circleId).random(random).teacher(teacher).build())
+                )).flatMap(Tuple2::getT2)
+                .map(data -> ServerSentEvent.<List<CircleAnswer>>builder()
+                        .data(data)
+                        .build());
     }
 
     /**
