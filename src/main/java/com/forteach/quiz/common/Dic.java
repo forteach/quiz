@@ -86,4 +86,17 @@ public class Dic {
      */
     public static final String ASK_CIRCLE_ANSWER_ALREADY = "1";
 
+    public static final String QUESTION_SINGLE = "single";
+
+    public static final String QUESTION_MULTIPLE = "multiple";
+
+    public static final String QUESTION_TRUEORFALSE = "trueOrFalse";
+
+    public static final String QUESTION_DESIGN = "design";
+
+    public static final String QUESTION_BIGQUESTION = "bigQuestion";
+
+    public static final String PARAMETER_ALL = "all";
+
+    public static final String PARAMETER_PART = "part";
 }

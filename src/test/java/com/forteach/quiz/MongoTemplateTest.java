@@ -1,6 +1,7 @@
 package com.forteach.quiz;
 
 import com.alibaba.fastjson.JSON;
+import com.forteach.quiz.domain.AskAnswer;
 import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.ExerciseBook;
@@ -143,5 +144,21 @@ public class MongoTemplateTest {
         StepVerifier.create(count).expectNext(2L).verifyComplete();
     }
 
+    @Test
+    public void findAskAnswer() {
+
+
+        Query query = Query.query(
+                Criteria.where("circleId").in("1")
+                        .and("questionId").in("5c07e066c8737b1b94c93c9a")
+                        .and("examineeId").in("10001"));
+
+//        Flux<AskAnswer> answerMono = template.find(query, AskAnswer.class).doOnNext(System.out::println);
+        Mono<AskAnswer> answerMono = template.findOne(query, AskAnswer.class).doOnNext(System.out::println);
+
+        StepVerifier.create(answerMono).expectNext().verifyComplete();
+
+//        Mono<Long> count = bigQuestionFlux.count().doOnNext(System.out::println);
+    }
 
 }
