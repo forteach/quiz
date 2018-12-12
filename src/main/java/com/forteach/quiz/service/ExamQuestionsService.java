@@ -214,7 +214,7 @@ public class ExamQuestionsService {
             dbObject.put("knowledgeId", sortVo.getKnowledgeId());
         }
         if (isNotEmpty(sortVo.getQuestionType())) {
-            dbObject.put("examChildren.$.examType", sortVo.getQuestionType());
+            dbObject.put("examChildren.examType", sortVo.getQuestionType());
         }
         //创建查询条件
         Query query = new BasicQuery(dbObject.toJson(), fieldsObject.toJson());
@@ -240,7 +240,7 @@ public class ExamQuestionsService {
             criteria.and("knowledgeId").in(sortVo.getKnowledgeId());
         }
         if (isNotEmpty(sortVo.getQuestionType())) {
-            criteria.and("examChildren.$.examType").in(sortVo.getQuestionType());
+            criteria.and("examChildren.examType").in(sortVo.getQuestionType());
         }
 
         sortVo.queryPaging(query);
