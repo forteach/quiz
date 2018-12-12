@@ -28,10 +28,10 @@ public abstract class AbstractExam {
     protected String teacherId;
 
     /**
-     * 考题类型   choice   trueOrFalse    design
+     * 考题类型   single  multiple trueOrFalse  design  bigQuestion
      */
     @JsonView(BigQuestionView.Summary.class)
-    @ApiModelProperty(value = "暂不需要 考题类型 choice  trueOrFalse  design", name = "id", example = "trueOrFalse")
+    @ApiModelProperty(value = "考题类型 后台自动赋值 single  multiple trueOrFalse  design  bigQuestion", name = "id", example = "trueOrFalse")
     protected String examType;
 
     /**

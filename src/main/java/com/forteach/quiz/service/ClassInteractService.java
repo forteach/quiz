@@ -115,6 +115,7 @@ public class ClassInteractService {
      */
     public Mono<List<CircleAnswer>> achieveAnswer(final AchieveAnswerVo achieves) {
         return Mono.just(achieves)
+                .filterWhen(achieveAnswerVo -> untitled(achieveAnswerVo.getAskKey()))
                 .flatMap(achieve -> askSelected(askQuestionsId(achieve.getCircleId())))
                 .map(ids -> (Arrays.asList(ids.split(","))))
                 .flatMapMany(Flux::fromIterable)
@@ -541,8 +542,7 @@ public class ClassInteractService {
     private Mono<String> askQuestionId(final String askKey) {
         return reactiveHashOperations.get(askKey, "questionId");
     }
-
-
+  
     private Mono<AskAnswer> findAskAnswer(final String circleId, final String examineeId, final String questionId) {
 
         Query query = Query.query(
@@ -551,5 +551,15 @@ public class ClassInteractService {
                         .and("examineeId").in(examineeId));
 
         return reactiveMongoTemplate.findOne(query, AskAnswer.class);
+    }
+
+    /**
+     * 过滤掉没有题的情况
+     *
+     * @param askKey
+     * @return
+     */
+    private Mono<Boolean> untitled(final String askKey) {
+        return reactiveHashOperations.hasKey(askKey, "questionId");
     }
 }

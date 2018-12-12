@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Query;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -41,5 +45,13 @@ public class SortVo {
 
     @ApiModelProperty(value = "操作人id", notes = "登陆未完成 手动传入操作人id", dataType = "string", name = "operatorId", example = "001", required = true)
     private String operatorId;
+
+    public Query queryPaging(Query query) {
+        Sort sort = new Sort(Sort.Direction.DESC, this.getSorting());
+        Pageable pageable = PageRequest.of(this.getPage(), this.getSize(), sort);
+        query.with(sort);
+        query.with(pageable);
+        return query;
+    }
 
 }
