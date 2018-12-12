@@ -296,7 +296,7 @@ public class ExamQuestionsService {
                     if (isEmpty(trueOrFalse.getId())) {
                         trueOrFalse.setId(getRandomUUID());
                     }
-                    trueOrFalse.setExamType("bigQuestion");
+                    trueOrFalse.setExamType("trueOrFalse");
                 })
                 .collect(Collectors.toList()));
         return bigQuestion;
