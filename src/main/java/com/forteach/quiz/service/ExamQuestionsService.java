@@ -7,16 +7,16 @@ import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.BigQuestionRepository;
-import com.forteach.quiz.web.vo.SortVo;
+import com.forteach.quiz.web.req.QuestionBankReq;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,17 +26,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.*;
-import static com.forteach.quiz.util.StringUtil.getRandomUUID;
-import static com.forteach.quiz.util.StringUtil.isEmpty;
+import static com.forteach.quiz.util.StringUtil.*;
 
 /**
- *  TODO 填空题 add 依据前端传入 答案数量
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/13  11:45
  */
-@Component
+@Service
 public class ExamQuestionsService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
@@ -184,19 +182,76 @@ public class ExamQuestionsService {
         return bigQuestionRepository.deleteById(id).and(delBankAssociation(Collections.singletonList(id)));
     }
 
-    public Flux<BigQuestion> findAllDetailed(final SortVo sortVo) {
+    public Flux<BigQuestion> findAllDetailed(final QuestionBankReq sortVo) {
 
-        Sort sort = new Sort(Sort.Direction.DESC, sortVo.getSorting());
-
-        return bigQuestionRepository.findAllDetailedPage(sortVo.getOperatorId(), PageRequest.of(sortVo.getPage(), sortVo.getSize(), sort));
+        if (PARAMETER_PART.equals(sortVo.getAllOrPart())) {
+            return findPartQuestion(sortVo);
+        } else if (PARAMETER_ALL.equals(sortVo.getAllOrPart())) {
+            return findAllQuestion(sortVo);
+        }
+        return Flux.error(new ExamQuestionsException("错误的查询条件"));
     }
+
+    private Flux<BigQuestion> findPartQuestion(final QuestionBankReq sortVo) {
+        //返回指定字段
+        BasicDBObject fieldsObject = new BasicDBObject();
+        fieldsObject.put("id", 1);
+        fieldsObject.put("chapter", 1);
+        fieldsObject.put("levelId", 1);
+        fieldsObject.put("knowledgeId", 1);
+        fieldsObject.put("examType", 1);
+        fieldsObject.put("teacherId", 1);
+        fieldsObject.put("uDate", 1);
+        //查询条件
+        BasicDBObject dbObject = new BasicDBObject();
+        if (isNotEmpty(sortVo.getLevelId())) {
+            dbObject.put("levelId", sortVo.getLevelId());
+        }
+        if (isNotEmpty(sortVo.getChapter())) {
+            dbObject.put("chapter", sortVo.getChapter());
+        }
+        if (isNotEmpty(sortVo.getKnowledgeId())) {
+            dbObject.put("knowledgeId", sortVo.getKnowledgeId());
+        }
+        if (isNotEmpty(sortVo.getQuestionType())) {
+            dbObject.put("examChildren.$.examType", sortVo.getQuestionType());
+        }
+        //创建查询条件
+        Query query = new BasicQuery(dbObject.toJson(), fieldsObject.toJson());
+        //分页及排序等
+        sortVo.queryPaging(query);
+        //执行查询
+        return reactiveMongoTemplate.find(query, BigQuestion.class);
+    }
+
+    private Flux<BigQuestion> findAllQuestion(final QuestionBankReq sortVo) {
+
+        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+
+        Query query = new Query(criteria);
+
+        if (isNotEmpty(sortVo.getLevelId())) {
+            criteria.and("levelId").in(sortVo.getLevelId());
+        }
+        if (isNotEmpty(sortVo.getChapter())) {
+            criteria.and("chapter").in(sortVo.getChapter());
+        }
+        if (isNotEmpty(sortVo.getKnowledgeId())) {
+            criteria.and("knowledgeId").in(sortVo.getKnowledgeId());
+        }
+        if (isNotEmpty(sortVo.getQuestionType())) {
+            criteria.and("examChildren.$.examType").in(sortVo.getQuestionType());
+        }
+
+        sortVo.queryPaging(query);
+
+        return reactiveMongoTemplate.find(query, BigQuestion.class);
+    }
+
 
     public Mono<BigQuestion> findOneDetailed(final String id) {
         return bigQuestionRepository.findById(id).switchIfEmpty(Mono.error(new CustomException("没有找到考题")));
     }
-
-
-
 
 
     private Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId) {
@@ -228,6 +283,7 @@ public class ExamQuestionsService {
                     if (isEmpty(design.getId())) {
                         design.setId(getRandomUUID());
                     }
+                    design.setExamType("design");
                 })
                 .collect(Collectors.toList()));
         return bigQuestion;
@@ -240,6 +296,7 @@ public class ExamQuestionsService {
                     if (isEmpty(trueOrFalse.getId())) {
                         trueOrFalse.setId(getRandomUUID());
                     }
+                    trueOrFalse.setExamType("bigQuestion");
                 })
                 .collect(Collectors.toList()));
         return bigQuestion;
@@ -257,18 +314,21 @@ public class ExamQuestionsService {
                             if (isEmpty(choiceQst.getId())) {
                                 choiceQst.setId(getRandomUUID());
                             }
+                            choiceQst.setExamType("bigQuestion");
                             return choiceQst;
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
                             TrueOrFalse trueOrFalse = JSON.parseObject(jsonObject.toJSONString(), TrueOrFalse.class);
                             if (isEmpty(trueOrFalse.getId())) {
                                 trueOrFalse.setId(getRandomUUID());
                             }
+                            trueOrFalse.setExamType("bigQuestion");
                             return trueOrFalse;
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
                             Design design = JSON.parseObject(jsonObject.toJSONString(), Design.class);
                             if (isEmpty(design.getId())) {
                                 design.setId(getRandomUUID());
                             }
+                            design.setExamType("bigQuestion");
                             return design;
                         default:
                             throw new ExamQuestionsException("非法参数 错误的题目类型");
@@ -284,6 +344,7 @@ public class ExamQuestionsService {
                 .stream()
                 .peek(choiceQst -> {
                     if (isEmpty(choiceQst.getId())) {
+                        choiceQst.setExamType(choiceQst.getChoiceType());
                         choiceQst.setId(getRandomUUID());
                         choiceQst.setOptChildren(choiceQst.getOptChildren()
                                 .stream()

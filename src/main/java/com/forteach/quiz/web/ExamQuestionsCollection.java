@@ -6,8 +6,8 @@ import com.forteach.quiz.domain.ChoiceQst;
 import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.TrueOrFalse;
 import com.forteach.quiz.service.ExamQuestionsService;
+import com.forteach.quiz.web.req.QuestionBankReq;
 import com.forteach.quiz.web.vo.QuestionBankVo;
-import com.forteach.quiz.web.vo.SortVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -108,7 +108,7 @@ public class ExamQuestionsCollection extends BaseController {
             @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
             @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
     })
-    public Mono<WebResult> findAllDetailed(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody SortVo sortVo) {
+    public Mono<WebResult> findAllDetailed(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody QuestionBankReq sortVo) {
         return examQuestionsService.findAllDetailed(sortVo).collectList().map(WebResult::okResult);
     }
 
