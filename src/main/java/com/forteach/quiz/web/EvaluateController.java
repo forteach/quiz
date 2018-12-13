@@ -21,7 +21,7 @@ import javax.validation.Valid;
  * @date: 2018/12/11  14:45
  */
 @RestController
-@Api(value = "评价相关", tags = {"对学生的评价", "提问奖励等"})
+@Api(value = "评价相关", tags = {"对学生的评价/提问奖励等"})
 @RequestMapping(path = "/evaluate")
 public class EvaluateController {
 
