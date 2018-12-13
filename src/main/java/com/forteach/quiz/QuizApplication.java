@@ -2,7 +2,9 @@ package com.forteach.quiz;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 /**
  * @Description:
@@ -10,7 +12,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @version: V1.0
  * @date: 2018/11/9 10:52
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableWebFlux
+@SpringBootApplication
+@EnableMongoAuditing
+@EnableReactiveMongoRepositories
 public class QuizApplication {
 
     public static void main(String[] args) {
@@ -19,4 +24,5 @@ public class QuizApplication {
         app.run(args);
 
     }
+
 }

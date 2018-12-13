@@ -1,6 +1,9 @@
 package com.forteach.quiz.config;
 
 import com.forteach.quiz.common.WebResult;
+import com.forteach.quiz.exceptions.AskException;
+import com.forteach.quiz.exceptions.CustomException;
+import com.forteach.quiz.exceptions.ProblemSetException;
 import io.lettuce.core.RedisException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,6 +29,12 @@ public class ExceptionHandlers {
         return WebResult.failResultMono();
     }
 
+    @ExceptionHandler(ProblemSetException.class)
+    public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, ProblemSetException e) {
+        log.error("全局异常拦截器  练习册异常 {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return Mono.just(WebResult.failResult(9200, e.getMessage()));
+    }
+
     @ExceptionHandler(RedisException.class)
     public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, RedisException e) {
         log.error("全局异常拦截器  redis 异常 {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
@@ -42,6 +51,18 @@ public class ExceptionHandlers {
     public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, HttpMessageNotReadableException e) {
         log.error("全局异常拦截器 请求参数格式不正确  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono(9100);
+    }
+
+    @ExceptionHandler(value = AskException.class)
+    public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, AskException e) {
+        log.error("全局异常拦截器 课堂交互请求拦截  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return WebResult.okCustomResultMono(2000, e.getMessage());
+    }
+
+    @ExceptionHandler(value = CustomException.class)
+    public Mono<WebResult> customException(ServerWebExchange exchange, CustomException e) {
+        log.error("全局异常拦截器 校验及自反馈前端  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        return WebResult.okCustomResultMono(3000, e.getMessage());
     }
 
 }
