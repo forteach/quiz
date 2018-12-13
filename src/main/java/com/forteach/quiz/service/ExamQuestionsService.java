@@ -7,10 +7,14 @@ import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.repository.ProblemSetRepository;
 import com.forteach.quiz.web.req.QuestionBankReq;
+import com.forteach.quiz.web.req.QuestionProblemSetReq;
+import com.forteach.quiz.web.vo.QuestionProblemSetVo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -41,10 +45,14 @@ public class ExamQuestionsService {
 
     private final BigQuestionRepository bigQuestionRepository;
 
+    private final ProblemSetRepository problemSetRepository;
 
-    public ExamQuestionsService(ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionRepository bigQuestionRepository) {
+
+    public ExamQuestionsService(ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionRepository bigQuestionRepository,
+                                ProblemSetRepository problemSetRepository) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionRepository = bigQuestionRepository;
+        this.problemSetRepository = problemSetRepository;
     }
 
     private Mono<BigQuestion> editQuestionsCover(final BigQuestion bigQuestion) {
@@ -191,6 +199,28 @@ public class ExamQuestionsService {
         }
         return Flux.error(new ExamQuestionsException("错误的查询条件"));
     }
+
+    public Mono<QuestionProblemSetVo> questionProblemSet(final QuestionProblemSetReq questionProblemSetReq) {
+
+        QuestionBankReq questionBankReq = new QuestionProblemSetReq();
+        BeanUtils.copyProperties(questionProblemSetReq, questionBankReq);
+
+        Mono<List<BigQuestion>> questionFlux = findAllDetailed(questionBankReq).collectList();
+
+        return questionFlux.zipWith(findProblemSet(questionProblemSetReq.getProblemSetId()), (questionList, problemSet) -> {
+
+            List<String> target = problemSet.getQuestionIds().stream().map(QuestionIds::getBigQuestionId).collect(Collectors.toList());
+            List<String> origin = questionList.stream().map(BigQuestion::getId).collect(Collectors.toList());
+            //交集
+            List<String> intersection = origin.stream().filter(target::contains).collect(Collectors.toList());
+            //差集
+            List<String> difference = origin.stream().filter(item -> !target.contains(item)).collect(Collectors.toList());
+            return QuestionProblemSetVo.builder().bigQuestionList(questionList).problemSet(problemSet).intersection(intersection).difference(difference).build();
+        });
+    }
+
+
+
 
     private Flux<BigQuestion> findPartQuestion(final QuestionBankReq sortVo) {
         //返回指定字段
@@ -360,5 +390,14 @@ public class ExamQuestionsService {
         return bigQuestion;
     }
 
+    /**
+     * 根据id 获取练习册 基本信息
+     *
+     * @param exerciseBookId
+     * @return
+     */
+    public Mono<ProblemSet> findProblemSet(final String exerciseBookId) {
+        return problemSetRepository.findById(exerciseBookId);
+    }
 
 }

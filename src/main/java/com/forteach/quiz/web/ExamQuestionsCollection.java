@@ -7,6 +7,7 @@ import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.TrueOrFalse;
 import com.forteach.quiz.service.ExamQuestionsService;
 import com.forteach.quiz.web.req.QuestionBankReq;
+import com.forteach.quiz.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.vo.QuestionBankVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -112,21 +113,28 @@ public class ExamQuestionsCollection extends BaseController {
         return examQuestionsService.findAllDetailed(sortVo).collectList().map(WebResult::okResult);
     }
 
+    /**
+     * 获得练习册 返回 分页的题库信息与 练习册已选择的题目信息
+     *
+     * @return
+     */
+    @PostMapping("/findAll/problemSet")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
+            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
+            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
+    })
+    @ApiOperation(value = "通过id查找练习册及包含的题目全部信息", notes = "通过id查找练习册及包含的题目全部信息")
+    public Mono<WebResult> questionProblemSetReq(@Valid @RequestBody QuestionProblemSetReq questionProblemSetReq) {
+        return examQuestionsService.questionProblemSet(questionProblemSetReq).map(WebResult::okResult);
+    }
+
     @ApiOperation(value = "根据id获取题目详细", notes = "详细")
     @PostMapping("/findOne/{id}")
     public Mono<WebResult> findAllDetailed(@Valid @ApiParam(name = "根据BigQuestionId查出详细信息", value = "根据id查出详细信息", required = true) @PathVariable String id) {
         return examQuestionsService.findOneDetailed(id).map(WebResult::okResult);
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }
