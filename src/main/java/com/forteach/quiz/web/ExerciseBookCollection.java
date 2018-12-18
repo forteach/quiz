@@ -106,7 +106,7 @@ public class ExerciseBookCollection extends BaseController {
     }
 
     @ApiOperation(value = "练习册 分页信息", notes = "查询练习册分页信息")
-    @PostMapping("/findAll/detailed")
+    @PostMapping("/findExerciseBook")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
