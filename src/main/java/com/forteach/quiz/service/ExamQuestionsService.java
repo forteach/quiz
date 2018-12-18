@@ -226,7 +226,7 @@ public class ExamQuestionsService {
         //返回指定字段
         BasicDBObject fieldsObject = new BasicDBObject();
         fieldsObject.put("id", 1);
-        fieldsObject.put("chapter", 1);
+        fieldsObject.put("chapterId", 1);
         fieldsObject.put("levelId", 1);
         fieldsObject.put("knowledgeId", 1);
         fieldsObject.put("examType", 1);
@@ -237,8 +237,8 @@ public class ExamQuestionsService {
         if (isNotEmpty(sortVo.getLevelId())) {
             dbObject.put("levelId", sortVo.getLevelId());
         }
-        if (isNotEmpty(sortVo.getChapter())) {
-            dbObject.put("chapter", sortVo.getChapter());
+        if (isNotEmpty(sortVo.getChapterId())) {
+            dbObject.put("chapterId", sortVo.getChapterId());
         }
         if (isNotEmpty(sortVo.getKnowledgeId())) {
             dbObject.put("knowledgeId", sortVo.getKnowledgeId());
@@ -263,8 +263,8 @@ public class ExamQuestionsService {
         if (isNotEmpty(sortVo.getLevelId())) {
             criteria.and("levelId").in(sortVo.getLevelId());
         }
-        if (isNotEmpty(sortVo.getChapter())) {
-            criteria.and("chapter").in(sortVo.getChapter());
+        if (isNotEmpty(sortVo.getChapterId())) {
+            criteria.and("chapterId").in(sortVo.getChapterId());
         }
         if (isNotEmpty(sortVo.getKnowledgeId())) {
             criteria.and("knowledgeId").in(sortVo.getKnowledgeId());

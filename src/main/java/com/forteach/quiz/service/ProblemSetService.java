@@ -119,7 +119,7 @@ public class ProblemSetService {
             criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));
         }
         if (isNotEmpty(sortVo.getCourseId())) {
-            criteria.and("chapter").in(sortVo.getChapter());
+            criteria.and("chapterId").in(sortVo.getCourseId());
         }
         if (isNotEmpty(sortVo.getLevelId())) {
             criteria.and("levelId").in(sortVo.getLevelId());

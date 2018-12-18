@@ -20,8 +20,8 @@ public class QuestionBankReq extends SortVo {
     /**
      * 章节id
      */
-    @ApiModelProperty(value = "章节id", name = "chapter", example = "463bcd8e5fed4a33883850c14f877271")
-    protected String chapter;
+    @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")
+    protected String chapterId;
 
     /**
      * 难易度id
