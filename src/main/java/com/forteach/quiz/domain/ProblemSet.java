@@ -23,21 +23,18 @@ public class ProblemSet extends BaseEntity {
     /**
      * 题集类型：1、预习练习册 2、课堂练习册3、课后作业册
      */
-
     @ApiModelProperty(value = "题集类型", name = "exeBookType", example = "1、预习练习册 2、课堂练习册3、课后作业册")
     private int exeBookType;
 
     /**
      * 教师操作人id
      */
-
     @ApiModelProperty(value = "教师操作人id", name = "teacherId", example = "教师操作人id ")
     private String teacherId;
 
     /**
      * 题册名
      */
-
     @ApiModelProperty(value = "题册名", name = "exeBookName", example = "题册名")
     private String exeBookName;
 
@@ -50,7 +47,6 @@ public class ProblemSet extends BaseEntity {
     /**
      * 章节id
      */
-
     @ApiModelProperty(value = "章节id", name = "sectionId", example = "章节id")
     private String sectionId;
 

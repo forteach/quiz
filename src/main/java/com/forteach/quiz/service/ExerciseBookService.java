@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
 /**
@@ -94,6 +93,4 @@ public class ExerciseBookService {
 
         return reactiveMongoTemplate.find(query, ExerciseBook.class);
     }
-
-
 }
