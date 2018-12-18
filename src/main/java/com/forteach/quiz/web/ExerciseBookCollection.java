@@ -169,17 +169,6 @@ public class ExerciseBookCollection extends BaseController {
 //        return problemSetService.correctExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
 //    }
 
-//    /**
-//     * 更改练习册的题目 并修改到题库中
-//     *
-//     * @param exerciseBookQuestionVo
-//     * @return
-//     */
-//    @PostMapping("/edit/questions")
-//    public Mono<WebResult> changeExerciseBookQuestions(@RequestBody ExerciseBookQuestionVo exerciseBookQuestionVo) {
-//        return problemSetService.changeExerciseBookQuestions(exerciseBookQuestionVo).map(WebResult::okResult);
-//    }
-//
 //    @PostMapping("/rewrite")
 //    public Mono<WebResult> associationAdd(@RequestBody RewriteVo rewriteVo) {
 //        return problemSetService.sheetRewrite(rewriteVo).map(WebResult::okResult);

@@ -22,8 +22,8 @@ public class ExerciseBookReq {
     /**
      * 章节id
      */
-    @ApiModelProperty(value = "章节id", name = "chapter", example = "章节id")
-    private String chapter;
+    @ApiModelProperty(value = "章节id", name = "chapterId", example = "章节id")
+    private String chapterId;
 
     /**
      * 课程id
