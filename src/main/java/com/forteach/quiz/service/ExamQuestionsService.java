@@ -186,7 +186,8 @@ public class ExamQuestionsService {
      * @return
      */
     public Mono<Void> delQuestions(final String id) {
-        return bigQuestionRepository.deleteById(id).and(delBankAssociation(Collections.singletonList(id)));
+        return bigQuestionRepository.deleteById(id)
+                .and(delBankAssociation(Collections.singletonList(id)));
     }
 
     public Flux<BigQuestion> findAllDetailed(final QuestionBankReq sortVo) {

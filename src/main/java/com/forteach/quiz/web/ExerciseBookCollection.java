@@ -57,7 +57,7 @@ public class ExerciseBookCollection extends BaseController {
     @GetMapping("/delete/{id}")
     @ApiOperation(value = "删除题集", notes = "通过id 删除题集")
     public Mono<WebResult> delExerciseBook(@Valid @PathVariable String id) {
-        return Mono.just(WebResult.okResult(problemSetService.delExerciseBook(id)));
+        return problemSetService.delExerciseBook(id).map(WebResult::okResult);
     }
 
     /**

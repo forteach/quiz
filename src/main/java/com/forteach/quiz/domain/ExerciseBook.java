@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 /**
- * @Description: 挂接课堂的练习题 类型：1、预习练习册 2、课堂练习册3、课后作业册
+ * @Description: 挂接课堂的练习题 类型：1、提问册 2、练习册3、作业册
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/15  16:35
@@ -20,7 +20,7 @@ import java.util.List;
 @Document(collection = "exerciseBook")
 public class ExerciseBook<T> extends BaseEntity {
 
-    @ApiModelProperty(value = "练习册类型：1、预习练习册 2、课堂练习册3、课后作业册", name = "exeBookType", example = "3")
+    @ApiModelProperty(value = "练习册类型：1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
     protected int exeBookType;
 
     @ApiModelProperty(value = "教师id (创建人id)", name = "teacherId", example = "001")
