@@ -2,9 +2,11 @@ package com.forteach.quiz.web;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.domain.ProblemSet;
+import com.forteach.quiz.service.ExerciseBookService;
 import com.forteach.quiz.service.ProblemSetService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.forteach.quiz.web.req.ProblemSetReq;
+import com.forteach.quiz.web.vo.ExerciseBookVo;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +22,17 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@Api(value = "练习册相关", tags = {"练习册相关操作"})
+@Api(value = "练习册,题集相关", tags = {"练习册,题集相关操作"})
 @RequestMapping(path = "/exerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ExerciseBookCollection extends BaseController {
 
     private final ProblemSetService problemSetService;
 
-    public ExerciseBookCollection(ProblemSetService problemSetService) {
+    private final ExerciseBookService exerciseBookService;
+
+    public ExerciseBookCollection(ProblemSetService problemSetService, ExerciseBookService exerciseBookService) {
         this.problemSetService = problemSetService;
+        this.exerciseBookService = exerciseBookService;
     }
 
     /**
@@ -37,58 +42,72 @@ public class ExerciseBookCollection extends BaseController {
      * @return
      */
     @PostMapping("/build")
-    @ApiOperation(value = "编辑题集", notes = "修改或增加题集,练习册")
+    @ApiOperation(value = "编辑题集", notes = "修改或增加题集")
     public Mono<WebResult> buildExerciseBook(@Valid @RequestBody ProblemSet problemSet) {
         return problemSetService.buildExerciseBook(problemSet).map(WebResult::okResult);
     }
 
     /**
-     * 删除练习册
+     * 删除题集
      *
      * @param id
      * @return
      */
     @GetMapping("/delete/{id}")
-    @ApiOperation(value = "删除练习册", notes = "通过id 删除练习册")
+    @ApiOperation(value = "删除题集", notes = "通过id 删除题集")
     public Mono<WebResult> delExerciseBook(@Valid @PathVariable String id) {
         return Mono.just(WebResult.okResult(problemSetService.delExerciseBook(id)));
     }
 
     /**
-     * 通过id查找练习册
+     * 通过id查找题集
      *
      * @param id
      * @return
      */
     @GetMapping("/findOne/{id}")
-    @ApiOperation(value = "查找练习册详细信息", notes = "通过id查找练习册,仅展示包括的题目id")
+    @ApiOperation(value = "查找题集详细信息", notes = "通过id查找题集,仅展示包括的题目id")
     public Mono<WebResult> findOne(@Valid @PathVariable String id) {
         return problemSetService.findOne(id).map(WebResult::okResult);
     }
 
     /**
-     * 通过id查找练习册及包含的题目全部信息
+     * 通过id查找题集及包含的题目全部信息
      */
     @GetMapping("/findDetailed/{id}")
-    @ApiOperation(value = "通过id查找练习册及包含的题目全部信息", notes = "通过id查找练习册及包含的题目全部信息")
+    @ApiOperation(value = "通过id查找题集及包含的题目全部信息", notes = "通过id查找题集及包含的题目全部信息")
     public Mono<WebResult> findAllDetailed(@Valid @PathVariable String id) {
         return problemSetService.findAllDetailed(id).map(WebResult::okResult);
     }
 
+    /**
+     * 生成练习册
+     *
+     * @param exerciseBookVo
+     * @return
+     */
+    @PostMapping("/generate/practice")
+    @ApiOperation(value = "生成练习册", notes = "根据id集,生成练习册 传入id修改,不传入id 新增")
+    public Mono<WebResult> buildExerciseBook(@Valid @RequestBody ExerciseBookVo exerciseBookVo) {
+        return exerciseBookService.buildBook(exerciseBookVo).map(WebResult::okResult);
+    }
 
-//    /**
-//     * 修改练习册属性
-//     *
-//     * @param exerciseBookAttributeVo
-//     * @return
-//     */
-//    @PostMapping("/edit/Attribute")
-//    public Mono<WebResult> editexerciseBookAttribute(@RequestBody ExerciseBookAttributeVo exerciseBookAttributeVo) {
-//        return problemSetService.editexerciseBookAttribute(exerciseBookAttributeVo).map(WebResult::okResult);
-//    }
-//
+    @ApiOperation(value = "题集 分页信息", notes = "查询题集分页信息")
+    @PostMapping("/findAll/detailed")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
+            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
+            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
+    })
+    public Mono<WebResult> findProblemSet(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody ProblemSetReq sortVo) {
+        return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
+    }
 
-//
+
+
+
+
 //    /**
 //     * 修改答案
 //     *
@@ -99,7 +118,7 @@ public class ExerciseBookCollection extends BaseController {
 //    public Mono<WebResult> editExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
 //        return problemSetService.editExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
 //    }
-//
+
 //    /**
 //     * 提交答案
 //     *

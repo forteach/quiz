@@ -46,12 +46,11 @@ public class SortVo {
     @ApiModelProperty(value = "操作人id", notes = "登陆未完成 手动传入操作人id", dataType = "string", name = "operatorId", example = "001", required = true)
     private String operatorId;
 
-    public Query queryPaging(Query query) {
+    public void queryPaging(Query query) {
         Sort sort = new Sort(Sort.Direction.DESC, this.getSorting());
         Pageable pageable = PageRequest.of(this.getPage(), this.getSize(), sort);
         query.with(sort);
         query.with(pageable);
-        return query;
     }
 
 }
