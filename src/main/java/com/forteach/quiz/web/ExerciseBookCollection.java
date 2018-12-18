@@ -57,7 +57,7 @@ public class ExerciseBookCollection extends BaseController {
     @GetMapping("/delete/{id}")
     @ApiOperation(value = "删除题集", notes = "通过id 删除题集")
     public Mono<WebResult> delExerciseBook(@Valid @PathVariable String id) {
-        return Mono.just(WebResult.okResult(problemSetService.delExerciseBook(id)));
+        return problemSetService.delExerciseBook(id).map(WebResult::okResult);
     }
 
     /**
@@ -105,16 +105,10 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "查找挂接的课堂练习题", notes = "查询练习册分页信息")
+    @ApiOperation(value = "查找挂接的课堂练习题", notes = "查找挂接的课堂练习题")
     @PostMapping("/findExerciseBook")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
-            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
-            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
-            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
-    })
-    public Mono<WebResult> findExerciseBook(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody ExerciseBookReq sortVo) {
-        return exerciseBookService.findExerciseBook(sortVo).collectList().map(WebResult::okResult);
+    public Mono<WebResult> findExerciseBook(@Valid @ApiParam(name = "ExerciseBookReq", value = "查找挂接的课堂练习题", required = true) @RequestBody ExerciseBookReq bookReq) {
+        return exerciseBookService.findExerciseBook(bookReq).map(WebResult::okResult);
     }
 
 
