@@ -23,7 +23,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@Api(value = "练习册,题集相关", tags = {"题集是题目的集合引用 练习册是生成的课后,课前作业等   练习册,题集相关操作"})
+@Api(value = "练习册,题集相关", tags = {"练习册,题集相关操作"})
 @RequestMapping(path = "/exerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ExerciseBookCollection extends BaseController {
 
@@ -82,13 +82,13 @@ public class ExerciseBookCollection extends BaseController {
     }
 
     /**
-     * 生成练习册
+     * 挂接课堂练习题目
      *
      * @param exerciseBookVo
      * @return
      */
     @PostMapping("/generate/practice")
-    @ApiOperation(value = "生成练习册", notes = "根据id集,生成练习册 传入id修改,不传入id 新增")
+    @ApiOperation(value = "生成挂接课堂练习题", notes = "根据id集,生成挂接课堂练习题 传入id修改,不传入id 新增")
     public Mono<WebResult> buildExerciseBook(@Valid @RequestBody ExerciseBookVo exerciseBookVo) {
         return exerciseBookService.buildBook(exerciseBookVo).map(WebResult::okResult);
     }
@@ -105,7 +105,7 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "练习册 分页信息", notes = "查询练习册分页信息")
+    @ApiOperation(value = "挂接的课堂练习题 分页信息", notes = "查询练习册分页信息")
     @PostMapping("/findExerciseBook")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
@@ -150,20 +150,7 @@ public class ExerciseBookCollection extends BaseController {
 //    public Mono<WebResult> correctExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
 //        return problemSetService.correctExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
 //    }
-//
 
-//
-//    /**
-//     * 生成作业册
-//     *
-//     * @param problemSetBackupVo
-//     * @return
-//     */
-//    @PostMapping("/edit/homework")
-//    public Mono<WebResult> editProblemSetBackup(@RequestBody ProblemSetBackupVo problemSetBackupVo) {
-//        return problemSetService.editProblemSetBackup(problemSetBackupVo).map(WebResult::okResult);
-//    }
-//
 //    /**
 //     * 更改练习册的题目 并修改到题库中
 //     *
