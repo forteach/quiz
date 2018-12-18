@@ -5,10 +5,13 @@ import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.vo.BigQuestionVo;
+import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
+import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +20,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
 /**
@@ -72,20 +77,39 @@ public class ExerciseBookService {
 
     public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        Criteria criteria = new Criteria();
+        final Criteria criteria = buildExerciseBook(sortVo.getExeBookType(), sortVo.getChapter(), sortVo.getCourseId());
 
         Query query = new Query(criteria);
 
-        if (isNotEmpty(sortVo.getExeBookType())) {
-            criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));
+        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
+    }
+
+    public Mono<UpdateResult> delExerciseBookPart(final DelExerciseBookPartVo delVo) {
+
+        final Criteria criteria = buildExerciseBook(delVo.getExeBookType(), delVo.getChapter(), delVo.getCourseId());
+
+        Update update = new Update();
+
+        update.pull("questionChildren", Query.query(Criteria.where(MONGDB_ID).is(delVo.getTargetId())));
+
+        return reactiveMongoTemplate
+                .updateMulti(Query.query(criteria), update, ExerciseBook.class);
+    }
+
+    private Criteria buildExerciseBook(final String exeBookType, final String chapter, final String courseId) {
+
+        Criteria criteria = new Criteria();
+
+        if (isNotEmpty(exeBookType)) {
+            criteria.and("exeBookType").in(Integer.parseInt(exeBookType));
         }
-        if (isNotEmpty(sortVo.getChapter())) {
-            criteria.and("chapter").in(sortVo.getChapter());
+        if (isNotEmpty(chapter)) {
+            criteria.and("chapter").in(chapter);
         }
-        if (isNotEmpty(sortVo.getCourseId())) {
-            criteria.and("courseId").in(sortVo.getCourseId());
+        if (isNotEmpty(courseId)) {
+            criteria.and("courseId").in(courseId);
         }
 
-        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
+        return criteria;
     }
 }
