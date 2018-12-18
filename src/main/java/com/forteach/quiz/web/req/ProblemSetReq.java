@@ -28,10 +28,16 @@ public class ProblemSetReq extends SortVo {
     private String sectionId;
 
     /**
-     * 知识点id
+     * 课程id
      */
-    @ApiModelProperty(value = "知识点id", name = "knowledgeId", example = "0")
-    private String knowledgeId;
+    @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
+    private String courseId;
+
+    /**
+     * 难易度id
+     */
+    @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
+    private String levelId;
 
     /**
      * 显示全部详情或者是只返回id

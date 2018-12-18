@@ -78,13 +78,16 @@ public class ExerciseBookService {
         Query query = new Query(criteria);
 
         if (isNotEmpty(sortVo.getExeBookType())) {
-            criteria.and("exeBookType").in(sortVo.getExeBookType());
+            criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));
         }
         if (isNotEmpty(sortVo.getSectionId())) {
             criteria.and("sectionId").in(sortVo.getSectionId());
         }
-        if (isNotEmpty(sortVo.getKnowledgeId())) {
-            criteria.and("knowledgeId").in(sortVo.getKnowledgeId());
+        if (isNotEmpty(sortVo.getCourseId())) {
+            criteria.and("courseId").in(sortVo.getCourseId());
+        }
+        if (isNotEmpty(sortVo.getLevelId())) {
+            criteria.and("levelId").in(sortVo.getLevelId());
         }
 
         sortVo.queryPaging(query);

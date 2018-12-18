@@ -55,10 +55,15 @@ public class ProblemSet extends BaseEntity {
     private String sectionId;
 
     /**
-     * 知识点id
+     * 课程id
      */
+    @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
+    private String courseId;
 
-    @ApiModelProperty(value = "知识点id", name = "knowledgeId", example = "0")
-    private String knowledgeId;
+    /**
+     * 难易度id
+     */
+    @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
+    private String levelId;
 
 }

@@ -17,7 +17,7 @@ public class ExerciseBookReq extends SortVo {
 
 
     /**
-     * 题集类型：1、预习练习册 2、课堂练习册3、课后作业册
+     * 挂接的课堂练习题：1、预习练习册 2、课堂练习册3、课后作业册
      */
     @ApiModelProperty(value = "题集类型", name = "exeBookType", example = "1、预习练习册 2、课堂练习册3、课后作业册")
     private String exeBookType;
@@ -29,10 +29,16 @@ public class ExerciseBookReq extends SortVo {
     private String sectionId;
 
     /**
-     * 知识点id
+     * 课程id
      */
-    @ApiModelProperty(value = "知识点id", name = "knowledgeId", example = "0")
-    private String knowledgeId;
+    @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
+    private String courseId;
+
+    /**
+     * 难易度id
+     */
+    @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
+    private String levelId;
 
 
 }
