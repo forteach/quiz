@@ -105,7 +105,7 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "挂接的课堂练习题 分页信息", notes = "查询练习册分页信息")
+    @ApiOperation(value = "查找挂接的课堂练习题", notes = "查询练习册分页信息")
     @PostMapping("/findExerciseBook")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),

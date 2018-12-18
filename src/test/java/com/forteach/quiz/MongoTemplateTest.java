@@ -117,7 +117,6 @@ public class MongoTemplateTest {
         update.set("questionChildren.$.paperInfo", obj.getPaperInfo());
         update.set("questionChildren.$.examChildren", obj.getExamChildren());
         update.set("questionChildren.$.type", obj.getType());
-        update.set("questionChildren.$.index", obj.getIndex());
         update.set("questionChildren.$.score", obj.getScore());
         update.set("questionChildren.$.teacherId", obj.getTeacherId());
 //        Update update = Update.update("examChildren.$.score",5).set("teacherId",123);
