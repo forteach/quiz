@@ -6,6 +6,7 @@ import com.forteach.quiz.service.ExerciseBookService;
 import com.forteach.quiz.service.ProblemSetService;
 import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.req.ProblemSetReq;
+import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +94,12 @@ public class ExerciseBookCollection extends BaseController {
         return exerciseBookService.buildBook(exerciseBookVo).map(WebResult::okResult);
     }
 
+    /**
+     * 查询题集分页信息
+     *
+     * @param sortVo
+     * @return
+     */
     @ApiOperation(value = "题集 分页信息", notes = "查询题集分页信息")
     @PostMapping("/findAll/detailed")
     @ApiImplicitParams({
@@ -105,10 +112,27 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
+    /**
+     * 查找挂接的课堂练习题
+     *
+     * @param bookReq
+     * @return
+     */
     @ApiOperation(value = "查找挂接的课堂练习题", notes = "查找挂接的课堂练习题")
     @PostMapping("/findExerciseBook")
     public Mono<WebResult> findExerciseBook(@Valid @ApiParam(name = "ExerciseBookReq", value = "查找挂接的课堂练习题", required = true) @RequestBody ExerciseBookReq bookReq) {
         return exerciseBookService.findExerciseBook(bookReq).map(WebResult::okResult);
+    }
+
+    /**
+     * 删除挂接的课堂练习题
+     *
+     * @return
+     */
+    @ApiOperation(value = "删除课堂练习题部分", notes = "删除课堂练习题部分")
+    @PostMapping("/delete/exerciseBookPart")
+    public Mono<WebResult> delExerciseBookPart(@Valid @ApiParam(name = "delVo", value = "通过题目id与挂接信息进行解除", required = true) @RequestBody DelExerciseBookPartVo delVo) {
+        return exerciseBookService.delExerciseBookPart(delVo).map(WebResult::okResult);
     }
 
 
@@ -133,7 +157,8 @@ public class ExerciseBookCollection extends BaseController {
 //    public Mono<WebResult> commitExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
 //        return problemSetService.commitExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
 //    }
-//
+
+
 //    /**
 //     * 提交练习册 主观题 批改
 //     *
@@ -145,17 +170,6 @@ public class ExerciseBookCollection extends BaseController {
 //        return problemSetService.correctExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
 //    }
 
-//    /**
-//     * 更改练习册的题目 并修改到题库中
-//     *
-//     * @param exerciseBookQuestionVo
-//     * @return
-//     */
-//    @PostMapping("/edit/questions")
-//    public Mono<WebResult> changeExerciseBookQuestions(@RequestBody ExerciseBookQuestionVo exerciseBookQuestionVo) {
-//        return problemSetService.changeExerciseBookQuestions(exerciseBookQuestionVo).map(WebResult::okResult);
-//    }
-//
 //    @PostMapping("/rewrite")
 //    public Mono<WebResult> associationAdd(@RequestBody RewriteVo rewriteVo) {
 //        return problemSetService.sheetRewrite(rewriteVo).map(WebResult::okResult);
