@@ -10,10 +10,11 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
@@ -69,9 +70,9 @@ public class ExerciseBookService {
                 ));
     }
 
-    public Flux<ExerciseBook> findExerciseBook(final ExerciseBookReq sortVo) {
+    public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+        Criteria criteria = new Criteria();
 
         Query query = new Query(criteria);
 
@@ -84,12 +85,7 @@ public class ExerciseBookService {
         if (isNotEmpty(sortVo.getCourseId())) {
             criteria.and("courseId").in(sortVo.getCourseId());
         }
-        if (isNotEmpty(sortVo.getLevelId())) {
-            criteria.and("levelId").in(sortVo.getLevelId());
-        }
 
-        sortVo.queryPaging(query);
-
-        return reactiveMongoTemplate.find(query, ExerciseBook.class);
+        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
     }
 }
