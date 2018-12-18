@@ -1,19 +1,20 @@
 package com.forteach.quiz.service;
 
-import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.web.req.ExerciseBookReq;
+import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
@@ -50,6 +51,8 @@ public class ExerciseBookService {
 
         final Map<String, Integer> idexMap = exerciseBookVo.getQuestionIds().stream().collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
 
+        final Map<String, String> previewMap = exerciseBookVo.getQuestionIds().stream().filter(obj -> isNotEmpty(obj.getPreview())).collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getPreview));
+
         return examQuestionsService
                 .findBigQuestionInId(
                         exerciseBookVo
@@ -57,11 +60,8 @@ public class ExerciseBookService {
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> {
-                    bigQuestion.setIndex(idexMap.get(bigQuestion.getId()));
-                    return bigQuestion;
-                })
-                .sort(Comparator.comparing(BigQuestion::getIndex))
+                .map(bigQuestion -> new BigQuestionVo(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
+                .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .flatMap(vos -> exerciseBookRepository.save(
                         new ExerciseBook<>(
@@ -70,27 +70,22 @@ public class ExerciseBookService {
                 ));
     }
 
-    public Flux<ExerciseBook> findExerciseBook(final ExerciseBookReq sortVo) {
+    public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+        Criteria criteria = new Criteria();
 
         Query query = new Query(criteria);
 
         if (isNotEmpty(sortVo.getExeBookType())) {
             criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));
         }
-        if (isNotEmpty(sortVo.getSectionId())) {
-            criteria.and("sectionId").in(sortVo.getSectionId());
+        if (isNotEmpty(sortVo.getChapter())) {
+            criteria.and("chapter").in(sortVo.getChapter());
         }
         if (isNotEmpty(sortVo.getCourseId())) {
             criteria.and("courseId").in(sortVo.getCourseId());
         }
-        if (isNotEmpty(sortVo.getLevelId())) {
-            criteria.and("levelId").in(sortVo.getLevelId());
-        }
 
-        sortVo.queryPaging(query);
-
-        return reactiveMongoTemplate.find(query, ExerciseBook.class);
+        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
     }
 }

@@ -91,7 +91,7 @@ public class ExamQuestionsCollection extends BaseController {
     @GetMapping("/delete/{id}")
     @ApiOperation(value = "删除题目", notes = "新增数据时 不添加id 修改时数据添加id")
     public Mono<WebResult> delQuestions(@Valid @PathVariable String id) {
-        return Mono.just(WebResult.okResult(examQuestionsService.delQuestions(id)));
+        return examQuestionsService.delQuestions(id).map(WebResult::okResult);
     }
 
 

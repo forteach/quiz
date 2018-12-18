@@ -62,7 +62,6 @@ public class ExamQuestionsService {
         update.set("questionChildren.$.paperInfo", bigQuestion.getPaperInfo());
         update.set("questionChildren.$.examChildren", bigQuestion.getExamChildren());
         update.set("questionChildren.$.type", bigQuestion.getType());
-        update.set("questionChildren.$.index", bigQuestion.getIndex());
         update.set("questionChildren.$.score", bigQuestion.getScore());
         return reactiveMongoTemplate.updateMulti(query, update, ExerciseBook.class).map(UpdateResult::getMatchedCount).flatMap(obj -> {
             if (obj != -1) {
@@ -187,7 +186,8 @@ public class ExamQuestionsService {
      * @return
      */
     public Mono<Void> delQuestions(final String id) {
-        return bigQuestionRepository.deleteById(id).and(delBankAssociation(Collections.singletonList(id)));
+        return bigQuestionRepository.deleteById(id)
+                .and(delBankAssociation(Collections.singletonList(id)));
     }
 
     public Flux<BigQuestion> findAllDetailed(final QuestionBankReq sortVo) {

@@ -1,9 +1,7 @@
 package com.forteach.quiz.web.req;
 
-import com.forteach.quiz.web.vo.SortVo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * @Description:
@@ -11,9 +9,8 @@ import lombok.EqualsAndHashCode;
  * @version: V1.0
  * @date: 2018/12/18  10:24
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class ExerciseBookReq extends SortVo {
+public class ExerciseBookReq {
 
 
     /**
@@ -25,20 +22,13 @@ public class ExerciseBookReq extends SortVo {
     /**
      * 章节id
      */
-    @ApiModelProperty(value = "章节id", name = "sectionId", example = "章节id")
-    private String sectionId;
+    @ApiModelProperty(value = "章节id", name = "chapter", example = "章节id")
+    private String chapter;
 
     /**
      * 课程id
      */
     @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
     private String courseId;
-
-    /**
-     * 难易度id
-     */
-    @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
-    private String levelId;
-
 
 }
