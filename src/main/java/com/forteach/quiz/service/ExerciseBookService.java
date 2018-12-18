@@ -1,10 +1,10 @@
 package com.forteach.quiz.service;
 
-import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.web.req.ExerciseBookReq;
+import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -57,11 +57,8 @@ public class ExerciseBookService {
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> {
-                    bigQuestion.setIndex(idexMap.get(bigQuestion.getId()));
-                    return bigQuestion;
-                })
-                .sort(Comparator.comparing(BigQuestion::getIndex))
+                .map(bigQuestion -> new BigQuestionVo(idexMap.get(bigQuestion.getId()), bigQuestion))
+                .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .flatMap(vos -> exerciseBookRepository.save(
                         new ExerciseBook<>(
@@ -79,8 +76,8 @@ public class ExerciseBookService {
         if (isNotEmpty(sortVo.getExeBookType())) {
             criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));
         }
-        if (isNotEmpty(sortVo.getSectionId())) {
-            criteria.and("sectionId").in(sortVo.getSectionId());
+        if (isNotEmpty(sortVo.getChapter())) {
+            criteria.and("chapter").in(sortVo.getChapter());
         }
         if (isNotEmpty(sortVo.getCourseId())) {
             criteria.and("courseId").in(sortVo.getCourseId());
