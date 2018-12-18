@@ -75,18 +75,30 @@ public class ExerciseBookService {
                 ));
     }
 
+    /**
+     * 查找挂接的课堂练习题
+     *
+     * @param sortVo
+     * @return
+     */
     public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        final Criteria criteria = buildExerciseBook(sortVo.getExeBookType(), sortVo.getChapter(), sortVo.getCourseId());
+        final Criteria criteria = buildExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId());
 
         Query query = new Query(criteria);
 
         return reactiveMongoTemplate.findOne(query, ExerciseBook.class).map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
     }
 
+    /**
+     * 删除课堂练习题部分子文档
+     *
+     * @param delVo
+     * @return
+     */
     public Mono<UpdateResult> delExerciseBookPart(final DelExerciseBookPartVo delVo) {
 
-        final Criteria criteria = buildExerciseBook(delVo.getExeBookType(), delVo.getChapter(), delVo.getCourseId());
+        final Criteria criteria = buildExerciseBook(delVo.getExeBookType(), delVo.getChapterId(), delVo.getCourseId());
 
         Update update = new Update();
 
@@ -96,15 +108,23 @@ public class ExerciseBookService {
                 .updateMulti(Query.query(criteria), update, ExerciseBook.class);
     }
 
-    private Criteria buildExerciseBook(final String exeBookType, final String chapter, final String courseId) {
+    /**
+     * 创建练习册的查询条件
+     *
+     * @param exeBookType
+     * @param chapterId
+     * @param courseId
+     * @return
+     */
+    private Criteria buildExerciseBook(final String exeBookType, final String chapterId, final String courseId) {
 
         Criteria criteria = new Criteria();
 
         if (isNotEmpty(exeBookType)) {
             criteria.and("exeBookType").in(Integer.parseInt(exeBookType));
         }
-        if (isNotEmpty(chapter)) {
-            criteria.and("chapter").in(chapter);
+        if (isNotEmpty(chapterId)) {
+            criteria.and("chapterId").in(chapterId);
         }
         if (isNotEmpty(courseId)) {
             criteria.and("courseId").in(courseId);
