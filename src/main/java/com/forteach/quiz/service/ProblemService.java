@@ -1,12 +1,17 @@
 package com.forteach.quiz.service;
 
 import com.alibaba.fastjson.JSON;
-import com.forteach.quiz.domain.*;
+import com.forteach.quiz.domain.ExerciseBook;
+import com.forteach.quiz.domain.ExerciseBookSheet;
+import com.forteach.quiz.domain.ProblemSetBackup;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
-import com.forteach.quiz.web.vo.*;
+import com.forteach.quiz.web.vo.ExerciseBookQuestionVo;
+import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
+import com.forteach.quiz.web.vo.ProblemSetBackupVo;
+import com.forteach.quiz.web.vo.RewriteVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,10 +19,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.Comparator;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.*;
 
@@ -54,52 +55,7 @@ public class ProblemService {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
 
-    /**
-     * 按照顺序 保存练习册
-     *
-     * @param exerciseBookVo
-     * @return
-     */
-    public Mono<ExerciseBook> buildExerciseBook(final ExerciseBookVo exerciseBookVo) {
 
-        final Map<String, Integer> idexMap = exerciseBookVo.getQuestionIds().stream().collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
-
-        return examQuestionsService
-                .findBigQuestionInId(
-                        exerciseBookVo
-                                .getQuestionIds()
-                                .stream()
-                                .map(QuestionIds::getBigQuestionId)
-                                .collect(Collectors.toList()))
-                .map(bigQuestion -> {
-                    bigQuestion.setIndex(idexMap.get(bigQuestion.getId()));
-                    return bigQuestion;
-                })
-                .sort(Comparator.comparing(BigQuestion::getIndex))
-                .collectList()
-                .flatMap(vos -> exerciseBookRepository.save(
-                        new ExerciseBook<>(
-                                exerciseBookVo.getExeBookType(), exerciseBookVo.getTeacherId(), exerciseBookVo.getExeBookName(), vos
-                        )
-                ));
-    }
-
-    /**
-     * 编辑保存练习册属性
-     *
-     * @param exerciseBookAttributeVo
-     * @return
-     */
-    public Mono<ExerciseBook> editexerciseBookAttribute(final ExerciseBookAttributeVo exerciseBookAttributeVo) {
-        return exerciseBookRepository
-                .findById(exerciseBookAttributeVo.getId())
-                .map(obj -> {
-                    obj.setExeBookName(exerciseBookAttributeVo.getExeBookName());
-                    obj.setExeBookType(exerciseBookAttributeVo.getExeBookType());
-                    return obj;
-                })
-                .flatMap(exerciseBookRepository::save);
-    }
 
     public Mono<Void> delExerciseBook(final String id) {
         return exerciseBookRepository.deleteById(id);
