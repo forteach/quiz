@@ -35,10 +35,6 @@ public class BigQuestion<T> extends AbstractExamEntity {
     @JsonView(BigQuestionView.Summary.class)
     protected String type;
 
-    @ApiModelProperty(value = "题册排序用坐标", name = "index", example = "1")
-    @JsonView(BigQuestionView.SummaryWithDetail.class)
-    protected int index;
-
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "章节id", name = "chapter", example = "463bcd8e5fed4a33883850c14f877271")
     protected String chapter;
@@ -71,12 +67,12 @@ public class BigQuestion<T> extends AbstractExamEntity {
         this.examChildren = examChildren;
     }
 
-    public BigQuestion(String paperInfo, List<T> examChildren, String type, int index) {
-        this.paperInfo = paperInfo;
-        this.examChildren = examChildren;
-        this.type = type;
-        this.index = index;
-    }
+//    public BigQuestion(String paperInfo, List<T> examChildren, String type, int index) {
+//        this.paperInfo = paperInfo;
+//        this.examChildren = examChildren;
+//        this.type = type;
+//        this.index = index;
+//    }
 
     public BigQuestion(String teacherId, List<T> examChildren, Double score) {
         this.score = score;
@@ -99,13 +95,13 @@ public class BigQuestion<T> extends AbstractExamEntity {
         this.examChildren = examChildren;
     }
 
-    public BigQuestion(int index, BigQuestion bigQuestion) {
-        this.id = bigQuestion.getId();
-        this.score = bigQuestion.getScore();
-        this.teacherId = bigQuestion.getTeacherId();
-        this.paperInfo = bigQuestion.getPaperInfo();
-        this.examChildren = bigQuestion.getExamChildren();
-        this.type = bigQuestion.getType();
-        this.index = index;
-    }
+//    public BigQuestion(int index, BigQuestion bigQuestion) {
+//        this.id = bigQuestion.getId();
+//        this.score = bigQuestion.getScore();
+//        this.teacherId = bigQuestion.getTeacherId();
+//        this.paperInfo = bigQuestion.getPaperInfo();
+//        this.examChildren = bigQuestion.getExamChildren();
+//        this.type = bigQuestion.getType();
+//        this.index = index;
+//    }
 }

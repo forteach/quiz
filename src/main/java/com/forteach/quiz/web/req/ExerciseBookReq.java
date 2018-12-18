@@ -25,8 +25,8 @@ public class ExerciseBookReq extends SortVo {
     /**
      * 章节id
      */
-    @ApiModelProperty(value = "章节id", name = "sectionId", example = "章节id")
-    private String sectionId;
+    @ApiModelProperty(value = "章节id", name = "chapter", example = "章节id")
+    private String chapter;
 
     /**
      * 课程id
