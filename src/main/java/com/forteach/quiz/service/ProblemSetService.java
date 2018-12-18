@@ -3,12 +3,15 @@ package com.forteach.quiz.service;
 import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.ProblemSet;
 import com.forteach.quiz.domain.QuestionIds;
+import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.repository.BigQuestionRepository;
-import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetRepository;
 import com.forteach.quiz.web.pojo.ProblemSetDet;
+import com.forteach.quiz.web.req.ProblemSetReq;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,6 +20,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.forteach.quiz.common.Dic.PARAMETER_ALL;
+import static com.forteach.quiz.common.Dic.PARAMETER_PART;
+import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
 /**
  * @Description:
@@ -27,7 +34,6 @@ import java.util.stream.Collectors;
 @Service
 public class ProblemSetService {
 
-    private final ExerciseBookRepository exerciseBookRepository;
 
     private final ExerciseBookSheetRepository exerciseBookSheetRepository;
 
@@ -40,11 +46,9 @@ public class ProblemSetService {
     private final BigQuestionRepository bigQuestionRepository;
 
 
-    public ProblemSetService(ExerciseBookRepository exerciseBookRepository,
-                             ExerciseBookSheetRepository exerciseBookSheetRepository,
+    public ProblemSetService(ExerciseBookSheetRepository exerciseBookSheetRepository,
                              ReactiveMongoTemplate reactiveMongoTemplate, CorrectService correctService,
                              ProblemSetRepository problemSetRepository, BigQuestionRepository bigQuestionRepository) {
-        this.exerciseBookRepository = exerciseBookRepository;
         this.exerciseBookSheetRepository = exerciseBookSheetRepository;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.correctService = correctService;
@@ -104,5 +108,50 @@ public class ProblemSetService {
     private Flux<BigQuestion> findById(final List<String> id) {
         return bigQuestionRepository.findAllById(id);
     }
+
+    private Flux<ProblemSet> findPratProblemSet(final ProblemSetReq sortVo) {
+
+        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+
+        Query query = new Query(criteria);
+
+        if (isNotEmpty(sortVo.getExeBookType())) {
+            criteria.and("exeBookType").in(sortVo.getExeBookType());
+        }
+        if (isNotEmpty(sortVo.getSectionId())) {
+            criteria.and("sectionId").in(sortVo.getSectionId());
+        }
+        if (isNotEmpty(sortVo.getKnowledgeId())) {
+            criteria.and("knowledgeId").in(sortVo.getKnowledgeId());
+        }
+
+        sortVo.queryPaging(query);
+
+        return reactiveMongoTemplate.find(query, ProblemSet.class);
+    }
+
+    private Flux<ProblemSet> findAllProblemSet(final ProblemSetReq sortVo) {
+        return findPratProblemSet(sortVo).flatMap(obj -> findAllDetailed(obj.getId()));
+    }
+
+
+    /**
+     * 根据分页信息查询
+     *
+     * @param sortVo
+     * @return
+     */
+    public Flux<ProblemSet> findProblemSet(final ProblemSetReq sortVo) {
+
+        if (PARAMETER_PART.equals(sortVo.getAllOrPart())) {
+            return findPratProblemSet(sortVo);
+        } else if (PARAMETER_ALL.equals(sortVo.getAllOrPart())) {
+            return findAllProblemSet(sortVo);
+        }
+
+        return Flux.error(new ExamQuestionsException("错误的查询条件"));
+
+    }
+
 
 }
