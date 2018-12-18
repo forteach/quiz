@@ -4,6 +4,7 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.domain.ProblemSet;
 import com.forteach.quiz.service.ExerciseBookService;
 import com.forteach.quiz.service.ProblemSetService;
+import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.req.ProblemSetReq;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
 import io.swagger.annotations.*;
@@ -22,7 +23,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@Api(value = "练习册,题集相关", tags = {"练习册,题集相关操作"})
+@Api(value = "练习册,题集相关", tags = {"题集是题目的集合引用 练习册是生成的课后,课前作业等   练习册,题集相关操作"})
 @RequestMapping(path = "/exerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ExerciseBookCollection extends BaseController {
 
@@ -104,8 +105,17 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
-
-
+    @ApiOperation(value = "练习册 分页信息", notes = "查询练习册分页信息")
+    @PostMapping("/findAll/detailed")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
+            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
+            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
+    })
+    public Mono<WebResult> findExerciseBook(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody ExerciseBookReq sortVo) {
+        return exerciseBookService.findExerciseBook(sortVo).collectList().map(WebResult::okResult);
+    }
 
 
 //    /**
