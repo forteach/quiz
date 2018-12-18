@@ -4,6 +4,7 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.domain.ProblemSet;
 import com.forteach.quiz.service.ExerciseBookService;
 import com.forteach.quiz.service.ProblemSetService;
+import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.req.ProblemSetReq;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
 import io.swagger.annotations.*;
@@ -81,13 +82,13 @@ public class ExerciseBookCollection extends BaseController {
     }
 
     /**
-     * 生成练习册
+     * 挂接课堂练习题目
      *
      * @param exerciseBookVo
      * @return
      */
     @PostMapping("/generate/practice")
-    @ApiOperation(value = "生成练习册", notes = "根据id集,生成练习册 传入id修改,不传入id 新增")
+    @ApiOperation(value = "生成挂接课堂练习题", notes = "根据id集,生成挂接课堂练习题 传入id修改,不传入id 新增")
     public Mono<WebResult> buildExerciseBook(@Valid @RequestBody ExerciseBookVo exerciseBookVo) {
         return exerciseBookService.buildBook(exerciseBookVo).map(WebResult::okResult);
     }
@@ -104,8 +105,17 @@ public class ExerciseBookCollection extends BaseController {
         return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
-
-
+    @ApiOperation(value = "挂接的课堂练习题 分页信息", notes = "查询练习册分页信息")
+    @PostMapping("/findExerciseBook")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
+            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
+            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
+    })
+    public Mono<WebResult> findExerciseBook(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody ExerciseBookReq sortVo) {
+        return exerciseBookService.findExerciseBook(sortVo).collectList().map(WebResult::okResult);
+    }
 
 
 //    /**
@@ -140,20 +150,7 @@ public class ExerciseBookCollection extends BaseController {
 //    public Mono<WebResult> correctExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
 //        return problemSetService.correctExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
 //    }
-//
 
-//
-//    /**
-//     * 生成作业册
-//     *
-//     * @param problemSetBackupVo
-//     * @return
-//     */
-//    @PostMapping("/edit/homework")
-//    public Mono<WebResult> editProblemSetBackup(@RequestBody ProblemSetBackupVo problemSetBackupVo) {
-//        return problemSetService.editProblemSetBackup(problemSetBackupVo).map(WebResult::okResult);
-//    }
-//
 //    /**
 //     * 更改练习册的题目 并修改到题库中
 //     *

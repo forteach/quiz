@@ -4,13 +4,19 @@ import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.repository.ExerciseBookRepository;
+import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
+import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
 /**
  * @Description:
@@ -25,9 +31,13 @@ public class ExerciseBookService {
 
     private final ExerciseBookRepository exerciseBookRepository;
 
-    public ExerciseBookService(ExamQuestionsService examQuestionsService, ExerciseBookRepository exerciseBookRepository) {
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
+
+    public ExerciseBookService(ExamQuestionsService examQuestionsService, ExerciseBookRepository exerciseBookRepository,
+                               ReactiveMongoTemplate reactiveMongoTemplate) {
         this.examQuestionsService = examQuestionsService;
         this.exerciseBookRepository = exerciseBookRepository;
+        this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
 
     /**
@@ -60,4 +70,27 @@ public class ExerciseBookService {
                 ));
     }
 
+    public Flux<ExerciseBook> findExerciseBook(final ExerciseBookReq sortVo) {
+
+        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+
+        Query query = new Query(criteria);
+
+        if (isNotEmpty(sortVo.getExeBookType())) {
+            criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));
+        }
+        if (isNotEmpty(sortVo.getSectionId())) {
+            criteria.and("sectionId").in(sortVo.getSectionId());
+        }
+        if (isNotEmpty(sortVo.getCourseId())) {
+            criteria.and("courseId").in(sortVo.getCourseId());
+        }
+        if (isNotEmpty(sortVo.getLevelId())) {
+            criteria.and("levelId").in(sortVo.getLevelId());
+        }
+
+        sortVo.queryPaging(query);
+
+        return reactiveMongoTemplate.find(query, ExerciseBook.class);
+    }
 }
