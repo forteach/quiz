@@ -50,6 +50,8 @@ public class ExerciseBookService {
 
         final Map<String, Integer> idexMap = exerciseBookVo.getQuestionIds().stream().collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
 
+        final Map<String, String> previewMap = exerciseBookVo.getQuestionIds().stream().filter(obj -> isNotEmpty(obj.getPreview())).collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getPreview));
+
         return examQuestionsService
                 .findBigQuestionInId(
                         exerciseBookVo
@@ -57,7 +59,7 @@ public class ExerciseBookService {
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> new BigQuestionVo(idexMap.get(bigQuestion.getId()), bigQuestion))
+                .map(bigQuestion -> new BigQuestionVo(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .flatMap(vos -> exerciseBookRepository.save(
