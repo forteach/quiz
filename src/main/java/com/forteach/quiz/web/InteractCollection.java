@@ -2,7 +2,7 @@ package com.forteach.quiz.web;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.service.ClassInteractService;
+import com.forteach.quiz.service.InteractService;
 import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
@@ -28,10 +28,10 @@ import java.util.List;
 @RequestMapping("/interact")
 public class InteractCollection extends BaseController {
 
-    private final ClassInteractService classInteractService;
+    private final InteractService interactService;
 
-    public InteractCollection(ClassInteractService classInteractService) {
-        this.classInteractService = classInteractService;
+    public InteractCollection(InteractService interactService) {
+        this.interactService = interactService;
     }
 
     /**
@@ -54,7 +54,7 @@ public class InteractCollection extends BaseController {
 
         return Flux.interval(Duration.ofSeconds(1))
                 .map(seq -> Tuples.of(
-                        seq, classInteractService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
+                        seq, interactService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
                 ))
                 .flatMap(Tuple2::getT2)
                 .map(data -> ServerSentEvent.<AskQuestionVo>builder()
@@ -73,7 +73,7 @@ public class InteractCollection extends BaseController {
 
         return Flux.interval(Duration.ofSeconds(1))
                 .map(seq -> Tuples.of(
-                        seq, classInteractService.achieveRaise(AchieveRaiseVo.builder().circleId(circleId).random(random).teacher(teacher).build())
+                        seq, interactService.achieveRaise(AchieveRaiseVo.builder().circleId(circleId).random(random).teacher(teacher).build())
                 )).flatMap(Tuple2::getT2)
                 .map(data -> ServerSentEvent.<List<Students>>builder()
                         .data(data)
@@ -91,7 +91,7 @@ public class InteractCollection extends BaseController {
 
         return Flux.interval(Duration.ofSeconds(1))
                 .map(seq -> Tuples.of(
-                        seq, classInteractService.achieveAnswer(AchieveAnswerVo.builder().circleId(circleId).random(random).teacher(teacher).build())
+                        seq, interactService.achieveAnswer(AchieveAnswerVo.builder().circleId(circleId).random(random).teacher(teacher).build())
                 )).flatMap(Tuple2::getT2)
                 .map(data -> ServerSentEvent.<List<CircleAnswer>>builder()
                         .data(data)
@@ -107,7 +107,7 @@ public class InteractCollection extends BaseController {
     @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
     @PostMapping("/launch/raise")
     public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody AskLaunchVo askLaunchVo) {
-        return classInteractService.launchRaise(askLaunchVo).map(WebResult::okResult);
+        return interactService.launchRaise(askLaunchVo).map(WebResult::okResult);
     }
 
     /**
@@ -119,7 +119,7 @@ public class InteractCollection extends BaseController {
     @PostMapping("/raise")
     @ApiOperation(value = "学生举手", notes = "课堂提问 学生举手")
     public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo) {
-        return classInteractService.raiseHand(raisehandVo).map(WebResult::okResult);
+        return interactService.raiseHand(raisehandVo).map(WebResult::okResult);
     }
 
     /**
@@ -131,7 +131,7 @@ public class InteractCollection extends BaseController {
     @ApiOperation(value = "发布问题", notes = "通过课堂id 及提问方式 进行发布问题")
     @PostMapping("/send/question")
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody GiveVo giveVo) {
-        return classInteractService.sendQuestion(giveVo).map(WebResult::okResult);
+        return interactService.sendQuestion(giveVo).map(WebResult::okResult);
     }
 
     /**
@@ -143,7 +143,7 @@ public class InteractCollection extends BaseController {
     @PostMapping("/send/answer")
     @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo) {
-        return classInteractService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
+        return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
     }
 
 
