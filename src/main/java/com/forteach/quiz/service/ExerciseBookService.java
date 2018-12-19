@@ -88,7 +88,7 @@ public class ExerciseBookService {
     public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
-                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
+                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList()).onErrorReturn(new ArrayList());
     }
 
     /**
