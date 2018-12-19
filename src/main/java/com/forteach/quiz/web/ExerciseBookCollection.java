@@ -8,6 +8,7 @@ import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.req.ProblemSetReq;
 import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
+import com.forteach.quiz.web.vo.PreviewChangeVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -133,6 +134,17 @@ public class ExerciseBookCollection extends BaseController {
     @PostMapping("/delete/exerciseBookPart")
     public Mono<WebResult> delExerciseBookPart(@Valid @ApiParam(name = "delVo", value = "通过题目id与挂接信息进行解除", required = true) @RequestBody DelExerciseBookPartVo delVo) {
         return exerciseBookService.delExerciseBookPart(delVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 编辑练习册 预习类型
+     *
+     * @return
+     */
+    @ApiOperation(value = "编辑练习册 预习类型", notes = "编辑练习册 预习类型")
+    @PostMapping("/edit/preview")
+    public Mono<WebResult> editPreview(@Valid @ApiParam(name = "delVo", value = "通过题目id与挂接信息进行编辑练习册", required = true) @RequestBody PreviewChangeVo changeVo) {
+        return exerciseBookService.editPreview(changeVo).map(WebResult::okResult);
     }
 
 

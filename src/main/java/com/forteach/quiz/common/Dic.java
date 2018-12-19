@@ -99,4 +99,12 @@ public class Dic {
     public static final String PARAMETER_ALL = "all";
 
     public static final String PARAMETER_PART = "part";
+
+    public static final String PREVIEW_BEFORE = "before";
+
+    public static final String PREVIEW_NOW = "now";
+
+    public static final String PREVIEW_ALL = "before,now";
+
+    public static final String EXE_BOOKTYPE_PREVIEW = "2";
 }
