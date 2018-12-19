@@ -17,7 +17,7 @@ public class QuestionIds {
     private String bigQuestionId;
 
     /**
-     * 课堂练习  before/预习 now/课堂 all/全部
+     * 课堂练习  before/预习 now/课堂 before,now/全部
      */
     private String preview;
 
