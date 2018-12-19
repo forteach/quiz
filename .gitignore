@@ -19,7 +19,7 @@
 mvnw
 mvnw.cmd
 .mvn
-
+*.sh
 ### NetBeans ###
 /nbproject/private/
 /build/
