@@ -38,7 +38,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
  */
 @Slf4j
 @Service
-public class ClassInteractService {
+public class SseInteractServiceImpl implements InteractService {
 
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
@@ -56,9 +56,9 @@ public class ClassInteractService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
 
-    public ClassInteractService(ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                                BigQuestionRepository bigQuestionRepository, AskAnswerRepository askAnswerRepository,
-                                StudentsService studentsService, CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
+    public SseInteractServiceImpl(ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations,
+                                  BigQuestionRepository bigQuestionRepository, AskAnswerRepository askAnswerRepository,
+                                  StudentsService studentsService, CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository = bigQuestionRepository;
@@ -75,6 +75,7 @@ public class ClassInteractService {
      * @param giveVo
      * @return
      */
+    @Override
     public Mono<Long> sendQuestion(final GiveVo giveVo) {
 
         HashMap<String, String> map = new HashMap<>(3);
@@ -113,6 +114,7 @@ public class ClassInteractService {
      *
      * @return
      */
+    @Override
     public Mono<List<CircleAnswer>> achieveAnswer(final AchieveAnswerVo achieves) {
         return Mono.just(achieves)
                 .filterWhen(achieveAnswerVo -> untitled(achieveAnswerVo.getAskKey()))
@@ -142,6 +144,7 @@ public class ClassInteractService {
      * @param achieveVo
      * @return
      */
+    @Override
     public Mono<AskQuestionVo> achieveQuestion(final AchieveVo achieveVo) {
         return askCategoryType(achieveVo.getAskKey())
                 .flatMap(type -> {
@@ -172,6 +175,7 @@ public class ClassInteractService {
      *
      * @return
      */
+    @Override
     public Mono<Long> sendAnswer(final InteractAnswerVo answerVo) {
 
         return Mono.just(answerVo)
@@ -207,6 +211,7 @@ public class ClassInteractService {
      * @param
      * @return
      */
+    @Override
     public Mono<Long> launchRaise(final AskLaunchVo askLaunchVo) {
         Mono<Long> deleteDistinctKey = stringRedisTemplate.delete(askLaunchVo.getRaiseDistinctKey());
         Mono<Long> deleteRaiseExmKey = stringRedisTemplate.delete(askLaunchVo.getRaiseKey(), "examinee");
@@ -219,6 +224,7 @@ public class ClassInteractService {
      *
      * @return
      */
+    @Override
     public Mono<Long> raiseHand(final RaisehandVo raisehandVo) {
         Mono<Long> set = stringRedisTemplate.opsForSet().add(raisehandVo.getRaiseKey(), raisehandVo.getExamineeId());
         Mono<Boolean> time = stringRedisTemplate.expire(raisehandVo.getRaiseKey(), Duration.ofSeconds(60 * 60 * 10));
@@ -234,6 +240,7 @@ public class ClassInteractService {
      * @param achieveRaiseVo
      * @return
      */
+    @Override
     public Mono<List<Students>> achieveRaise(final AchieveRaiseVo achieveRaiseVo) {
         return stringRedisTemplate.opsForSet().members(achieveRaiseVo.getRaiseKey())
                 .flatMap(studentsService::findStudentsBrief).collectList()
@@ -250,7 +257,7 @@ public class ClassInteractService {
      * @param listMono
      * @return
      */
-    public Mono<List<Students>> raiseDistinct(final String distinct, final Mono<List<Students>> listMono) {
+    private Mono<List<Students>> raiseDistinct(final String distinct, final Mono<List<Students>> listMono) {
         return listMono.filterWhen(list -> raiseIsDistinct(distinct, list.size()));
     }
 
@@ -431,7 +438,7 @@ public class ClassInteractService {
         return Mono.just(interactVo).flatMap(interactAnswerVo -> sendSelect(interactAnswerVo, ASK_INTERACTIVE_RAISE));
     }
 
-    public Mono<Boolean> isMember(final String redisKey, final String examineeId) {
+    private Mono<Boolean> isMember(final String redisKey, final String examineeId) {
         return stringRedisTemplate.opsForSet().isMember(redisKey, examineeId);
     }
 

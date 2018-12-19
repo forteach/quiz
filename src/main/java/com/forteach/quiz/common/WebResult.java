@@ -1,6 +1,8 @@
 package com.forteach.quiz.common;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.util.PropertiesUtil;
+import com.forteach.quiz.web.vo.BigQuestionView;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,12 +24,15 @@ import java.util.Map;
 @ApiModel(value = "返回数据对象", description = "统一的数据返回对象")
 public class WebResult implements Serializable {
 
+    @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(required = true, value = "返回码", dataType = "int", example = "0", position = 0)
     private int ret;
 
+    @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(required = true, value = "返回数据", dataType = "string", example = "{'id': '5c06d23bc8737b1dc8068da8'}", position = 1)
     private Object data;
 
+    @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(required = true, value = "msg信息", dataType = "string", example = "OK", position = 2)
     private String msg;
 
