@@ -3,19 +3,11 @@ package com.forteach.quiz.web;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.service.InteractService;
-import com.forteach.quiz.web.pojo.CircleAnswer;
-import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
 import io.swagger.annotations.*;
-import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
-
-import java.time.Duration;
-import java.util.List;
 
 /**
  * @Description:
@@ -25,7 +17,7 @@ import java.util.List;
  */
 @RestController
 @Api(value = "互动交互", tags = {"课堂提问等互动交互"})
-@RequestMapping("/interact")
+@RequestMapping(value = "/interact", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class InteractCollection extends BaseController {
 
     private final InteractService interactService;
@@ -49,17 +41,10 @@ public class InteractCollection extends BaseController {
             @ApiImplicitParam(name = "random", value = "随机数 每次访问需要", paramType = "get", dataType = "string", required = true)
     })
     @ApiOperation(value = "学生获取推送的题目", notes = "学生链接接口时 每有新题目 则接收")
-    @GetMapping(value = "/achieve/questions", produces = "text/event-stream;charset=UTF-8")
-    public Flux<ServerSentEvent<AskQuestionVo>> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
+    @GetMapping(value = "/achieve/questions")
+    public Mono<WebResult> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
 
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(seq -> Tuples.of(
-                        seq, interactService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build())
-                ))
-                .flatMap(Tuple2::getT2)
-                .map(data -> ServerSentEvent.<AskQuestionVo>builder()
-                        .data(data)
-                        .build());
+        return interactService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build()).map(WebResult::okResult);
     }
 
     @ApiImplicitParams({
@@ -68,16 +53,10 @@ public class InteractCollection extends BaseController {
             @ApiImplicitParam(name = "teacher", value = "教师id", paramType = "get", dataType = "string", required = true)
     })
     @ApiOperation(value = "老师获取实时举手的学生", notes = "每次有新的学生举手 则接收到推送")
-    @GetMapping(value = "/achieve/raise", produces = "text/event-stream;charset=UTF-8")
-    public Flux<ServerSentEvent<List<Students>>> achieveRaise(@RequestParam String circleId, @RequestParam String random, @RequestParam String teacher) {
+    @GetMapping(value = "/achieve/raise")
+    public Mono<WebResult> achieveRaise(@RequestParam String circleId, @RequestParam String random, @RequestParam String teacher) {
 
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(seq -> Tuples.of(
-                        seq, interactService.achieveRaise(AchieveRaiseVo.builder().circleId(circleId).random(random).teacher(teacher).build())
-                )).flatMap(Tuple2::getT2)
-                .map(data -> ServerSentEvent.<List<Students>>builder()
-                        .data(data)
-                        .build());
+        return interactService.achieveRaise(AchieveRaiseVo.builder().circleId(circleId).random(random).teacher(teacher).build()).map(WebResult::okResult);
     }
 
     @ApiImplicitParams({
@@ -86,16 +65,10 @@ public class InteractCollection extends BaseController {
             @ApiImplicitParam(name = "teacher", value = "教师id", paramType = "get", dataType = "string", required = true)
     })
     @ApiOperation(value = "老师获取实时学生的答题情况", notes = "每次有新的学生答案 则接收到推送")
-    @GetMapping(value = "/achieve/answer", produces = "text/event-stream;charset=UTF-8")
-    public Flux<ServerSentEvent<List<CircleAnswer>>> achieveQuestion(@RequestParam String circleId, @RequestParam String random, @RequestParam String teacher) {
+    @GetMapping(value = "/achieve/answer")
+    public Mono<WebResult> achieveQuestion(@RequestParam String circleId, @RequestParam String random, @RequestParam String teacher) {
 
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(seq -> Tuples.of(
-                        seq, interactService.achieveAnswer(AchieveAnswerVo.builder().circleId(circleId).random(random).teacher(teacher).build())
-                )).flatMap(Tuple2::getT2)
-                .map(data -> ServerSentEvent.<List<CircleAnswer>>builder()
-                        .data(data)
-                        .build());
+        return interactService.achieveAnswer(AchieveAnswerVo.builder().circleId(circleId).random(random).teacher(teacher).build()).map(WebResult::okResult);
     }
 
     /**
