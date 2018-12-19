@@ -7,6 +7,7 @@ import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.web.vo.ExerciseBookVo;
+import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.forteach.quiz.common.Dic.EXE_BOOKTYPE_PREVIEW;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
@@ -116,6 +118,22 @@ public class ExerciseBookService {
         Update update = new Update();
 
         update.pull("questionChildren", Query.query(Criteria.where(MONGDB_ID).is(delVo.getTargetId())));
+
+        return reactiveMongoTemplate
+                .updateMulti(Query.query(criteria), update, ExerciseBook.class);
+    }
+
+    /**
+     * 编辑练习册 预习类型
+     *
+     * @param changeVo
+     * @return
+     */
+    public Mono<UpdateResult> editPreview(final PreviewChangeVo changeVo) {
+
+        final Criteria criteria = buildExerciseBook(EXE_BOOKTYPE_PREVIEW, changeVo.getChapterId(), changeVo.getCourseId())
+                .and("questionChildren." + MONGDB_ID).is(changeVo.getTargetId());
+        Update update = Update.update("questionChildren.$.preview", changeVo.getPreview());
 
         return reactiveMongoTemplate
                 .updateMulti(Query.query(criteria), update, ExerciseBook.class);
