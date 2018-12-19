@@ -203,6 +203,10 @@ public class WebResult implements Serializable {
         return Mono.just(customResult(code, msg, ""));
     }
 
+    public static Mono<WebResult> okCustomResultMono(int code) {
+        return Mono.just(okResult(code));
+    }
+
     public static WebResult customResult(int code, String msg, Object obj) {
         WebResult wr = new WebResult();
         wr.setRet(code);

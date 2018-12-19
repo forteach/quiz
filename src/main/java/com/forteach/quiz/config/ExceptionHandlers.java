@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
 @RestControllerAdvice
 public class ExceptionHandlers {
 
+    public static final String NULL_POINTEREXCEPTION_EMPTY_DATA = "The mapper returned a null value.";
+
     @ExceptionHandler(Exception.class)
     public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, Exception e) {
         log.error("全局异常拦截器  {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
@@ -63,6 +65,16 @@ public class ExceptionHandlers {
     public Mono<WebResult> customException(ServerWebExchange exchange, CustomException e) {
         log.error("全局异常拦截器 校验及自反馈前端  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.okCustomResultMono(3000, e.getMessage());
+    }
+
+    @ExceptionHandler(value = NullPointerException.class)
+    public Mono<WebResult> nullPointerException(ServerWebExchange exchange, NullPointerException e) {
+        log.error("全局异常拦截器 校验及自反馈前端  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+
+        if (NULL_POINTEREXCEPTION_EMPTY_DATA.equals(e.getMessage())) {
+            return WebResult.okCustomResultMono(3000);
+        }
+        return WebResult.failResultMono(9000);
     }
 
 }
