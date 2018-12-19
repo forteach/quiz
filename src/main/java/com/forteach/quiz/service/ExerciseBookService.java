@@ -68,11 +68,15 @@ public class ExerciseBookService {
                 .map(bigQuestion -> new BigQuestionVo(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
-                .flatMap(vos -> exerciseBookRepository.save(
-                        new ExerciseBook<>(
-                                exerciseBookVo, vos
-                        )
-                ));
+                .zipWhen(list -> findExerciseBook(String.valueOf(exerciseBookVo.getExeBookType()), exerciseBookVo.getChapterId(), exerciseBookVo.getCourseId()))
+                .flatMap(tuple2 -> {
+                    if (isNotEmpty(tuple2.getT2().getId())) {
+                        tuple2.getT2().setQuestionChildren(tuple2.getT1());
+                        return exerciseBookRepository.save(tuple2.getT2());
+                    } else {
+                        return exerciseBookRepository.save(new ExerciseBook<>(exerciseBookVo, tuple2.getT1()));
+                    }
+                });
     }
 
     /**
@@ -83,11 +87,20 @@ public class ExerciseBookService {
      */
     public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        final Criteria criteria = buildExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId());
+        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
+                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
+    }
+
+    /**
+     * 查找需要挂接的课堂链接册
+     */
+    private Mono<ExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId) {
+
+        final Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId);
 
         Query query = new Query(criteria);
 
-        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList());
+        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).defaultIfEmpty(new ExerciseBook());
     }
 
     /**
