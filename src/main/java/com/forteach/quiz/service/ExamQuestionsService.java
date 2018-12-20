@@ -339,7 +339,8 @@ public class ExamQuestionsService {
                     JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(obj));
                     String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
                     switch (type) {
-                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:
+                        case QUESTION_CHOICE_OPTIONS_SINGLE:
+                        case QUESTION_CHOICE_MULTIPLE_SINGLE:
                             ChoiceQst choiceQst = JSON.parseObject(jsonObject.toJSONString(), ChoiceQst.class);
                             if (isEmpty(choiceQst.getId())) {
                                 choiceQst.setId(getRandomUUID());

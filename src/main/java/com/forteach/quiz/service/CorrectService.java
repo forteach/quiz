@@ -95,7 +95,8 @@ public class CorrectService {
                 String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
 
                 switch (type) {
-                    case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:
+                    case QUESTION_CHOICE_OPTIONS_SINGLE:
+                    case QUESTION_CHOICE_MULTIPLE_SINGLE:
                         ChoiceQst choiceQst = JSON.parseObject(jsonObject.toJSONString(), ChoiceQst.class);
                         answChildren.setScore(choice(choiceQst, answChildren));
                         break;
@@ -120,7 +121,8 @@ public class CorrectService {
                     JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
 
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
-                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE:
+                        case QUESTION_CHOICE_OPTIONS_SINGLE:
+                        case QUESTION_CHOICE_MULTIPLE_SINGLE:
                             ChoiceQst choiceQst = (ChoiceQst) bigQuestion.getExamChildren().get(0);
                             return Mono.just(String.valueOf(choice(choiceQst, answer)));
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
