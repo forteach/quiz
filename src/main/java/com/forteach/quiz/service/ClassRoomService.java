@@ -71,7 +71,7 @@ public class ClassRoomService {
      * @return
      */
     public Mono<String> createInteractiveRoom(final InteractiveRoomVo roomVo) {
-        return reactiveHashOperations.get(roomVo.getRoomKey(), "interactiveId")
+        return reactiveHashOperations.get(roomVo.getRoomKey(), "interactiveId").defaultIfEmpty("")
                 .flatMap(id -> {
                     if (isEmpty(id)) {
                         return buildRoom(roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey());
