@@ -67,4 +67,5 @@ public class InteractAnswerVo {
     public String getExamineeIsReplyKey() {
         return EXAMINEE_IS_REPLY_KEY.concat(circleId);
     }
+
 }

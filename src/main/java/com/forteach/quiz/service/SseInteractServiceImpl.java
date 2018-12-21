@@ -22,10 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
@@ -133,7 +130,7 @@ public class SseInteractServiceImpl implements InteractService {
                                 }))
                 )
                 .collectList()
-                .filterWhen(obj -> answerDistinct(achieves.getAnswDistinctKey(), achieves.getExamineeIsReplyKey()));
+                .filterWhen(obj -> answerDistinct(achieves.getAnswDistinctKey(), achieves.getExamineeIsReplyKey(), achieves.getAskKey()));
     }
 
     /**
@@ -201,7 +198,7 @@ public class SseInteractServiceImpl implements InteractService {
                     }
                 })
                 .map(UpdateResult::getModifiedCount)
-                .filterWhen(monoLong -> setRedis(answerVo.getExamineeIsReplyKey(), answerVo.getExamineeId()));
+                .filterWhen(monoLong -> setRedis(answerVo.getExamineeIsReplyKey(), answerVo.getExamineeId(), answerVo.getAskKey()));
     }
 
     /**
@@ -299,19 +296,23 @@ public class SseInteractServiceImpl implements InteractService {
      *
      * @return
      */
-    private Mono<Boolean> answerDistinct(final String distinctKey, final String setKey) {
+    private Mono<Boolean> answerDistinct(final String distinctKey, final String setKey, final String askKey) {
 
         return redisGet(distinctKey)
                 .switchIfEmpty(Mono.just(DISTINCT_INITIAL))
-                .zipWith(stringRedisTemplate.opsForSet().size(setKey), (origin, size) -> {
-                    if (origin.equals(String.valueOf(size))) {
+                .zipWhen(origin -> findAnswerFlag(askKey).defaultIfEmpty(DISTINCT_INITIAL))
+                .zipWith(stringRedisTemplate.opsForSet().size(setKey), (tuple2, size) -> {
+                    //T1 : 去重参数里的答题标识  T2 : 上课对象中的答题标识
+                    // 去重参数里的答题标识 & 上课答题标识 & 答题人数
+                    if (tuple2.getT1().equals(String.valueOf(size.intValue())) && tuple2.getT2().equals(String.valueOf(size.intValue()))) {
                         //如果等于 排除
                         return Mono.just(false);
                     }
+                    //去重参数里的答题标识 = 答题人数 / 但是去重参数里的答题标识 != 上课答题标识  表示第一次
                     //如果去重结果无数据 代表 第一次 返回
                     //如果上次推送长度与本次不一致 进行推送
-                    return saveRedis(distinctKey, String.valueOf(size));
-                }).flatMap(flag -> flag);
+                    return saveRedis(distinctKey, String.valueOf(size.intValue())).filterWhen(obj -> reactiveHashOperations.put(askKey, "answerFlag", String.valueOf(size.intValue())).map(Objects::nonNull));
+                }).flatMap(booleanMono -> booleanMono);
     }
 
     /**
@@ -469,6 +470,10 @@ public class SseInteractServiceImpl implements InteractService {
         return reactiveHashOperations.get(askKey, "questionId").flatMap(bigQuestionRepository::findById);
     }
 
+    private Mono<String> findAnswerFlag(final String askKey) {
+        return reactiveHashOperations.get(askKey, "answerFlag");
+    }
+
     /**
      * 判断学生是否被选中
      *
@@ -527,10 +532,12 @@ public class SseInteractServiceImpl implements InteractService {
         return stringRedisTemplate.hasKey(redisKey);
     }
 
-    private Mono<Boolean> setRedis(final String redisKey, final String value) {
+    private Mono<Boolean> setRedis(final String redisKey, final String value, final String askKey) {
+
         Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);
         Mono<Boolean> time = stringRedisTemplate.expire(redisKey, Duration.ofSeconds(60 * 60 * 10));
-        return set.zipWith(time, (c, t) -> t ? c : -1).map(monoLong -> monoLong != -1);
+
+        return set.zipWith(time, (c, t) -> t ? c : -1).map(monoLong -> monoLong != -1).filterWhen(take -> reactiveHashOperations.increment(askKey, "answerFlag", 1).map(Objects::nonNull));
     }
 
 
@@ -549,7 +556,7 @@ public class SseInteractServiceImpl implements InteractService {
     private Mono<String> askQuestionId(final String askKey) {
         return reactiveHashOperations.get(askKey, "questionId");
     }
-  
+
     private Mono<AskAnswer> findAskAnswer(final String circleId, final String examineeId, final String questionId) {
 
         Query query = Query.query(
