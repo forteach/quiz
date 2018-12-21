@@ -65,7 +65,7 @@ public class GiveVo {
             "     * 当老师重复提问问题时  但是两次的提问类型不一样  如第一次抢答 第二次提问\n" +
             "     * 需要传送切换标识\n" +
             "     * 0 : 原题目   非0 : 切题")
-    private int cut;
+    private String cut;
 
     public String getRaceAnswerFlag() {
         return CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);

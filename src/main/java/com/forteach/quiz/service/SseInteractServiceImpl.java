@@ -83,7 +83,7 @@ public class SseInteractServiceImpl implements InteractService {
         map.put("interactive", giveVo.getInteractive());
         map.put("category", giveVo.getCategory());
         map.put("selected", giveVo.getSelected());
-        map.put("cut", String.valueOf(giveVo.getCut()));
+        map.put("cut", giveVo.getCut());
 
         //如果本题和redis里的题目id不一致 视为换题 进行清理
         Mono<Boolean> clearCut = clearCut(giveVo);
