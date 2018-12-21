@@ -52,7 +52,7 @@ public class AchieveAnswerVo {
     }
 
     public String getAnswDistinctKey() {
-        return ANSW_HAND_STUDENT_DISTINCT.concat(circleId).concat(teacher).concat(random);
+        return ANSW_HAND_STUDENT_DISTINCT.concat(circleId).concat(random);
     }
 
 
