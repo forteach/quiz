@@ -22,4 +22,8 @@ public class KeyStorage {
 
     public static final String EXAMINEE_IS_REPLY_KEY = "askExamineeIsReply";
 
+    public static final String INTERACTIVE_CLASSROOM = "interactiveClassroom";
+
+    public static final String INTERACTIVE_CLASSROOM_STUDENTS = "ICStudents";
+
 }

@@ -75,7 +75,7 @@ public class SseInteractServiceImpl implements InteractService {
     @Override
     public Mono<Long> sendQuestion(final GiveVo giveVo) {
 
-        HashMap<String, String> map = new HashMap<>(3);
+        HashMap<String, String> map = new HashMap<>(10);
         map.put("questionId", giveVo.getQuestionId());
         map.put("interactive", giveVo.getInteractive());
         map.put("category", giveVo.getCategory());
