@@ -159,7 +159,7 @@ public class SseInteractServiceImpl implements InteractService {
                         .flatMap(cut ->
                                 askInteractiveType(achieveVo.getAskKey())
                                         .map(interactive ->
-                                                new AskQuestionVo(cut, bigQuestion, interactive))
+                                                new AskQuestionVo<BigQuestion>(cut, bigQuestion, interactive))
                         ));
     }
 
@@ -265,7 +265,7 @@ public class SseInteractServiceImpl implements InteractService {
      *
      * @return
      */
-    private Mono<BigQuestion> askDistinct(final Mono<BigQuestion> bigQuestionMono, final AchieveVo achieveVo) {
+    private Mono<OptBigQuestionVo> askDistinct(final Mono<OptBigQuestionVo> bigQuestionMono, final AchieveVo achieveVo) {
         return bigQuestionMono
                 .filterWhen(bigQuestion -> distinctKeyIsEmpty(achieveVo.getDistinctKey(bigQuestion.getId()), achieveVo.getAskKey()));
     }
@@ -359,22 +359,36 @@ public class SseInteractServiceImpl implements InteractService {
      * @param achieveVo
      * @return
      */
-    private Mono<BigQuestion> askPeople(final AchieveVo achieveVo) {
+    private Mono<OptBigQuestionVo> askPeople(final AchieveVo achieveVo) {
         return reactiveHashOperations.get(achieveVo.getAskKey(), ASK_INTERACTIVE)
                 .flatMap(interactive -> {
                     switch (interactive) {
                         case ASK_INTERACTIVE_RACE:
-                            return selectQuestion(achieveVo);
+                            return selectQuestion(achieveVo).transform(this::selected);
                         case ASK_INTERACTIVE_RAISE:
-                            return findBigQuestion(achieveVo.getAskKey());
+                            return findBigQuestion(achieveVo.getAskKey()).flatMap(obj -> raiseQuestion(achieveVo, obj));
                         case ASK_INTERACTIVE_SELECT:
-                            return selectQuestion(achieveVo);
+                            return selectQuestion(achieveVo).transform(this::selected);
                         case ASK_INTERACTIVE_VOTE:
                             return Mono.empty();
                         default:
                             throw new ExamQuestionsException("非法参数 错误的数据类型");
                     }
                 });
+    }
+
+    private Mono<OptBigQuestionVo> selected(final Mono<BigQuestion> bigQuestionMono) {
+        return bigQuestionMono.map(bigQuestion -> new OptBigQuestionVo(ASK_QUESTIONS_SELECTED, bigQuestion));
+    }
+
+    private Mono<OptBigQuestionVo> raiseQuestion(final AchieveVo achieve, final BigQuestion bigQuestion) {
+        return selectVerify(achieve.getAskKey(), achieve.getExamineeId()).map(flag -> {
+            if (flag) {
+                return new OptBigQuestionVo(ASK_QUESTIONS_SELECTED, bigQuestion);
+            } else {
+                return new OptBigQuestionVo(ASK_QUESTIONS_UN_SELECTED, bigQuestion);
+            }
+        });
     }
 
     /**

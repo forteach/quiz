@@ -106,5 +106,36 @@ public class Dic {
 
     public static final String PREVIEW_ALL = "before,now";
 
+    /**
+     * 课程挂接练习题  提问册
+     */
+    public static final String EXE_BOOKTYPE_ASK_QUESTIONS = "1";
+
+    /**
+     * 课程挂接练习题  练习册
+     */
     public static final String EXE_BOOKTYPE_PREVIEW = "2";
+
+    /**
+     * 课程挂接练习题  课后作业册
+     */
+    public static final String EXE_BOOKTYPE_BOOK_OF_JOB = "3";
+
+    /**
+     * 提问 选中
+     */
+    public static final String ASK_QUESTIONS_SELECTED = "1";
+
+    /**
+     * 提问 未选中
+     */
+    public static final String ASK_QUESTIONS_UN_SELECTED = "2";
+
+
+
+
+
+
+
+
 }

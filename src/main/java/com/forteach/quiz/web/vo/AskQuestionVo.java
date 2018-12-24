@@ -1,7 +1,6 @@
 package com.forteach.quiz.web.vo;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.forteach.quiz.domain.BigQuestion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -16,7 +15,7 @@ import lombok.Data;
 @Data
 @Builder
 @ApiModel(value = "学生获取的提问题目信息", description = "接收的cut值 提交答案需要")
-public class AskQuestionVo {
+public class AskQuestionVo<T> {
 
     /**
      * 提交答案所需cut值
@@ -30,7 +29,7 @@ public class AskQuestionVo {
      */
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "题目信息", name = "bigQuestion")
-    private BigQuestion bigQuestion;
+    private T bigQuestion;
 
     /**
      * 参与方式
@@ -42,9 +41,10 @@ public class AskQuestionVo {
             "     * vote   : 投票", name = "circleId", notes = "")
     private String participate;
 
-    public AskQuestionVo(String cut, BigQuestion bigQuestion, String participate) {
+    public AskQuestionVo(String cut, T bigQuestion, String participate) {
         this.cut = cut;
         this.bigQuestion = bigQuestion;
         this.participate = participate;
     }
+
 }
