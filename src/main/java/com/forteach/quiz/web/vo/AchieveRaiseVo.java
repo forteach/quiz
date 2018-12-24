@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
+import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 import static com.forteach.quiz.common.KeyStorage.RAISE_HAND_STUDENT_DISTINCT;
 
 /**
@@ -36,6 +37,16 @@ public class AchieveRaiseVo {
      * 随机数
      */
     private String random;
+
+
+    /**
+     * 获取redis 提问 key
+     *
+     * @return
+     */
+    public String getAskKey() {
+        return CLASSROOM_ASK_QUESTIONS_ID.concat(circleId);
+    }
 
     public String getRaiseKey() {
         return ASK_RAISE_HAND.concat(circleId);

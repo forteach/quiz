@@ -242,7 +242,7 @@ public class SseInteractServiceImpl implements InteractService {
         return stringRedisTemplate.opsForSet().members(achieveRaiseVo.getRaiseKey())
                 .flatMap(studentsService::findStudentsBrief).collectList()
                 .filter(list -> list.size() > 0)
-                .transform(listMono -> raiseDistinct(achieveRaiseVo.getRaiseDistinctKey(), listMono));
+                .transform(listMono -> raiseDistinct(achieveRaiseVo.getRaiseDistinctKey(), listMono, achieveRaiseVo.getAskKey()));
     }
 
     /**
@@ -254,8 +254,8 @@ public class SseInteractServiceImpl implements InteractService {
      * @param listMono
      * @return
      */
-    private Mono<List<Students>> raiseDistinct(final String distinct, final Mono<List<Students>> listMono) {
-        return listMono.filterWhen(list -> raiseIsDistinct(distinct, list.size()));
+    private Mono<List<Students>> raiseDistinct(final String distinct, final Mono<List<Students>> listMono, final String askKey) {
+        return listMono.filterWhen(list -> raiseIsDistinct(distinct, list.size(), askKey));
     }
 
     /**
@@ -339,16 +339,17 @@ public class SseInteractServiceImpl implements InteractService {
                 });
     }
 
-    private Mono<Boolean> raiseIsDistinct(final String redisKey, final int size) {
+    private Mono<Boolean> raiseIsDistinct(final String redisKey, final int size, final String askKey) {
         return redisGet(redisKey)
                 .switchIfEmpty(Mono.just(DISTINCT_INITIAL))
-                .flatMap(origin -> {
-                    if (DISTINCT_INITIAL.equals(origin)) {
-                        return saveRedis(redisKey, String.valueOf(size));
-                    } else if (origin.equals(String.valueOf(size))) {
+                .zipWhen(origin -> askQuestionCut(askKey))
+                .flatMap(tuple2 -> {
+                    if (DISTINCT_INITIAL.equals(tuple2.getT1())) {
+                        return saveRedis(redisKey, String.valueOf(size).concat(tuple2.getT2()));
+                    } else if (tuple2.getT1().equals(String.valueOf(size).concat(tuple2.getT2()))) {
                         return Mono.just(false);
                     }
-                    return saveRedis(redisKey, String.valueOf(size));
+                    return saveRedis(redisKey, String.valueOf(size).concat(tuple2.getT2()));
                 });
     }
 
