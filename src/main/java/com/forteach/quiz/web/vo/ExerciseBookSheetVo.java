@@ -53,4 +53,14 @@ public class ExerciseBookSheetVo {
      * 是否老师让学生撤回
      */
     private int rewrite;
+
+    /**
+     * 章节id
+     */
+    private String chapterId;
+
+    /**
+     * 课程id
+     */
+    private String courseId;
 }

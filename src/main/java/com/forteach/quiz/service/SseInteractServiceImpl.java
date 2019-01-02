@@ -100,9 +100,9 @@ public class SseInteractServiceImpl implements InteractService {
                 .flatMap(flag -> {
                     if (flag) {
                         //清除提问标识
-                        return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey());
+                        return Mono.just(false);
                     }
-                    return Mono.just(false);
+                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey());
                 });
     }
 

@@ -45,7 +45,8 @@ public class ClassRoomService {
      * @return
      */
     public Mono<Long> joinInteractiveRoom(final JoinInteractiveRoomVo joinVo) {
-        return stringRedisTemplate.opsForSet().add(joinVo.getJoinKey(), joinVo.getExamineeId());
+        return stringRedisTemplate.opsForSet().add(joinVo.getJoinKey(), joinVo.getExamineeId())
+                .filterWhen(obj -> stringRedisTemplate.expire(joinVo.getJoinKey(), Duration.ofSeconds(60 * 60 * 2)));
 
     }
 

@@ -20,7 +20,7 @@ import org.springframework.beans.BeanUtils;
 public class OptBigQuestionVo extends BigQuestion {
 
     @JsonView(BigQuestionView.Summary.class)
-    @ApiModelProperty(value = "是否被选中  1 : 被选中 / 0 : 未被选中", name = "selected", example = "1")
+    @ApiModelProperty(value = "是否被选中  1 : 被选中 / 2 : 未被选中", name = "selected", example = "1")
     private String selected;
 
     public OptBigQuestionVo() {
