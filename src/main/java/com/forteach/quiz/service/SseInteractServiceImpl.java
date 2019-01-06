@@ -4,12 +4,10 @@ import com.forteach.quiz.domain.AskAnswer;
 import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.repository.AskAnswerRepository;
 import com.forteach.quiz.repository.BigQuestionRepository;
 import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
-import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -44,7 +42,7 @@ public class SseInteractServiceImpl implements InteractService {
 
     private final BigQuestionRepository bigQuestionRepository;
 
-    private final AskAnswerRepository askAnswerRepository;
+    private final InteractRecordService interactRecordService;
 
     private final StudentsService studentsService;
 
@@ -54,15 +52,15 @@ public class SseInteractServiceImpl implements InteractService {
 
 
     public SseInteractServiceImpl(ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                                  BigQuestionRepository bigQuestionRepository, AskAnswerRepository askAnswerRepository,
+                                  BigQuestionRepository bigQuestionRepository, InteractRecordService interactRecordService,
                                   StudentsService studentsService, CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository = bigQuestionRepository;
-        this.askAnswerRepository = askAnswerRepository;
         this.studentsService = studentsService;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.interactRecordService = interactRecordService;
     }
 
 
@@ -91,7 +89,8 @@ public class SseInteractServiceImpl implements InteractService {
         //删除抢答答案
         Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag());
 
-        return Flux.concat(set, time, removeRace, clearCut).filter(flag -> !flag).count();
+        return Flux.concat(set, time, removeRace, clearCut).filter(flag -> !flag).count()
+                .filterWhen(obj -> interactRecordService.releaseQuestion(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), giveVo.getInteractive()));
     }
 
     private Mono<Boolean> clearCut(final GiveVo giveVo) {
@@ -173,7 +172,7 @@ public class SseInteractServiceImpl implements InteractService {
      * @return
      */
     @Override
-    public Mono<Long> sendAnswer(final InteractAnswerVo answerVo) {
+    public Mono<String> sendAnswer(final InteractAnswerVo answerVo) {
 
         return Mono.just(answerVo)
                 .transform(this::filterSelectVerify)
@@ -197,8 +196,8 @@ public class SseInteractServiceImpl implements InteractService {
                         return Mono.error(new AskException("请重新刷新获取最新题目"));
                     }
                 })
-                .map(UpdateResult::getModifiedCount)
-                .filterWhen(monoLong -> setRedis(answerVo.getExamineeIsReplyKey(), answerVo.getExamineeId(), answerVo.getAskKey()));
+                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(), answerVo.getExamineeId(), answerVo.getAskKey()))
+                .filterWhen(right -> interactRecordService.answer(answerVo.getCircleId(), answerVo.getQuestionId(), answerVo.getExamineeId(), answerVo.getAnswer(), right));
     }
 
     /**
@@ -218,15 +217,18 @@ public class SseInteractServiceImpl implements InteractService {
 
     /**
      * 学生进行举手
-     *
+     * 最后记录
      * @return
      */
     @Override
     public Mono<Long> raiseHand(final RaisehandVo raisehandVo) {
         Mono<Long> set = stringRedisTemplate.opsForSet().add(raisehandVo.getRaiseKey(), raisehandVo.getExamineeId());
         Mono<Boolean> time = stringRedisTemplate.expire(raisehandVo.getRaiseKey(), Duration.ofSeconds(60 * 60 * 10));
-        return set.zipWith(time, (c, t) -> t ? c : -1);
+        Mono<String> questionId = askQuestionId(raisehandVo.getAskKey());
+        return set.zipWith(time, (c, t) -> t ? c : -1)
+                .filterWhen(obj -> questionId.flatMap(qid -> interactRecordService.raiseHand(raisehandVo.getCircleId(), raisehandVo.getExamineeId(), qid)));
     }
+
 
     /**
      * 主动推送给老师举手的学生
@@ -430,7 +432,7 @@ public class SseInteractServiceImpl implements InteractService {
      *
      * @return
      */
-    private Mono<UpdateResult> sendRace(final InteractAnswerVo interactAnswerVo) {
+    private Mono<String> sendRace(final InteractAnswerVo interactAnswerVo) {
         return stringRedisTemplate.hasKey(interactAnswerVo.getRaceAnswerFlag())
                 .flatMap(flag -> {
                     if (flag) {
@@ -450,7 +452,7 @@ public class SseInteractServiceImpl implements InteractService {
     /**
      * 举手 回答
      */
-    private Mono<UpdateResult> sendRaise(final InteractAnswerVo interactVo) {
+    private Mono<String> sendRaise(final InteractAnswerVo interactVo) {
         return Mono.just(interactVo).flatMap(interactAnswerVo -> sendSelect(interactAnswerVo, ASK_INTERACTIVE_RAISE));
     }
 
@@ -463,7 +465,7 @@ public class SseInteractServiceImpl implements InteractService {
      *
      * @return
      */
-    private Mono<UpdateResult> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
+    private Mono<String> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
 
         return correctService.correcting(interactAnswerVo.getQuestionId(), interactAnswerVo.getAnswer())
                 .flatMap(f -> {
@@ -477,7 +479,13 @@ public class SseInteractServiceImpl implements InteractService {
                     update.set("right", String.valueOf(f));
                     update.set("uDate", new Date());
 
-                    return reactiveMongoTemplate.upsert(query, update, AskAnswer.class);
+                    return reactiveMongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
+                        if (result.wasAcknowledged()) {
+                            return Mono.just(f);
+                        } else {
+                            return Mono.error(new AskException("操作失败"));
+                        }
+                    });
                 });
     }
 

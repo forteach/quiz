@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
+import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
  * @Description:
@@ -31,6 +32,15 @@ public class RaisehandVo {
 
     public String getRaiseKey() {
         return ASK_RAISE_HAND.concat(circleId);
+    }
+
+    /**
+     * 获取redis 提问 key
+     *
+     * @return
+     */
+    public String getAskKey() {
+        return CLASSROOM_ASK_QUESTIONS_ID.concat(circleId);
     }
 
 }
