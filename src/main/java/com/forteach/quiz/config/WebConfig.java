@@ -36,4 +36,29 @@ public class WebConfig implements WebFluxConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
+//    @Bean
+//    public RouterFunction<ServerResponse> routes() {
+//        return RouterFunctions.route(
+//                GET("/idx"),
+//                request -> ServerResponse.ok().body(BodyInserters.fromResource(new ClassPathResource("resources/static/idx.html")))
+//        );
+//    }
+
+//    @Bean
+//    public HandlerMapping handlerMapping() {
+//        Map<String, WebSocketHandler> map = new HashMap<>(5);
+//        map.put("/websocket/demo", new InteractSocketHandler());
+//
+//        SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+//        mapping.setUrlMap(map);
+//        // before annotated controllers
+//        mapping.setOrder(-1);
+//        return mapping;
+//    }
+
+//    @Bean
+//    public WebSocketHandlerAdapter handlerAdapter() {
+//        return new WebSocketHandlerAdapter();
+//    }
+
 }

@@ -45,7 +45,7 @@ public interface InteractService {
      * @param answerVo
      * @return
      */
-    Mono<Long> sendAnswer(final InteractAnswerVo answerVo);
+    Mono<String> sendAnswer(final InteractAnswerVo answerVo);
 
     /**
      * 课堂提问

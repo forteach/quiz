@@ -8,7 +8,9 @@ import com.forteach.quiz.domain.TrueOrFalse;
 import com.forteach.quiz.service.ExamQuestionsService;
 import com.forteach.quiz.web.req.QuestionBankReq;
 import com.forteach.quiz.web.req.QuestionProblemSetReq;
+import com.forteach.quiz.web.vo.AddChildrenVo;
 import com.forteach.quiz.web.vo.QuestionBankVo;
+import com.forteach.quiz.web.vo.UpdateChildrenVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -136,5 +138,33 @@ public class ExamQuestionsCollection extends BaseController {
         return examQuestionsService.findOneDetailed(id).map(WebResult::okResult);
     }
 
+
+    @ApiOperation(value = "删除大体下某题目", notes = "删除大体下某题目")
+    @PostMapping("/bigQuestion/partRemove/{id}")
+    public Mono<WebResult> questionPartDetailed(@Valid @ApiParam(name = "根据大体下子项id删除", value = "根据大体下子项id删除", required = true) @PathVariable String id) {
+        return examQuestionsService.deleteChildren(id).map(WebResult::okResult);
+    }
+
+    /**
+     * 修改大体下某题目
+     *
+     * @return
+     */
+    @PostMapping("/bigQuestion/partUpdate")
+    @ApiOperation(value = "修改大体下某题目", notes = "修改大体下某题目")
+    public Mono<WebResult> questionPartUpdate(@Valid @RequestBody UpdateChildrenVo updateChildrenVo) {
+        return examQuestionsService.updateChildren(updateChildrenVo.getChildrenId(), updateChildrenVo.getJson(), updateChildrenVo.getTeacherId()).map(WebResult::okResult);
+    }
+
+    /**
+     * 增加大体下子项
+     *
+     * @return
+     */
+    @PostMapping("/bigQuestion/partAdd")
+    @ApiOperation(value = "增加大体下子项", notes = "增加大体下子项")
+    public Mono<WebResult> questionPartAdd(@Valid @RequestBody AddChildrenVo addChildrenVo) {
+        return examQuestionsService.addChildren(addChildrenVo.getQuestionId(), addChildrenVo.getJson(), addChildrenVo.getTeacherId()).map(WebResult::okResult);
+    }
 
 }

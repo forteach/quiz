@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.*;
@@ -220,8 +221,6 @@ public class ExamQuestionsService {
     }
 
 
-
-
     private Flux<BigQuestion> findPartQuestion(final QuestionBankReq sortVo) {
         //返回指定字段
         BasicDBObject fieldsObject = new BasicDBObject();
@@ -399,6 +398,127 @@ public class ExamQuestionsService {
      */
     public Mono<ProblemSet> findProblemSet(final String exerciseBookId) {
         return problemSetRepository.findById(exerciseBookId);
+    }
+
+    /**
+     * 更新大题中的某项
+     *
+     * @param childrenId
+     * @param json
+     * @return
+     */
+    public Mono<Boolean> updateChildren(final String childrenId, final String json, final String teacherId) {
+
+        JSONObject jsonObject = JSON.parseObject(json);
+
+        String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
+
+        Query query = Query.query(Criteria.where(BIG_QUESTION_EXAM_CHILDREN + "." + MONGDB_ID).is(childrenId));
+        Update update = new Update();
+
+        switch (type) {
+            case QUESTION_CHOICE_OPTIONS_SINGLE:
+            case QUESTION_CHOICE_MULTIPLE_SINGLE:
+                ChoiceQst choiceQst = JSON.parseObject(jsonObject.toJSONString(), ChoiceQst.class);
+                choiceQst.setId(childrenId);
+
+                update.set("examChildren.$.score", choiceQst.getScore());
+                update.set("examChildren.$.teacherId", teacherId);
+                update.set("examChildren.$.examType", "bigQuestion");
+                update.set("examChildren.$.choiceQstTxt", choiceQst.getChoiceQstTxt());
+                update.set("examChildren.$.choiceQstAnsw", choiceQst.getChoiceQstAnsw());
+                update.set("examChildren.$.choiceQstAnalysis", choiceQst.getChoiceQstAnalysis());
+                update.set("examChildren.$.choiceType", choiceQst.getChoiceType());
+                update.set("examChildren.$.optChildren", choiceQst.getOptChildren());
+
+                break;
+            case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
+                TrueOrFalse trueOrFalse = JSON.parseObject(jsonObject.toJSONString(), TrueOrFalse.class);
+                trueOrFalse.setId(childrenId);
+
+                update.set("examChildren.$.score", trueOrFalse.getScore());
+                update.set("examChildren.$.teacherId", teacherId);
+                update.set("examChildren.$.examType", "bigQuestion");
+                update.set("examChildren.$.trueOrFalseInfo", trueOrFalse.getTrueOrFalseInfo());
+                update.set("examChildren.$.trueOrFalseAnsw", trueOrFalse.getTrueOrFalseAnsw());
+                update.set("examChildren.$.trueOrFalseAnalysis", trueOrFalse.getTrueOrFalseAnalysis());
+                break;
+            case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
+                Design design = JSON.parseObject(jsonObject.toJSONString(), Design.class);
+                design.setId(childrenId);
+
+                update.set("examChildren.$.score", design.getScore());
+                update.set("examChildren.$.teacherId", teacherId);
+                update.set("examChildren.$.examType", "bigQuestion");
+                update.set("examChildren.$.designQuestion", design.getDesignQuestion());
+                update.set("examChildren.$.designAnsw", design.getDesignAnsw());
+                update.set("examChildren.$.designAnalysis", design.getDesignAnalysis());
+                break;
+            default:
+                throw new ExamQuestionsException("非法参数 错误的题目类型");
+        }
+
+        return reactiveMongoTemplate.updateFirst(query, update, BigQuestion.class).map(UpdateResult::wasAcknowledged);
+
+
+    }
+
+    /**
+     * 删除大题中的某项
+     *
+     * @param childrenId
+     * @return
+     */
+    public Mono<Boolean> deleteChildren(final String childrenId) {
+
+        Query query = Query.query(Criteria.where(BIG_QUESTION_EXAM_CHILDREN + "." + MONGDB_ID).is(childrenId));
+
+        Update update = new Update();
+        update.pull("examChildren", new BasicDBObject(MONGDB_ID, childrenId));
+        return reactiveMongoTemplate.updateFirst(query, update, BigQuestion.class).map(Objects::nonNull);
+    }
+
+    /**
+     * 新增大题子题目一项
+     *
+     * @param questionId
+     * @return
+     */
+    public Mono<Boolean> addChildren(final String questionId, final String json, final String teacherId) {
+
+        JSONObject jsonObject = JSON.parseObject(json);
+
+        Query query = Query.query(Criteria.where(MONGDB_ID).is(questionId));
+
+        Update update = new Update();
+
+        String type = jsonObject.getString(BIG_QUESTION_EXAM_CHILDREN_TYPE);
+
+        BigQuestion bigQuestion = new BigQuestion();
+
+        switch (type) {
+            case QUESTION_CHOICE_OPTIONS_SINGLE:
+            case QUESTION_CHOICE_MULTIPLE_SINGLE:
+                ChoiceQst choiceQst = JSON.parseObject(jsonObject.toJSONString(), ChoiceQst.class);
+                choiceQst.setTeacherId(teacherId);
+                bigQuestion.setExamChildren(Collections.singletonList(choiceQst));
+                break;
+            case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
+                TrueOrFalse trueOrFalse = JSON.parseObject(jsonObject.toJSONString(), TrueOrFalse.class);
+                trueOrFalse.setTeacherId(teacherId);
+                bigQuestion.setExamChildren(Collections.singletonList(trueOrFalse));
+                break;
+            case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
+                Design design = JSON.parseObject(jsonObject.toJSONString(), Design.class);
+                design.setTeacherId(teacherId);
+                bigQuestion.setExamChildren(Collections.singletonList(design));
+                break;
+            default:
+                throw new ExamQuestionsException("非法参数 错误的题目类型");
+        }
+        setBigQuestionUUID(bigQuestion);
+        update.push("examChildren", bigQuestion.getExamChildren().get(0));
+        return reactiveMongoTemplate.updateFirst(query, update, BigQuestion.class).map(Objects::nonNull);
     }
 
 }

@@ -33,19 +33,26 @@ public class ClassRoomService {
 
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
 
-    public ClassRoomService(StudentsService studentsService, ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations) {
+    private final InteractRecordService interactRecordService;
+
+    public ClassRoomService(StudentsService studentsService, ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations
+            , InteractRecordService interactRecordService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.studentsService = studentsService;
+        this.interactRecordService = interactRecordService;
     }
 
     /**
      * 学生加入课堂
+     * 最后记录学生加入信息
      *
      * @return
      */
     public Mono<Long> joinInteractiveRoom(final JoinInteractiveRoomVo joinVo) {
-        return stringRedisTemplate.opsForSet().add(joinVo.getJoinKey(), joinVo.getExamineeId());
+        return stringRedisTemplate.opsForSet().add(joinVo.getJoinKey(), joinVo.getExamineeId())
+                .filterWhen(obj -> stringRedisTemplate.expire(joinVo.getJoinKey(), Duration.ofSeconds(60 * 60 * 2)))
+                .filterWhen(obj -> interactRecordService.join(joinVo.getCircleId(), joinVo.getExamineeId()));
 
     }
 
@@ -66,6 +73,7 @@ public class ClassRoomService {
      * 创建课堂
      * 数据有就返回,没有就创建
      * 两个小时
+     * 最后记录创建
      *
      * @param roomVo
      * @return
@@ -78,17 +86,20 @@ public class ClassRoomService {
                     } else {
                         return Mono.just(id);
                     }
-                });
+                })
+                .filterWhen(circleId -> interactRecordService.init(circleId, roomVo.getTeacherId()));
     }
 
     /**
      * 重新覆写创建课堂
+     * 最后记录创建
      *
      * @param roomVo
      * @return
      */
     public Mono<String> createCoverInteractiveRoom(final InteractiveRoomVo roomVo) {
-        return buildRoom(roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey());
+        return buildRoom(roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey())
+                .filterWhen(circleId -> interactRecordService.init(circleId, roomVo.getTeacherId()));
     }
 
     private Mono<String> buildRoom(final String teacherId, final String chapterId, final String roomKey) {
@@ -99,7 +110,7 @@ public class ClassRoomService {
         final String interactiveId = getRandomUUID();
 
         HashMap<String, String> map = new HashMap<>(10);
-        map.put("interactiveId", getRandomUUID());
+        map.put("interactiveId", interactiveId);
         map.put("effectTime", effectTime.toString());
         map.put("failureTime", failureTime.toString());
         map.put("teacherId", teacherId);
