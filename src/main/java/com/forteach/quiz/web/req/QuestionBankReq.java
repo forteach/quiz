@@ -48,4 +48,7 @@ public class QuestionBankReq extends SortVo {
     @ApiModelProperty(value = "显示全部详情或者是只返回id all 全部/part 只显示id", name = "questionType", example = "part")
     private String allOrPart;
 
+    @ApiModelProperty(value = "关键字", name = "keyword", example = "")
+    private String[] keyword;
+
 }

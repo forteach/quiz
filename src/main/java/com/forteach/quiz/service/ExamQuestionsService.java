@@ -16,7 +16,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -48,12 +47,14 @@ public class ExamQuestionsService {
 
     private final ProblemSetRepository problemSetRepository;
 
+    private final KeywordService keywordService;
 
     public ExamQuestionsService(ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionRepository bigQuestionRepository,
-                                ProblemSetRepository problemSetRepository) {
+                                ProblemSetRepository problemSetRepository, KeywordService keywordService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionRepository = bigQuestionRepository;
         this.problemSetRepository = problemSetRepository;
+        this.keywordService = keywordService;
     }
 
     private Mono<BigQuestion> editQuestionsCover(final BigQuestion bigQuestion) {
@@ -222,42 +223,35 @@ public class ExamQuestionsService {
 
 
     private Flux<BigQuestion> findPartQuestion(final QuestionBankReq sortVo) {
-        //返回指定字段
-        BasicDBObject fieldsObject = new BasicDBObject();
-        fieldsObject.put("id", 1);
-        fieldsObject.put("chapterId", 1);
-        fieldsObject.put("levelId", 1);
-        fieldsObject.put("knowledgeId", 1);
-        fieldsObject.put("examType", 1);
-        fieldsObject.put("teacherId", 1);
-        fieldsObject.put("uDate", 1);
-        //查询条件
-        BasicDBObject dbObject = new BasicDBObject();
-        if (isNotEmpty(sortVo.getLevelId())) {
-            dbObject.put("levelId", sortVo.getLevelId());
-        }
-        if (isNotEmpty(sortVo.getChapterId())) {
-            dbObject.put("chapterId", sortVo.getChapterId());
-        }
-        if (isNotEmpty(sortVo.getKnowledgeId())) {
-            dbObject.put("knowledgeId", sortVo.getKnowledgeId());
-        }
-        if (isNotEmpty(sortVo.getQuestionType())) {
-            dbObject.put("examChildren.examType", sortVo.getQuestionType());
-        }
-        //创建查询条件
-        Query query = new BasicQuery(dbObject.toJson(), fieldsObject.toJson());
-        //分页及排序等
+
+        Query query = buildFindQuestion(sortVo);
+
+        query.fields()
+                .include(MONGDB_ID)
+                .include("chapterId")
+                .include("levelId")
+                .include("knowledgeId")
+                .include("examType")
+                .include("teacherId")
+                .include("uDate");
+
         sortVo.queryPaging(query);
-        //执行查询
+
         return reactiveMongoTemplate.find(query, BigQuestion.class);
     }
 
     private Flux<BigQuestion> findAllQuestion(final QuestionBankReq sortVo) {
 
-        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+        Query query = buildFindQuestion(sortVo);
 
-        Query query = new Query(criteria);
+        sortVo.queryPaging(query);
+
+        return reactiveMongoTemplate.find(query, BigQuestion.class);
+    }
+
+    private Query buildFindQuestion(final QuestionBankReq sortVo) {
+
+        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
 
         if (isNotEmpty(sortVo.getLevelId())) {
             criteria.and("levelId").in(sortVo.getLevelId());
@@ -271,12 +265,13 @@ public class ExamQuestionsService {
         if (isNotEmpty(sortVo.getQuestionType())) {
             criteria.and("examChildren.examType").in(sortVo.getQuestionType());
         }
+        if (sortVo.getKeyword() == null || sortVo.getKeyword().length < 1) {
+            criteria.and("keyword").all(sortVo.getKeyword());
+        }
 
-        sortVo.queryPaging(query);
-
-        return reactiveMongoTemplate.find(query, BigQuestion.class);
+        Query query = new Query(criteria);
+        return query;
     }
-
 
     public Mono<BigQuestion> findOneDetailed(final String id) {
         return bigQuestionRepository.findById(id).switchIfEmpty(Mono.error(new CustomException("没有找到考题")));

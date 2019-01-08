@@ -58,6 +58,12 @@ public class BigQuestion<T> extends AbstractExamEntity {
     @ApiModelProperty(value = "知识点id", name = "knowledgeId", example = "0")
     private String knowledgeId;
 
+    /**
+     * 关键词
+     */
+    @ApiModelProperty(value = "关键词", name = "keyword", example = "")
+    private List<String> keyword;
+
     public BigQuestion() {
     }
 
