@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -62,6 +63,7 @@ public class BigQuestion<T> extends AbstractExamEntity {
      * 关键词
      */
     @ApiModelProperty(value = "关键词", name = "keyword", example = "")
+    @Indexed
     private List<String> keyword;
 
     public BigQuestion() {
@@ -72,13 +74,6 @@ public class BigQuestion<T> extends AbstractExamEntity {
         this.setUDate(new Date());
         this.examChildren = examChildren;
     }
-
-//    public BigQuestion(String paperInfo, List<T> examChildren, String type, int index) {
-//        this.paperInfo = paperInfo;
-//        this.examChildren = examChildren;
-//        this.type = type;
-//        this.index = index;
-//    }
 
     public BigQuestion(String teacherId, List<T> examChildren, Double score) {
         this.score = score;
@@ -101,13 +96,4 @@ public class BigQuestion<T> extends AbstractExamEntity {
         this.examChildren = examChildren;
     }
 
-//    public BigQuestion(int index, BigQuestion bigQuestion) {
-//        this.id = bigQuestion.getId();
-//        this.score = bigQuestion.getScore();
-//        this.teacherId = bigQuestion.getTeacherId();
-//        this.paperInfo = bigQuestion.getPaperInfo();
-//        this.examChildren = bigQuestion.getExamChildren();
-//        this.type = bigQuestion.getType();
-//        this.index = index;
-//    }
 }
