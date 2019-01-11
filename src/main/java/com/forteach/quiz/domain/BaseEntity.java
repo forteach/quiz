@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.web.vo.BigQuestionView;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -29,18 +28,4 @@ public abstract class BaseEntity {
     @JsonView({BigQuestionView.Summary.class})
     protected Date uDate;
 
-}
-
-@EqualsAndHashCode(callSuper = true)
-@Data
-class AbstractExamEntity extends BaseEntity{
-
-    @ApiModelProperty(value = "题目分数", name = "score", example = "5")
-    protected Double score;
-
-    /**
-     * 创作老师
-     */
-    @ApiModelProperty(value = "创建人id", name = "teacherId", example = "5c06d23sz8737b1dc8068da8")
-    protected String teacherId;
 }

@@ -1,7 +1,6 @@
-package com.forteach.quiz.service;
+package com.forteach.quiz.questionlibrary.service;
 
-import com.forteach.quiz.domain.BigQuestion;
-import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
@@ -22,14 +22,12 @@ import static com.forteach.quiz.common.Dic.MONGDB_ID;
  * @date: 2019/1/8  10:00
  */
 @Service
-public class KeywordService {
+public class KeywordService<T extends QuestionExamEntity> {
 
-    private final BigQuestionRepository repository;
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public KeywordService(BigQuestionRepository repository, ReactiveMongoTemplate reactiveMongoTemplate) {
-        this.repository = repository;
+    public KeywordService(ReactiveMongoTemplate reactiveMongoTemplate) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
 
@@ -48,7 +46,7 @@ public class KeywordService {
         Update update = new Update();
         update.set("keyword", keyword);
 
-        return reactiveMongoTemplate.upsert(Query.query(criteria), update, BigQuestion.class).map(UpdateResult::isModifiedCountAvailable);
+        return reactiveMongoTemplate.upsert(Query.query(criteria), update, entityClass()).map(UpdateResult::isModifiedCountAvailable);
     }
 
     /**
@@ -66,7 +64,7 @@ public class KeywordService {
         Update update = new Update();
         update.pullAll("keyword", keyword);
 
-        return reactiveMongoTemplate.upsert(Query.query(criteria), update, BigQuestion.class).map(UpdateResult::isModifiedCountAvailable);
+        return reactiveMongoTemplate.upsert(Query.query(criteria), update, entityClass()).map(UpdateResult::isModifiedCountAvailable);
     }
 
     /**
@@ -84,11 +82,11 @@ public class KeywordService {
 
         query.fields().include(MONGDB_ID);
 
-        return reactiveMongoTemplate.find(Query.query(criteria), BigQuestion.class).map(BigQuestion::getId);
+        return reactiveMongoTemplate.find(Query.query(criteria), entityClass()).map(QuestionExamEntity::getId);
 
     }
 
-    public Flux<BigQuestion> keywordFilter(final Flux<BigQuestion> questionFlux, final String[] keyword) {
+    public Flux<T> keywordFilter(final Flux<T> questionFlux, final String[] keyword) {
 
         if (keyword == null || keyword.length < 1) {
             return questionFlux;
@@ -100,6 +98,15 @@ public class KeywordService {
                 .filterWhen(flux -> questionFlux.zipWith(keywordList, (questions, keywords) ->
                         keywords.contains(flux.getId())
                 ));
+    }
+
+    /**
+     * 获取泛型的class
+     *
+     * @return
+     */
+    private Class<T> entityClass() {
+        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
 }

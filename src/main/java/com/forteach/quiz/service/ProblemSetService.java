@@ -1,10 +1,10 @@
 package com.forteach.quiz.service;
 
-import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.ProblemSet;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetRepository;
 import com.forteach.quiz.web.pojo.ProblemSetDet;

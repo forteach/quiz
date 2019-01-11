@@ -2,6 +2,7 @@ package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
+import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.vo.BigQuestionVo;
@@ -35,15 +36,15 @@ import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 @Service
 public class ExerciseBookService {
 
-    private final ExamQuestionsService examQuestionsService;
+    private final BigQuestionService bigQuestionService;
 
     private final ExerciseBookRepository exerciseBookRepository;
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public ExerciseBookService(ExamQuestionsService examQuestionsService, ExerciseBookRepository exerciseBookRepository,
+    public ExerciseBookService(BigQuestionService bigQuestionService, ExerciseBookRepository exerciseBookRepository,
                                ReactiveMongoTemplate reactiveMongoTemplate) {
-        this.examQuestionsService = examQuestionsService;
+        this.bigQuestionService = bigQuestionService;
         this.exerciseBookRepository = exerciseBookRepository;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
     }
@@ -60,7 +61,7 @@ public class ExerciseBookService {
 
         final Map<String, String> previewMap = exerciseBookVo.getQuestionIds().stream().filter(obj -> isNotEmpty(obj.getPreview())).collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getPreview));
 
-        return examQuestionsService
+        return bigQuestionService
                 .findBigQuestionInId(
                         exerciseBookVo
                                 .getQuestionIds()

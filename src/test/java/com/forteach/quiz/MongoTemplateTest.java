@@ -2,9 +2,9 @@ package com.forteach.quiz;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.domain.AskAnswer;
-import com.forteach.quiz.domain.BigQuestion;
-import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.ExerciseBook;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.question.Design;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,18 +1,20 @@
-package com.forteach.quiz.repository;
+package com.forteach.quiz.questionlibrary.repository.base;
 
-import com.forteach.quiz.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 
 /**
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
- * @date: 2018/11/15  11:16
+ * @date: 2019/1/10  11:10
  */
-public interface BigQuestionRepository extends ReactiveMongoRepository<BigQuestion,String> {
+@NoRepositoryBean
+public interface QuestionMongoRepository<T extends QuestionExamEntity> extends ReactiveMongoRepository<T, String> {
 
     /**
      * 根据id 分页查询对象
@@ -22,7 +24,7 @@ public interface BigQuestionRepository extends ReactiveMongoRepository<BigQuesti
      * @return
      */
     @Query("{ 'teacherId':?0}")
-    Flux<BigQuestion> findAllDetailedPage(final String teacherId, final Pageable page);
+    Flux<T> findAllDetailedPage(final String teacherId, final Pageable page);
 
 
 }

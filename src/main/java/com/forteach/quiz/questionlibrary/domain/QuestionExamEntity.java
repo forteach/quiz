@@ -1,28 +1,34 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.questionlibrary.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.web.vo.BigQuestionView;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.List;
 
 /**
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
- * @date: 2018/11/15  11:04
+ * @date: 2019/1/10  11:02
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Document(collection = "bigQuestion")
-@ApiModel(value = "题对象", description = "所有的题目类型 全部由大题外部封装   由examChildren展示具体的题目信息")
-public class BigQuestion<T> extends AbstractExamEntity {
+public class QuestionExamEntity<T> extends BaseEntity {
+
+    @ApiModelProperty(value = "题目分数", name = "score", example = "5")
+    protected Double score;
+
+    /**
+     * 创作老师
+     */
+    @ApiModelProperty(value = "创建人id", name = "teacherId", example = "5c06d23sz8737b1dc8068da8")
+    protected String teacherId;
 
     @ApiModelProperty(value = "大题用题干", name = "paperInfo", example = "阅读理解... ...")
     @JsonView(BigQuestionView.Summary.class)
@@ -44,6 +50,7 @@ public class BigQuestion<T> extends AbstractExamEntity {
      * 是否修改应用到所有的练习册
      * 1 : 应用到所有练习册    0  :  只修改本题
      */
+    @Transient
     @ApiModelProperty(value = "是否修改应用到所有的练习册", name = "relate", example = "0")
     private int relate;
 
@@ -65,35 +72,5 @@ public class BigQuestion<T> extends AbstractExamEntity {
     @ApiModelProperty(value = "关键词", name = "keyword", example = "")
     @Indexed
     private List<String> keyword;
-
-    public BigQuestion() {
-    }
-
-    public BigQuestion(final String id, final List<T> examChildren) {
-        this.id = id;
-        this.setUDate(new Date());
-        this.examChildren = examChildren;
-    }
-
-    public BigQuestion(String teacherId, List<T> examChildren, Double score) {
-        this.score = score;
-        this.teacherId = teacherId;
-        this.examChildren = examChildren;
-    }
-
-    public BigQuestion(String teacherId, String paperInfo, List<T> examChildren, Double score) {
-        this.score = score;
-        this.teacherId = teacherId;
-        this.paperInfo = paperInfo;
-        this.examChildren = examChildren;
-    }
-
-    public BigQuestion(String id, Double score, String teacherId, String paperInfo, List<T> examChildren) {
-        this.id = id;
-        this.score = score;
-        this.teacherId = teacherId;
-        this.paperInfo = paperInfo;
-        this.examChildren = examChildren;
-    }
 
 }

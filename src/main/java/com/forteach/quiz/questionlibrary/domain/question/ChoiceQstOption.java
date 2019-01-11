@@ -1,4 +1,4 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.questionlibrary.domain.question;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.web.vo.BigQuestionView;

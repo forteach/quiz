@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

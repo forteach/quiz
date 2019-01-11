@@ -1,10 +1,10 @@
 package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.AskAnswer;
-import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.repository.BigQuestionRepository;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;

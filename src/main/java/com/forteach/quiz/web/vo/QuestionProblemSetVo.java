@@ -1,7 +1,7 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.domain.BigQuestion;
 import com.forteach.quiz.domain.ProblemSet;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

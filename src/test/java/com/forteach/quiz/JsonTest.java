@@ -2,10 +2,10 @@ package com.forteach.quiz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.forteach.quiz.domain.BigQuestion;
-import com.forteach.quiz.domain.Design;
 import com.forteach.quiz.domain.ExerciseBook;
-import com.forteach.quiz.domain.TrueOrFalse;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.question.Design;
+import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -5,6 +5,7 @@ import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.domain.ProblemSetBackup;
 import com.forteach.quiz.exceptions.ProblemSetException;
+import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
@@ -31,7 +32,7 @@ import static com.forteach.quiz.common.Dic.*;
 @Service
 public class ProblemService {
 
-    private final ExamQuestionsService examQuestionsService;
+    private final BigQuestionService bigQuestionService;
 
     private final ExerciseBookRepository exerciseBookRepository;
 
@@ -44,10 +45,10 @@ public class ProblemService {
     private final CorrectService correctService;
 
 
-    public ProblemService(ExamQuestionsService examQuestionsService, ExerciseBookRepository exerciseBookRepository,
+    public ProblemService(BigQuestionService bigQuestionService, ExerciseBookRepository exerciseBookRepository,
                           ExerciseBookSheetRepository exerciseBookSheetRepository, ProblemSetBackupRepository problemSetBackupRepository,
                           CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
-        this.examQuestionsService = examQuestionsService;
+        this.bigQuestionService = bigQuestionService;
         this.exerciseBookRepository = exerciseBookRepository;
         this.problemSetBackupRepository = problemSetBackupRepository;
         this.exerciseBookSheetRepository = exerciseBookSheetRepository;
@@ -116,7 +117,7 @@ public class ProblemService {
      */
     public Mono<ExerciseBook> changeExerciseBookQuestions(final ExerciseBookQuestionVo exerciseBookQuestionVo) {
 
-        return examQuestionsService.editExerciseBookQuestion(exerciseBookQuestionVo.getRelate(), exerciseBookQuestionVo.getBigQuestions())
+        return bigQuestionService.editExerciseBookQuestion(exerciseBookQuestionVo.getRelate(), exerciseBookQuestionVo.getBigQuestions())
                 .collectList()
                 .flatMap(questionList -> exerciseBookRepository
                         .findById(exerciseBookQuestionVo.getExerciseBookId())
