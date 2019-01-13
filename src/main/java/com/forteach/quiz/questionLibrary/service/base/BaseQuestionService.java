@@ -1,7 +1,7 @@
-package com.forteach.quiz.questionlibrary.service.base;
+package com.forteach.quiz.questionLibrary.service.base;
 
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
-import com.forteach.quiz.web.req.QuestionBankReq;
+import com.forteach.quiz.questionLibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionLibrary.web.req.QuestionBankReq;
 import com.mongodb.client.result.UpdateResult;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

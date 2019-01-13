@@ -1,13 +1,13 @@
-package com.forteach.quiz.questionlibrary.web.control.base;
+package com.forteach.quiz.questionLibrary.web.control.base;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
-import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
-import com.forteach.quiz.questionlibrary.domain.question.Design;
-import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
-import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
-import com.forteach.quiz.web.req.QuestionBankReq;
-import com.forteach.quiz.web.vo.QuestionBankVo;
+import com.forteach.quiz.questionLibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionLibrary.domain.question.ChoiceQst;
+import com.forteach.quiz.questionLibrary.domain.question.Design;
+import com.forteach.quiz.questionLibrary.domain.question.TrueOrFalse;
+import com.forteach.quiz.questionLibrary.service.base.BaseQuestionService;
+import com.forteach.quiz.questionLibrary.web.req.QuestionBankReq;
+import com.forteach.quiz.questionLibrary.web.vo.QuestionBankVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;

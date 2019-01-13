@@ -1,20 +1,20 @@
-package com.forteach.quiz.questionlibrary.service;
+package com.forteach.quiz.questionLibrary.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.forteach.quiz.domain.ProblemSet;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
-import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
-import com.forteach.quiz.questionlibrary.domain.question.Design;
-import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
-import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
-import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
-import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
-import com.forteach.quiz.questionlibrary.service.base.BaseBaseQuestionServiceImpl;
+import com.forteach.quiz.questionLibrary.domain.BigQuestion;
+import com.forteach.quiz.questionLibrary.domain.question.ChoiceQst;
+import com.forteach.quiz.questionLibrary.domain.question.Design;
+import com.forteach.quiz.questionLibrary.domain.question.TrueOrFalse;
+import com.forteach.quiz.questionLibrary.reflect.QuestionReflect;
+import com.forteach.quiz.questionLibrary.repository.BigQuestionRepository;
+import com.forteach.quiz.questionLibrary.repository.base.QuestionMongoRepository;
+import com.forteach.quiz.questionLibrary.service.base.BaseBaseQuestionServiceImpl;
 import com.forteach.quiz.repository.ProblemSetRepository;
-import com.forteach.quiz.web.req.QuestionBankReq;
+import com.forteach.quiz.questionLibrary.web.req.QuestionBankReq;
 import com.forteach.quiz.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.vo.QuestionProblemSetVo;
 import com.mongodb.BasicDBObject;
@@ -60,10 +60,21 @@ public class BigQuestionService extends BaseBaseQuestionServiceImpl<BigQuestion>
         this.problemSetRepository = problemSetRepository;
     }
 
+    /**
+     * 批量保存修改
+     * @param questionList
+     * @return
+     */
     private Flux<BigQuestion> editBigQuestion(final List<BigQuestion> questionList) {
         return bigQuestionRepository.saveAll(questionList);
     }
 
+    /**
+     * 更改问题 (根据需要是否修改至练习册)
+     * @param relate
+     * @param questionList
+     * @return
+     */
     public Flux<BigQuestion> editExerciseBookQuestion(int relate, final List<BigQuestion> questionList) {
         if (relate == COVER_QUESTION_BANK) {
             return editBigQuestion(questionList);

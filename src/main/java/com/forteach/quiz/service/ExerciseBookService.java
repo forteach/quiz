@@ -2,7 +2,7 @@ package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
-import com.forteach.quiz.questionlibrary.service.BigQuestionService;
+import com.forteach.quiz.questionLibrary.service.BigQuestionService;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.vo.BigQuestionVo;

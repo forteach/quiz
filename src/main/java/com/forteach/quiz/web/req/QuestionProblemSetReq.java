@@ -1,5 +1,6 @@
 package com.forteach.quiz.web.req;
 
+import com.forteach.quiz.questionLibrary.web.req.QuestionBankReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

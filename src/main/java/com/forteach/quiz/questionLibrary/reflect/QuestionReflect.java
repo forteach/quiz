@@ -1,10 +1,10 @@
-package com.forteach.quiz.questionlibrary.reflect;
+package com.forteach.quiz.questionLibrary.reflect;
 
 import com.forteach.quiz.exceptions.CustomException;
-import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
-import com.forteach.quiz.questionlibrary.domain.question.ChoiceQstOption;
-import com.forteach.quiz.questionlibrary.domain.question.Design;
-import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
+import com.forteach.quiz.questionLibrary.domain.question.ChoiceQst;
+import com.forteach.quiz.questionLibrary.domain.question.ChoiceQstOption;
+import com.forteach.quiz.questionLibrary.domain.question.Design;
+import com.forteach.quiz.questionLibrary.domain.question.TrueOrFalse;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;

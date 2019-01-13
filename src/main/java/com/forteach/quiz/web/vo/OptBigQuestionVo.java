@@ -1,7 +1,7 @@
 package com.forteach.quiz.web.vo;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionLibrary.domain.BigQuestion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

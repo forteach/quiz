@@ -1,4 +1,4 @@
-package com.forteach.quiz.questionlibrary.service.base;
+package com.forteach.quiz.questionLibrary.service.base;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
@@ -7,11 +7,11 @@ import com.forteach.quiz.domain.QuestionBank;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
-import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
-import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
-import com.forteach.quiz.questionlibrary.service.KeywordService;
-import com.forteach.quiz.web.req.QuestionBankReq;
+import com.forteach.quiz.questionLibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionLibrary.reflect.QuestionReflect;
+import com.forteach.quiz.questionLibrary.repository.base.QuestionMongoRepository;
+import com.forteach.quiz.questionLibrary.service.KeywordService;
+import com.forteach.quiz.questionLibrary.web.req.QuestionBankReq;
 import com.forteach.quiz.web.vo.KeywordIncreaseVo;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;

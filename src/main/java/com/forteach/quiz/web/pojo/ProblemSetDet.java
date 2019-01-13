@@ -1,7 +1,7 @@
 package com.forteach.quiz.web.pojo;
 
 import com.forteach.quiz.domain.ProblemSet;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionLibrary.domain.BigQuestion;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
