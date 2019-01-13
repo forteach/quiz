@@ -3,6 +3,7 @@ package com.forteach.quiz.questionlibrary.service.base;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.domain.ExerciseBook;
+import com.forteach.quiz.domain.QuestionBank;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
@@ -141,7 +142,7 @@ public abstract class BaseBaseQuestionServiceImpl<T extends QuestionExamEntity> 
      */
     @Override
     public Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId) {
-        return reactiveMongoTemplate.upsert(Query.query(Criteria.where(MONGDB_ID).is(questionBankId)), new Update().addToSet(MONGDB_COLUMN_QUESTION_BANK_TEACHER, teacherId), entityClass());
+        return reactiveMongoTemplate.upsert(Query.query(Criteria.where(MONGDB_ID).is(questionBankId)), new Update().addToSet(MONGDB_COLUMN_QUESTION_BANK_TEACHER, teacherId), QuestionBank.class);
     }
 
     /**
