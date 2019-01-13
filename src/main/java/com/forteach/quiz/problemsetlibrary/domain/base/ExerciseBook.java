@@ -1,11 +1,11 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.problemsetlibrary.domain.base;
 
+import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
@@ -17,11 +17,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Document(collection = "exerciseBook")
 public class ExerciseBook<T> extends BaseEntity {
-
-    @ApiModelProperty(value = "练习册类型：1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
-    protected int exeBookType;
 
     @ApiModelProperty(value = "教师id (创建人id)", name = "teacherId", example = "001")
     protected String teacherId;

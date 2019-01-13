@@ -1,41 +1,41 @@
-package com.forteach.quiz.problemsetlibrary.web.control;
+package com.forteach.quiz.problemsetlibrary.web.control.base;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.problemsetlibrary.domain.ProblemSet;
-import com.forteach.quiz.problemsetlibrary.service.ProblemSetService;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
+import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookService;
+import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetService;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.problemsetlibrary.web.req.ProblemSetReq;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
-import com.forteach.quiz.service.ExerciseBookService;
-import com.forteach.quiz.web.BaseController;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
-import com.forteach.quiz.web.vo.PreviewChangeVo;
-import io.swagger.annotations.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
 /**
- * @Description: 练习册相关
+ * @Description:
  * @author: liu zhenming
  * @version: V1.0
- * @date: 2018/11/19  10:21
+ * @date: 2019/1/13  21:14
  */
-@Slf4j
-@RestController
-@Api(value = "练习册,题集相关", tags = {"练习册,题集相关操作"})
-@RequestMapping(path = "/exerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class ProblemSetCollection extends BaseController {
+public abstract class BaseProblemSetController<T extends ProblemSet, R extends QuestionExamEntity, E extends ExerciseBook> {
 
-    private final ProblemSetService problemSetService;
+    protected final BaseExerciseBookService<E, R> exerciseBookService;
+    private final BaseProblemSetService<T, R> service;
 
-    private final ExerciseBookService exerciseBookService;
-
-    public ProblemSetCollection(ProblemSetService problemSetService, ExerciseBookService exerciseBookService) {
-        this.problemSetService = problemSetService;
+    public BaseProblemSetController(BaseProblemSetService<T, R> service,
+                                    BaseExerciseBookService<E, R> exerciseBookService) {
+        this.service = service;
         this.exerciseBookService = exerciseBookService;
     }
 
@@ -47,8 +47,8 @@ public class ProblemSetCollection extends BaseController {
      */
     @PostMapping("/build")
     @ApiOperation(value = "编辑题集", notes = "修改或增加题集")
-    public Mono<WebResult> buildExerciseBook(@Valid @RequestBody ProblemSet problemSet) {
-        return problemSetService.buildExerciseBook(problemSet).map(WebResult::okResult);
+    public Mono<WebResult> buildExerciseBook(@Valid @RequestBody T problemSet) {
+        return service.buildExerciseBook(problemSet).map(WebResult::okResult);
     }
 
     /**
@@ -60,7 +60,7 @@ public class ProblemSetCollection extends BaseController {
     @GetMapping("/delete/{id}")
     @ApiOperation(value = "删除题集", notes = "通过id 删除题集")
     public Mono<WebResult> delExerciseBook(@Valid @PathVariable String id) {
-        return problemSetService.delExerciseBook(id).map(WebResult::okResult);
+        return service.delExerciseBook(id).map(WebResult::okResult);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ProblemSetCollection extends BaseController {
     @GetMapping("/findOne/{id}")
     @ApiOperation(value = "查找题集详细信息", notes = "通过id查找题集,仅展示包括的题目id")
     public Mono<WebResult> findOne(@Valid @PathVariable String id) {
-        return problemSetService.findOne(id).map(WebResult::okResult);
+        return service.findOne(id).map(WebResult::okResult);
     }
 
     /**
@@ -81,7 +81,7 @@ public class ProblemSetCollection extends BaseController {
     @GetMapping("/findDetailed/{id}")
     @ApiOperation(value = "通过id查找题集及包含的题目全部信息", notes = "通过id查找题集及包含的题目全部信息")
     public Mono<WebResult> findAllDetailed(@Valid @PathVariable String id) {
-        return problemSetService.findAllDetailed(id).map(WebResult::okResult);
+        return service.findAllDetailed(id).map(WebResult::okResult);
     }
 
     /**
@@ -111,7 +111,7 @@ public class ProblemSetCollection extends BaseController {
             @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
     })
     public Mono<WebResult> findProblemSet(@Valid @ApiParam(name = "sortVo", value = "题目分页查询", required = true) @RequestBody ProblemSetReq sortVo) {
-        return problemSetService.findProblemSet(sortVo).collectList().map(WebResult::okResult);
+        return service.findProblemSet(sortVo).collectList().map(WebResult::okResult);
     }
 
     /**
@@ -136,55 +136,5 @@ public class ProblemSetCollection extends BaseController {
     public Mono<WebResult> delExerciseBookPart(@Valid @ApiParam(name = "delVo", value = "通过题目id与挂接信息进行解除", required = true) @RequestBody DelExerciseBookPartVo delVo) {
         return exerciseBookService.delExerciseBookPart(delVo).map(WebResult::okResult);
     }
-
-    /**
-     * 编辑练习册 预习类型
-     *
-     * @return
-     */
-    @ApiOperation(value = "编辑练习册 预习类型", notes = "编辑练习册 预习类型")
-    @PostMapping("/edit/preview")
-    public Mono<WebResult> editPreview(@Valid @ApiParam(name = "delVo", value = "通过题目id与挂接信息进行编辑练习册", required = true) @RequestBody PreviewChangeVo changeVo) {
-        return exerciseBookService.editPreview(changeVo).map(WebResult::okResult);
-    }
-
-
-//    /**
-//     * 修改答案
-//     *
-//     * @param exerciseBookSheetVo
-//     * @return
-//     */
-//    @PostMapping("/edit/answ")
-//    public Mono<WebResult> editExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
-//        return problemSetService.editExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
-//    }
-
-//    /**
-//     * 提交答案
-//     *
-//     * @param exerciseBookSheetVo
-//     * @return
-//     */
-//    @PostMapping("/commit/answ")
-//    public Mono<WebResult> commitExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
-//        return problemSetService.commitExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
-//    }
-//
-//    /**
-//     * 提交练习册 主观题 批改
-//     *
-//     * @param exerciseBookSheetVo
-//     * @return
-//     */
-//    @PostMapping("/correct/subjective")
-//    public Mono<WebResult> correctExerciseBookSheet(@RequestBody ExerciseBookSheetVo exerciseBookSheetVo) {
-//        return problemSetService.correctExerciseBookSheet(exerciseBookSheetVo).map(WebResult::okResult);
-//    }
-
-//    @PostMapping("/rewrite")
-//    public Mono<WebResult> associationAdd(@RequestBody RewriteVo rewriteVo) {
-//        return problemSetService.sheetRewrite(rewriteVo).map(WebResult::okResult);
-//    }
 
 }

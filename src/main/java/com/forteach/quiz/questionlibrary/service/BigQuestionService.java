@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.problemsetlibrary.domain.ProblemSet;
-import com.forteach.quiz.problemsetlibrary.repository.ProblemSetRepository;
+import com.forteach.quiz.problemsetlibrary.domain.BigQuestionProblemSet;
+import com.forteach.quiz.problemsetlibrary.repository.BigQuestionProblemSetRepository;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
 import com.forteach.quiz.questionlibrary.domain.question.Design;
@@ -13,7 +13,7 @@ import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
 import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
-import com.forteach.quiz.questionlibrary.service.base.BaseBaseQuestionServiceImpl;
+import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.questionlibrary.web.req.QuestionBankReq;
 import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.vo.QuestionProblemSetVo;
@@ -44,20 +44,22 @@ import static com.forteach.quiz.util.StringUtil.isEmpty;
  * @date: 2018/11/13  11:45
  */
 @Service
-public class BigQuestionService extends BaseBaseQuestionServiceImpl<BigQuestion> {
+public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
 
 
     private final BigQuestionRepository bigQuestionRepository;
 
-    private final ProblemSetRepository problemSetRepository;
+    private final BigQuestionProblemSetRepository bigQuestionProblemSetRepository;
 
-    public BigQuestionService(QuestionMongoRepository<BigQuestion> repository, KeywordService<BigQuestion> keywordService,
-                              ReactiveMongoTemplate reactiveMongoTemplate, QuestionReflect questionReflect,
+    public BigQuestionService(QuestionMongoRepository<BigQuestion> repository,
+                              ReactiveMongoTemplate reactiveMongoTemplate,
+                              QuestionReflect questionReflect,
                               BigQuestionRepository bigQuestionRepository,
-                              ProblemSetRepository problemSetRepository) {
-        super(repository, keywordService, reactiveMongoTemplate, questionReflect);
+                              BigQuestionProblemSetRepository bigQuestionProblemSetRepository) {
+
+        super(repository, reactiveMongoTemplate, questionReflect);
         this.bigQuestionRepository = bigQuestionRepository;
-        this.problemSetRepository = problemSetRepository;
+        this.bigQuestionProblemSetRepository = bigQuestionProblemSetRepository;
     }
 
     /**
@@ -104,16 +106,6 @@ public class BigQuestionService extends BaseBaseQuestionServiceImpl<BigQuestion>
             List<String> difference = origin.stream().filter(item -> !target.contains(item)).collect(Collectors.toList());
             return QuestionProblemSetVo.builder().bigQuestionList(questionList).problemSet(problemSet).intersection(intersection).difference(difference).build();
         });
-    }
-
-    /**
-     * 查找大题 in
-     *
-     * @param ids
-     * @return
-     */
-    public Flux<BigQuestion> findBigQuestionInId(final List<String> ids) {
-        return reactiveMongoTemplate.find(Query.query(Criteria.where(MONGDB_ID).in(ids)), BigQuestion.class);
     }
 
     /**
@@ -165,8 +157,8 @@ public class BigQuestionService extends BaseBaseQuestionServiceImpl<BigQuestion>
      * @param exerciseBookId
      * @return
      */
-    public Mono<ProblemSet> findProblemSet(final String exerciseBookId) {
-        return problemSetRepository.findById(exerciseBookId);
+    public Mono<BigQuestionProblemSet> findProblemSet(final String exerciseBookId) {
+        return bigQuestionProblemSetRepository.findById(exerciseBookId);
     }
 
     /**

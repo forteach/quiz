@@ -3,6 +3,7 @@ package com.forteach.quiz.questionlibrary.web.control;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.service.BigQuestionService;
+import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
 import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
@@ -30,8 +31,10 @@ public class BigQuestionsController extends BaseQuestionController<BigQuestion> 
 
     private final BigQuestionService bigQuestionService;
 
-    public BigQuestionsController(BaseQuestionService<BigQuestion> service, BigQuestionService bigQuestionService) {
-        super(service);
+    public BigQuestionsController(BaseQuestionService<BigQuestion> service,
+                                  KeywordService<BigQuestion> keywordService,
+                                  BigQuestionService bigQuestionService) {
+        super(service, keywordService);
         this.bigQuestionService = bigQuestionService;
     }
 

@@ -1,6 +1,6 @@
 package com.forteach.quiz.repository;
 
-import com.forteach.quiz.domain.ExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**

@@ -1,28 +1,21 @@
 package com.forteach.quiz.questionlibrary.service.base;
 
 import com.alibaba.fastjson.JSON;
-import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.questionlibrary.domain.QuestionBank;
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
-import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.web.req.QuestionBankReq;
-import com.forteach.quiz.web.vo.KeywordIncreaseVo;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -41,19 +34,17 @@ import static com.forteach.quiz.util.StringUtil.isNotEmpty;
  * @version: V1.0
  * @date: 2019/1/10  11:53
  */
-public abstract class BaseBaseQuestionServiceImpl<T extends QuestionExamEntity> implements BaseQuestionService<T> {
+public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> implements BaseQuestionService<T> {
 
     protected final ReactiveMongoTemplate reactiveMongoTemplate;
     private final QuestionMongoRepository<T> repository;
-    private final KeywordService<T> keywordService;
     private final QuestionReflect questionReflect;
 
-    public BaseBaseQuestionServiceImpl(QuestionMongoRepository<T> repository, KeywordService<T> keywordService,
-                                       ReactiveMongoTemplate reactiveMongoTemplate, QuestionReflect questionReflect) {
+    public BaseQuestionServiceImpl(QuestionMongoRepository<T> repository,
+                                   ReactiveMongoTemplate reactiveMongoTemplate, QuestionReflect questionReflect) {
         this.repository = repository;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.questionReflect = questionReflect;
-        this.keywordService = keywordService;
     }
 
     /**
@@ -285,35 +276,13 @@ public abstract class BaseBaseQuestionServiceImpl<T extends QuestionExamEntity> 
     }
 
     /**
-     * 增加关键字关联关系
+     * 查找题 in
      *
+     * @param ids
      * @return
      */
-    @ApiOperation(value = "增加关键字关联关系", notes = "增加关键字关联关系")
-    @PostMapping("/keyword/increase")
-    public Mono<WebResult> increase(@ApiParam(value = "增加关键字关联关系", required = true) @RequestBody KeywordIncreaseVo increaseVo) {
-        return keywordService.increase(increaseVo.getValue(), increaseVo.getBigQuestionId()).map(WebResult::okResult);
-    }
-
-    /**
-     * 删除关键字
-     *
-     * @return
-     */
-    @ApiOperation(value = "删除关键字", notes = "删除关键字")
-    @PostMapping("/keyword/undock")
-    public Mono<WebResult> undock(@ApiParam(value = "删除关键字", required = true) @RequestBody KeywordIncreaseVo increaseVo) {
-        return keywordService.undock(increaseVo.getValue(), increaseVo.getBigQuestionId()).map(WebResult::okResult);
-    }
-
-    /**
-     * 查询关键字下id问题
-     *
-     * @return
-     */
-    @ApiOperation(value = "查询关键字下问题id", notes = "查询关键字下问题id")
-    @PostMapping("/keyword/associated")
-    public Mono<WebResult> associated(@ApiParam(value = "查询知识点下问题id", required = true) @RequestBody KeywordIncreaseVo increaseVo) {
-        return keywordService.keywordQuestion(increaseVo.getValue()).collectList().map(WebResult::okResult);
+    @Override
+    public Flux<T> findBigQuestionInId(final List<String> ids) {
+        return reactiveMongoTemplate.find(Query.query(Criteria.where(MONGDB_ID).in(ids)), entityClass());
     }
 }

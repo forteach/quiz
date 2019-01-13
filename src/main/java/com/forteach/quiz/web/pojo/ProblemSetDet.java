@@ -1,7 +1,7 @@
 package com.forteach.quiz.web.pojo;
 
-import com.forteach.quiz.problemsetlibrary.domain.ProblemSet;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,14 +18,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "详细的练习册信息", description = "详细的练习册信息 包含完整的题目全部参数")
-public class ProblemSetDet extends ProblemSet {
+public class ProblemSetDet<T> extends ProblemSet {
 
     /**
      * 题目集 完整的题目信息
      */
-    private List<BigQuestion> bigQuestionList;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<T> bigQuestionList;
 
-    public ProblemSetDet(ProblemSet problemSet, List<BigQuestion> bigQuestionList) {
+    public ProblemSetDet(ProblemSet problemSet, List<T> bigQuestionList) {
         this.bigQuestionList = bigQuestionList;
         BeanUtils.copyProperties(problemSet, this);
     }

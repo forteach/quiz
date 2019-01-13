@@ -1,6 +1,6 @@
 package com.forteach.quiz.questionlibrary.service;
 
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

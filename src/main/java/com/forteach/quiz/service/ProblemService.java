@@ -1,10 +1,10 @@
 package com.forteach.quiz.service;
 
 import com.alibaba.fastjson.JSON;
-import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.domain.ProblemSetBackup;
 import com.forteach.quiz.exceptions.ProblemSetException;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;

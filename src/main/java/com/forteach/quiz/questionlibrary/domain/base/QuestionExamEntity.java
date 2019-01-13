@@ -1,4 +1,4 @@
-package com.forteach.quiz.questionlibrary.domain;
+package com.forteach.quiz.questionlibrary.domain.base;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.domain.BaseEntity;

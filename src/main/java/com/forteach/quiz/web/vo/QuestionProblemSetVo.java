@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.problemsetlibrary.domain.ProblemSet;
+import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

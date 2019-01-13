@@ -1,6 +1,7 @@
 package com.forteach.quiz.questionlibrary.web.control;
 
 import com.forteach.quiz.questionlibrary.domain.SurveyQuestion;
+import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
 import io.swagger.annotations.Api;
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/surveyQuestion", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class SurveyQuestionController extends BaseQuestionController<SurveyQuestion> {
 
-    public SurveyQuestionController(BaseQuestionService<SurveyQuestion> service) {
-        super(service);
+    public SurveyQuestionController(BaseQuestionService<SurveyQuestion> service, KeywordService<SurveyQuestion> keywordService) {
+        super(service, keywordService);
     }
+
 }

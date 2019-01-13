@@ -3,7 +3,7 @@ package com.forteach.quiz.questionlibrary.service;
 import com.forteach.quiz.questionlibrary.domain.TaskQuestion;
 import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
-import com.forteach.quiz.questionlibrary.service.base.BaseBaseQuestionServiceImpl;
+import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
  * @date: 2019/1/11  16:08
  */
 @Service
-public class TaskQuestionService extends BaseBaseQuestionServiceImpl<TaskQuestion> {
+public class TaskQuestionService extends BaseQuestionServiceImpl<TaskQuestion> {
 
-    public TaskQuestionService(QuestionMongoRepository<TaskQuestion> repository, KeywordService<TaskQuestion> keywordService,
-                               ReactiveMongoTemplate reactiveMongoTemplate, QuestionReflect questionReflect) {
+    public TaskQuestionService(QuestionMongoRepository<TaskQuestion> repository,
+                               ReactiveMongoTemplate reactiveMongoTemplate,
+                               QuestionReflect questionReflect) {
 
-        super(repository, keywordService, reactiveMongoTemplate, questionReflect);
+        super(repository, reactiveMongoTemplate, questionReflect);
     }
+
 }

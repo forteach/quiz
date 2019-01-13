@@ -1,22 +1,20 @@
-package com.forteach.quiz.problemsetlibrary.service;
+package com.forteach.quiz.problemsetlibrary.service.base;
 
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.problemsetlibrary.domain.ProblemSet;
-import com.forteach.quiz.problemsetlibrary.repository.ProblemSetRepository;
+import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
+import com.forteach.quiz.problemsetlibrary.repository.base.ProblemSetMongoRepository;
 import com.forteach.quiz.problemsetlibrary.web.req.ProblemSetReq;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
-import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
-import com.forteach.quiz.repository.ExerciseBookSheetRepository;
-import com.forteach.quiz.service.CorrectService;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
 import com.forteach.quiz.web.pojo.ProblemSetDet;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -30,31 +28,21 @@ import static com.forteach.quiz.util.StringUtil.isNotEmpty;
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
- * @date: 2018/12/11  16:18
+ * @date: 2019/1/13  19:12
  */
-@Service
-public class ProblemSetService {
+public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends QuestionExamEntity> implements BaseProblemSetService<T, R> {
 
+    protected final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    private final ExerciseBookSheetRepository exerciseBookSheetRepository;
+    private final ProblemSetMongoRepository<T> repository;
 
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private final QuestionMongoRepository<R> questionRepository;
 
-    private final CorrectService correctService;
-
-    private final ProblemSetRepository problemSetRepository;
-
-    private final BigQuestionRepository bigQuestionRepository;
-
-
-    public ProblemSetService(ExerciseBookSheetRepository exerciseBookSheetRepository,
-                             ReactiveMongoTemplate reactiveMongoTemplate, CorrectService correctService,
-                             ProblemSetRepository problemSetRepository, BigQuestionRepository bigQuestionRepository) {
-        this.exerciseBookSheetRepository = exerciseBookSheetRepository;
+    public BaseProblemSetServiceImpl(ReactiveMongoTemplate reactiveMongoTemplate, ProblemSetMongoRepository<T> repository,
+                                     QuestionMongoRepository<R> questionRepository) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.correctService = correctService;
-        this.problemSetRepository = problemSetRepository;
-        this.bigQuestionRepository = bigQuestionRepository;
+        this.repository = repository;
+        this.questionRepository = questionRepository;
     }
 
     /**
@@ -63,8 +51,9 @@ public class ProblemSetService {
      * @param problemSet
      * @return
      */
-    public Mono<ProblemSet> buildExerciseBook(final ProblemSet problemSet) {
-        return problemSetRepository.save(problemSet);
+    @Override
+    public Mono<T> buildExerciseBook(final T problemSet) {
+        return repository.save(problemSet);
     }
 
     /**
@@ -73,8 +62,9 @@ public class ProblemSetService {
      * @param id
      * @return
      */
+    @Override
     public Mono<Void> delExerciseBook(final String id) {
-        return problemSetRepository.deleteById(id);
+        return repository.deleteById(id);
     }
 
     /**
@@ -83,11 +73,19 @@ public class ProblemSetService {
      * @param exerciseBookId
      * @return
      */
-    public Mono<ProblemSet> findOne(final String exerciseBookId) {
-        return problemSetRepository.findById(exerciseBookId);
+    @Override
+    public Mono<T> findOne(final String exerciseBookId) {
+        return repository.findById(exerciseBookId);
     }
 
-    public Mono<ProblemSetDet> findAllDetailed(final String exerciseBookId) {
+    /**
+     * 查找出详情 (所有大题全部数据)
+     *
+     * @param exerciseBookId
+     * @return
+     */
+    @Override
+    public Mono<T> findAllDetailed(final String exerciseBookId) {
         return findOne(exerciseBookId)
                 .flatMap(set -> {
                     /*
@@ -99,18 +97,30 @@ public class ProblemSetService {
                     final Map<String, Integer> indexMap = set.getQuestionIds().stream()
                             .collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
 
-                    return findById(list)
+                    return findByIdQuestion(list)
                             .sort(Comparator.comparing(question -> indexMap.get(question.getId())))
                             .collectList()
-                            .map(monoList -> new ProblemSetDet(set, monoList));
+                            .map(monoList -> entityClass().cast(new ProblemSetDet<R>(set, monoList)));
                 });
     }
 
-    private Flux<BigQuestion> findById(final List<String> id) {
-        return bigQuestionRepository.findAllById(id);
+    /**
+     * 根据id批量查询
+     *
+     * @param id
+     * @return
+     */
+    private Flux<R> findByIdQuestion(final List<String> id) {
+        return questionRepository.findAllById(id);
     }
 
-    private Flux<ProblemSet> findPratProblemSet(final ProblemSetReq sortVo) {
+    /**
+     * 分页查询基本数据 (大题不含题干)
+     *
+     * @param sortVo
+     * @return
+     */
+    private Flux<T> findPratProblemSet(final ProblemSetReq sortVo) {
 
         Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
 
@@ -131,10 +141,16 @@ public class ProblemSetService {
 
         sortVo.queryPaging(query);
 
-        return reactiveMongoTemplate.find(query, ProblemSet.class);
+        return reactiveMongoTemplate.find(query, entityClass());
     }
 
-    private Flux<ProblemSet> findAllProblemSet(final ProblemSetReq sortVo) {
+    /**
+     * 分页查询详细数据
+     *
+     * @param sortVo
+     * @return
+     */
+    private Flux<T> findAllProblemSet(final ProblemSetReq sortVo) {
         return findPratProblemSet(sortVo).flatMap(obj -> findAllDetailed(obj.getId()));
     }
 
@@ -145,7 +161,8 @@ public class ProblemSetService {
      * @param sortVo
      * @return
      */
-    public Flux<ProblemSet> findProblemSet(final ProblemSetReq sortVo) {
+    @Override
+    public Flux<T> findProblemSet(final ProblemSetReq sortVo) {
 
         if (PARAMETER_PART.equals(sortVo.getAllOrPart())) {
             return findPratProblemSet(sortVo);
@@ -155,6 +172,25 @@ public class ProblemSetService {
 
         return Flux.error(new ExamQuestionsException("错误的查询条件"));
 
+    }
+
+
+    /**
+     * 获取泛型的class
+     *
+     * @return
+     */
+    private Class<T> entityClass() {
+        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    /**
+     * 获取Question泛型的class
+     *
+     * @return
+     */
+    private Class<R> questionClass() {
+        return (Class<R>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
 

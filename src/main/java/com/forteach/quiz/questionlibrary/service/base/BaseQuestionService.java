@@ -1,10 +1,12 @@
 package com.forteach.quiz.questionlibrary.service.base;
 
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.web.req.QuestionBankReq;
 import com.mongodb.client.result.UpdateResult;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @Description: 问题结构的基础服务
@@ -72,4 +74,6 @@ public interface BaseQuestionService<T extends QuestionExamEntity> {
      * @return
      */
     Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId);
+
+    Flux<T> findBigQuestionInId(final List<String> ids);
 }

@@ -1,6 +1,6 @@
 package com.forteach.quiz.questionlibrary.repository.base;
 
-import com.forteach.quiz.questionlibrary.domain.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

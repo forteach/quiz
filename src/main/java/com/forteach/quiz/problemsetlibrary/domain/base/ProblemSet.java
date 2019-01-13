@@ -1,12 +1,13 @@
-package com.forteach.quiz.problemsetlibrary.domain;
+package com.forteach.quiz.problemsetlibrary.domain.base;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.domain.QuestionIds;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Transient;
 
 import java.util.List;
 
@@ -18,16 +19,8 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Document(collection = "problemSet")
 @ApiModel(value = "编辑题册对象", description = "如果新增 不添加id 如果修改 添加id")
 public class ProblemSet extends BaseEntity {
-
-    /**
-     * 题集类型：1、预习练习册 2、课堂练习册3、课后作业册
-     */
-
-    @ApiModelProperty(value = "题集类型", name = "exeBookType", example = "1、预习练习册 2、课堂练习册3、课后作业册")
-    private int exeBookType;
 
     /**
      * 教师操作人id
@@ -66,5 +59,12 @@ public class ProblemSet extends BaseEntity {
      */
     @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
     private String levelId;
+
+    /**
+     * 题目集 完整的题目信息
+     */
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<?> bigQuestionList;
 
 }

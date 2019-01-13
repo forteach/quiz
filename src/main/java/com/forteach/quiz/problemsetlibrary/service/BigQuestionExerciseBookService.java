@@ -1,11 +1,14 @@
-package com.forteach.quiz.service;
+package com.forteach.quiz.problemsetlibrary.service;
 
-import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
+import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
+import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
+import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceImpl;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
-import com.forteach.quiz.questionlibrary.service.BigQuestionService;
-import com.forteach.quiz.repository.ExerciseBookRepository;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
@@ -31,22 +34,15 @@ import static com.forteach.quiz.util.StringUtil.isNotEmpty;
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
- * @date: 2018/12/13  16:45
+ * @date: 2019/1/13  22:43
  */
 @Service
-public class ExerciseBookService {
+public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<BigQuestionExerciseBook, BigQuestion> {
 
-    private final BigQuestionService bigQuestionService;
-
-    private final ExerciseBookRepository exerciseBookRepository;
-
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
-
-    public ExerciseBookService(BigQuestionService bigQuestionService, ExerciseBookRepository exerciseBookRepository,
-                               ReactiveMongoTemplate reactiveMongoTemplate) {
-        this.bigQuestionService = bigQuestionService;
-        this.exerciseBookRepository = exerciseBookRepository;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
+    public BigQuestionExerciseBookService(ExerciseBookMongoRepository<BigQuestionExerciseBook> repository,
+                                          ReactiveMongoTemplate template,
+                                          BaseQuestionServiceImpl<BigQuestion> questionRepository) {
+        super(repository, template, questionRepository);
     }
 
     /**
@@ -55,29 +51,30 @@ public class ExerciseBookService {
      * @param problemSetVo
      * @return
      */
-    public Mono<ExerciseBook> buildBook(final ProblemSetVo problemSetVo) {
+    @Override
+    public Mono<BigQuestionExerciseBook> buildBook(final ProblemSetVo problemSetVo) {
 
         final Map<String, Integer> idexMap = problemSetVo.getQuestionIds().stream().collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
 
         final Map<String, String> previewMap = problemSetVo.getQuestionIds().stream().filter(obj -> isNotEmpty(obj.getPreview())).collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getPreview));
 
-        return bigQuestionService
+        return questionRepository
                 .findBigQuestionInId(
                         problemSetVo
                                 .getQuestionIds()
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> new BigQuestionVo(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
+                .map(bigQuestion -> new BigQuestionVo<BigQuestion>(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .zipWhen(list -> findExerciseBook(String.valueOf(problemSetVo.getExeBookType()), problemSetVo.getChapterId(), problemSetVo.getCourseId()))
                 .flatMap(tuple2 -> {
                     if (isNotEmpty(tuple2.getT2().getId())) {
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
-                        return exerciseBookRepository.save(tuple2.getT2());
+                        return repository.save(tuple2.getT2());
                     } else {
-                        return exerciseBookRepository.save(new ExerciseBook<>(problemSetVo, tuple2.getT1()));
+                        return repository.save(new BigQuestionExerciseBook(problemSetVo, tuple2.getT1()));
                     }
                 });
     }
@@ -88,6 +85,7 @@ public class ExerciseBookService {
      * @param sortVo
      * @return
      */
+    @Override
     public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
@@ -97,13 +95,13 @@ public class ExerciseBookService {
     /**
      * 查找需要挂接的课堂链接册
      */
-    private Mono<ExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId) {
+    private Mono<BigQuestionExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId) {
 
         final Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId);
 
         Query query = new Query(criteria);
 
-        return reactiveMongoTemplate.findOne(query, ExerciseBook.class).defaultIfEmpty(new ExerciseBook());
+        return template.findOne(query, BigQuestionExerciseBook.class).defaultIfEmpty(new BigQuestionExerciseBook());
     }
 
     /**
@@ -112,6 +110,7 @@ public class ExerciseBookService {
      * @param delVo
      * @return
      */
+    @Override
     public Mono<UpdateResult> delExerciseBookPart(final DelExerciseBookPartVo delVo) {
 
         final Criteria criteria = buildExerciseBook(delVo.getExeBookType(), delVo.getChapterId(), delVo.getCourseId());
@@ -120,8 +119,8 @@ public class ExerciseBookService {
 
         update.pull("questionChildren", Query.query(Criteria.where(MONGDB_ID).is(delVo.getTargetId())));
 
-        return reactiveMongoTemplate
-                .updateMulti(Query.query(criteria), update, ExerciseBook.class);
+        return template
+                .updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
     }
 
     /**
@@ -136,8 +135,8 @@ public class ExerciseBookService {
                 .and("questionChildren." + MONGDB_ID).is(changeVo.getTargetId());
         Update update = Update.update("questionChildren.$.preview", changeVo.getPreview());
 
-        return reactiveMongoTemplate
-                .updateMulti(Query.query(criteria), update, ExerciseBook.class);
+        return template
+                .updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
     }
 
     /**
@@ -164,5 +163,4 @@ public class ExerciseBookService {
 
         return criteria;
     }
-
 }

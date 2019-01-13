@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.base.AbstractExam;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +14,7 @@ import org.springframework.beans.BeanUtils;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BigQuestionVo extends BigQuestion {
+public class BigQuestionVo<T> extends AbstractExam {
 
     @ApiModelProperty(value = "题册排序用坐标", name = "index", example = "1")
     private int index;
@@ -25,9 +25,9 @@ public class BigQuestionVo extends BigQuestion {
     public BigQuestionVo() {
     }
 
-    public BigQuestionVo(String preview, int index, BigQuestion bigQuestion) {
+    public BigQuestionVo(String preview, int index, T question) {
         this.preview = preview;
         this.index = index;
-        BeanUtils.copyProperties(bigQuestion, this);
+        BeanUtils.copyProperties(question, this);
     }
 }

@@ -1,5 +1,6 @@
 package com.forteach.quiz.questionlibrary.domain;
 
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

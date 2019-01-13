@@ -1,6 +1,7 @@
 package com.forteach.quiz.questionlibrary.web.control;
 
 import com.forteach.quiz.questionlibrary.domain.BrainstormQuestion;
+import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
 import io.swagger.annotations.Api;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/brainstormQuestion", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BrainstormQuestionController extends BaseQuestionController<BrainstormQuestion> {
 
-    public BrainstormQuestionController(BaseQuestionService<BrainstormQuestion> service) {
-        super(service);
+    public BrainstormQuestionController(BaseQuestionService<BrainstormQuestion> service, KeywordService<BrainstormQuestion> keywordService) {
+        super(service, keywordService);
     }
 }
