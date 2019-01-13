@@ -2,12 +2,12 @@ package com.forteach.quiz.service;
 
 import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.QuestionIds;
-import com.forteach.quiz.questionLibrary.service.BigQuestionService;
+import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
+import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
+import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.repository.ExerciseBookRepository;
-import com.forteach.quiz.web.req.ExerciseBookReq;
 import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
-import com.forteach.quiz.web.vo.ExerciseBookVo;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -52,18 +52,18 @@ public class ExerciseBookService {
     /**
      * 按照顺序 保存练习册
      *
-     * @param exerciseBookVo
+     * @param problemSetVo
      * @return
      */
-    public Mono<ExerciseBook> buildBook(final ExerciseBookVo exerciseBookVo) {
+    public Mono<ExerciseBook> buildBook(final ProblemSetVo problemSetVo) {
 
-        final Map<String, Integer> idexMap = exerciseBookVo.getQuestionIds().stream().collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
+        final Map<String, Integer> idexMap = problemSetVo.getQuestionIds().stream().collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getIndex));
 
-        final Map<String, String> previewMap = exerciseBookVo.getQuestionIds().stream().filter(obj -> isNotEmpty(obj.getPreview())).collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getPreview));
+        final Map<String, String> previewMap = problemSetVo.getQuestionIds().stream().filter(obj -> isNotEmpty(obj.getPreview())).collect(Collectors.toMap(QuestionIds::getBigQuestionId, QuestionIds::getPreview));
 
         return bigQuestionService
                 .findBigQuestionInId(
-                        exerciseBookVo
+                        problemSetVo
                                 .getQuestionIds()
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
@@ -71,13 +71,13 @@ public class ExerciseBookService {
                 .map(bigQuestion -> new BigQuestionVo(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
-                .zipWhen(list -> findExerciseBook(String.valueOf(exerciseBookVo.getExeBookType()), exerciseBookVo.getChapterId(), exerciseBookVo.getCourseId()))
+                .zipWhen(list -> findExerciseBook(String.valueOf(problemSetVo.getExeBookType()), problemSetVo.getChapterId(), problemSetVo.getCourseId()))
                 .flatMap(tuple2 -> {
                     if (isNotEmpty(tuple2.getT2().getId())) {
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
                         return exerciseBookRepository.save(tuple2.getT2());
                     } else {
-                        return exerciseBookRepository.save(new ExerciseBook<>(exerciseBookVo, tuple2.getT1()));
+                        return exerciseBookRepository.save(new ExerciseBook<>(problemSetVo, tuple2.getT1()));
                     }
                 });
     }

@@ -1,6 +1,6 @@
 package com.forteach.quiz;
 
-import com.forteach.quiz.questionLibrary.domain.question.TrueOrFalse;
+import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.questionLibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import lombok.Data;
 
 import java.util.List;

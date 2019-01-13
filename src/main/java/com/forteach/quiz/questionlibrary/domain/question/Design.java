@@ -1,7 +1,7 @@
 package com.forteach.quiz.questionlibrary.domain.question;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.forteach.quiz.domain.AbstractExam;
+import com.forteach.quiz.questionlibrary.domain.base.AbstractExam;
 import com.forteach.quiz.web.vo.BigQuestionView;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

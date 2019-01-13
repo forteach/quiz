@@ -1,6 +1,6 @@
 package com.forteach.quiz.domain;
 
-import com.forteach.quiz.web.vo.ExerciseBookVo;
+import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,8 +45,8 @@ public class ExerciseBook<T> extends BaseEntity {
     public ExerciseBook() {
     }
 
-    public ExerciseBook(final ExerciseBookVo exerciseBookVo, final List<T> list) {
-        BeanUtils.copyProperties(exerciseBookVo, this);
+    public ExerciseBook(final ProblemSetVo problemSetVo, final List<T> list) {
+        BeanUtils.copyProperties(problemSetVo, this);
         this.questionChildren = list;
     }
 

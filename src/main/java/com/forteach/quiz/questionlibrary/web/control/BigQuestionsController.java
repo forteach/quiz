@@ -5,7 +5,7 @@ import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
-import com.forteach.quiz.web.req.QuestionProblemSetReq;
+import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.vo.AddChildrenVo;
 import com.forteach.quiz.web.vo.UpdateChildrenVo;
 import io.swagger.annotations.*;

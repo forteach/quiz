@@ -5,7 +5,7 @@ import com.forteach.quiz.domain.ExerciseBook;
 import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.domain.ProblemSetBackup;
 import com.forteach.quiz.exceptions.ProblemSetException;
-import com.forteach.quiz.questionLibrary.service.BigQuestionService;
+import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.repository.ExerciseBookRepository;
 import com.forteach.quiz.repository.ExerciseBookSheetRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
