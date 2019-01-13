@@ -1,13 +1,11 @@
 package com.forteach.quiz.problemsetlibrary.domain.base;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.domain.QuestionIds;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.Transient;
 
 import java.util.List;
 
@@ -59,12 +57,4 @@ public class ProblemSet extends BaseEntity {
      */
     @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
     private String levelId;
-
-    /**
-     * 题目集 完整的题目信息
-     */
-    @Transient
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<?> bigQuestionList;
-
 }
