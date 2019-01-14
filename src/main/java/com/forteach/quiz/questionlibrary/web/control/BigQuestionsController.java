@@ -5,7 +5,7 @@ import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
-import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
+import com.forteach.quiz.questionlibrary.web.control.base.BaseAllController;
 import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.vo.AddChildrenVo;
 import com.forteach.quiz.web.vo.UpdateChildrenVo;
@@ -27,7 +27,7 @@ import javax.validation.Valid;
 @RestController
 @Api(value = "考试 练习 题目", tags = {"考试 练习 题库内容操作"})
 @RequestMapping(path = "/question", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class BigQuestionsController extends BaseQuestionController<BigQuestion> {
+public class BigQuestionsController extends BaseAllController<BigQuestion> {
 
     private final BigQuestionService bigQuestionService;
 

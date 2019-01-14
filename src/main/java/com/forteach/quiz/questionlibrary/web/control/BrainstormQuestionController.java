@@ -3,7 +3,7 @@ package com.forteach.quiz.questionlibrary.web.control;
 import com.forteach.quiz.questionlibrary.domain.BrainstormQuestion;
 import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
-import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
+import com.forteach.quiz.questionlibrary.web.control.base.BaseSubjectiveController;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(value = "头脑风暴的问题 题目", tags = {"头脑风暴的问题 题库内容操作"})
 @RequestMapping(path = "/brainstormQuestion", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class BrainstormQuestionController extends BaseQuestionController<BrainstormQuestion> {
+public class BrainstormQuestionController extends BaseSubjectiveController<BrainstormQuestion> {
 
     public BrainstormQuestionController(BaseQuestionService<BrainstormQuestion> service, KeywordService<BrainstormQuestion> keywordService) {
         super(service, keywordService);

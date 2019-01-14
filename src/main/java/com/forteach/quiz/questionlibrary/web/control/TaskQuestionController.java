@@ -3,7 +3,7 @@ package com.forteach.quiz.questionlibrary.web.control;
 import com.forteach.quiz.questionlibrary.domain.TaskQuestion;
 import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
-import com.forteach.quiz.questionlibrary.web.control.base.BaseQuestionController;
+import com.forteach.quiz.questionlibrary.web.control.base.BaseSubjectiveController;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(value = "任务库 题目", tags = {"任务库 题库内容操作"})
 @RequestMapping(path = "/taskQuestion", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class TaskQuestionController extends BaseQuestionController<TaskQuestion> {
+public class TaskQuestionController extends BaseSubjectiveController<TaskQuestion> {
 
     public TaskQuestionController(BaseQuestionService<TaskQuestion> service, KeywordService<TaskQuestion> keywordService) {
         super(service, keywordService);
