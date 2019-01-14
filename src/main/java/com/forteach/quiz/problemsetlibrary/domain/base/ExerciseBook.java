@@ -37,13 +37,17 @@ public class ExerciseBook<T> extends BaseEntity {
     @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
     private String courseId;
 
-
     public ExerciseBook() {
     }
 
     public ExerciseBook(final ProblemSetVo problemSetVo, final List<T> list) {
         BeanUtils.copyProperties(problemSetVo, this);
         this.questionChildren = list;
+    }
+
+    public ExerciseBook build(ExerciseBook<T> exerciseBook) {
+        BeanUtils.copyProperties(exerciseBook, this);
+        return this;
     }
 
 }

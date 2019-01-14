@@ -70,13 +70,14 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
                 .map(bigQuestion -> new BigQuestionVo<R>(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
-                .zipWhen(list -> findExerciseBook(problemSetVo.getChapterId(), problemSetVo.getCourseId()))
+                .zipWhen(list ->
+                        findExerciseBook(problemSetVo.getChapterId(), problemSetVo.getCourseId()))
                 .flatMap(tuple2 -> {
                     if (isNotEmpty(tuple2.getT2().getId())) {
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
                         return repository.save(tuple2.getT2());
                     } else {
-                        return repository.save(entityClass().cast(new ExerciseBook<>(problemSetVo, tuple2.getT1())));
+                        return repository.save((T) instantiate(entityClass()).build(new ExerciseBook<>(problemSetVo, tuple2.getT1())));
                     }
                 });
     }

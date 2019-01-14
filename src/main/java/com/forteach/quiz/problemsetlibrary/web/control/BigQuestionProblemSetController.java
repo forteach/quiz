@@ -29,7 +29,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@Api(value = "考题库 练习册,题集相关", tags = {"练习册,题集相关操作"})
+@Api(value = "考题库 练习册,题集相关", tags = {"考题库 练习册,题集相关操作"})
 @RequestMapping(path = "/exerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BigQuestionProblemSetController extends BaseProblemSetController<BigQuestionProblemSet, BigQuestion, BigQuestionExerciseBook> {
 

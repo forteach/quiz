@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@Api(value = "头脑风暴题库 练习册,题集相关", tags = {"练习册,题集相关操作"})
+@Api(value = "头脑风暴题库 练习册,题集相关", tags = {"头脑风暴题库 练习册,题集相关操作"})
 @RequestMapping(path = "/brainstormExerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BrainstormQuestionProblemSetController extends BaseProblemSetController<BrainstormQuestionProblemSet, BrainstormQuestion, BrainstormQuestionExerciseBook> {
 
