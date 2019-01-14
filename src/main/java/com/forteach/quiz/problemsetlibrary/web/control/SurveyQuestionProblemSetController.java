@@ -1,11 +1,11 @@
 package com.forteach.quiz.problemsetlibrary.web.control;
 
-import com.forteach.quiz.problemsetlibrary.domain.BrainstormQuestionExerciseBook;
-import com.forteach.quiz.problemsetlibrary.domain.BrainstormQuestionProblemSet;
-import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookService;
+import com.forteach.quiz.problemsetlibrary.domain.SurveyQuestionExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.SurveyQuestionProblemSet;
+import com.forteach.quiz.problemsetlibrary.service.SurveyQuestionExerciseBookService;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetService;
 import com.forteach.quiz.problemsetlibrary.web.control.base.BaseProblemSetController;
-import com.forteach.quiz.questionlibrary.domain.BrainstormQuestion;
+import com.forteach.quiz.questionlibrary.domain.SurveyQuestion;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(value = "问卷库 练习册,题集相关", tags = {"问卷库 练习册,题集相关操作"})
 @RequestMapping(path = "/surveyExerciseBook", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class SurveyQuestionProblemSetController extends BaseProblemSetController<BrainstormQuestionProblemSet, BrainstormQuestion, BrainstormQuestionExerciseBook> {
+public class SurveyQuestionProblemSetController extends BaseProblemSetController<SurveyQuestionProblemSet, SurveyQuestion, SurveyQuestionExerciseBook> {
 
-    public SurveyQuestionProblemSetController(BaseProblemSetService<BrainstormQuestionProblemSet, BrainstormQuestion> service,
-                                              BaseExerciseBookService<BrainstormQuestionExerciseBook, BrainstormQuestion> exerciseBookService) {
+    public SurveyQuestionProblemSetController(BaseProblemSetService<SurveyQuestionProblemSet, SurveyQuestion> service,
+                                              SurveyQuestionExerciseBookService exerciseBookService) {
         super(service, exerciseBookService);
     }
 }

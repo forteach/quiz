@@ -1,6 +1,7 @@
 package com.forteach.quiz.problemsetlibrary.service.base;
 
 import com.forteach.quiz.domain.QuestionIds;
+import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
 import com.forteach.quiz.problemsetlibrary.repository.base.ProblemSetMongoRepository;
@@ -100,7 +101,7 @@ public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends 
                     return findByIdQuestion(list)
                             .sort(Comparator.comparing(question -> indexMap.get(question.getId())))
                             .collectList()
-                            .map(monoList -> entityClass().cast(new ProblemSetDet<R>(set, monoList)));
+                            .map(monoList -> (T) instantiate(entityClass()).build(new ProblemSetDet<R>(set, monoList)));
                 });
     }
 
@@ -193,5 +194,11 @@ public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends 
         return (Class<R>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
-
+    private <C> C instantiate(Class<C> c) {
+        try {
+            return c.newInstance();
+        } catch (Exception e) {
+            throw new CustomException("反射实例化泛型出错" + e);
+        }
+    }
 }

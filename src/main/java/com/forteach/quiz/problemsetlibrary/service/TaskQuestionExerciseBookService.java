@@ -1,9 +1,9 @@
 package com.forteach.quiz.problemsetlibrary.service;
 
-import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.TaskQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceImpl;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.questionlibrary.domain.TaskQuestion;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,11 @@ import org.springframework.stereotype.Service;
  * @date: 2019/1/13  22:43
  */
 @Service
-public class TaskQuestionExerciseBookService extends BaseExerciseBookServiceImpl<BigQuestionExerciseBook, BigQuestion> {
+public class TaskQuestionExerciseBookService extends BaseExerciseBookServiceImpl<TaskQuestionExerciseBook, TaskQuestion> {
 
-    public TaskQuestionExerciseBookService(ExerciseBookMongoRepository<BigQuestionExerciseBook> repository,
+    public TaskQuestionExerciseBookService(ExerciseBookMongoRepository<TaskQuestionExerciseBook> repository,
                                            ReactiveMongoTemplate template,
-                                           BaseQuestionServiceImpl<BigQuestion> questionRepository) {
+                                           BaseQuestionServiceImpl<TaskQuestion> questionRepository) {
         super(repository, template, questionRepository);
     }
-
-
 }

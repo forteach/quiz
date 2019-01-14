@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.beans.BeanUtils;
 
 import java.util.List;
 
@@ -57,4 +58,9 @@ public class ProblemSet extends BaseEntity {
      */
     @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
     private String levelId;
+
+    public ProblemSet build(final ProblemSet problemSet) {
+        BeanUtils.copyProperties(problemSet, this);
+        return this;
+    }
 }
