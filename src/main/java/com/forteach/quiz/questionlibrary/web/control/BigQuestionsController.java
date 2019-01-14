@@ -25,7 +25,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@Api(value = "考试 练习 题目", tags = {"题库内容操作"})
+@Api(value = "考试 练习 题目", tags = {"考试 练习 题库内容操作"})
 @RequestMapping(path = "/question", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BigQuestionsController extends BaseQuestionController<BigQuestion> {
 
