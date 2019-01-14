@@ -2,6 +2,7 @@ package com.forteach.quiz.problemsetlibrary.service.base;
 
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.CustomException;
+import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
@@ -9,7 +10,6 @@ import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.web.vo.BigQuestionVo;
-import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

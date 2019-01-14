@@ -1,10 +1,10 @@
 package com.forteach.quiz.problemsetlibrary.service.base;
 
+import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
-import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.mongodb.client.result.UpdateResult;
 import reactor.core.publisher.Mono;
 
