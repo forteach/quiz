@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@Api(value = "问卷的 题目", tags = {"问卷 题库内容操作"})
+@Api(value = "任务库 题目", tags = {"任务库 题库内容操作"})
 @RequestMapping(path = "/taskQuestion", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class TaskQuestionController extends BaseQuestionController<TaskQuestion> {
 
