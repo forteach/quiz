@@ -40,7 +40,7 @@ public class RedisTest {
                     Map<String, String> map = new HashMap<>(5);
                     map.put("id", String.valueOf(10000 + i));
                     map.put("name", "学生" + i);
-                    map.put("portrait", "https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=1670224544,3291774560&fm=58&bpow=464&bpoh=608");
+                    map.put("portrait", "https://cdn.v2ex.com/gravatar/cc2fa800888e12870e0739750cd9c9e7.jpg?s=100&d=identicon");
                     return reactiveHashOperations.putAll(("studentsData$".concat(String.valueOf(10000 + i))), map);
                 }).count();
 ////

@@ -1,9 +1,9 @@
-package com.forteach.quiz.service;
+package com.forteach.quiz.interaction.service;
 
-import com.forteach.quiz.domain.InteractAnswerRecord;
-import com.forteach.quiz.domain.InteractQuestionsRecord;
-import com.forteach.quiz.domain.InteractRecord;
-import com.forteach.quiz.repository.InteractRecordRepository;
+import com.forteach.quiz.interaction.domain.InteractAnswerRecord;
+import com.forteach.quiz.interaction.domain.InteractQuestionsRecord;
+import com.forteach.quiz.interaction.domain.InteractRecord;
+import com.forteach.quiz.interaction.repository.InteractRecordRepository;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -29,13 +29,13 @@ import static com.forteach.quiz.util.DateUtil.getStartTime;
  * @date: 2019/1/4  15:33
  */
 @Service
-public class InteractRecordService {
+public class InteractRecordExecuteService {
 
     private final InteractRecordRepository repository;
     private final ReactiveMongoTemplate mongoTemplate;
     private Mono<Boolean> executeSuccessfully = Mono.just(true);
 
-    public InteractRecordService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate) {
+    public InteractRecordExecuteService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
     }
@@ -50,7 +50,7 @@ public class InteractRecordService {
      * @param right
      * @return
      */
-    Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
+    public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
 
         final Query query = Query.query(Criteria.where("circleId").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
@@ -78,7 +78,7 @@ public class InteractRecordService {
      * @param category
      * @return
      */
-    Mono<Boolean> releaseQuestion(final String circleId, final String questionId, final String selectId, final String category, final String interactive) {
+    public Mono<Boolean> releaseQuestion(final String circleId, final String questionId, final String selectId, final String category, final String interactive) {
 
         Mono<Long> number = questionNumber(circleId);
 
@@ -103,7 +103,7 @@ public class InteractRecordService {
      * @param student
      * @return
      */
-    Mono<Boolean> join(final String circleId, final String student) {
+    public Mono<Boolean> join(final String circleId, final String student) {
 
         final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
 
@@ -122,7 +122,7 @@ public class InteractRecordService {
      * @param questionId
      * @return
      */
-    Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
+    public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
 
         final Query query = Query.query(
                 Criteria.where("circleId").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
@@ -141,7 +141,7 @@ public class InteractRecordService {
      *
      * @return
      */
-    Mono<Boolean> init(final String circleId, final String teacherId) {
+    public Mono<Boolean> init(final String circleId, final String teacherId) {
 
         return repository.findByCircleIdAndTeacherId(circleId, teacherId).collectList()
                 .flatMap(list -> {

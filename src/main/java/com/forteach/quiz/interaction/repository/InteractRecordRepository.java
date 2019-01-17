@@ -1,6 +1,6 @@
-package com.forteach.quiz.repository;
+package com.forteach.quiz.interaction.repository;
 
-import com.forteach.quiz.domain.InteractRecord;
+import com.forteach.quiz.interaction.domain.InteractRecord;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

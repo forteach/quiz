@@ -13,11 +13,17 @@ import java.util.List;
 @Data
 public class Answ {
 
+    /**
+     * 答案集
+     */
     List<AnswChildren> childrenList;
     /**
      * 大题id
      */
     private String bigQuestionId;
+    /**
+     * 分数
+     */
     private Double score;
 
 }

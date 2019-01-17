@@ -1,4 +1,4 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.interaction.domain;
 
 import lombok.Data;
 

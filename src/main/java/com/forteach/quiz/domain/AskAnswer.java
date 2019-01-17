@@ -48,6 +48,13 @@ public class AskAnswer extends BaseEntity {
     private String questionId;
 
     /**
+     * 问题库类别
+     */
+    @ApiModelProperty(value = "不需要传值 后台赋值 问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
+            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "questionId")
+    private String libraryType;
+
+    /**
      * 答案对错
      */
     @ApiModelProperty(value = "答案回答对错 true  false  主观题则未空串", name = "right")
