@@ -8,6 +8,9 @@ package com.forteach.quiz.common;
  */
 public class KeyStorage {
 
+    /**
+     * 互动提问hash 前缀
+     */
     public static final String CLASSROOM_ASK_QUESTIONS_ID = "classAsk";
 
     public static final String CLASSROOM_ASK_QUESTIONS_DISTINCT = "distinctAsk";

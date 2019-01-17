@@ -1,7 +1,8 @@
-package com.forteach.quiz.web;
+package com.forteach.quiz.interaction.web.control;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.service.ClassRoomService;
+import com.forteach.quiz.interaction.service.ClassRoomService;
+import com.forteach.quiz.web.BaseController;
 import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;

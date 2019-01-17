@@ -1,5 +1,6 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -45,8 +46,8 @@ public class AchieveVo {
      *
      * @return
      */
-    public String getAskKey() {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(circleId);
+    public String getAskKey(QuestionType type) {
+        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
     public String getDistinctKey(String questions) {

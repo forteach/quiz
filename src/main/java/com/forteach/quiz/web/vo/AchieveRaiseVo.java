@@ -1,5 +1,6 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,8 +45,8 @@ public class AchieveRaiseVo {
      *
      * @return
      */
-    public String getAskKey() {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(circleId);
+    public String getAskKey(QuestionType type) {
+        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
     public String getRaiseKey() {
