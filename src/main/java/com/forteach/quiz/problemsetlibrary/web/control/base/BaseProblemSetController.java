@@ -61,7 +61,7 @@ public abstract class BaseProblemSetController<T extends ProblemSet, R extends Q
     @GetMapping("/delete/{id}")
     @ApiOperation(value = "删除题集", notes = "通过id 删除题集")
     public Mono<WebResult> delExerciseBook(@Valid @PathVariable String id) {
-        return service.delExerciseBook(id).map(WebResult::okResult);
+        return service.delExerciseBook(id).thenReturn("ok").map(WebResult::okResult);
     }
 
     /**
