@@ -6,10 +6,11 @@ import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import com.forteach.quiz.questionlibrary.web.control.base.BaseAllController;
-import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.vo.AddChildrenVo;
 import com.forteach.quiz.web.vo.UpdateChildrenVo;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -48,23 +49,6 @@ public class BigQuestionsController extends BaseAllController<BigQuestion> {
     @ApiOperation(value = "编辑大题", notes = "新增数据时 不添加id 修改时数据添加id")
     public Mono<WebResult> editBigQuestion(@Valid @RequestBody @ApiParam(value = "编辑大题", required = true) BigQuestion bigQuestion) {
         return bigQuestionService.editBigQuestion(bigQuestion).map(WebResult::okResult);
-    }
-
-    /**
-     * 获得题集 返回 分页的题库信息与 练习册已选择的题目信息
-     *
-     * @return
-     */
-    @PostMapping("/findAll/problemSet")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
-            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
-            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
-            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
-    })
-    @ApiOperation(value = "通过id查找题集及包含的题目全部信息", notes = "通过id查找题集及包含的题目全部信息")
-    public Mono<WebResult> questionProblemSetReq(@Valid @RequestBody QuestionProblemSetReq questionProblemSetReq) {
-        return bigQuestionService.questionProblemSet(questionProblemSetReq).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "删除大体下某题目", notes = "删除大体下某题目")

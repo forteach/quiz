@@ -1,4 +1,4 @@
-package com.forteach.quiz.web.vo;
+package com.forteach.quiz.evaluate.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
