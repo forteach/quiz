@@ -1,7 +1,6 @@
 package com.forteach.quiz.web.vo;
 
 import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -25,7 +24,7 @@ import java.util.List;
 public class QuestionProblemSetVo {
 
     @ApiModelProperty(value = "获得的题库数据", name = "bigQuestionList")
-    private List<BigQuestion> bigQuestionList;
+    private List<?> bigQuestionList;
 
     @ApiModelProperty(value = "题集", name = "problemSet")
     private ProblemSet problemSet;

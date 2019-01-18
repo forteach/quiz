@@ -1,5 +1,6 @@
 package com.forteach.quiz.problemsetlibrary.service.base;
 
+import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
@@ -8,7 +9,12 @@ import com.forteach.quiz.problemsetlibrary.repository.base.ProblemSetMongoReposi
 import com.forteach.quiz.problemsetlibrary.web.req.ProblemSetReq;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
+import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
+import com.forteach.quiz.questionlibrary.web.req.QuestionBankReq;
+import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
 import com.forteach.quiz.web.pojo.ProblemSetDet;
+import com.forteach.quiz.web.vo.QuestionProblemSetVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -39,11 +45,14 @@ public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends 
 
     private final QuestionMongoRepository<R> questionRepository;
 
+    private final BaseQuestionService<R> questionService;
+
     public BaseProblemSetServiceImpl(ReactiveMongoTemplate reactiveMongoTemplate, ProblemSetMongoRepository<T> repository,
-                                     QuestionMongoRepository<R> questionRepository) {
+                                     QuestionMongoRepository<R> questionRepository, BaseQuestionService<R> questionService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.repository = repository;
         this.questionRepository = questionRepository;
+        this.questionService = questionService;
     }
 
     /**
@@ -200,5 +209,41 @@ public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends 
         } catch (Exception e) {
             throw new CustomException("反射实例化泛型出错" + e);
         }
+    }
+
+    /**
+     * 通过id查找题集及包含的题目全部信息
+     *
+     * @param questionProblemSetReq
+     * @return
+     */
+    @Override
+    public Mono<QuestionProblemSetVo> questionProblemSet(final QuestionProblemSetReq questionProblemSetReq) {
+
+        QuestionBankReq questionBankReq = new QuestionProblemSetReq();
+        BeanUtils.copyProperties(questionProblemSetReq, questionBankReq);
+
+        Mono<List<R>> questionFlux = questionService.findAllDetailed(questionBankReq).collectList();
+
+        return questionFlux.zipWith(findProblemSet(questionProblemSetReq.getProblemSetId()), (questionList, problemSet) -> {
+
+            List<String> target = problemSet.getQuestionIds().stream().map(QuestionIds::getBigQuestionId).collect(Collectors.toList());
+            List<String> origin = questionList.stream().map(BaseEntity::getId).collect(Collectors.toList());
+            //交集
+            List<String> intersection = origin.stream().filter(target::contains).collect(Collectors.toList());
+            //差集
+            List<String> difference = origin.stream().filter(item -> !target.contains(item)).collect(Collectors.toList());
+            return QuestionProblemSetVo.builder().bigQuestionList(questionList).problemSet(problemSet).intersection(intersection).difference(difference).build();
+        });
+    }
+
+    /**
+     * 根据id 获取练习册 基本信息
+     *
+     * @param exerciseBookId
+     * @return
+     */
+    private Mono<T> findProblemSet(final String exerciseBookId) {
+        return repository.findById(exerciseBookId);
     }
 }

@@ -10,6 +10,7 @@ import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.problemsetlibrary.web.req.ProblemSetReq;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -137,4 +138,20 @@ public abstract class BaseProblemSetController<T extends ProblemSet, R extends Q
         return exerciseBookService.delExerciseBookPart(delVo).map(WebResult::okResult);
     }
 
+    /**
+     * 获得题集 返回 分页的题库信息与 练习册已选择的题目信息
+     *
+     * @return
+     */
+    @PostMapping("/findAll/problemSet")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "分页从0开始", required = true, dataType = "int", type = "int", example = "0"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "int", type = "int", example = "10"),
+            @ApiImplicitParam(value = "排序规则", dataType = "string", name = "sorting", example = "cTime", required = true),
+            @ApiImplicitParam(value = "sort", name = "排序方式", dataType = "int", example = "1")
+    })
+    @ApiOperation(value = "通过id查找题集及包含的题目全部信息", notes = "通过id查找题集及包含的题目全部信息")
+    public Mono<WebResult> questionProblemSetReq(@Valid @RequestBody QuestionProblemSetReq questionProblemSetReq) {
+        return service.questionProblemSet(questionProblemSetReq).map(WebResult::okResult);
+    }
 }

@@ -5,6 +5,7 @@ import com.forteach.quiz.problemsetlibrary.repository.base.ProblemSetMongoReposi
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetServiceImpl;
 import com.forteach.quiz.questionlibrary.domain.TaskQuestion;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
+import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,9 @@ public class TaskQuestionProblemSetService extends BaseProblemSetServiceImpl<Tas
 
     public TaskQuestionProblemSetService(ReactiveMongoTemplate reactiveMongoTemplate,
                                          ProblemSetMongoRepository<TaskQuestionProblemSet> repository,
-                                         QuestionMongoRepository<TaskQuestion> questionRepository) {
-        super(reactiveMongoTemplate, repository, questionRepository);
+                                         QuestionMongoRepository<TaskQuestion> questionRepository,
+                                         BaseQuestionService<TaskQuestion> questionService) {
+        super(reactiveMongoTemplate, repository, questionRepository, questionService);
     }
+
 }

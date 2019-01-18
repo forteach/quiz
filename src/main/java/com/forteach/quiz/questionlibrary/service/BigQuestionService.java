@@ -2,9 +2,7 @@ package com.forteach.quiz.questionlibrary.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.problemsetlibrary.domain.BigQuestionProblemSet;
 import com.forteach.quiz.problemsetlibrary.repository.BigQuestionProblemSetRepository;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
@@ -14,12 +12,8 @@ import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
-import com.forteach.quiz.questionlibrary.web.req.QuestionBankReq;
-import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
-import com.forteach.quiz.web.vo.QuestionProblemSetVo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.UpdateResult;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -85,30 +79,6 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
     }
 
     /**
-     * 通过id查找题集及包含的题目全部信息
-     * @param questionProblemSetReq
-     * @return
-     */
-    public Mono<QuestionProblemSetVo> questionProblemSet(final QuestionProblemSetReq questionProblemSetReq) {
-
-        QuestionBankReq questionBankReq = new QuestionProblemSetReq();
-        BeanUtils.copyProperties(questionProblemSetReq, questionBankReq);
-
-        Mono<List<BigQuestion>> questionFlux = findAllDetailed(questionBankReq).collectList();
-
-        return questionFlux.zipWith(findProblemSet(questionProblemSetReq.getProblemSetId()), (questionList, problemSet) -> {
-
-            List<String> target = problemSet.getQuestionIds().stream().map(QuestionIds::getBigQuestionId).collect(Collectors.toList());
-            List<String> origin = questionList.stream().map(BigQuestion::getId).collect(Collectors.toList());
-            //交集
-            List<String> intersection = origin.stream().filter(target::contains).collect(Collectors.toList());
-            //差集
-            List<String> difference = origin.stream().filter(item -> !target.contains(item)).collect(Collectors.toList());
-            return QuestionProblemSetVo.builder().bigQuestionList(questionList).problemSet(problemSet).intersection(intersection).difference(difference).build();
-        });
-    }
-
-    /**
      * 设置大题的id及属性
      * @param bigQuestion
      * @return
@@ -149,16 +119,6 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
                 })
                 .collect(Collectors.toList()));
         return bigQuestion;
-    }
-
-    /**
-     * 根据id 获取练习册 基本信息
-     *
-     * @param exerciseBookId
-     * @return
-     */
-    public Mono<BigQuestionProblemSet> findProblemSet(final String exerciseBookId) {
-        return bigQuestionProblemSetRepository.findById(exerciseBookId);
     }
 
     /**

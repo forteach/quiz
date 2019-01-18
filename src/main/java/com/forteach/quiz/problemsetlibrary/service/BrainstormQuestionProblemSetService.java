@@ -1,10 +1,11 @@
 package com.forteach.quiz.problemsetlibrary.service;
 
 import com.forteach.quiz.problemsetlibrary.domain.BrainstormQuestionProblemSet;
-import com.forteach.quiz.problemsetlibrary.repository.BrainstormQuestionProblemSetRepository;
+import com.forteach.quiz.problemsetlibrary.repository.base.ProblemSetMongoRepository;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetServiceImpl;
 import com.forteach.quiz.questionlibrary.domain.BrainstormQuestion;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
+import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,10 @@ public class BrainstormQuestionProblemSetService extends BaseProblemSetServiceIm
 
 
     public BrainstormQuestionProblemSetService(ReactiveMongoTemplate reactiveMongoTemplate,
-                                               BrainstormQuestionProblemSetRepository repository,
-                                               QuestionMongoRepository<BrainstormQuestion> questionRepository) {
-        super(reactiveMongoTemplate, repository, questionRepository);
+                                               ProblemSetMongoRepository<BrainstormQuestionProblemSet> repository,
+                                               QuestionMongoRepository<BrainstormQuestion> questionRepository,
+                                               BaseQuestionService<BrainstormQuestion> questionService) {
+
+        super(reactiveMongoTemplate, repository, questionRepository, questionService);
     }
-
-
 }

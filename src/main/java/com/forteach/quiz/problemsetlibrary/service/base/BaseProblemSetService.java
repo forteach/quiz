@@ -3,6 +3,8 @@ package com.forteach.quiz.problemsetlibrary.service.base;
 import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
 import com.forteach.quiz.problemsetlibrary.web.req.ProblemSetReq;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
+import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
+import com.forteach.quiz.web.vo.QuestionProblemSetVo;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -53,6 +55,14 @@ public interface BaseProblemSetService<T extends ProblemSet, R extends QuestionE
      * @return
      */
     Mono<T> findAllDetailed(final String exerciseBookId);
+
+    /**
+     * 通过id查找题集及包含的题目全部信息
+     *
+     * @param questionProblemSetReq
+     * @return
+     */
+    Mono<QuestionProblemSetVo> questionProblemSet(final QuestionProblemSetReq questionProblemSetReq);
 
 
 }
