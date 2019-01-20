@@ -1,8 +1,8 @@
 package com.forteach.quiz.interaction.web.control;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.domain.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.service.BigQuestionInteractService;
+import com.forteach.quiz.interaction.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;

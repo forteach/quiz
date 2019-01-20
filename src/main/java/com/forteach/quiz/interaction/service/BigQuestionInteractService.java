@@ -1,9 +1,9 @@
 package com.forteach.quiz.interaction.service;
 
-import com.forteach.quiz.domain.AskAnswer;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.interaction.domain.BigQuestionGiveVo;
+import com.forteach.quiz.interaction.domain.AskAnswer;
+import com.forteach.quiz.interaction.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
 import com.forteach.quiz.web.vo.AskLaunchVo;

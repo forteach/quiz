@@ -1,5 +1,6 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.interaction.domain;
 
+import com.forteach.quiz.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

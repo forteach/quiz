@@ -1,7 +1,7 @@
 package com.forteach.quiz.interaction.service;
 
-import com.forteach.quiz.domain.AskAnswer;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.interaction.domain.AskAnswer;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;

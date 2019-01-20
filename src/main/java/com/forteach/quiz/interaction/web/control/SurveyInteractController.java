@@ -1,8 +1,9 @@
 package com.forteach.quiz.interaction.web.control;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.domain.MoreGiveVo;
 import com.forteach.quiz.interaction.service.SurveyInteractService;
+import com.forteach.quiz.interaction.web.vo.InteractiveSheetVo;
+import com.forteach.quiz.interaction.web.vo.MoreGiveVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,6 +42,19 @@ public class SurveyInteractController {
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo) {
         return surveyService.sendQuestion(giveVo).map(WebResult::okResult);
     }
+
+    /**
+     * 提交答案
+     *
+     * @param sheetVo
+     * @return
+     */
+    @PostMapping("/send/answer")
+    @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+        return surveyService.sendAnswer(sheetVo).map(WebResult::okResult);
+    }
+
 
 
 }
