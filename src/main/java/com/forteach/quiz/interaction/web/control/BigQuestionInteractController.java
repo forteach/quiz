@@ -3,6 +3,8 @@ package com.forteach.quiz.interaction.web.control;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.service.BigQuestionInteractService;
 import com.forteach.quiz.interaction.web.vo.BigQuestionGiveVo;
+import com.forteach.quiz.interaction.web.vo.InteractiveSheetVo;
+import com.forteach.quiz.interaction.web.vo.MoreGiveVo;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
@@ -58,6 +60,18 @@ public class BigQuestionInteractController {
     }
 
     /**
+     * 提交答案
+     *
+     * @param interactAnswerVo
+     * @return
+     */
+    @PostMapping("/send/answer")
+    @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo) {
+        return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
+    }
+
+    /**
      * 发布问题
      *
      * @param giveVo
@@ -70,15 +84,27 @@ public class BigQuestionInteractController {
     }
 
     /**
-     * 提交答案
+     * 发布本节课 练习册
      *
-     * @param interactAnswerVo
+     * @param giveVo
      * @return
      */
-    @PostMapping("/send/answer")
-    @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo) {
-        return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
+    @ApiOperation(value = "发布互动练习册", notes = "传入练习册内题目的id 发布互动练习册题目")
+    @PostMapping("/send/book")
+    public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo) {
+        return interactService.sendInteractiveBook(giveVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 提交课堂练习答案
+     *
+     * @param sheetVo
+     * @return
+     */
+    @PostMapping("/sendBook/answer")
+    @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+        return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
     }
 
 
