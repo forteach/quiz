@@ -1,4 +1,4 @@
-package com.forteach.quiz.interaction.domain;
+package com.forteach.quiz.interaction.web.vo;
 
 import com.forteach.quiz.interaction.domain.base.GiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;

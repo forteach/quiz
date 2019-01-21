@@ -1,4 +1,4 @@
-package com.forteach.quiz.interaction.domain;
+package com.forteach.quiz.interaction.web.vo;
 
 /**
  * @Description:
