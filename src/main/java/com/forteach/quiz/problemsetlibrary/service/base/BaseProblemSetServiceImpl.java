@@ -110,7 +110,7 @@ public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends 
                     return findByIdQuestion(list)
                             .sort(Comparator.comparing(question -> indexMap.get(question.getId())))
                             .collectList()
-                            .map(monoList -> (T) instantiate(entityClass()).build(new ProblemSetDet<R>(set, monoList)));
+                            .map(monoList -> (T) (new ProblemSetDet<R>(set, monoList)));
                 });
     }
 
