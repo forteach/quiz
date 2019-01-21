@@ -15,10 +15,10 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +77,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
                         return repository.save(tuple2.getT2());
                     } else {
-                        return repository.save((T) instantiate(entityClass()).build(new ExerciseBook<>(problemSetVo, tuple2.getT1())));
+                        return repository.save((T) instantiate(entityClass()).build(new ExerciseBook(problemSetVo, tuple2.getT1())));
                     }
                 });
     }
@@ -89,10 +89,29 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
      * @return
      */
     @Override
-    public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
+    public Mono<List<R>> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getChapterId(), sortVo.getCourseId())
-                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList()).onErrorReturn(new ArrayList());
+                .map(ExerciseBook::getQuestionChildren);
+    }
+
+    /**
+     * 查找详细的 挂接的课堂练习题
+     *
+     * @param sortVo
+     * @return
+     */
+    @Override
+    public Mono<List<R>> findDetailedExerciseBook(final ExerciseBookReq sortVo) {
+        return findExerciseBook(sortVo)
+                .flatMapMany(list -> Flux.fromStream(list.stream()))
+                .flatMap(que -> {
+                    return questionRepository.findOneDetailed(que.getId()).map(det -> {
+                        det.setIndex(que.getIndex());
+                        return det;
+                    });
+                })
+                .collectList();
     }
 
     /**

@@ -128,6 +128,18 @@ public abstract class BaseProblemSetController<T extends ProblemSet, R extends Q
     }
 
     /**
+     * 查找详细 挂接的课堂练习题
+     *
+     * @param bookReq
+     * @return
+     */
+    @ApiOperation(value = "查找详细 挂接的课堂练习题", notes = "查找详细挂接的课堂练习题")
+    @PostMapping("/findDetailedExerciseBook")
+    public Mono<WebResult> findDetailedExerciseBook(@Valid @ApiParam(name = "ExerciseBookReq", value = "查找挂接的课堂练习题", required = true) @RequestBody ExerciseBookReq bookReq) {
+        return exerciseBookService.findDetailedExerciseBook(bookReq).map(WebResult::okResult);
+    }
+
+    /**
      * 删除挂接的课堂练习题
      *
      * @return

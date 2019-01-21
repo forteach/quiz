@@ -32,7 +32,7 @@ public interface BaseExerciseBookService<T extends ExerciseBook, R extends Quest
      * @param sortVo
      * @return
      */
-    Mono<List> findExerciseBook(final ExerciseBookReq sortVo);
+    Mono<List<R>> findExerciseBook(final ExerciseBookReq sortVo);
 
     /**
      * 删除课堂练习题部分子文档
@@ -41,6 +41,14 @@ public interface BaseExerciseBookService<T extends ExerciseBook, R extends Quest
      * @return
      */
     Mono<UpdateResult> delExerciseBookPart(final DelExerciseBookPartVo delVo);
+
+    /**
+     * 查找详细的挂接的课堂练习题
+     *
+     * @param sortVo
+     * @return
+     */
+    Mono<List<R>> findDetailedExerciseBook(final ExerciseBookReq sortVo);
 
 
 }

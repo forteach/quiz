@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -86,11 +85,12 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
      * @return
      */
     @Override
-    public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
+    public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
-                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList()).onErrorReturn(new ArrayList());
+                .map(ExerciseBook::getQuestionChildren);
     }
+
 
     /**
      * 查找需要挂接的课堂链接册
