@@ -14,7 +14,7 @@ import org.springframework.beans.BeanUtils;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class BigQuestionVo<T> extends QuestionExamEntity {
+public class BigQuestionVo<T extends QuestionExamEntity> extends QuestionExamEntity {
 
     @ApiModelProperty(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", example = "1")
     private String preview;
