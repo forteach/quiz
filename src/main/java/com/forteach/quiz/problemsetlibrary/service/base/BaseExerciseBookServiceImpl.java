@@ -77,7 +77,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
                         return repository.save(tuple2.getT2());
                     } else {
-                        return repository.save((T) instantiate(entityClass()).build(new ExerciseBook(problemSetVo, tuple2.getT1())));
+                        return repository.save((T) instantiate(entityClass()).build(new ExerciseBook<>(problemSetVo, tuple2.getT1())));
                     }
                 });
     }
