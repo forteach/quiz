@@ -1,6 +1,6 @@
 package com.forteach.quiz.repository;
 
-import com.forteach.quiz.interaction.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**
