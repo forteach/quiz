@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.interaction.domain.Answ;
+import com.forteach.quiz.interaction.execute.domain.Answ;
 import lombok.Data;
 
 import java.util.List;

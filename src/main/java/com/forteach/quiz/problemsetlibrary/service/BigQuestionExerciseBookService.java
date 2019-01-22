@@ -64,7 +64,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> new BigQuestionVo<BigQuestion>(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
+                .map(bigQuestion -> new BigQuestionVo<BigQuestion>(previewMap.get(bigQuestion.getId()), String.valueOf(idexMap.get(bigQuestion.getId())), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .zipWhen(list -> findExerciseBook(String.valueOf(problemSetVo.getExeBookType()), problemSetVo.getChapterId(), problemSetVo.getCourseId()))
@@ -87,7 +87,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
     @Override
     public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
+        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId()).doOnNext(System.out::println)
                 .map(ExerciseBook::getQuestionChildren);
     }
 

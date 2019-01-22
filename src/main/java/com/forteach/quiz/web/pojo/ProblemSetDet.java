@@ -27,7 +27,7 @@ public class ProblemSetDet<T> extends ProblemSet {
     private List<T> bigQuestionList;
 
     public ProblemSetDet(ProblemSet problemSet, List<T> bigQuestionList) {
-        this.bigQuestionList = bigQuestionList;
         BeanUtils.copyProperties(problemSet, this);
+        this.bigQuestionList = bigQuestionList;
     }
 }

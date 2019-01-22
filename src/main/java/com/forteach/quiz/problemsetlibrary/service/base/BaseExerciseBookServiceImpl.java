@@ -67,7 +67,9 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> new BigQuestionVo<R>(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
+                .map(bigQuestion ->
+                        new BigQuestionVo<>(previewMap.get(bigQuestion.getId()), String.valueOf(idexMap.get(bigQuestion.getId())), bigQuestion)
+                )
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .zipWhen(list ->
@@ -104,7 +106,9 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
     @Override
     public Mono<List<R>> findDetailedExerciseBook(final ExerciseBookReq sortVo) {
         return findExerciseBook(sortVo)
-                .flatMapMany(list -> Flux.fromStream(list.stream()))
+                .flatMapMany(list ->
+                        Flux.fromStream(list.stream())
+                )
                 .flatMap(que -> {
                     return questionRepository.findOneDetailed(que.getId()).map(det -> {
                         det.setIndex(que.getIndex());

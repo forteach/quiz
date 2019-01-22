@@ -27,7 +27,7 @@ public class OptBigQuestionVo extends BigQuestion {
     }
 
     public OptBigQuestionVo(String selected, BigQuestion bigQuestion) {
-        this.selected = selected;
         BeanUtils.copyProperties(bigQuestion, this);
+        this.selected = selected;
     }
 }
