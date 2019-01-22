@@ -1,5 +1,6 @@
 package com.forteach.quiz.domain;
 
+import com.forteach.quiz.interaction.execute.domain.Answ;
 import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

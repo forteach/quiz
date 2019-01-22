@@ -1,5 +1,6 @@
 package com.forteach.quiz.questionlibrary.domain.base;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.web.vo.BigQuestionView;
@@ -73,4 +74,8 @@ public class QuestionExamEntity<T> extends BaseEntity {
     @Indexed
     private List<String> keyword;
 
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @ApiModelProperty(value = "下标", name = "index", example = "")
+    protected String index;
 }

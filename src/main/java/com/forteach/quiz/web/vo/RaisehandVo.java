@@ -1,5 +1,6 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,8 +40,8 @@ public class RaisehandVo {
      *
      * @return
      */
-    public String getAskKey() {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(circleId);
+    public String getAskKey(QuestionType type) {
+        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
 }

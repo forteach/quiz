@@ -1,5 +1,6 @@
-package com.forteach.quiz.service;
+package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
@@ -33,14 +34,14 @@ public class ClassRoomService {
 
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
 
-    private final InteractRecordService interactRecordService;
+    private final InteractRecordExecuteService interactRecordExecuteService;
 
     public ClassRoomService(StudentsService studentsService, ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations
-            , InteractRecordService interactRecordService) {
+            , InteractRecordExecuteService interactRecordExecuteService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.studentsService = studentsService;
-        this.interactRecordService = interactRecordService;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -52,7 +53,7 @@ public class ClassRoomService {
     public Mono<Long> joinInteractiveRoom(final JoinInteractiveRoomVo joinVo) {
         return stringRedisTemplate.opsForSet().add(joinVo.getJoinKey(), joinVo.getExamineeId())
                 .filterWhen(obj -> stringRedisTemplate.expire(joinVo.getJoinKey(), Duration.ofSeconds(60 * 60 * 2)))
-                .filterWhen(obj -> interactRecordService.join(joinVo.getCircleId(), joinVo.getExamineeId()));
+                .filterWhen(obj -> interactRecordExecuteService.join(joinVo.getCircleId(), joinVo.getExamineeId()));
 
     }
 
@@ -87,7 +88,7 @@ public class ClassRoomService {
                         return Mono.just(id);
                     }
                 })
-                .filterWhen(circleId -> interactRecordService.init(circleId, roomVo.getTeacherId()));
+                .filterWhen(circleId -> interactRecordExecuteService.init(circleId, roomVo.getTeacherId()));
     }
 
     /**
@@ -99,7 +100,7 @@ public class ClassRoomService {
      */
     public Mono<String> createCoverInteractiveRoom(final InteractiveRoomVo roomVo) {
         return buildRoom(roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey())
-                .filterWhen(circleId -> interactRecordService.init(circleId, roomVo.getTeacherId()));
+                .filterWhen(circleId -> interactRecordExecuteService.init(circleId, roomVo.getTeacherId()));
     }
 
     private Mono<String> buildRoom(final String teacherId, final String chapterId, final String roomKey) {

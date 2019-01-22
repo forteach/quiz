@@ -1,7 +1,7 @@
 package com.forteach.quiz;
 
 import com.alibaba.fastjson.JSON;
-import com.forteach.quiz.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.question.Design;

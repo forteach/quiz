@@ -2,6 +2,7 @@ package com.forteach.quiz.problemsetlibrary.service.base;
 
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.CustomException;
+import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
@@ -9,16 +10,15 @@ import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.web.vo.BigQuestionVo;
-import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -67,16 +67,19 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> new BigQuestionVo<R>(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
+                .map(bigQuestion ->
+                        new BigQuestionVo<>(previewMap.get(bigQuestion.getId()), String.valueOf(idexMap.get(bigQuestion.getId())), bigQuestion)
+                )
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
-                .zipWhen(list -> findExerciseBook(problemSetVo.getChapterId(), problemSetVo.getCourseId()))
+                .zipWhen(list ->
+                        findExerciseBook(problemSetVo.getChapterId(), problemSetVo.getCourseId()))
                 .flatMap(tuple2 -> {
                     if (isNotEmpty(tuple2.getT2().getId())) {
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
                         return repository.save(tuple2.getT2());
                     } else {
-                        return repository.save(entityClass().cast(new ExerciseBook<>(problemSetVo, tuple2.getT1())));
+                        return repository.save((T) instantiate(entityClass()).build(new ExerciseBook<>(problemSetVo, tuple2.getT1())));
                     }
                 });
     }
@@ -88,10 +91,31 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
      * @return
      */
     @Override
-    public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
+    public Mono<List<R>> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getChapterId(), sortVo.getCourseId())
-                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList()).onErrorReturn(new ArrayList());
+                .map(ExerciseBook::getQuestionChildren);
+    }
+
+    /**
+     * 查找详细的 挂接的课堂练习题
+     *
+     * @param sortVo
+     * @return
+     */
+    @Override
+    public Mono<List<R>> findDetailedExerciseBook(final ExerciseBookReq sortVo) {
+        return findExerciseBook(sortVo)
+                .flatMapMany(list ->
+                        Flux.fromStream(list.stream())
+                )
+                .flatMap(que -> {
+                    return questionRepository.findOneDetailed(que.getId()).map(det -> {
+                        det.setIndex(que.getIndex());
+                        return det;
+                    });
+                })
+                .collectList();
     }
 
     /**

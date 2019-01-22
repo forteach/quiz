@@ -1,30 +1,40 @@
-package com.forteach.quiz.web;
+package com.forteach.quiz.interaction.execute.web.control;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.service.InteractService;
-import com.forteach.quiz.web.vo.*;
-import io.swagger.annotations.*;
+import com.forteach.quiz.interaction.execute.service.ActiveInitiativeService;
+import com.forteach.quiz.web.vo.AchieveAnswerVo;
+import com.forteach.quiz.web.vo.AchieveRaiseVo;
+import com.forteach.quiz.web.vo.AchieveVo;
+import com.forteach.quiz.web.vo.BigQuestionView;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
- * @date: 2018/11/19  14:46
+ * @date: 2019/1/15  14:38
  */
 @RestController
-@Api(value = "互动交互", tags = {"课堂提问等互动交互"})
-@RequestMapping(value = "/interact", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class InteractCollection extends BaseController {
+@Api(value = "互动交互 轮询方式", tags = {"课堂提问等互动交互"})
+@RequestMapping(value = "/interactPolling", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class ActiveInitiativeController {
 
-    private final InteractService interactService;
+    private final ActiveInitiativeService interactService;
 
-    public InteractCollection(InteractService interactService) {
+    public ActiveInitiativeController(ActiveInitiativeService interactService) {
         this.interactService = interactService;
     }
+
 
     /**
      * 主动推送问题
@@ -70,54 +80,5 @@ public class InteractCollection extends BaseController {
 
         return interactService.achieveAnswer(AchieveAnswerVo.builder().circleId(circleId).random(random).teacher(teacher).build()).map(WebResult::okResult);
     }
-
-    /**
-     * 课堂提问
-     * 重新发起举手
-     *
-     * @return
-     */
-    @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
-    @PostMapping("/launch/raise")
-    public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody AskLaunchVo askLaunchVo) {
-        return interactService.launchRaise(askLaunchVo).map(WebResult::okResult);
-    }
-
-    /**
-     * 课堂提问
-     * 学生举手
-     *
-     * @return
-     */
-    @PostMapping("/raise")
-    @ApiOperation(value = "学生举手", notes = "课堂提问 学生举手")
-    public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo) {
-        return interactService.raiseHand(raisehandVo).map(WebResult::okResult);
-    }
-
-    /**
-     * 发布问题
-     *
-     * @param giveVo
-     * @return
-     */
-    @ApiOperation(value = "发布问题", notes = "通过课堂id 及提问方式 进行发布问题")
-    @PostMapping("/send/question")
-    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody GiveVo giveVo) {
-        return interactService.sendQuestion(giveVo).map(WebResult::okResult);
-    }
-
-    /**
-     * 提交答案
-     *
-     * @param interactAnswerVo
-     * @return
-     */
-    @PostMapping("/send/answer")
-    @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo) {
-        return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
-    }
-
 
 }

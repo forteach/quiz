@@ -2,6 +2,7 @@ package com.forteach.quiz.problemsetlibrary.domain.base;
 
 import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ExerciseBook<T> extends BaseEntity {
+public class ExerciseBook<T extends QuestionExamEntity> extends BaseEntity {
 
     @ApiModelProperty(value = "教师id (创建人id)", name = "teacherId", example = "001")
     protected String teacherId;
@@ -37,13 +38,17 @@ public class ExerciseBook<T> extends BaseEntity {
     @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
     private String courseId;
 
-
     public ExerciseBook() {
     }
 
     public ExerciseBook(final ProblemSetVo problemSetVo, final List<T> list) {
         BeanUtils.copyProperties(problemSetVo, this);
         this.questionChildren = list;
+    }
+
+    public ExerciseBook build(ExerciseBook<T> exerciseBook) {
+        BeanUtils.copyProperties(exerciseBook, this);
+        return this;
     }
 
 }

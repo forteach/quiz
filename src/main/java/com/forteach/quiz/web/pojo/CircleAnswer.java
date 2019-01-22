@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.pojo;
 
-import com.forteach.quiz.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

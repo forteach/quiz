@@ -1,5 +1,6 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.interaction.execute.domain;
 
+import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -47,6 +48,21 @@ public class InteractRecord extends BaseEntity {
      * 进行提问过的问题(发布了哪些题目 发布顺序 发布时间 发布次数 选择了哪些人 哪些人进行了回答 回答情况 回答答案)
      */
     private List<InteractQuestionsRecord> questions;
+
+    /**
+     * 头脑风暴记录
+     */
+    private List<BrainstormInteractRecord> brainstorms;
+
+    /**
+     * 任务记录
+     */
+    private List<TaskInteractRecord> interacts;
+
+    /**
+     * 问卷记录(发布了哪些题目 发布顺序 发布时间 发布次数 选择了哪些人 哪些人进行了回答 回答情况 回答答案)
+     */
+    private List<SurveyInteractRecord> surveys;
 
     /**
      * 上课时间

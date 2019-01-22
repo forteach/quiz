@@ -1,5 +1,6 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.interaction.execute.domain;
 
+import com.forteach.quiz.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,13 @@ public class AskAnswer extends BaseEntity {
      */
     @ApiModelProperty(value = "问题id", name = "questionId")
     private String questionId;
+
+    /**
+     * 问题库类别
+     */
+    @ApiModelProperty(value = "不需要传值 后台赋值 问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
+            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "questionId")
+    private String libraryType;
 
     /**
      * 答案对错

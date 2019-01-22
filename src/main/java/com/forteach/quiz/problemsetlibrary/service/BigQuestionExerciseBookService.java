@@ -2,6 +2,7 @@ package com.forteach.quiz.problemsetlibrary.service;
 
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceImpl;
@@ -10,7 +11,6 @@ import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.web.vo.BigQuestionVo;
-import com.forteach.quiz.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
                                 .stream()
                                 .map(QuestionIds::getBigQuestionId)
                                 .collect(Collectors.toList()))
-                .map(bigQuestion -> new BigQuestionVo<BigQuestion>(previewMap.get(bigQuestion.getId()), idexMap.get(bigQuestion.getId()), bigQuestion))
+                .map(bigQuestion -> new BigQuestionVo<BigQuestion>(previewMap.get(bigQuestion.getId()), String.valueOf(idexMap.get(bigQuestion.getId())), bigQuestion))
                 .sort(Comparator.comparing(BigQuestionVo::getIndex))
                 .collectList()
                 .zipWhen(list -> findExerciseBook(String.valueOf(problemSetVo.getExeBookType()), problemSetVo.getChapterId(), problemSetVo.getCourseId()))
@@ -86,11 +85,12 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
      * @return
      */
     @Override
-    public Mono<List> findExerciseBook(final ExerciseBookReq sortVo) {
+    public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
-                .map(ExerciseBook::getQuestionChildren).defaultIfEmpty(new ArrayList()).onErrorReturn(new ArrayList());
+        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId()).doOnNext(System.out::println)
+                .map(ExerciseBook::getQuestionChildren);
     }
+
 
     /**
      * 查找需要挂接的课堂链接册

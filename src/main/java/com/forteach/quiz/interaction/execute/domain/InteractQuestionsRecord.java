@@ -1,4 +1,4 @@
-package com.forteach.quiz.domain;
+package com.forteach.quiz.interaction.execute.domain;
 
 import lombok.Data;
 
@@ -13,11 +13,6 @@ import java.util.List;
  */
 @Data
 public class InteractQuestionsRecord {
-
-    /**
-     * 问题id
-     */
-    private String questionsId;
 
     /**
      * 发布顺序
@@ -35,11 +30,6 @@ public class InteractQuestionsRecord {
     private Integer number;
 
     /**
-     * 提问方式
-     */
-    private String interactive;
-
-    /**
      * 发布类别 ,个人 , 小组
      */
     private String category;
@@ -53,6 +43,16 @@ public class InteractQuestionsRecord {
      * 回答的人数
      */
     private Integer answerNumber;
+
+    /**
+     * 问题id
+     */
+    private String questionsId;
+
+    /**
+     * 提问方式
+     */
+    private String interactive;
 
     /**
      * 举手的人数
@@ -73,7 +73,6 @@ public class InteractQuestionsRecord {
      * 回答错误的数量
      */
     private Integer errorNumber;
-
 
     /**
      * 回答的情况
