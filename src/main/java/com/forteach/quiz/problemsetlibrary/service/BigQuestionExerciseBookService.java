@@ -87,7 +87,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
     @Override
     public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId()).doOnNext(System.out::println)
+        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
                 .map(ExerciseBook::getQuestionChildren);
     }
 
