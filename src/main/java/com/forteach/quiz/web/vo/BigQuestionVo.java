@@ -16,6 +16,9 @@ import org.springframework.beans.BeanUtils;
 @Data
 public class BigQuestionVo<T extends QuestionExamEntity> extends QuestionExamEntity {
 
+    /**
+     * 课堂练习  before/预习 now/课堂 before,now/全部
+     */
     @ApiModelProperty(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", example = "1")
     private String preview;
 

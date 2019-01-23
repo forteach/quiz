@@ -10,7 +10,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.List;
 
 /**
- * @Description:
+ * @Description: 详细的练习册信息
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/12  15:56

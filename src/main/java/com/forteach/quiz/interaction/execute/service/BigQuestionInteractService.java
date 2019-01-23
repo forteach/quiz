@@ -33,7 +33,7 @@ import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
- * @Description:
+ * @Description: 题库 考题 互动交互
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/27  15:00

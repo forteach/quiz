@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 
 
 /**
- * @Description:
+ * @Description: 简答思考题
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/12  17:06
@@ -20,14 +20,23 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value = "简答思考题", description = "BigQuestion的子项")
 public class Design extends AbstractExam {
 
+    /**
+     * 题目题干
+     */
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "题目题干", name = "examChildren", required = true, example = "亚特兰蒂斯是否存在")
     private String designQuestion;
 
+    /**
+     * 题目答安
+     */
     @JsonView(BigQuestionView.SummaryWithDetail.class)
     @ApiModelProperty(value = "题目答案", name = "designAnsw", required = true, example = "存在")
     private String designAnsw;
 
+    /**
+     * 题目解析
+     */
     @JsonView(BigQuestionView.SummaryWithDetail.class)
     @ApiModelProperty(value = "题目解析", name = "designAnalysis", required = true, example = "历史存在 现与海底")
     private String designAnalysis;

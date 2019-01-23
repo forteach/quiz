@@ -75,5 +75,10 @@ public interface BaseQuestionService<T extends QuestionExamEntity> {
      */
     Mono<UpdateResult> questionBankAssociation(final String questionBankId, final String teacherId);
 
+    /**
+     * 查找题用于
+     * @param ids
+     * @return
+     */
     Flux<T> findBigQuestionInId(final List<String> ids);
 }

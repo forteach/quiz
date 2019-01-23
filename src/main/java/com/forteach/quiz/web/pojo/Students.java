@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Description:
+ * @Description: 学生信息
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/5  23:19
@@ -20,12 +20,21 @@ import lombok.NoArgsConstructor;
 @ApiModel(value = "学生信息", description = "学生的简略信息")
 public class Students {
 
+    /**
+     * 学生id
+     */
     @ApiModelProperty(value = "学生id", name = "id")
     private String id;
 
+    /**
+     * 学生名字
+     */
     @ApiModelProperty(value = "学生名字", name = "name")
     private String name;
 
+    /**
+     * 学生头像
+     */
     @ApiModelProperty(value = "学生头像", name = "portrait")
     private String portrait;
 

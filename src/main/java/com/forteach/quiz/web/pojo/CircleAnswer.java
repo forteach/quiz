@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 
 /**
- * @Description:
+ * @Description: 回答信息
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/7  15:38
@@ -21,9 +21,15 @@ import org.springframework.beans.BeanUtils;
 public class CircleAnswer extends Students {
 
 
+    /**
+     * 回答状态   1: 已回答   2 : 未回答
+     */
     @ApiModelProperty(value = "回答状态   1: 已回答   2 : 未回答", name = "state")
     private String state;
 
+    /**
+     * 学生回答信息
+     */
     @ApiModelProperty(value = "学生回答信息  ", name = "askAnswer")
     private AskAnswer askAnswer;
 

@@ -29,7 +29,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
  * @Description:
- * @author: liu zhenming
+ * @author: liu zhenming 头脑风暴交互
  * @version: V1.0
  * @date: 2019/1/14  15:08
  */

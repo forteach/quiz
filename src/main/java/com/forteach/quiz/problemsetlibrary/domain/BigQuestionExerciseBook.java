@@ -21,6 +21,9 @@ import java.util.List;
 @Data
 public class BigQuestionExerciseBook extends ExerciseBook {
 
+    /**
+     * 练习册类型：1、提问册 2、练习册3、作业册
+     */
     @ApiModelProperty(value = "练习册类型：1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
     protected int exeBookType;
 

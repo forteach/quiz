@@ -17,6 +17,9 @@
 *.iml
 *.ipr
 *.yml
+*.log
+*.zip
+/logs/
 mvnw
 mvnw.cmd
 .mvn

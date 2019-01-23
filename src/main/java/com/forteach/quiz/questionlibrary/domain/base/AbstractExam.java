@@ -14,10 +14,16 @@ import lombok.Data;
 @Data
 public abstract class AbstractExam {
 
+    /**
+     * 题目id
+     */
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "题目id", name = "id", required = true, example = "463bcd8e5fed4a33883850c14f877271")
     protected String id;
 
+    /**
+     * 题目分数
+     */
     @ApiModelProperty(value = "题目分数", name = "score", required = true, example = "2.0")
     protected Double score;
 

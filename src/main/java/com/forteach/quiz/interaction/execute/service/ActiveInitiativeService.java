@@ -64,8 +64,8 @@ public class ActiveInitiativeService {
      * 转换为学生list
      * 去除空数据
      *
-     * @param achieveRaiseVo
-     * @return
+     * @param achieveRaiseVo 加入课堂的学生信息vo
+     * @return 学生信息list集合(Mono)
      */
     public Mono<List<Students>> achieveRaise(final AchieveRaiseVo achieveRaiseVo) {
         return stringRedisTemplate.opsForSet().members(achieveRaiseVo.getRaiseKey())
@@ -135,8 +135,9 @@ public class ActiveInitiativeService {
      * 通过去重标识的 value 值 与查询出的list.size 比对 如果相同 则代表已经拉取过
      * 如果返回空数据 则进行获取{并且插入标识 list.size} 否则退出请求
      * RAISE_HAND_STUDENT_DISTINCT
-     *
-     * @param listMono
+     * @param distinct 去重标识
+     * @param listMono 查询到的学生信息(Mono)
+     * @param askKey
      * @return
      */
     private Mono<List<Students>> raiseDistinct(final String distinct, final Mono<List<Students>> listMono, final String askKey) {

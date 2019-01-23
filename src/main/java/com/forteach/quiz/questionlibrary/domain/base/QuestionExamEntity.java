@@ -22,6 +22,9 @@ import java.util.List;
 @Data
 public class QuestionExamEntity<T> extends BaseEntity {
 
+    /**
+     * 题目分数
+     */
     @ApiModelProperty(value = "题目分数", name = "score", example = "5")
     protected Double score;
 
@@ -31,18 +34,30 @@ public class QuestionExamEntity<T> extends BaseEntity {
     @ApiModelProperty(value = "创建人id", name = "teacherId", example = "5c06d23sz8737b1dc8068da8")
     protected String teacherId;
 
+    /**
+     * 大题用题干
+     */
     @ApiModelProperty(value = "大题用题干", name = "paperInfo", example = "阅读理解... ...")
     @JsonView(BigQuestionView.Summary.class)
     protected String paperInfo;
 
+    /**
+     * 题目的具体内容信息,是一个list
+     */
     @ApiModelProperty(value = "题目的具体内容信息,是一个list", name = "examChildren", required = true)
     @JsonView(BigQuestionView.Summary.class)
     protected List<T> examChildren;
 
+    /**
+     * 大题用题目类型 分为主管或客观 director  objective
+     */
     @ApiModelProperty(value = "大题用题目类型 分为主管或客观 director  objective", name = "type", example = "director")
     @JsonView(BigQuestionView.Summary.class)
     protected String type;
 
+    /**
+     * 章节id
+     */
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")
     protected String chapterId;
@@ -74,6 +89,10 @@ public class QuestionExamEntity<T> extends BaseEntity {
     @Indexed
     private List<String> keyword;
 
+    /**
+     * 下标
+     * 不保存数据库
+     */
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(value = "下标", name = "index", example = "")

@@ -18,8 +18,14 @@ import java.util.List;
 @Data
 public class ProblemSetVo extends ExerciseBook {
 
+    /**
+     * 只有考题库存在 练习册类型：1、提问册 2、练习册3、作业册
+     */
     @ApiModelProperty(value = "只有考题库存在 练习册类型：1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
     protected int exeBookType;
+    /**
+     * 题目Id
+     */
     @ApiModelProperty(value = "题目id", name = "questionIds", example = "")
     private List<QuestionIds> questionIds;
 

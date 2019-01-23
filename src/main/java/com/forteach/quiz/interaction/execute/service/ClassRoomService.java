@@ -103,8 +103,16 @@ public class ClassRoomService {
                 .filterWhen(circleId -> interactRecordExecuteService.init(circleId, roomVo.getTeacherId()));
     }
 
+    /**
+     * 新建一个临时教室信息有效时间是2个小时
+     * @param teacherId　教室id
+     * @param chapterId 课堂id
+     * @param roomKey 课堂信息的临时前缀
+     * @return　Mono<String> 返回课堂id ==> circleId
+     */
     private Mono<String> buildRoom(final String teacherId, final String chapterId, final String roomKey) {
 
+        //获取当前时间和两个小时时间后的时间
         LocalTime effectTime = LocalTime.now();
         LocalTime failureTime = effectTime.plusHours(2);
 
