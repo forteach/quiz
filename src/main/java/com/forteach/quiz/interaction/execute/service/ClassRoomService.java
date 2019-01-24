@@ -2,7 +2,6 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
-import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import org.springframework.data.redis.core.ReactiveHashOperations;
@@ -60,14 +59,24 @@ public class ClassRoomService {
     /**
      * 查找加入的学生
      *
-     * @param interactiveReq
+     * @param
      * @return
      */
-    public Mono<List<Students>> findInteractiveStudents(final InteractiveStudentsReq interactiveReq) {
-        return Mono.just(interactiveReq.getCircleId())
+    public Mono<List<Students>> findInteractiveStudents(final String circleId) {
+        return Mono.just(circleId)
                 .flatMapMany(interactiveId -> stringRedisTemplate.opsForSet().members(INTERACTIVE_CLASSROOM_STUDENTS.concat(interactiveId)))
                 .flatMap(studentsService::findStudentsBrief)
                 .collectList();
+    }
+
+    /**
+     * 获得课堂人数
+     *
+     * @param circleId
+     * @return
+     */
+    public Mono<Long> studentNumber(final String circleId) {
+        return stringRedisTemplate.opsForSet().size(INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId));
     }
 
     /**

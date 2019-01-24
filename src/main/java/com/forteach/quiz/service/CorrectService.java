@@ -129,10 +129,10 @@ public class CorrectService {
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
                         case QUESTION_CHOICE_OPTIONS_SINGLE:
                         case QUESTION_CHOICE_MULTIPLE_SINGLE:
-                            ChoiceQst choiceQst = (ChoiceQst) bigQuestion.getExamChildren().get(0);
+                            ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
                             return Mono.just(String.valueOf(choice(choiceQst, answer)));
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
-                            TrueOrFalse trueOrFalse = (TrueOrFalse) bigQuestion.getExamChildren().get(0);
+                            TrueOrFalse trueOrFalse = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), TrueOrFalse.class);
                             return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
                             //简答主观题 人工手动批改

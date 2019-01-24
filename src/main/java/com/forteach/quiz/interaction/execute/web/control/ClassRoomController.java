@@ -66,7 +66,7 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "query", required = true)
     })
     public Mono<WebResult> findInteractiveStudents(@ApiParam(value = "查找加入课堂的学生", required = true) @RequestBody InteractiveStudentsReq interactiveReq) {
-        return classRoomService.findInteractiveStudents(interactiveReq).map(WebResult::okResult);
+        return classRoomService.findInteractiveStudents(interactiveReq.getCircleId()).map(WebResult::okResult);
     }
 
 
