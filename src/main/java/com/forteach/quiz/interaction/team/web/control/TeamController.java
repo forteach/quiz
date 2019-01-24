@@ -32,8 +32,8 @@ public class TeamController {
 
     @ApiOperation(value = "课堂随机分组", notes = "填入分组个数,随机分组")
     @PostMapping(value = "/randomBuild")
-    public Mono<WebResult> groupRandom(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final Mono<GroupRandomVo> random) {
-        return teamService.groupRandom(random).map(WebResult::okResult);
+    public Mono<WebResult> groupRandom(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final GroupRandomVo random) {
+        return teamService.groupRandom(Mono.just(random)).map(WebResult::okResult);
     }
 
 

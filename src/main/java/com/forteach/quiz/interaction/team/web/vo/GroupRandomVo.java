@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.team.web.vo;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date: 2019/1/23  11:00
  */
 @Data
+@ApiModel(value = "随机分组", description = "")
 public class GroupRandomVo {
 
     /**
