@@ -27,12 +27,10 @@ import static com.forteach.quiz.util.StringUtil.isEmpty;
 @Service
 public class ClassRoomService {
 
+    public static final String CLASS_ROOM_QR_CODE_PREFIX = "interactionQr";
     private final StudentsService studentsService;
-
     private final ReactiveStringRedisTemplate stringRedisTemplate;
-
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-
     private final InteractRecordExecuteService interactRecordExecuteService;
 
     public ClassRoomService(StudentsService studentsService, ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations
@@ -120,7 +118,8 @@ public class ClassRoomService {
         final String interactiveId = getRandomUUID();
 
         HashMap<String, String> map = new HashMap<>(10);
-        map.put("interactiveId", interactiveId);
+        String interactiveIdQr = CLASS_ROOM_QR_CODE_PREFIX.concat(interactiveId);
+        map.put("interactiveId", interactiveIdQr);
         map.put("effectTime", effectTime.toString());
         map.put("failureTime", failureTime.toString());
         map.put("teacherId", teacherId);
@@ -129,7 +128,7 @@ public class ClassRoomService {
         Mono<Boolean> set = reactiveHashOperations.putAll(roomKey, map);
         Mono<Boolean> time = stringRedisTemplate.expire(roomKey, Duration.ofSeconds(60 * 60 * 2));
 
-        return Mono.just(interactiveId).filterWhen(obj -> set).filterWhen(obj -> time);
+        return Mono.just(interactiveIdQr).filterWhen(obj -> set).filterWhen(obj -> time);
     }
 
 
