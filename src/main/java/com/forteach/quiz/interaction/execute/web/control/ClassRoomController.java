@@ -53,7 +53,7 @@ public class ClassRoomController extends BaseController {
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")
     @PostMapping(value = "/find/interactiveStudents")
     public Mono<WebResult> findInteractiveStudents(@ApiParam(value = "查找加入课堂的学生", required = true) @RequestBody InteractiveStudentsReq interactiveReq) {
-        return classRoomService.findInteractiveStudents(interactiveReq).map(WebResult::okResult);
+        return classRoomService.findInteractiveStudents(interactiveReq.getCircleId()).map(WebResult::okResult);
     }
 
 
