@@ -9,6 +9,7 @@ import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,6 +33,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
  * @version: V1.0
  * @date: 2019/1/15  14:34
  */
+@Slf4j
 @Service
 public class ActiveInitiativeService {
 
@@ -68,6 +70,9 @@ public class ActiveInitiativeService {
      * @return 学生信息list集合(Mono)
      */
     public Mono<List<Students>> achieveRaise(final AchieveRaiseVo achieveRaiseVo) {
+        if (log.isDebugEnabled()){
+            log.debug("主动推送给老师举手的学生 参数 : {}", achieveRaiseVo.toString());
+        }
         return stringRedisTemplate.opsForSet().members(achieveRaiseVo.getRaiseKey())
                 .flatMap(studentsService::findStudentsBrief).collectList()
                 .filter(list -> list.size() > 0)
@@ -80,6 +85,9 @@ public class ActiveInitiativeService {
      * @return
      */
     public Mono<List<CircleAnswer>> achieveAnswer(final AchieveAnswerVo achieves) {
+        if (log.isDebugEnabled()){
+            log.debug("主动推送给教师 : {}", achieves.toString());
+        }
         return Mono.just(achieves)
                 .filterWhen(achieveAnswerVo -> untitled(achieveAnswerVo.getAskKey(QuestionType.BigQuestion)))
                 .flatMap(achieve -> askSelected(askQuestionsId(QuestionType.BigQuestion, achieve.getCircleId())))

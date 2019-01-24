@@ -15,6 +15,7 @@ import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
 import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -31,6 +32,7 @@ import static java.util.stream.Collectors.toList;
  * @version: V1.0
  * @date: 2018/11/20  16:55
  */
+@Slf4j
 @Component
 public class CorrectService {
 
@@ -65,6 +67,9 @@ public class CorrectService {
     }
 
     Mono<ExerciseBookSheet> subjectiveCorrect(final ExerciseBookSheet sheet, final ExerciseBookSheetVo correctVo) {
+        if (log.isDebugEnabled()){
+            log.debug("练习册 答题卡 参数　sheet : {}, correctVo : {}", sheet.toString(), correctVo.toString());
+        }
         JSONObject json = JSON.parseObject(JSON.toJSONString(correctVo));
         sheet.setEvaluation(correctVo.getEvaluation());
         sheet.setAnsw(
@@ -82,7 +87,9 @@ public class CorrectService {
      * @return
      */
     private void answCorrect(final Answ answ, final ExerciseBook<BigQuestion> exerciseBook) {
-
+        if (log.isDebugEnabled()){
+            log.debug("遍历答案 批改客观题 参数 ==> answ : {}, exerciseBook : {}", answ.toString(), exerciseBook.toString());
+        }
         BigQuestion question = exerciseBook.getQuestionChildren().stream()
                 .filter(bigQuestion -> bigQuestion.getId().equals(answ.getBigQuestionId()))
                 .findFirst()
@@ -114,6 +121,7 @@ public class CorrectService {
                         //简答主观题 人工手动批改
                         break;
                     default:
+                        log.error("非法参数 错误的题目类型 : {}", type);
                         throw new ExamQuestionsException("非法参数 错误的题目类型");
                 }
             }
@@ -138,6 +146,7 @@ public class CorrectService {
                             //简答主观题 人工手动批改
                             return Mono.just("");
                         default:
+                            log.error("非法参数 错误的题目类型 : {}", String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType")));
                             throw new ExamQuestionsException("非法参数 错误的题目类型");
                     }
                 });
@@ -151,6 +160,7 @@ public class CorrectService {
             case QUESTION_CHOICE_MULTIPLE_SINGLE:
                 return multiple(choiceQst, answChildren);
             default:
+                log.error("非法参数 错误的选择题选项类型 : {}", choiceQst.getChoiceType());
                 throw new ExamQuestionsException("非法参数 错误的选择题选项类型");
         }
     }
@@ -162,6 +172,7 @@ public class CorrectService {
             case QUESTION_CHOICE_MULTIPLE_SINGLE:
                 return multiple(choiceQst, answer);
             default:
+                log.error("非法参数 错误的选择题选项类型 : {}", choiceQst.getChoiceType());
                 throw new ExamQuestionsException("非法参数 错误的选择题选项类型");
         }
     }

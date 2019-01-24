@@ -285,7 +285,9 @@ public class BigQuestionInteractService {
      * @return
      */
     private Mono<String> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
-
+        if(log.isDebugEnabled()) {
+            log.debug("选人 回答 参数 interactAnswerVo : {}, type : {}", interactAnswerVo, type);
+        }
         return correctService.correcting(interactAnswerVo.getQuestionId(), interactAnswerVo.getAnswer())
                 .flatMap(f -> {
                     Query query = Query.query(

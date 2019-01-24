@@ -8,6 +8,7 @@ import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.SurveyQuestionRepository;
 import com.mongodb.client.result.UpdateResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,6 +34,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
  * @version: V1.0
  * @date: 2019/1/14  15:08
  */
+@Slf4j
 @Service
 public class BrainstormInteractService {
 
@@ -61,7 +63,9 @@ public class BrainstormInteractService {
      * @return
      */
     public Mono<Long> sendQuestion(final MoreGiveVo giveVo) {
-
+        if (log.isDebugEnabled()){
+            log.debug("发布问卷问题 ==> MoreGiveVo : {}", giveVo);
+        }
         HashMap<String, String> map = new HashMap<>(10);
         map.put("questionId", giveVo.getQuestionId());
         map.put("category", giveVo.getCategory());

@@ -14,6 +14,7 @@ import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
 import com.forteach.quiz.web.vo.ProblemSetBackupVo;
 import com.forteach.quiz.web.vo.RewriteVo;
 import com.mongodb.client.result.UpdateResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -29,6 +30,7 @@ import static com.forteach.quiz.common.Dic.*;
  * @version: V1.0
  * @date: 2018/11/15  11:01
  */
+@Slf4j
 @Service
 public class ProblemService {
 
@@ -152,9 +154,13 @@ public class ProblemService {
     }
 
     private Mono<Boolean> verifyExerciseBookSheetCommit(final ExerciseBookSheet sheetMono) {
+        if (log.isDebugEnabled()){
+            log.debug("判断练习册信息是否提交 参数 ==> {}", sheetMono.toString());
+        }
         if (COMMIT_EXERCISE_BOOK_SHEET_MODIFY.equals(sheetMono.getCommit())) {
             return Mono.just(true);
         } else {
+            log.error("练习册已提交或已批改 : {}", sheetMono.toString());
             return Mono.error(new ProblemSetException("练习册已提交或已批改"));
         }
     }
