@@ -16,9 +16,15 @@ import java.util.Arrays;
 @ApiModel(value = "问题关键字", description = "问题添加或移除关键字")
 public class KeywordIncreaseVo {
 
+    /**
+     * 关键字数组 (字符串数组)
+     */
     @ApiModelProperty(value = "关键字数组", name = "value")
     private String[] value;
 
+    /**
+     * 问题id
+     */
     @ApiModelProperty(value = "问题id", name = "bigQuestionId")
     private String bigQuestionId;
 

@@ -14,12 +14,21 @@ import lombok.Data;
 @ApiModel(value = "奖励累加", description = "对学生进行奖励累加")
 public class CumulativeVo {
 
+    /**
+     * 被累加的学生id
+     */
     @ApiModelProperty(value = "被累加的学生id", name = "studentId")
     private String studentId;
 
+    /**
+     * 增加值
+     */
     @ApiModelProperty(value = "增加值", name = "amount")
     private String amount;
 
+    /**
+     * 教师Id
+     */
     @ApiModelProperty(value = "教师id", name = "teacher")
     private String teacher;
 }

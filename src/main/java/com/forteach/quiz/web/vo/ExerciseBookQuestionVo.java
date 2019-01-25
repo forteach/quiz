@@ -14,6 +14,9 @@ import java.util.List;
 @Data
 public class ExerciseBookQuestionVo {
 
+    /**
+     * 习题册id
+     */
     private String exerciseBookId;
 
     private List<BigQuestion> bigQuestions;

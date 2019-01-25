@@ -48,10 +48,19 @@ public class AchieveAnswerVo {
         return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
+    /**
+     * 考生是否答复
+     * @param type 考试习题头脑风暴的类型
+     * @return
+     */
     public String getExamineeIsReplyKey(QuestionType type) {
         return EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
     }
 
+    /**
+     * 获取课堂随机字符串拼接结果推送给教师
+     * @return
+     */
     public String getAnswDistinctKey() {
         return ANSW_HAND_STUDENT_DISTINCT.concat(circleId).concat(random);
     }

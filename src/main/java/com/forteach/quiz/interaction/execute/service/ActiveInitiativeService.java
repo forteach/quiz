@@ -9,6 +9,7 @@ import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.CircleAnswer;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,6 +33,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
  * @version: V1.0
  * @date: 2019/1/15  14:34
  */
+@Slf4j
 @Service
 public class ActiveInitiativeService {
 
@@ -64,10 +66,13 @@ public class ActiveInitiativeService {
      * 转换为学生list
      * 去除空数据
      *
-     * @param achieveRaiseVo
-     * @return
+     * @param achieveRaiseVo 加入课堂的学生信息vo
+     * @return 学生信息list集合(Mono)
      */
     public Mono<List<Students>> achieveRaise(final AchieveRaiseVo achieveRaiseVo) {
+        if (log.isDebugEnabled()){
+            log.debug("主动推送给老师举手的学生 参数 : {}", achieveRaiseVo.toString());
+        }
         return stringRedisTemplate.opsForSet().members(achieveRaiseVo.getRaiseKey())
                 .flatMap(studentsService::findStudentsBrief).collectList()
                 .filter(list -> list.size() > 0)
@@ -80,6 +85,9 @@ public class ActiveInitiativeService {
      * @return
      */
     public Mono<List<CircleAnswer>> achieveAnswer(final AchieveAnswerVo achieves) {
+        if (log.isDebugEnabled()){
+            log.debug("主动推送给教师 : {}", achieves.toString());
+        }
         return Mono.just(achieves)
                 .filterWhen(achieveAnswerVo -> untitled(achieveAnswerVo.getAskKey(QuestionType.BigQuestion)))
                 .flatMap(achieve -> askSelected(askQuestionsId(QuestionType.BigQuestion, achieve.getCircleId())))
@@ -135,8 +143,9 @@ public class ActiveInitiativeService {
      * 通过去重标识的 value 值 与查询出的list.size 比对 如果相同 则代表已经拉取过
      * 如果返回空数据 则进行获取{并且插入标识 list.size} 否则退出请求
      * RAISE_HAND_STUDENT_DISTINCT
-     *
-     * @param listMono
+     * @param distinct 去重标识
+     * @param listMono 查询到的学生信息(Mono)
+     * @param askKey
      * @return
      */
     private Mono<List<Students>> raiseDistinct(final String distinct, final Mono<List<Students>> listMono, final String askKey) {

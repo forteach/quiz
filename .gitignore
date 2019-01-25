@@ -17,6 +17,9 @@
 *.iml
 *.ipr
 *.yml
+*.log
+*.zip
+
 mvnw
 mvnw.cmd
 .mvn
@@ -28,3 +31,4 @@ mvnw.cmd
 /dist/
 /nbdist/
 /.nb-gradle/
+/logs/

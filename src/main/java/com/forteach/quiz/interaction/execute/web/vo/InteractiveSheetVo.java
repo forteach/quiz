@@ -53,6 +53,11 @@ public class InteractiveSheetVo {
         return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
+    /**
+     * 问卷提问 问卷题库
+     * @param type
+     * @return
+     */
     public String getExamineeIsReplyKey(QuestionType type) {
         return EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
     }

@@ -16,6 +16,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "evaluate")
 public class Evaluate extends BaseEntity {
 
+    /**
+     * 考试结果保存
+     */
     private String value;
 
 

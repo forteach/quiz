@@ -23,15 +23,27 @@ import java.util.List;
 @ApiModel(value = "分页获取题库数据 并且获得题集关系", description = "获取到题集信息,交集信息,差集信息")
 public class QuestionProblemSetVo {
 
+    /**
+     * 获得的题库数据
+     */
     @ApiModelProperty(value = "获得的题库数据", name = "bigQuestionList")
     private List<?> bigQuestionList;
 
+    /**
+     * 题集
+     */
     @ApiModelProperty(value = "题集", name = "problemSet")
     private ProblemSet problemSet;
 
+    /**
+     * 交集 (题集中包含的id)
+     */
     @ApiModelProperty(value = "交集 (题集中包含的id)", name = "intersection")
     private List<String> intersection;
 
+    /**
+     * 差集 (题集中未包含的id)
+     */
     @ApiModelProperty(value = "差集 (题集中未包含的id)", name = "difference")
     private List<String> difference;
 

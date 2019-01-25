@@ -81,6 +81,11 @@ public class SurveyInteractService {
 
     }
 
+    /**
+     * 清理换题信息
+     * @param giveVo
+     * @return
+     */
     private Mono<Boolean> clearCut(final MoreGiveVo giveVo) {
         return reactiveHashOperations.get(askQuestionsId(QuestionType.SurveyQuestion, giveVo.getCircleId()), "questionId")
                 .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
@@ -155,6 +160,11 @@ public class SurveyInteractService {
         });
     }
 
+    /**
+     * 过滤选择题，没有选中的不能提交
+     * @param answerVo
+     * @return
+     */
     private Mono<InteractiveSheetVo> filterSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
         return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.SurveyQuestion), answer.getExamineeId()))
                 .flatMap(tuple2 -> {
@@ -195,6 +205,13 @@ public class SurveyInteractService {
         return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
+    /**
+     * 设置
+     * @param redisKey 问卷题库 key
+     * @param value 学生id
+     * @param askKey 问卷题库 前缀
+     * @return
+     */
     private Mono<Boolean> setRedis(final String redisKey, final String value, final String askKey) {
 
         Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);
