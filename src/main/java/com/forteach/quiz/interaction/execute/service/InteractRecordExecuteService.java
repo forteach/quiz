@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -23,7 +24,7 @@ import static com.forteach.quiz.util.DateUtil.getEndTime;
 import static com.forteach.quiz.util.DateUtil.getStartTime;
 
 /**
- * @Description:
+ * @Description: 课堂交互记录数据相关
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/4  15:33
@@ -262,5 +263,17 @@ public class InteractRecordExecuteService {
         update.push("questions", records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
+
+    /**
+     * 根据条件查询对应的questions 任务记录
+     * @param circleId 课堂id
+     * @return Flux<List<InteractQuestionsRecord>>
+     */
+    public Flux<List<InteractQuestionsRecord>> getRecord(final String circleId){
+          return repository.findByCircleIdAndQuestionsNotNull(circleId)
+                .filter(interactRecord -> interactRecord != null)
+                .map(interactRecord -> interactRecord.getQuestions()).flux();
+    }
+
 
 }

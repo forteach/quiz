@@ -2,19 +2,21 @@ package com.forteach.quiz.interaction.execute.web.control;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
+import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
+import com.forteach.quiz.interaction.execute.web.vo.RecordVo;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.validation.Valid;
 
 /**
  * @Description:
@@ -28,9 +30,11 @@ import reactor.core.publisher.Mono;
 public class BigQuestionInteractController {
 
     private final BigQuestionInteractService interactService;
+    private final InteractRecordExecuteService interactRecordExecuteService;
 
-    public BigQuestionInteractController(BigQuestionInteractService interactService) {
+    public BigQuestionInteractController(BigQuestionInteractService interactService, InteractRecordExecuteService interactRecordExecuteService) {
         this.interactService = interactService;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -130,5 +134,13 @@ public class BigQuestionInteractController {
         return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
     }
 
+    @ApiOperation(value = "查询课堂学生提交的答案")
+    @PostMapping("/showRecord")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "课堂id", dataType = "string", required = true, paramType = "query")
+    })
+    public Flux<WebResult> showRecord(@Valid @ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody RecordVo recordVo){
+        return interactRecordExecuteService.getRecord(recordVo.getCircleId()).map(WebResult::okResult);
+    }
 
 }

@@ -30,7 +30,7 @@ public class InteractQuestionsRecord {
     private Integer number;
 
     /**
-     * 发布类别 ,个人 , 小组
+     * 发布类别 ,个人(people) , 小组(team)
      */
     private String category;
 
