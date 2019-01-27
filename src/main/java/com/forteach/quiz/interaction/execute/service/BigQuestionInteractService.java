@@ -212,7 +212,8 @@ public class BigQuestionInteractService {
      */
     private Mono<Boolean> selectVerify(final String askKey, final String examineeId) {
         return reactiveHashOperations.get(askKey, "selected")
-                .map(selectId -> isSelected(selectId, examineeId));
+                .map(selectId ->
+                        isSelected(selectId, examineeId));
     }
 
     /**
@@ -239,7 +240,7 @@ public class BigQuestionInteractService {
      * @return
      */
     private Mono<InteractiveSheetVo> filterSheetSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
-        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.SurveyQuestion), answer.getExamineeId()))
+        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.ExerciseBook), answer.getExamineeId()))
                 .flatMap(tuple2 -> {
                     if (tuple2.getT2()) {
                         return Mono.just(tuple2.getT1());
@@ -365,9 +366,13 @@ public class BigQuestionInteractService {
     public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
                 .transform(this::filterSheetSelectVerify)
-                .filterWhen(shee -> sendAnswerVerify(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnswList(), shee.getCut()))
-                .filterWhen(set -> sendValue(sheetVo))
-                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
+                .filterWhen(shee ->
+                        sendAnswerVerify(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnswList(), shee.getCut())
+                )
+                .filterWhen(
+                        set -> sendValue(sheetVo))
+                .filterWhen(
+                        right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
                 .map(InteractiveSheetVo::getCut);
     }
 
