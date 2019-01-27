@@ -150,6 +150,7 @@ public class TaskInteractService {
 
         Mono<Boolean> cutVerify = cut.zipWith(Mono.just(oCut), String::equals);
 
+        //判断提交的问题数量是否相同
         return Flux.concat(questionVerify, cutVerify).filter(flag -> !flag).count().flatMap(c -> {
             if (c == 0) {
                 return Mono.just(true);
@@ -159,6 +160,11 @@ public class TaskInteractService {
         });
     }
 
+    /**
+     * 过滤查询选择题
+     * @param answerVo
+     * @return
+     */
     private Mono<InteractiveSheetVo> filterSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
         return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.TaskQuestion), answer.getExamineeId()))
                 .flatMap(tuple2 -> {
@@ -190,6 +196,13 @@ public class TaskInteractService {
         return Arrays.asList(selectId.split(",")).contains(examineeId);
     }
 
+    /**
+     * 设置提交答案的 redis 信息　保存时间是两个小时
+     * @param redisKey
+     * @param value
+     * @param askKey
+     * @return
+     */
     private Mono<Boolean> setRedis(final String redisKey, final String value, final String askKey) {
 
         Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);

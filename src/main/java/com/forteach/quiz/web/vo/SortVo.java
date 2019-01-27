@@ -25,24 +25,41 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class SortVo {
 
+    /**
+     * 页码
+     */
     @NotNull(message = "页码不能位空")
     @ApiModelProperty(value = "分页", notes = "分页 从0开始", dataType = "int", name = "page", example = "0", required = true)
     private int page;
 
+    /**
+     * 一夜条数
+     */
     @NotNull(message = "每页数量不为空")
     @DecimalMin(value = "0", message = "每页数量不能小于０")
     @DecimalMax(value = "100", message = "每页数量不能大于１００")
     @ApiModelProperty(value = "每页数量", notes = "每页数量", dataType = "int", name = "size", example = "20", required = true)
     private int size;
 
+    /**
+     * 排序规则　默认倒叙
+     * 依照数据库哪条字段排序 驼峰
+     */
     @NotNull(message = "排序规则不能为空")
     @ApiModelProperty(value = "排序规则", notes = "依照数据库哪条字段排序 驼峰", dataType = "string", name = "sorting", example = "uTime", required = true)
     private String sorting;
 
+    /**
+     * 排序方式
+     * 排序方式 0 正序　１ 倒叙　默认倒叙(1)
+     */
     @Range(min = 0, max = 1, message = "排序方式不正确")
     @ApiModelProperty(value = "sort", name = "排序方式", notes = "排序方式 0 正序　１ 倒叙　默认倒叙(1)", dataType = "int", example = "1")
     private int sort = 1;
 
+    /**
+     * 登陆未完成 手动传入操作人id
+     */
     @ApiModelProperty(value = "操作人id", notes = "登陆未完成 手动传入操作人id", dataType = "string", name = "operatorId", example = "001", required = true)
     private String operatorId;
 

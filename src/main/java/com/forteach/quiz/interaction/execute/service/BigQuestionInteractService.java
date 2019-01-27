@@ -31,7 +31,7 @@ import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
- * @Description:
+ * @Description: 题库 考题 互动交互
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/27  15:00
@@ -283,7 +283,9 @@ public class BigQuestionInteractService {
      * @return
      */
     private Mono<String> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
-
+        if(log.isDebugEnabled()) {
+            log.debug("选人 回答 参数 interactAnswerVo : {}, type : {}", interactAnswerVo, type);
+        }
         return correctService.correcting(interactAnswerVo.getQuestionId(), interactAnswerVo.getAnswer())
                 .flatMap(f -> {
                     Query query = Query.query(

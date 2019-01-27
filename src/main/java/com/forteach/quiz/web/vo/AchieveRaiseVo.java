@@ -11,7 +11,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 import static com.forteach.quiz.common.KeyStorage.RAISE_HAND_STUDENT_DISTINCT;
 
 /**
- * @Description:
+ * @Description: 加入课堂的学生信息vo
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/4  15:46

@@ -3,6 +3,7 @@ package com.forteach.quiz.interaction.execute.domain;
 import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;

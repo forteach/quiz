@@ -19,9 +19,15 @@ import java.util.List;
 @Data
 public class ExerciseBook<T> extends BaseEntity {
 
+    /**
+     * 教师id (创建人id)
+     */
     @ApiModelProperty(value = "教师id (创建人id)", name = "teacherId", example = "001")
     protected String teacherId;
 
+    /**
+     * 挂接课堂的练习题 的子题目集
+     */
     @ApiModelProperty(value = "挂接课堂的练习题 的子题目集", name = "questionChildren")
     protected List<T> questionChildren;
 

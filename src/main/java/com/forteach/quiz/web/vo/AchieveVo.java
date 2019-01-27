@@ -50,6 +50,11 @@ public class AchieveVo {
         return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
+    /**
+     * 获取不同的课堂加入前缀,用于判断是否推送过相关题目
+     * @param questions
+     * @return
+     */
     public String getDistinctKey(String questions) {
         return CLASSROOM_ASK_QUESTIONS_DISTINCT
                 .concat(circleId)

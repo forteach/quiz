@@ -27,6 +27,11 @@ public class StudentsService {
     }
 
 
+    /**
+     * 从redis 查询学生信息并返回相关对象
+     * @param id 加入课堂的学生id
+     * @return 学生 Mono
+     */
     public Mono<Students> findStudentsBrief(final String id) {
         return Mono.just(id)
                 .zipWith(findStudentsName(id), (i, n) -> Students.builder().id(i).name(n).build())
@@ -37,10 +42,20 @@ public class StudentsService {
     }
 
 
+    /**
+     * 从redis 查找学生名称
+     * @param id　学生对应的id
+     * @return 学生名字
+     */
     public Mono<String> findStudentsName(final String id) {
         return reactiveHashOperations.get(STUDENT_ADO.concat(id), "name");
     }
 
+    /**
+     * 从redis 查找学生头像
+     * @param id　学生对应的id
+     * @return 学生头像对应的url
+     */
     public Mono<String> findStudentsPortrait(final String id) {
         return reactiveHashOperations.get(STUDENT_ADO.concat(id), "portrait");
     }
