@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
 
@@ -41,8 +39,8 @@ public class InteractiveSheetVo {
     /**
      * 答案列表
      */
-    @ApiModelProperty(value = "答案列表", name = "answList")
-    private List<InteractiveSheetAnsw> answList;
+    @ApiModelProperty(value = "答案列表", name = "answ")
+    private InteractiveSheetAnsw answ;
 
     /**
      * 获取redis 提问 key

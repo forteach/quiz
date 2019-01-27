@@ -5,7 +5,6 @@ import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
@@ -27,7 +26,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
@@ -123,7 +121,6 @@ public class BigQuestionInteractService {
                     return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.BigQuestion));
                 });
     }
-
 
 
     /**
@@ -367,7 +364,7 @@ public class BigQuestionInteractService {
         return Mono.just(sheetVo)
                 .transform(this::filterSheetSelectVerify)
                 .filterWhen(shee ->
-                        sendAnswerVerify(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnswList(), shee.getCut())
+                        sendAnswerVerifyMore(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnsw().getQuestionId(), shee.getCut())
                 )
                 .filterWhen(
                         set -> sendValue(sheetVo))
@@ -389,8 +386,7 @@ public class BigQuestionInteractService {
                         .and("libraryType").is(QuestionType.ExerciseBook));
 
         Update update = new Update();
-
-        update.set("answList", sheetVo.getAnswList());
+        update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);
     }
@@ -401,17 +397,15 @@ public class BigQuestionInteractService {
      *
      * @return
      */
-    private Mono<Boolean> sendAnswerVerify(final String askId, final List<InteractiveSheetAnsw> answList, final String oCut) {
+    private Mono<Boolean> sendAnswerVerifyMore(final String askId, final String oQuestionId, final String oCut) {
 
         Mono<List<String>> questionId = reactiveHashOperations.get(askId, "questionId").map(ids -> Arrays.asList(ids.split(",")));
 
-        Mono<List<String>> oQuestionId = Mono.just(answList.stream().map(InteractiveSheetAnsw::getQuestionId).collect(Collectors.toList()));
 
         Mono<String> cut = reactiveHashOperations.get(askId, "cut");
         //如果差集不等于0 验证不通过
-        Mono<Boolean> questionVerify = questionId.zipWith((oQuestionId), (q, o) ->
-                o.stream().filter(item -> !q.contains(item)).collect(Collectors.toList()).size() == 0
-        );
+        Mono<Boolean> questionVerify = questionId.map(list -> list.contains(oQuestionId));
+
         Mono<Boolean> cutVerify = cut.zipWith(Mono.just(oCut), String::equals);
 
         return Flux.concat(questionVerify, cutVerify).filter(flag -> !flag).count().flatMap(c -> {
@@ -422,9 +416,5 @@ public class BigQuestionInteractService {
             }
         });
     }
-
-
-
-
 
 }
