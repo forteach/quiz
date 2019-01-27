@@ -2,7 +2,6 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
@@ -24,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
@@ -114,7 +112,7 @@ public class BrainstormInteractService {
     public Mono<String> sendAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
                 .transform(this::filterSelectVerify)
-                .filterWhen(shee -> sendAnswerVerify(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnswList(), shee.getCut()))
+                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
                 .map(InteractiveSheetVo::getCut);
@@ -134,7 +132,7 @@ public class BrainstormInteractService {
 
         Update update = new Update();
 
-        update.set("answList", sheetVo.getAnswList());
+        update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);
     }
@@ -145,17 +143,16 @@ public class BrainstormInteractService {
      *
      * @return
      */
-    private Mono<Boolean> sendAnswerVerify(final String askId, final List<InteractiveSheetAnsw> answList, final String oCut) {
+    private Mono<Boolean> sendAnswerVerifyMore(final String askId, final String oQuestionId, final String oCut) {
 
         Mono<List<String>> questionId = reactiveHashOperations.get(askId, "questionId").map(ids -> Arrays.asList(ids.split(",")));
 
-        Mono<List<String>> oQuestionId = Mono.just(answList.stream().map(InteractiveSheetAnsw::getQuestionId).collect(Collectors.toList()));
+
 
         Mono<String> cut = reactiveHashOperations.get(askId, "cut");
         //如果差集不等于0 验证不通过
-        Mono<Boolean> questionVerify = questionId.zipWith((oQuestionId), (q, o) ->
-                o.stream().filter(item -> !q.contains(item)).collect(Collectors.toList()).size() == 0
-        );
+        Mono<Boolean> questionVerify = questionId.map(list -> list.contains(oQuestionId));
+
         Mono<Boolean> cutVerify = cut.zipWith(Mono.just(oCut), String::equals);
 
         return Flux.concat(questionVerify, cutVerify).filter(flag -> !flag).count().flatMap(c -> {
