@@ -8,12 +8,24 @@ package com.forteach.quiz.common;
  */
 public class Dic {
 
+    /**
+     * 默认错误代码
+     */
     public static final int DEFAULT_ERROR_CODE = 9999;
 
+    /**
+     * mongodb _id
+     */
     public static final String MONGDB_ID = "_id";
 
+    /**
+     * mongodb
+     */
     public static final String MONGDB_COLUMN_QUESTION_BANK_TEACHER = "teachers";
 
+    /**
+     *
+     */
     public static final String STATUS_SUCCESS = "0";
 
     public static final String DISTINCT_INITIAL = "initial";

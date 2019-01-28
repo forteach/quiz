@@ -14,9 +14,15 @@ import lombok.EqualsAndHashCode;
 @Data
 public class Reward extends BaseEntity {
 
+    /**
+     * 学生id
+     */
     @ApiModelProperty(value = "学生id", name = "id")
     private String sutdentId;
 
+    /**
+     * 获得的数量
+     */
     @ApiModelProperty(value = "获得的数量", name = "amount")
     private Double amount;
 

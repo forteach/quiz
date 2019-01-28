@@ -13,6 +13,9 @@ public class ProblemSetBackupVo {
 
     private String id;
 
+    /**
+     *
+     */
     private String name;
 
     /**
@@ -20,6 +23,9 @@ public class ProblemSetBackupVo {
      */
     private String type;
 
+    /**
+     * 习题册id
+     */
     private String exerciseBookId;
 
 }

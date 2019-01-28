@@ -19,6 +19,9 @@ import org.springframework.beans.BeanUtils;
 @ApiModel(value = "题对象", description = "通过 selected 判断是否选中")
 public class OptBigQuestionVo extends BigQuestion {
 
+    /**
+     * 是否被选中  1 : 被选中 / 2 : 未被选中
+     */
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "是否被选中  1 : 被选中 / 2 : 未被选中", name = "selected", example = "1")
     private String selected;

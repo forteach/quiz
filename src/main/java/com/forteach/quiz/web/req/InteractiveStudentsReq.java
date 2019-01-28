@@ -22,6 +22,10 @@ public class InteractiveStudentsReq {
     @ApiModelProperty(value = "课堂圈子id", name = "circleId")
     private String circleId;
 
+    /**
+     * 获取房间键的前缀
+     * @return String　房间信息的redis key
+     */
     public String getRoomKey() {
         return INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
     }

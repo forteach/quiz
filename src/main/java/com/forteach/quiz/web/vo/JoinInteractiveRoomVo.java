@@ -28,6 +28,10 @@ public class JoinInteractiveRoomVo {
     @ApiModelProperty(value = "课堂圈子id", name = "circleId")
     private String circleId;
 
+    /**
+     * 学生加入课堂前缀
+     * @return　学生加入信息 redis key
+     */
     public String getJoinKey() {
         return INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
     }

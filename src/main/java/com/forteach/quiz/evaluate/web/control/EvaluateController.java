@@ -4,9 +4,7 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.evaluate.domain.CumulativeVo;
 import com.forteach.quiz.evaluate.service.EvaluateService;
 import com.forteach.quiz.service.RewardService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -47,6 +45,11 @@ public class EvaluateController {
      */
     @PostMapping("/reward/cumulative")
     @ApiOperation(value = "奖励(红花等... ...)", notes = "对学生进行奖励等")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "被累加的学生id", name = "studentId", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(value = "增加值", name = "amount", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(value = "教师id", name = "teacher", dataType = "string", required = true, paramType = "from")
+    })
     public Mono<WebResult> reward(@ApiParam(value = "对学生奖励累加", required = true) @Valid @RequestBody CumulativeVo cumulativeVo) {
         return rewardService.cumulative(cumulativeVo.getStudentId(), Double.valueOf(cumulativeVo.getAmount())).map(WebResult::okResult);
     }

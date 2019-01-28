@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Description:
+ * @Description: 所有的题目类型 全部由大题外部封装   由examChildren展示具体的题目信息
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/15  11:04

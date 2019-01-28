@@ -1,7 +1,7 @@
 package com.forteach.quiz.questionlibrary.domain;
 
 /**
- * @Description:
+ * @Description: 习题练习的类型
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/15  10:26
