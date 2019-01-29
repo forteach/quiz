@@ -4,6 +4,7 @@ import com.forteach.quiz.interaction.execute.domain.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
+import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_FALSE;
 import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_TRUE;
@@ -34,11 +37,13 @@ public class InteractRecordExecuteService {
 
     private final InteractRecordRepository repository;
     private final ReactiveMongoTemplate mongoTemplate;
+    private final StudentsService studentsService;
     private Mono<Boolean> executeSuccessfully = Mono.just(true);
 
-    public InteractRecordExecuteService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate) {
+    public InteractRecordExecuteService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate, StudentsService studentsService) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
+        this.studentsService = studentsService;
     }
 
     /**
@@ -269,11 +274,56 @@ public class InteractRecordExecuteService {
      * @param circleId 课堂id
      * @return Flux<List<InteractQuestionsRecord>>
      */
-    public Flux<List<InteractQuestionsRecord>> getRecord(final String circleId){
-          return repository.findByCircleIdAndQuestionsNotNull(circleId)
-                .filter(interactRecord -> interactRecord != null)
-                .map(interactRecord -> interactRecord.getQuestions()).flux();
+//    public Mono<List<InteractQuestionsRecord>> selectRecord(final String circleId){
+//          return repository.findByCircleIdAndQuestionsNotNull(circleId)
+//                .filter(Objects::nonNull)
+//                .map(InteractRecord::getQuestions).;
+//    }
+
+    protected void findRecord(final String circleId){
+        //                    studentsService.findStudentsBrief(
+//                    )
+//        return repository.findByCircleIdAndQuestionsNotNull(circleId)
+//                .filter(Objects::nonNull)
+//                .map(InteractRecord::getQuestions)
+//                .flatMap()
+//                .subscribe(list -> studentsService.findStudentsBrief(list.get(0).getSelectId()))
+
+//                .flatMap(list -> studentsService.findStudentsBrief(list))
+//                .flatMapMany(strings -> i)
+
+//                .map(InteractRecord::getQuestions)
+//                .
     }
 
-
+//    public static void main(String[] args) {
+//         List<String> words = Arrays.asList(
+//                "the",
+//                "quick",
+//                "brown",
+//                "fox",
+//                "jumped",
+//                "over",
+//                "the",
+//                "lazy",
+//                "dog"
+//        );
+//        Flux<String> fewWords = Flux.just("Hello", "World");
+//        Flux<String> manyWords = Flux.fromIterable(words);
+//
+//        Mono<String> missing = Mono.just("s");
+//        fewWords.subscribe(System.out::println);
+//        System.out.println();
+//        manyWords.subscribe(System.out::println);
+//        Flux<String> manyLetters = Flux
+//                .fromIterable(words)
+//                .flatMap(word -> Flux.fromArray(word.split("")))
+//                .concatWith(missing)
+//                .distinct()
+//                .sort()
+//                .zipWith(Flux.range(1, Integer.MAX_VALUE),
+//                        (string, count) -> String.format("%2d. %s", count, string));
+//
+//        manyLetters.subscribe(System.out::println);
+//    }
 }

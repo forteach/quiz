@@ -4,11 +4,13 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
+import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
@@ -41,6 +43,7 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 public class BigQuestionInteractService {
 
 
+    private final StudentsService studentsService;
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final InteractRecordExecuteService interactRecordExecuteService;
@@ -51,12 +54,14 @@ public class BigQuestionInteractService {
                                       ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                       InteractRecordExecuteService interactRecordExecuteService,
                                       CorrectService correctService,
-                                      ReactiveMongoTemplate reactiveMongoTemplate) {
+                                      ReactiveMongoTemplate reactiveMongoTemplate,
+                                      StudentsService studentsService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.interactRecordExecuteService = interactRecordExecuteService;
+        this.studentsService = studentsService;
     }
 
     /**
@@ -418,5 +423,10 @@ public class BigQuestionInteractService {
             }
         });
     }
+
+//    public void findStudent(final String circleId){
+//        Flux<List<InteractQuestionsRecord>> listFlux = interactRecordExecuteService.selectRecord(circleId);
+//        listFlux.transform(l)
+//    }
 
 }

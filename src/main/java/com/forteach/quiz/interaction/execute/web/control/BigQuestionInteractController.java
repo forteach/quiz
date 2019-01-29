@@ -6,7 +6,7 @@ import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteServic
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
-import com.forteach.quiz.interaction.execute.web.vo.RecordVo;
+import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
@@ -137,10 +137,11 @@ public class BigQuestionInteractController {
     @ApiOperation(value = "查询课堂学生提交的答案")
     @PostMapping("/showRecord")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂id", dataType = "string", required = true, paramType = "query")
+            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query")
     })
-    public Flux<WebResult> showRecord(@Valid @ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody RecordVo recordVo){
-        return interactRecordExecuteService.getRecord(recordVo.getCircleId()).map(WebResult::okResult);
+    public Mono<WebResult> showRecord(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody @Valid RecordReq recordReq){
+//        return interactRecordExecuteService.selectRecord(recordReq.getCircleId()).map(WebResult::okResult);
+        return null;
     }
 
 }
