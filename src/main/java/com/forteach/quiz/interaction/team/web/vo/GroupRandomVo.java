@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import static com.forteach.quiz.common.Dic.ASK_GROUP;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -25,5 +27,13 @@ public class GroupRandomVo {
      */
     @ApiModelProperty(value = "要分分几个组", name = "number")
     private Integer number;
+
+    public static String groupKey(String circleId) {
+        return ASK_GROUP.concat(circleId);
+    }
+
+    public String getGroupKey() {
+        return ASK_GROUP.concat(circleId);
+    }
 
 }
