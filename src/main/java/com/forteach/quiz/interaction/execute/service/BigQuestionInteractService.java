@@ -283,7 +283,7 @@ public class BigQuestionInteractService {
      * @return
      */
     private Mono<String> sendSelect(final InteractAnswerVo interactAnswerVo, final String type) {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("选人 回答 参数 interactAnswerVo : {}, type : {}", interactAnswerVo, type);
         }
         return correctService.correcting(interactAnswerVo.getQuestionId(), interactAnswerVo.getAnswer())
@@ -374,6 +374,7 @@ public class BigQuestionInteractService {
                         right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
                 .map(InteractiveSheetVo::getCut);
     }
+//                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
 
     /**
      * 直接累积答案 不用给分
@@ -388,6 +389,7 @@ public class BigQuestionInteractService {
                         .and("libraryType").is(QuestionType.ExerciseBook));
 
         Update update = new Update();
+        sheetVo.getAnsw().setDate(new Date());
         update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);

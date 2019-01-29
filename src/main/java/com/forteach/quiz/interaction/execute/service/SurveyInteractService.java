@@ -18,10 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
@@ -124,7 +121,7 @@ public class SurveyInteractService {
                         .and("libraryType").is(QuestionType.SurveyQuestion));
 
         Update update = new Update();
-
+        sheetVo.getAnsw().setDate(new Date());
         update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);
