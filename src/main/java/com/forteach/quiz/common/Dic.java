@@ -143,7 +143,20 @@ public class Dic {
      */
     public static final String ASK_QUESTIONS_UN_SELECTED = "2";
 
+    /**
+     * 课堂小组
+     */
+    public static final String ASK_GROUP = "askGroup";
 
+    /**
+     * 新增 课堂提问 小组
+     */
+    public static final String ASK_GROUP_CHANGE_MORE = "1";
+
+    /**
+     * 移除 课堂提问 小组
+     */
+    public static final String ASK_GROUP_CHANGE_LESS = "2";
 
 
 
