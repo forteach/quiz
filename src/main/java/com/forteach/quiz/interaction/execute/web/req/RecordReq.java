@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @Auther: zhangyy
@@ -18,8 +19,11 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecordReq {
+public class RecordReq implements Serializable {
     @NotBlank(message = "课堂id不为空")
     @ApiModelProperty(value = "课堂id", name = "circleId", dataType = "string", required = true)
     private String circleId;
+
+    @ApiModelProperty(value = "问题id", name = "questionsId", dataType = "string")
+    private String questionsId;
 }

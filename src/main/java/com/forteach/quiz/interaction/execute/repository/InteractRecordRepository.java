@@ -45,6 +45,15 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param recordName 记录名字 questions
      * @return
      */
-    @Query(value = "{'circleId': ?0, ?1 : {$exists:true}}}")
+    @Query(value = "{'circleId': ?0, ?1 : {$exists:true}}")
     Mono<InteractRecord> findByCircleIdAndRecord(final String circleId, final String recordName);
+
+    /**
+     * 查询答题信息
+     * @param circleId　课堂id
+     * @param questionsId 学生 id
+     * @return
+     */
+    @Query(value = "{'circleId': ?0, 'questions' : { questionsId : ?1} }")
+    Mono<InteractRecord> findByCircleIdAndQuestionsId(final String circleId, final String questionsId);
 }

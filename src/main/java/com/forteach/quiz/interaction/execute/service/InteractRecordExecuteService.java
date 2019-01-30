@@ -5,6 +5,8 @@ import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
 import com.forteach.quiz.service.StudentsService;
+import com.forteach.quiz.util.StringUtil;
+import com.forteach.quiz.web.pojo.Students;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -15,11 +17,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_FALSE;
 import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_TRUE;
@@ -274,56 +274,31 @@ public class InteractRecordExecuteService {
      * @param circleId 课堂id
      * @return Flux<List<InteractQuestionsRecord>>
      */
-//    public Mono<List<InteractQuestionsRecord>> selectRecord(final String circleId){
-//          return repository.findByCircleIdAndQuestionsNotNull(circleId)
-//                .filter(Objects::nonNull)
-//                .map(InteractRecord::getQuestions).;
-//    }
-
-    protected void findRecord(final String circleId){
-        //                    studentsService.findStudentsBrief(
-//                    )
-//        return repository.findByCircleIdAndQuestionsNotNull(circleId)
-//                .filter(Objects::nonNull)
-//                .map(InteractRecord::getQuestions)
-//                .flatMap()
-//                .subscribe(list -> studentsService.findStudentsBrief(list.get(0).getSelectId()))
-
-//                .flatMap(list -> studentsService.findStudentsBrief(list))
-//                .flatMapMany(strings -> i)
-
-//                .map(InteractRecord::getQuestions)
-//                .
+    public Mono<List<Students>> selectRecord(final String circleId, final String questionsId) {
+        if (StringUtil.isEmpty(questionsId)) {
+            return repository.findByCircleIdAndQuestionsNotNull(circleId)
+                    .filter(Objects::nonNull)
+                    .map(InteractRecord::getStudents)
+                    .flatMap(studentsService::exchangeStudents);
+        } else {
+            return repository.findByCircleIdAndQuestionsId(circleId, questionsId)
+                    .filter(Objects::nonNull)
+                    .map(InteractRecord::getQuestions)
+                    .flatMapMany(Flux::fromIterable)
+                    .map(InteractQuestionsRecord::getAnswerRecordList)
+                    .flatMap(this::findInteractAnswerRecords).next();
+        }
     }
 
-//    public static void main(String[] args) {
-//         List<String> words = Arrays.asList(
-//                "the",
-//                "quick",
-//                "brown",
-//                "fox",
-//                "jumped",
-//                "over",
-//                "the",
-//                "lazy",
-//                "dog"
-//        );
-//        Flux<String> fewWords = Flux.just("Hello", "World");
-//        Flux<String> manyWords = Flux.fromIterable(words);
-//
-//        Mono<String> missing = Mono.just("s");
-//        fewWords.subscribe(System.out::println);
-//        System.out.println();
-//        manyWords.subscribe(System.out::println);
-//        Flux<String> manyLetters = Flux
-//                .fromIterable(words)
-//                .flatMap(word -> Flux.fromArray(word.split("")))
-//                .concatWith(missing)
-//                .distinct()
-//                .sort()
-//                .zipWith(Flux.range(1, Integer.MAX_VALUE),
-//                        (string, count) -> String.format("%2d. %s", count, string));
-//
-//        manyLetters.subscribe(System.out::println);
-//    }
+    /**
+     * 查询各个题目答题的学生信息列表
+     * @param interactAnswerRecords
+     * @return
+     */
+    public Mono<List<Students>> findInteractAnswerRecords(List<InteractAnswerRecord> interactAnswerRecords) {
+        return Flux.fromIterable(interactAnswerRecords)
+                .map(InteractAnswerRecord::getExamineeId)
+                .flatMap(studentsService::findStudentsBrief)
+                .collectList();
+    }
 }

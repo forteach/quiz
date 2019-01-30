@@ -4,7 +4,10 @@ import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static com.forteach.quiz.common.KeyStorage.STUDENT_ADO;
 
@@ -26,6 +29,17 @@ public class StudentsService {
         this.reactiveHashOperations = reactiveHashOperations;
     }
 
+
+    /**
+     * 根据学生id转换为用户学生信息
+     * @param strings
+     * @return
+     */
+    public Mono<List<Students>> exchangeStudents(List<String> strings){
+        return Flux.fromIterable(strings)
+                .flatMap(this::findStudentsBrief)
+                .collectList();
+    }
 
     /**
      * 从redis 查询学生信息并返回相关对象

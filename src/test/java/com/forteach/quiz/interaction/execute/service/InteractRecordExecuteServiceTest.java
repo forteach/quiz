@@ -25,4 +25,9 @@ public class InteractRecordExecuteServiceTest {
     public void getRecord() {
 //        interactRecordExecuteService.getRecord("0cf3feef4ba84ae99d5e24c4d3c8270f");
     }
+
+    @Test
+    public void findRecord() {
+        interactRecordExecuteService.selectRecord("d4ab75daef9344f681a667390c0b4532", null);
+    }
 }

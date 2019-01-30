@@ -134,14 +134,14 @@ public class BigQuestionInteractController {
         return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "查询课堂学生提交的答案")
+    @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
     @PostMapping("/showRecord")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query")
+            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", paramType = "query"),
     })
     public Mono<WebResult> showRecord(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody @Valid RecordReq recordReq){
-//        return interactRecordExecuteService.selectRecord(recordReq.getCircleId()).map(WebResult::okResult);
-        return null;
+        return interactRecordExecuteService.selectRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
 }
