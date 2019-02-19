@@ -73,11 +73,6 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>cn.hutool</groupId>-->
-        <!--<artifactId>hutool-all</artifactId>-->
-        <!--<version>4.1.12</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>io.springfox</groupId>
@@ -94,15 +89,18 @@
             <artifactId>springfox-spring-webflux</artifactId>
             <version>3.0.0-SNAPSHOT</version>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.3</version>
         </dependency>
-
-
+        <!-- JWT token -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.7.0</version>
+        </dependency>
     </dependencies>
 
     <!-- 配置远程仓库 -->
