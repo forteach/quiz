@@ -4,10 +4,15 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
+import java.util.Date;
+
+import static com.forteach.quiz.common.Dic.TokenValidityTime;
+import static com.forteach.quiz.common.Dic.WX_USER_PREFIX;
 
 /**
  * @Auther: zhangyy
@@ -23,11 +28,12 @@ public class TokenService {
     private String salt;
 
     @Resource
-    private HashOperations<String, String, String> hashOperations;
-
+    private ReactiveHashOperations<String, String, String> reactiveHashOperations;
 
     public String createToken(String openId) {
-        return JWT.create().withAudience(openId)
+        return JWT.create()
+                .withAudience(openId)
+                .withExpiresAt(new Date(System.currentTimeMillis() + TokenValidityTime * 1000))
                 .sign(Algorithm.HMAC256(salt.concat(openId)));
     }
 
@@ -35,12 +41,12 @@ public class TokenService {
         return JWT.require(Algorithm.HMAC256(salt.concat(openId))).build();
     }
 
-//    public String getOpenId(HttpServletRequest request) {
-//        String token = request.getHeader("token");
+//    public String getOpenId(ServerHttpRequest request) {
+//        String token = request.
 //        return JWT.decode(token).getAudience().get(0);
 //    }
 
-//    public String getSessionKey(String openId) {
-//        return hashOperations.get(WX_USER_PREFIX.concat(openId), "sessionKey");
-//    }
+    public Mono<String> getSessionKey(String openId) {
+        return reactiveHashOperations.get(WX_USER_PREFIX.concat(openId), "sessionKey");
+    }
 }

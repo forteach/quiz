@@ -1,10 +1,15 @@
 package com.forteach.quiz.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
+import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.reactive.resource.VersionResourceResolver;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description:
@@ -29,11 +34,11 @@ public class WebConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        registry.addResourceHandler("/swagger-ui.html**")
-                .addResourceLocations("classpath:/META-INF/resources/");
-
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/swagger-ui.html**", "/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/**", "classpath:/static/", "/public")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
+                .resourceChain(true)
+                .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));
     }
 
 //    @Bean
@@ -61,4 +66,12 @@ public class WebConfig implements WebFluxConfigurer {
 //        return new WebSocketHandlerAdapter();
 //    }
 
+    /**
+     * TODO 输出敏感日志
+     * @param configurer
+     */
+    @Override
+    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
+        configurer.defaultCodecs().enableLoggingRequestDetails(true);
+    }
 }
