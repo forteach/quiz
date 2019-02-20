@@ -21,7 +21,7 @@ public class RaisehandVo {
     /**
      * 学生id
      */
-    @ApiModelProperty(value = "学生id", name = "examineeId")
+//    @ApiModelProperty(value = "学生id", name = "examineeId")
     private String examineeId;
 
     /**

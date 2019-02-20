@@ -2,11 +2,14 @@ package com.forteach.quiz.interaction.execute.web.control;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.ClassRoomService;
+import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.BaseController;
 import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import io.swagger.annotations.*;
+import jdk.nashorn.internal.parser.Token;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +29,11 @@ public class ClassRoomController extends BaseController {
 
     private final ClassRoomService classRoomService;
 
-    public ClassRoomController(ClassRoomService classRoomService) {
+    private final TokenService tokenService;
+
+    public ClassRoomController(ClassRoomService classRoomService, TokenService tokenService) {
         this.classRoomService = classRoomService;
+        this.tokenService = tokenService;
     }
 
     @ApiOperation(value = "老师创建临时课堂", notes = "有效期为2个小时 此方法两个小时内返回同一数据")
@@ -43,10 +49,11 @@ public class ClassRoomController extends BaseController {
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
     @PostMapping(value = "/join/interactiveRoom")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "学生id", name = "examineeId", required = true, dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(value = "学生id", name = "examineeId", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo) {
+    public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, ServerHttpRequest request) {
+        joinVo.setExamineeId(tokenService.getStudentId(request));
         return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
     }
 

@@ -7,11 +7,13 @@ import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
+import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,10 +33,14 @@ public class BigQuestionInteractController {
 
     private final BigQuestionInteractService interactService;
     private final InteractRecordExecuteService interactRecordExecuteService;
+    private final TokenService tokenService;
 
-    public BigQuestionInteractController(BigQuestionInteractService interactService, InteractRecordExecuteService interactRecordExecuteService) {
+    public BigQuestionInteractController(BigQuestionInteractService interactService,
+                                         InteractRecordExecuteService interactRecordExecuteService,
+                                         TokenService tokenService) {
         this.interactService = interactService;
         this.interactRecordExecuteService = interactRecordExecuteService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -59,10 +65,11 @@ public class BigQuestionInteractController {
     @PostMapping("/raise")
     @ApiOperation(value = "学生举手", notes = "课堂提问 学生举手")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
+//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true)
     })
-    public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo) {
+    public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo, ServerHttpRequest serverHttpRequest) {
+        raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         return interactService.raiseHand(raisehandVo).map(WebResult::okResult);
     }
 
@@ -75,13 +82,14 @@ public class BigQuestionInteractController {
     @PostMapping("/send/answer")
     @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "问题id", name = "questionId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "答案", name = "answer", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", dataType = "string", required = true, paramType = "from")
     })
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo) {
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
+        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
     }
 
@@ -124,13 +132,14 @@ public class BigQuestionInteractController {
      */
     @PostMapping("/sendBook/answer")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
             @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
     })
     @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest serverHttpRequest) {
+        sheetVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
     }
 

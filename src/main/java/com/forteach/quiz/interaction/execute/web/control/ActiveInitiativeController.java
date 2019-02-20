@@ -3,6 +3,7 @@ package com.forteach.quiz.interaction.execute.web.control;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.ActiveInitiativeService;
+import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.AchieveAnswerVo;
 import com.forteach.quiz.web.vo.AchieveRaiseVo;
 import com.forteach.quiz.web.vo.AchieveVo;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,30 +33,34 @@ public class ActiveInitiativeController {
 
     private final ActiveInitiativeService interactService;
 
-    public ActiveInitiativeController(ActiveInitiativeService interactService) {
+    private final TokenService tokenService;
+
+    public ActiveInitiativeController(ActiveInitiativeService interactService, TokenService tokenService) {
         this.interactService = interactService;
+        this.tokenService = tokenService;
     }
 
 
     /**
      * 主动推送问题
      *
-     * @param examineeId
+//     * @param examineeId
      * @param circleId
      * @param random
      * @return
      */
     @JsonView(BigQuestionView.Summary.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "examineeId", value = "学生id", paramType = "get", dataType = "string", required = true),
+//            @ApiImplicitParam(name = "examineeId", value = "学生id", paramType = "get", dataType = "string", required = true),
             @ApiImplicitParam(name = "circleId", value = "课堂id", paramType = "get", dataType = "string", required = true),
             @ApiImplicitParam(name = "random", value = "随机数 每次访问需要", paramType = "get", dataType = "string", required = true)
     })
     @ApiOperation(value = "学生获取推送的题目", notes = "学生链接接口时 每有新题目 则接收")
     @GetMapping(value = "/achieve/questions")
-    public Mono<WebResult> achieveQuestions(@RequestParam String examineeId, @RequestParam String circleId, @RequestParam String random) {
-
-        return interactService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(examineeId).random(random).build()).map(WebResult::okResult);
+    public Mono<WebResult> achieveQuestions(//@RequestParam String examineeId,
+                                            @RequestParam String circleId, @RequestParam String random, ServerHttpRequest serverHttpRequest) {
+        String studentId = tokenService.getStudentId(serverHttpRequest);
+        return interactService.achieveQuestion(AchieveVo.builder().circleId(circleId).examineeId(studentId).random(random).build()).map(WebResult::okResult);
     }
 
     @ApiImplicitParams({

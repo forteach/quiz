@@ -20,6 +20,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecordReq implements Serializable {
+
     @NotBlank(message = "课堂id不为空")
     @ApiModelProperty(value = "课堂id", name = "circleId", dataType = "string", required = true)
     private String circleId;

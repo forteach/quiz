@@ -3,15 +3,20 @@ package com.forteach.quiz.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.forteach.quiz.exceptions.TokenException;
+import com.forteach.quiz.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.ReactiveHashOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
-import static com.forteach.quiz.common.Dic.TokenValidityTime;
 import static com.forteach.quiz.common.Dic.WX_USER_PREFIX;
 
 /**
@@ -21,6 +26,7 @@ import static com.forteach.quiz.common.Dic.WX_USER_PREFIX;
  * @Version: 1.0
  * @Description:
  */
+@Slf4j
 @Service(value = "TokenService")
 public class TokenService {
 
@@ -28,25 +34,50 @@ public class TokenService {
     private String salt;
 
     @Resource
-    private ReactiveHashOperations<String, String, String> reactiveHashOperations;
+    private StringRedisTemplate stringRedisTemplate;
 
-    public String createToken(String openId) {
-        return JWT.create()
-                .withAudience(openId)
-                .withExpiresAt(new Date(System.currentTimeMillis() + TokenValidityTime * 1000))
-                .sign(Algorithm.HMAC256(salt.concat(openId)));
-    }
-
-    public JWTVerifier verifier(String openId) {
+    private JWTVerifier verifier(String openId) {
         return JWT.require(Algorithm.HMAC256(salt.concat(openId))).build();
     }
 
-//    public String getOpenId(ServerHttpRequest request) {
-//        String token = request.
-//        return JWT.decode(token).getAudience().get(0);
-//    }
+    /**
+     * 通过token 获取openId
+     * @param request
+     * @return
+     */
+    private String getOpenId(ServerHttpRequest request) {
+        String token = request.getHeaders().getFirst("token");
+        Assert.notNull(token, "token is null");
+        return JWT.decode(token).getAudience().get(0);
+    }
 
-    public Mono<String> getSessionKey(String openId) {
-        return reactiveHashOperations.get(WX_USER_PREFIX.concat(openId), "sessionKey");
+    /**
+     * 根据token 查找对应的学生信息
+     * @param request
+     * @return
+     */
+    public String getStudentId(ServerHttpRequest request){
+        return  String.valueOf(stringRedisTemplate.opsForHash().get(WX_USER_PREFIX.concat(getOpenId(request)), "studentId"));
+    }
+
+    /**
+     * 校验token 是否有效
+     * @param request
+     * @return
+     */
+    public Mono<Boolean> check(ServerRequest request){
+        String token = request.exchange().getRequest().getHeaders().getFirst("token");
+        if (StringUtil.isEmpty(token)){
+            log.error("token is null");
+            return Mono.error(new TokenException("缺少token"));
+        }
+        try {
+            String openId = JWT.decode(token).getAudience().get(0);
+            verifier(openId).verify(token);
+        } catch (JWTVerificationException e) {
+            log.error("token check false 401");
+            return Mono.error(new TokenException("401"));
+        }
+        return Mono.just(true);
     }
 }

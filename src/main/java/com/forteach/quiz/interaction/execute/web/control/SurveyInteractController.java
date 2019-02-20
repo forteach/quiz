@@ -4,8 +4,10 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.SurveyInteractService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
+import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +27,11 @@ public class SurveyInteractController {
 
     private final SurveyInteractService surveyService;
 
-    public SurveyInteractController(SurveyInteractService surveyService) {
+    private final TokenService tokenService;
+
+    public SurveyInteractController(SurveyInteractService surveyService, TokenService tokenService) {
         this.surveyService = surveyService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -51,15 +56,13 @@ public class SurveyInteractController {
     @PostMapping("/send/answer")
     @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "学生id", name = "examineeId",  dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(value = "学生id", name = "examineeId",  dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId",  dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", paramType = "from")
     })
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest request) {
+        sheetVo.setExamineeId(tokenService.getStudentId(request));
         return surveyService.sendAnswer(sheetVo).map(WebResult::okResult);
     }
-
-
-
 }
