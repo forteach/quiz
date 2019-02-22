@@ -241,6 +241,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
      * @param sortVo
      * @return
      */
+    @SuppressWarnings(value = "all")
     private Query buildFindQuestion(final QuestionBankReq sortVo) {
 
         Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());

@@ -14,10 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
-
 import javax.annotation.Resource;
-
-import static com.forteach.quiz.common.Dic.WX_USER_PREFIX;
+import static com.forteach.quiz.common.Dic.USER_PREFIX;
 
 /**
  * @Auther: zhangyy
@@ -57,7 +55,7 @@ public class TokenService {
      * @return
      */
     public String getStudentId(ServerHttpRequest request){
-        return  String.valueOf(stringRedisTemplate.opsForHash().get(WX_USER_PREFIX.concat(getOpenId(request)), "studentId"));
+        return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
     }
 
     /**

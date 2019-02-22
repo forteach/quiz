@@ -159,9 +159,9 @@ public class Dic {
     public static final String ASK_GROUP_CHANGE_LESS = "2";
 
     /*----------微信登录token设置----------*/
-    public final static String WX_USER_PREFIX = "wxUserToken$";
+    public final static String USER_PREFIX = "userToken$";
 
-    public final static Long TokenValidityTime = 3600L * 24 * 7;
+    public final static Long TOKEN_VALIDITY_TIME = 3600L * 24 * 7;
     /**
      * 微信登录用户是否绑定信息标识 0 (绑定)　1(未绑定)
      */

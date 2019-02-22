@@ -73,6 +73,7 @@ public class KeywordService<T extends QuestionExamEntity> {
      * @param keyword
      * @return
      */
+    @SuppressWarnings(value = "all")
     public Flux<String> keywordQuestion(final String[] keyword) {
 
         Query query = new Query();
