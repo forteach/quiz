@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.forteach.quiz.exceptions.TokenException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.forteach.quiz.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +15,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import javax.annotation.Resource;
+import java.util.Optional;
+
+import static com.forteach.quiz.common.Dic.TOKEN_TEACHER;
 import static com.forteach.quiz.common.Dic.USER_PREFIX;
 
 /**
@@ -59,6 +62,19 @@ public class TokenService {
     }
 
     /**
+     * 通过token 类型判断转换为教师id
+     * @param request
+     * @return Optional<String>
+     */
+    public Optional<String> getTeacherId(ServerHttpRequest request){
+        String token = request.getHeaders().getFirst("token");
+        if (TOKEN_TEACHER.equals(JWT.decode(token).getAudience().get(1))){
+            return Optional.of(JWT.decode(token).getAudience().get(0));
+        }
+        return Optional.empty();
+    }
+
+    /**
      * 校验token 是否有效
      * @param request
      * @return
@@ -67,14 +83,14 @@ public class TokenService {
         String token = request.exchange().getRequest().getHeaders().getFirst("token");
         if (StringUtil.isEmpty(token)){
             log.error("token is null");
-            return Mono.error(new TokenException("缺少token"));
+            return Mono.error(new TokenExpiredException("缺少token"));
         }
         try {
             String openId = JWT.decode(token).getAudience().get(0);
             verifier(openId).verify(token);
         } catch (JWTVerificationException e) {
             log.error("token check false 401");
-            return Mono.error(new TokenException("401"));
+            return Mono.error(new TokenExpiredException("401"));
         }
         return Mono.just(true);
     }

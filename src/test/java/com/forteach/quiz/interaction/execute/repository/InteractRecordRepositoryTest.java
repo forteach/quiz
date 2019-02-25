@@ -27,6 +27,11 @@ import static org.junit.Assert.*;
 public class InteractRecordRepositoryTest {
     @Autowired
     private InteractRecordRepository recordRepository;
+
+    @Test
+    public void findAllByCircleId(){
+
+    }
     @Test
     public void findByCircleIdAndQuestionsNotNull(){
         Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsNotNull("bf7cda019c5049d18c002b502b053c46");
@@ -44,7 +49,7 @@ public class InteractRecordRepositoryTest {
 
     @Test
     public void findByCircleIdAndQuestionsId(){
-        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsId("bd4a84e4a61943e6b07e02947ecc85f1","5c332ae152faff0001056c0d");
+        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c73676306a38f000101b7b6");
         interactRecordMono.log();
         interactRecordMono.log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
 

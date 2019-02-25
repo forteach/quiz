@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -39,10 +41,12 @@ public class ClassRoomController extends BaseController {
     @ApiOperation(value = "老师创建临时课堂", notes = "有效期为2个小时 此方法两个小时内返回同一数据")
     @PostMapping(value = "/create/reuse")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> createInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
+    public Mono<WebResult> createInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+        Optional<String> teacherId = tokenService.getTeacherId(request);
+        teacherId.ifPresent(roomVo::setTeacherId);
         return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
     }
 
@@ -60,10 +64,12 @@ public class ClassRoomController extends BaseController {
     @ApiOperation(value = "老师创建临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
     @PostMapping(value = "/create/cover")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
+    public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+        Optional<String> teacherId = tokenService.getTeacherId(request);
+        teacherId.ifPresent(roomVo::setTeacherId);
         return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
     }
 

@@ -20,7 +20,7 @@ public class InteractiveRoomVo {
     /**
      * 教师id
      */
-    @ApiModelProperty(value = "教师id", name = "teacherId")
+//    @ApiModelProperty(value = "教师id", name = "teacherId")
     private String teacherId;
 
     /**

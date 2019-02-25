@@ -3,6 +3,7 @@ package com.forteach.quiz.interaction.execute.repository;
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,6 +37,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param circleId
      * @return
      */
+    @Transactional(readOnly = true)
     @Query(value = " { 'circleId': ?0, 'questions' : {$exists:true}}")
     Mono<InteractRecord> findByCircleIdAndQuestionsNotNull(final String circleId);
 
@@ -46,6 +48,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @return
      * db.interactRecord.find({"circleId" : "bd4a84e4a61943e6b07e02947ecc85f1"},{"students":1, _id: 0})
      */
+    @Transactional(readOnly = true)
     @Query(value = "{'circleId': ?0, ?1 : {$exists:true}}")
     Mono<InteractRecord> findByCircleIdAndRecord(final String circleId, final String recordName);
 
@@ -56,6 +59,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @return
      */
 //    @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1 }", fields = "{ '_id' : 1, 'selectId' : 1}")
+    @Transactional(readOnly = true)
     @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1 }")
     Mono<InteractRecord> findByCircleIdAndQuestionsId(final String circleId, final String questionsId);
 }

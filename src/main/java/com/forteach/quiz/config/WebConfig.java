@@ -35,7 +35,7 @@ public class WebConfig implements WebFluxConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
         registry.addResourceHandler("/swagger-ui.html**", "/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/**", "classpath:/static/", "/public")
+                .addResourceLocations("classpath:/META-INF/resources/**", "classpath:/static/**", "/public")
                 .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
                 .resourceChain(true)
                 .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));

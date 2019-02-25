@@ -1,6 +1,6 @@
 package com.forteach.quiz.handlers;
 
-import com.forteach.quiz.exceptions.TokenException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import io.lettuce.core.RedisException;
 import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
@@ -30,7 +30,7 @@ class ThrowableTranslator {
     private HttpStatus getStatus(final Throwable error) {
         if (error instanceof RedisException) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
-        } else if (error instanceof TokenException) {
+        } else if (error instanceof TokenExpiredException) {
             return HttpStatus.BAD_REQUEST;
         } else {
             return HttpStatus.INTERNAL_SERVER_ERROR;
