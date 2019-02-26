@@ -1,5 +1,8 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
+import com.forteach.quiz.config.ExceptionHandlers;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
@@ -87,15 +90,19 @@ public class ClassRoomService {
      * @return
      */
     public Mono<String> createInteractiveRoom(final InteractiveRoomVo roomVo) {
+         //根据互动课堂KEY值，获得课堂互动ID属性，如果为空，创建互动课堂，否则返回返回互动课堂ID
         return reactiveHashOperations.get(roomVo.getRoomKey(), "interactiveId").defaultIfEmpty("")
                 .flatMap(id -> {
                     if (isEmpty(id)) {
+                        //创建Redis课堂信息,过期时间2小时
                         return buildRoom(roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey());
                     } else {
                         return Mono.just(id);
                     }
                 })
+                //根据互动课堂ID和教师ID，创建或返回课堂信息
                 .filterWhen(circleId -> interactRecordExecuteService.init(circleId, roomVo.getTeacherId()));
+
     }
 
     /**
@@ -133,8 +140,8 @@ public class ClassRoomService {
         map.put("teacherId", teacherId);
         map.put("chapterId", chapterId);
 
-        Mono<Boolean> set = reactiveHashOperations.putAll(roomKey, map);
-        Mono<Boolean> time = stringRedisTemplate.expire(roomKey, Duration.ofSeconds(60 * 60 * 2));
+        Mono<Boolean> set = reactiveHashOperations.putAll(roomKey, map).flatMap(item->MyAssert.isFalse(item.booleanValue(), DefineCode.ERR0013,"redis操作错误"));
+        Mono<Boolean> time = stringRedisTemplate.expire(roomKey, Duration.ofSeconds(60 * 60 * 2)).flatMap(item->MyAssert.isFalse(item.booleanValue(), DefineCode.ERR0013,"redis操作错误"));
 
         return Mono.just(interactiveIdQr).filterWhen(obj -> set).filterWhen(obj -> time);
     }

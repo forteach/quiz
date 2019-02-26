@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.ClassRoomService;
 import com.forteach.quiz.web.BaseController;
@@ -37,6 +39,10 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> createInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
+        //验证请求参数
+        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
+        MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
+        //流式调用
         return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
     }
 
