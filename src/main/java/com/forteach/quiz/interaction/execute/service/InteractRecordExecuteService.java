@@ -3,7 +3,9 @@ package com.forteach.quiz.interaction.execute.service;
 import com.forteach.quiz.interaction.execute.domain.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
+import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
+import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.util.StringUtil;
 import com.forteach.quiz.web.pojo.Students;
@@ -274,31 +276,16 @@ public class InteractRecordExecuteService {
      * @param circleId 课堂id
      * @return Flux<List<InteractQuestionsRecord>>
      */
-    public Mono<List<Students>> selectRecord(final String circleId, final String questionsId) {
-        if (StringUtil.isEmpty(questionsId)) {
-            return repository.findByCircleIdAndQuestionsNotNull(circleId)
+    public Mono<InteractQuestionsRecord> findQuestionsRecord(final String circleId, final String questionsId) {
+        if(StringUtil.isNotEmpty(circleId) && StringUtil.isNotEmpty(questionsId)) {
+            return repository.findRecordByCircleIdAndQuestionsId(circleId, questionsId)
                     .filter(Objects::nonNull)
-                    .map(InteractRecord::getStudents)
-                    .flatMap(studentsService::exchangeStudents);
-        } else {
-            return repository.findByCircleIdAndQuestionsId(circleId, questionsId)
-                    .filter(Objects::nonNull)
-                    .map(InteractRecord::getQuestions)
+                    .map(QuestionsDto::getQuestions)
+                    .filter(list -> list != null && list.size() > 0)
                     .flatMapMany(Flux::fromIterable)
-                    .map(InteractQuestionsRecord::getAnswerRecordList)
-                    .flatMap(this::findInteractAnswerRecords).next();
+                    .filter(interactQuestionsRecord -> questionsId.equals(interactQuestionsRecord.getQuestionsId()))
+                    .last();
         }
-    }
-
-    /**
-     * 查询各个题目答题的学生信息列表
-     * @param interactAnswerRecords
-     * @return
-     */
-    public Mono<List<Students>> findInteractAnswerRecords(List<InteractAnswerRecord> interactAnswerRecords) {
-        return Flux.fromIterable(interactAnswerRecords)
-                .map(InteractAnswerRecord::getExamineeId)
-                .flatMap(studentsService::findStudentsBrief)
-                .collectList();
+        return Mono.empty();
     }
 }

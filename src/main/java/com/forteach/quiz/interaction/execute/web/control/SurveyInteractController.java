@@ -65,4 +65,15 @@ public class SurveyInteractController {
         sheetVo.setExamineeId(tokenService.getStudentId(request));
         return surveyService.sendAnswer(sheetVo).map(WebResult::okResult);
     }
+
+    @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
+    @PostMapping("/findQuestionsRecord")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
+    })
+    public Mono<WebResult> findSurveys(){
+
+        return Mono.just(WebResult.okResult());
+    }
 }

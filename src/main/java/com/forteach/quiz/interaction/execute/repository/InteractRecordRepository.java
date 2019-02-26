@@ -1,6 +1,8 @@
 package com.forteach.quiz.interaction.execute.repository;
 
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
+import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
+import com.forteach.quiz.interaction.execute.dto.SurveysDto;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,11 +57,20 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
     /**
      * 查询答题信息
      * @param circleId　课堂id
-     * @param questionsId 学生 id
+     * @param questionsId 问题 id
      * @return
      */
-//    @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1 }", fields = "{ '_id' : 1, 'selectId' : 1}")
     @Transactional(readOnly = true)
-    @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1 }")
-    Mono<InteractRecord> findByCircleIdAndQuestionsId(final String circleId, final String questionsId);
+    @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1}", fields = "{ '_id' : 0, 'questions' : 1}")
+    Mono<QuestionsDto> findRecordByCircleIdAndQuestionsId(final String circleId, final String questionsId);
+
+    /**
+     * 查询问卷记录
+     * @param circleId　课堂id
+     * @param questionsId 问题 id
+     * @return
+     */
+    @Transactional(readOnly = true)
+    @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1 }", fields = "{ '_id' : 0, 'surveys' : 1}")
+    Mono<SurveysDto> findRecordCircleIdAndQuestionsId(final String circleId, final String questionsId);
 }

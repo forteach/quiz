@@ -49,10 +49,10 @@ public class InteractRecordRepositoryTest {
 
     @Test
     public void findByCircleIdAndQuestionsId(){
-        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c73676306a38f000101b7b6");
-        interactRecordMono.log();
-        interactRecordMono.log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
-
-        System.out.println("---->> "+interactRecordMono.hasElement());
+//        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c73676306a38f000101b7b6");
+//        interactRecordMono.log();
+//        interactRecordMono.log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
+//
+//        System.out.println("---->> "+interactRecordMono.hasElement());
     }
 }

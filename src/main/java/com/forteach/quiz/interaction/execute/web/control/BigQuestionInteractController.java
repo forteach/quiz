@@ -3,10 +3,10 @@ package com.forteach.quiz.interaction.execute.web.control;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
 import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
+import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
-import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
@@ -14,8 +14,10 @@ import com.forteach.quiz.web.vo.RaisehandVo;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
@@ -144,13 +146,13 @@ public class BigQuestionInteractController {
     }
 
     @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
-    @PostMapping("/showRecord")
+    @PostMapping("/findQuestionsRecord")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
     })
-    public Mono<WebResult> showRecord(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody @Valid RecordReq recordReq){
-        return interactRecordExecuteService.selectRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+    public Mono<WebResult> findQuestionsRecord(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody @Valid RecordReq recordReq){
+        return interactRecordExecuteService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
 }
