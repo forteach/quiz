@@ -1,5 +1,6 @@
 package com.forteach.quiz.config;
 
+import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.AssertErrorException;
@@ -30,7 +31,9 @@ public class ExceptionHandlers {
     @ExceptionHandler(AssertErrorException.class)
     @ResponseBody
     public Mono<WebResult> serverExceptionHandler(AssertErrorException ex) {
-        return  Mono.just(WebResult.failResult(ex.getErrorCode(), ex.getMessage()));
+        WebResult wr=WebResult.failResult(ex.getErrorCode(), ex.getMessage());
+        System.out.println("MyAssert:"+ JSON.toJSONString(wr));
+        return  Mono.just(wr);
     }
 
     @ExceptionHandler(Exception.class)

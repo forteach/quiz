@@ -1,11 +1,9 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import static com.forteach.quiz.common.KeyStorage.INTERACTIVE_CLASSROOM;
-
 /**
  * @Description: 创建临时课堂
  * @author: liu zhenming
@@ -35,7 +33,7 @@ public class InteractiveRoomVo {
      * @return string 临时课堂
      */
     public String getRoomKey() {
-        return INTERACTIVE_CLASSROOM.concat(teacherId);
+        return ClassRoomKey.INTERACTIVE_CLASSROOM.concat(teacherId);
     }
 
     public InteractiveRoomVo(String teacherId, String chapterId) {

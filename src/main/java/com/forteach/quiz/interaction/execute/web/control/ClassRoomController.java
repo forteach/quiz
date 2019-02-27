@@ -32,7 +32,7 @@ public class ClassRoomController extends BaseController {
         this.classRoomService = classRoomService;
     }
 
-    @ApiOperation(value = "老师创建临时课堂", notes = "有效期为2个小时 此方法两个小时内返回同一数据")
+    @ApiOperation(value = "老师有效期内创建同一临时课堂", notes = "有效期为2个小时 此方法两个小时内返回同一数据")
     @PostMapping(value = "/create/reuse")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
@@ -43,7 +43,20 @@ public class ClassRoomController extends BaseController {
         MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
         //流式调用
-        return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom1(roomVo).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
+    @PostMapping(value = "/create/cover")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
+    })
+    public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
+        //验证请求参数
+        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
+        MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
+        return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
@@ -53,18 +66,13 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo) {
+        //验证请求参数
+        MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
+        MyAssert.blank(joinVo.getExamineeId(), DefineCode.ERR0010 ,"学生编号不存在");
         return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "老师创建临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
-    @PostMapping(value = "/create/cover")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
-    })
-    public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
-        return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
-    }
+
 
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")
     @PostMapping(value = "/find/interactiveStudents")

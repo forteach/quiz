@@ -3,8 +3,8 @@ package com.forteach.quiz.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.web.control.ClassRoomController;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
+import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +37,24 @@ public class ClassRoomTest {
                 .isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
                // .expectBody()
+                .returnResult(WebResult.class)
+                .getResponseBody().subscribe(System.out::println);
+
+    }
+
+    @Test
+    public void joinInteractiveRoom(){
+        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("stu02","interactionQr9710abee14d54551b7b8dc5e91589c7b");
+        System.out.println("json------"+ JSON.toJSONString(vo));
+        webTestClient
+                .post().uri("/classRoom/join/interactiveRoom")
+                .contentType(MediaType.APPLICATION_JSON) // 2
+                .body(Mono.just(vo),JoinInteractiveRoomVo.class) // 3
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                // .expectBody()
                 .returnResult(WebResult.class)
                 .getResponseBody().subscribe(System.out::println);
 

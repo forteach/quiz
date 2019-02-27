@@ -1,10 +1,9 @@
 package com.forteach.quiz.web.req;
 
+import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import static com.forteach.quiz.common.KeyStorage.INTERACTIVE_CLASSROOM_STUDENTS;
 
 /**
  * @Description:
@@ -27,7 +26,7 @@ public class InteractiveStudentsReq {
      * @return String　房间信息的redis key
      */
     public String getRoomKey() {
-        return INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
+        return ClassRoomKey.INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
     }
 
 }

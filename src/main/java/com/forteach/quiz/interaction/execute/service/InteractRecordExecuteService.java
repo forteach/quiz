@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
@@ -52,7 +54,7 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
 
-        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+        final Query query = Query.query(Criteria.where("id").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         Update update = new Update();
 
@@ -105,13 +107,18 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> join(final String circleId, final String student) {
 
-        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
+        //获得课堂记录信息，并更新参与的学生
+//        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
+        final Query query = Query.query(Criteria.where("circleId").is(circleId));
 
         Update update = new Update();
         update.addToSet("students", student);
+        //学生数量+1
         update.inc("participate", 1);
 
-        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
+//        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord()))
+        return mongoTemplate.findAndModify(query, update, InteractRecord.class)
+                .map(item->{MyAssert.isNull(item,DefineCode.ERR0013,"更新课堂学生信息失败");return true;});
     }
 
     /**
@@ -125,7 +132,7 @@ public class InteractRecordExecuteService {
     public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
 
         final Query query = Query.query(
-                Criteria.where("circleId").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
+                Criteria.where("id").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         Update update = new Update();
@@ -138,28 +145,47 @@ public class InteractRecordExecuteService {
 
     /**
      * 创建课堂时,进行初始化记录创建记录
-     *
+     * @param circleId 课堂ID
      * @return
      */
     public Mono<Boolean> init(final String circleId, final String teacherId) {
-
-        return repository.findByCircleIdAndTeacherId(circleId, teacherId).collectList()
+         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
+        return repository.findByIdAndTeacherId(circleId, teacherId).collectList()
                 .flatMap(list -> {
                     if (list != null && list.size() != 0) {
                         return executeSuccessfully;
                     } else {
-                        return build(circleId, teacherId).map(Objects::nonNull);
+                        //创建该课堂的互动记录
+                        return build(circleId, teacherId).map(item->{
+                            MyAssert.isNull(item, DefineCode.ERR0012,"创建互动课堂失败");
+                            return true;});
                     }
                 });
     }
 
+    public Mono<String> init1(final String teacherId) {
+        //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
+        return build(teacherId).flatMap(item->{
+                                    MyAssert.isNull(item, DefineCode.ERR0012,"创建互动课堂失败");
+                                    MyAssert.blank(item.getId(), DefineCode.ERR0012,"创建互动课堂失败");
+                                    return Mono.just(item.getId());});
+                            }
+
+
+    //创建Mongo课堂信息
     private Mono<InteractRecord> build(final String circleId, final String teacherId) {
 
         return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId, teacherId, number + 1L)));
     }
 
+    //创建Mongo课堂信息
+    private Mono<InteractRecord> build(final String teacherId) {
+
+        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(teacherId, number + 1L)));
+    }
+
     /**
-     * 获取今日上课次数
+     * 获取今日创建课堂次数
      *
      * @return
      */
@@ -173,7 +199,7 @@ public class InteractRecordExecuteService {
      * @return
      */
     private Mono<Long> questionNumber(final String circleId) {
-        return mongoTemplate.count(Query.query(Criteria.where("circleId").is(circleId).and("questions.questionsId").ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
+        return mongoTemplate.count(Query.query(Criteria.where("id").is(circleId).and("questions.questionsId").ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }
 
     /**
@@ -211,7 +237,7 @@ public class InteractRecordExecuteService {
     private Query buildLastQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
 
         final Query query = Query.query(
-                Criteria.where("circleId").is(circleId)
+                Criteria.where("id").is(circleId)
                         .and("questions.questionsId").is(questionId)
                         .and("questions.interactive").is(interactive)
                         .and("questions.category").is(category)
@@ -256,7 +282,7 @@ public class InteractRecordExecuteService {
      * @return
      */
     private Mono<UpdateResult> pushInteractQuestions(final String selectId, final String circleId, final String questionId, final Long number, final String interactive, final String category) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Query query = Query.query(Criteria.where("id").is(circleId));
         Update update = new Update();
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, interactive, category, Arrays.asList(selectId.split(",")));
         update.push("questions", records);

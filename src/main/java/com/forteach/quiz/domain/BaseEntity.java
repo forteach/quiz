@@ -25,7 +25,7 @@ public abstract class BaseEntity {
 
     @ApiModelProperty(value = "更新时间", name = "uDate", example = "1543950907881", notes = "时间戳")
     @LastModifiedDate
-    @JsonView({BigQuestionView.Summary.class})
+//    @JsonView({BigQuestionView.Summary.class})
     protected Date uDate;
 
 }

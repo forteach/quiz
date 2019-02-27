@@ -37,14 +37,6 @@ public class KeyStorage {
      */
     public static final String EXAMINEE_IS_REPLY_KEY = "askExamineeIsReply";
 
-    /**
-     * 老师创建临时课堂前缀
-     */
-    public static final String INTERACTIVE_CLASSROOM = "interactiveClassroom";
 
-    /**
-     * 查找加入课堂的学生前缀
-     */
-    public static final String INTERACTIVE_CLASSROOM_STUDENTS = "ICStudents";
 
 }

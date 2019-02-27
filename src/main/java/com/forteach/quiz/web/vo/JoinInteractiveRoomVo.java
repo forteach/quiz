@@ -1,10 +1,10 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import static com.forteach.quiz.common.KeyStorage.INTERACTIVE_CLASSROOM_STUDENTS;
 
 /**
  * @Description:
@@ -33,7 +33,14 @@ public class JoinInteractiveRoomVo {
      * @return　学生加入信息 redis key
      */
     public String getJoinKey() {
-        return INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
+        return ClassRoomKey.INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
     }
 
+    public JoinInteractiveRoomVo(String examineeId, String circleId) {
+        this.examineeId = examineeId;
+        this.circleId = circleId;
+    }
+
+    public JoinInteractiveRoomVo() {
+    }
 }
