@@ -1,6 +1,7 @@
 package com.forteach.quiz.interaction.execute.repository;
 
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
+import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +50,10 @@ public class InteractRecordRepositoryTest {
 
     @Test
     public void findByCircleIdAndQuestionsId(){
-//        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c73676306a38f000101b7b6");
+        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByCircleIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c10b2a9dc623b4024d693ae");
 //        interactRecordMono.log();
 //        interactRecordMono.log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
-//
-//        System.out.println("---->> "+interactRecordMono.hasElement());
+        System.out.println(interactRecordMono.block().getQuestions().get(0).toString());
+        System.out.println("---->> "+interactRecordMono.hasElement());
     }
 }

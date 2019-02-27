@@ -2,6 +2,7 @@ package com.forteach.quiz.config;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.exceptions.AskException;
+import com.forteach.quiz.exceptions.AssertErrorException;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ProblemSetException;
 import io.lettuce.core.RedisException;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -24,6 +26,12 @@ import reactor.core.publisher.Mono;
 public class ExceptionHandlers {
 
     public static final String NULL_POINTEREXCEPTION_EMPTY_DATA = "The mapper returned a null value.";
+
+    @ExceptionHandler(AssertErrorException.class)
+    @ResponseBody
+    public Mono<WebResult> serverExceptionHandler(AssertErrorException ex) {
+        return  Mono.just(WebResult.failResult(ex.getErrorCode(), ex.getMessage()));
+    }
 
     @ExceptionHandler(Exception.class)
     public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, Exception e) {

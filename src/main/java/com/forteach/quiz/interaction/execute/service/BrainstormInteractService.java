@@ -192,6 +192,13 @@ public class BrainstormInteractService {
         return Arrays.asList(selectId.split(",")).contains(examineeId);
     }
 
+    /**
+     * 提交的答案保存到redis 10分钟
+     * @param redisKey
+     * @param value
+     * @param askKey
+     * @return
+     */
     private Mono<Boolean> setRedis(final String redisKey, final String value, final String askKey) {
 
         Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);

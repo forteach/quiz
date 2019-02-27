@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
 import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
@@ -151,7 +153,10 @@ public class BigQuestionInteractController {
             @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
     })
-    public Mono<WebResult> findQuestionsRecord(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody @Valid RecordReq recordReq){
+    public Mono<WebResult> findQuestionsRecord(@ApiParam(value = "查询课堂提交的记录", required = true) @Valid @RequestBody RecordReq recordReq){
+        //验证请求参数
+        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
+        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
         return interactRecordExecuteService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 

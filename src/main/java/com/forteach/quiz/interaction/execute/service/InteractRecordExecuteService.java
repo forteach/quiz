@@ -5,10 +5,8 @@ import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
+import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.service.StudentsService;
-import com.forteach.quiz.util.StringUtil;
-import com.forteach.quiz.web.pojo.Students;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -60,7 +58,10 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
 
-        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+        final Query query = Query.query(Criteria.where("circleId")
+                .is(circleId).and("questions.questionsId").is(questionId)
+                .and("questions.answerRecordList.examineeId").ne(studentId))
+                .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         Update update = new Update();
 
@@ -75,6 +76,14 @@ public class InteractRecordExecuteService {
         update.push("questions.$.answerRecordList", new InteractAnswerRecord(studentId, answer, right));
 
         return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
+    }
+
+    Mono<Boolean> taskMongo(final String examineeId, final String circleId, final InteractiveSheetAnsw answ){
+//        Query query = Query.query(Criteria.where("circleId")
+
+//        .is(circleId).and("interacts."));
+
+        return Mono.just(true);
     }
 
     /**
@@ -161,9 +170,16 @@ public class InteractRecordExecuteService {
                 });
     }
 
+    /**
+     * 构建上课信息时默认见天上课次数为 1， 并进行记录
+     * @param circleId
+     * @param teacherId
+     * @return
+     */
     private Mono<InteractRecord> build(final String circleId, final String teacherId) {
-
-        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId, teacherId, number + 1L)));
+        return todayNumber(teacherId)
+                .flatMap(number ->
+                        repository.save(new InteractRecord(circleId, teacherId, number + 1L)));
     }
 
     /**
@@ -204,7 +220,9 @@ public class InteractRecordExecuteService {
      * @return
      */
     private Mono<InteractRecord> findInteractQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
-        return mongoTemplate.findOne(buildLastQuestionsRecord(circleId, questionId, category, interactive), InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord()));
+        return mongoTemplate
+                .findOne(buildLastQuestionsRecord(circleId, questionId, category, interactive), InteractRecord.class)
+                .switchIfEmpty(Mono.just(new InteractRecord()));
     }
 
     /**
@@ -266,6 +284,7 @@ public class InteractRecordExecuteService {
     private Mono<UpdateResult> pushInteractQuestions(final String selectId, final String circleId, final String questionId, final Long number, final String interactive, final String category) {
         Query query = Query.query(Criteria.where("circleId").is(circleId));
         Update update = new Update();
+        //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, interactive, category, Arrays.asList(selectId.split(",")));
         update.push("questions", records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
@@ -277,15 +296,13 @@ public class InteractRecordExecuteService {
      * @return Flux<List<InteractQuestionsRecord>>
      */
     public Mono<InteractQuestionsRecord> findQuestionsRecord(final String circleId, final String questionsId) {
-        if(StringUtil.isNotEmpty(circleId) && StringUtil.isNotEmpty(questionsId)) {
-            return repository.findRecordByCircleIdAndQuestionsId(circleId, questionsId)
-                    .filter(Objects::nonNull)
-                    .map(QuestionsDto::getQuestions)
-                    .filter(list -> list != null && list.size() > 0)
-                    .flatMapMany(Flux::fromIterable)
-                    .filter(interactQuestionsRecord -> questionsId.equals(interactQuestionsRecord.getQuestionsId()))
-                    .last();
-        }
-        return Mono.empty();
+        return repository.findRecordByCircleIdAndQuestionsId(circleId, questionsId)
+                .filter(Objects::nonNull)
+                .map(QuestionsDto::getQuestions)
+                .filter(list -> list != null && list.size() > 0)
+                .flatMapMany(Flux::fromIterable)
+                .filter(interactQuestionsRecord -> questionsId.equals(interactQuestionsRecord.getQuestionsId()))
+                .last()
+                .onErrorReturn(new InteractQuestionsRecord());
     }
 }

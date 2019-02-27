@@ -38,4 +38,12 @@ public class InteractiveRoomVo {
         return INTERACTIVE_CLASSROOM.concat(teacherId);
     }
 
+    public InteractiveRoomVo(String teacherId, String chapterId) {
+        this.teacherId = teacherId;
+        this.chapterId = chapterId;
+    }
+
+    public InteractiveRoomVo(){
+
+    }
 }

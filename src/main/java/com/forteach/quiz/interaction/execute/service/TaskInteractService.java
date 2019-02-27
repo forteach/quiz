@@ -39,14 +39,18 @@ public class TaskInteractService {
 
     private final TaskQuestionRepository questionRepository;
 
+    private final InteractRecordExecuteService interactRecordExecuteService;
+
     public TaskInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                ReactiveMongoTemplate reactiveMongoTemplate,
-                               TaskQuestionRepository questionRepository) {
+                               TaskQuestionRepository questionRepository,
+                               InteractRecordExecuteService interactRecordExecuteService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.questionRepository = questionRepository;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -109,6 +113,8 @@ public class TaskInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.TaskQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.TaskQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.TaskQuestion)))
+                //保存到记录mongodb 集合
+                .filterWhen(tack -> interactRecordExecuteService.taskMongo(tack.getExamineeId(), tack.getCircleId(), tack.getAnsw()))
                 .map(InteractiveSheetVo::getCut);
     }
 
@@ -205,6 +211,9 @@ public class TaskInteractService {
         Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);
         Mono<Boolean> time = stringRedisTemplate.expire(redisKey, Duration.ofSeconds(60 * 60 * 10));
 
-        return set.zipWith(time, (c, t) -> t ? c : -1).map(monoLong -> monoLong != -1).filterWhen(take -> reactiveHashOperations.increment(askKey, "answerFlag", 1).map(Objects::nonNull));
+        return set.zipWith(time, (c, t) -> t ? c : -1)
+                .map(monoLong -> monoLong != -1)
+                .filterWhen(take -> reactiveHashOperations.increment(askKey, "answerFlag", 1)
+                        .map(Objects::nonNull));
     }
 }

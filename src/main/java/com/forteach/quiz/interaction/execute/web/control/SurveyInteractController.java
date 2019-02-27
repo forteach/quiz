@@ -2,6 +2,7 @@ package com.forteach.quiz.interaction.execute.web.control;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.SurveyInteractService;
+import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.service.TokenService;
@@ -66,13 +67,13 @@ public class SurveyInteractController {
         return surveyService.sendAnswer(sheetVo).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
-    @PostMapping("/findQuestionsRecord")
+    @ApiOperation(value = "查询问卷记录", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
+    @PostMapping("/findSurveysRecord")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
     })
-    public Mono<WebResult> findSurveys(){
+    public Mono<WebResult> findSurveys(@RequestBody RecordReq recordReq){
 
         return Mono.just(WebResult.okResult());
     }

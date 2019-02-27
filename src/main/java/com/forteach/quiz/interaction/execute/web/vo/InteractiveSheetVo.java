@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
 
@@ -27,18 +29,21 @@ public class InteractiveSheetVo {
     /**
      * 课堂圈子id
      */
+    @NotBlank(message = "课堂id不为空")
     @ApiModelProperty(value = "课堂圈子id", name = "circleId")
     private String circleId;
 
     /**
      * 切换提问类型过期标识
      */
+    @NotBlank(message = "接收的该题cut不为空")
     @ApiModelProperty(value = "切换提问类型过期标识  接收的该题cut", name = "cut")
     private String cut;
 
     /**
      * 答案列表
      */
+    @NotBlank(message = "答案列表不为空")
     @ApiModelProperty(value = "答案列表", name = "answ")
     private InteractiveSheetAnsw answ;
 

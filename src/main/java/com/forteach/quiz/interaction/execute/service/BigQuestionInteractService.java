@@ -377,9 +377,10 @@ public class BigQuestionInteractService {
                         set -> sendValue(sheetVo))
                 .filterWhen(
                         right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
-                .map(InteractiveSheetVo::getCut);
-    }
+                .map(InteractiveSheetVo::getCut)
 //                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
+                ;
+    }
 
     /**
      * 直接累积答案 不用给分

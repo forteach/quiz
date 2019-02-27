@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.ClassRoomService;
 import com.forteach.quiz.service.TokenService;
@@ -8,7 +10,6 @@ import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import io.swagger.annotations.*;
-import jdk.nashorn.internal.parser.Token;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,12 +42,16 @@ public class ClassRoomController extends BaseController {
     @ApiOperation(value = "老师创建临时课堂", notes = "有效期为2个小时 此方法两个小时内返回同一数据")
     @PostMapping(value = "/create/reuse")
     @ApiImplicitParams({
-//            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> createInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+        //验证请求参数
+        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
+        MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
         Optional<String> teacherId = tokenService.getTeacherId(request);
         teacherId.ifPresent(roomVo::setTeacherId);
+        //流式调用
         return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
     }
 

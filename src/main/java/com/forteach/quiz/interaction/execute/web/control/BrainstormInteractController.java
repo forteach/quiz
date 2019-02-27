@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -61,7 +63,7 @@ public class BrainstormInteractController {
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
             @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
     })
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest request) {
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @Valid @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest request) {
         sheetVo.setExamineeId(tokenService.getStudentId(request));
         return interactService.sendAnswer(sheetVo).map(WebResult::okResult);
     }
