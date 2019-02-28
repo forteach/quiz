@@ -58,4 +58,6 @@ public class ActivityAskAnswer extends BaseEntity {
     private List<InteractiveSheetAnsw> answList;
 
 
+    public ActivityAskAnswer() {
+    }
 }

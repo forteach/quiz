@@ -1,6 +1,9 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
+import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.service.SurveyInteractService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
@@ -30,9 +33,13 @@ public class SurveyInteractController {
 
     private final TokenService tokenService;
 
-    public SurveyInteractController(SurveyInteractService surveyService, TokenService tokenService) {
+    private final InteractRecordExecuteService interactRecordExecuteService;
+
+    public SurveyInteractController(SurveyInteractService surveyService, TokenService tokenService,
+                                    InteractRecordExecuteService interactRecordExecuteService) {
         this.surveyService = surveyService;
         this.tokenService = tokenService;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -67,14 +74,16 @@ public class SurveyInteractController {
         return surveyService.sendAnswer(sheetVo).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "查询问卷记录", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
+    @ApiOperation(value = "查询问卷互动记录", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
     @PostMapping("/findSurveysRecord")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
     })
     public Mono<WebResult> findSurveys(@RequestBody RecordReq recordReq){
-
-        return Mono.just(WebResult.okResult());
+        //验证请求参数
+        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
+        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
+        return interactRecordExecuteService.findSurveyRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 }

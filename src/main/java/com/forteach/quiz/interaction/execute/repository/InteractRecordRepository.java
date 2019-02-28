@@ -1,8 +1,10 @@
 package com.forteach.quiz.interaction.execute.repository;
 
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
+import com.forteach.quiz.interaction.execute.dto.BrainstormDto;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import com.forteach.quiz.interaction.execute.dto.SurveysDto;
+import com.forteach.quiz.interaction.execute.dto.TaskInteractDto;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +73,26 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @return
      */
     @Transactional(readOnly = true)
-    @Query(value = "{'circleId': ?0, 'questions.questionsId' : ?1 }", fields = "{ '_id' : 0, 'surveys' : 1}")
-    Mono<SurveysDto> findRecordCircleIdAndQuestionsId(final String circleId, final String questionsId);
+    @Query(value = "{'circleId': ?0, 'surveys.questionsId' : ?1 }", fields = "{ '_id' : 0, 'surveys' : 1}")
+    Mono<SurveysDto> findRecordSurveysByCircleIdAndQuestionsId(final String circleId, final String questionsId);
+
+    /**
+     * 查询任务记录
+     * @param circleId
+     * @param questionsId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    @Query(value = "{'circleId': ?0, 'interacts.questionsId' : ?1 }", fields = "{ '_id' : 0, 'interacts' : 1}")
+    Mono<TaskInteractDto> findRecordTaskByCircleIdAndQuestionsId(final String circleId, final String questionsId);
+
+    /**
+     * 查询头脑风暴记录
+     * @param circleId
+     * @param questionsId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    @Query(value = "{'circleId' : ?0, 'brainstorms.questionsId' : ?1 }", fields = "{'_id' : 0, 'brainstorms' : 1}")
+    Mono<BrainstormDto> findBrainstormsByCircleIdAndQuestionsId(final String circleId, final String questionsId);
 }

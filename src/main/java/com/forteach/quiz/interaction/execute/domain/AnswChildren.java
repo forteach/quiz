@@ -36,4 +36,7 @@ public class AnswChildren {
      */
     @ApiModelProperty(value = "大题下子项id", name = "questionId")
     private String evaluation;
+
+    public AnswChildren() {
+    }
 }

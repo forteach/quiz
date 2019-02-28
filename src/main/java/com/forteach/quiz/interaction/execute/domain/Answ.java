@@ -32,4 +32,6 @@ public class Answ {
     @ApiModelProperty(value = "答案集", name = "answList")
     private Double score;
 
+    public Answ() {
+    }
 }

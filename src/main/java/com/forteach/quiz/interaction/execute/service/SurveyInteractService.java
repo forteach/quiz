@@ -39,15 +39,19 @@ public class SurveyInteractService {
 
     private final SurveyQuestionRepository questionRepository;
 
+    private final InteractRecordExecuteService interactRecordExecuteService;
+
     public SurveyInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                  ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                  ReactiveMongoTemplate reactiveMongoTemplate,
-                                 SurveyQuestionRepository questionRepository) {
+                                 SurveyQuestionRepository questionRepository,
+                                 InteractRecordExecuteService interactRecordExecuteService) {
 
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.questionRepository = questionRepository;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -71,8 +75,8 @@ public class SurveyInteractService {
         Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.SurveyQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
-        return Flux.concat(set, time, clearCut).filter(flag -> !flag).count();
-//                .filterWhen(obj -> interactRecordExecuteService.releaseQuestion(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), giveVo.getInteractive()));
+        return Flux.concat(set, time, clearCut).filter(flag -> !flag).count()
+                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "surveys"));
 
     }
 
@@ -105,6 +109,7 @@ public class SurveyInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.SurveyQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.SurveyQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.SurveyQuestion)))
+                .filterWhen(interactRecordExecuteService::surveyMongo)
                 .map(InteractiveSheetVo::getCut);
     }
 
@@ -212,7 +217,4 @@ public class SurveyInteractService {
             }
         });
     }
-
-//    public Mono<>
-
 }

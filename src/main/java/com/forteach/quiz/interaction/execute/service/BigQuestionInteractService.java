@@ -370,16 +370,11 @@ public class BigQuestionInteractService {
     public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
                 .transform(this::filterSheetSelectVerify)
-                .filterWhen(shee ->
-                        sendAnswerVerifyMore(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnsw().getQuestionId(), shee.getCut())
-                )
-                .filterWhen(
-                        set -> sendValue(sheetVo))
-                .filterWhen(
-                        right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
-                .map(InteractiveSheetVo::getCut)
+                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnsw().getQuestionId(), shee.getCut()))
+                .filterWhen(set -> sendValue(sheetVo))
+                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
+                .map(InteractiveSheetVo::getCut);
 //                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
-                ;
     }
 
     /**
@@ -426,10 +421,5 @@ public class BigQuestionInteractService {
             }
         });
     }
-
-//    public void findStudent(final String circleId){
-//        Flux<List<InteractQuestionsRecord>> listFlux = interactRecordExecuteService.selectRecord(circleId);
-//        listFlux.transform(l)
-//    }
 
 }

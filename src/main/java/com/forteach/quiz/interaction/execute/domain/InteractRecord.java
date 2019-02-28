@@ -79,4 +79,9 @@ public class InteractRecord extends BaseEntity {
         this.time = new Date();
         this.number = number.intValue();
     }
+    public InteractRecord( String teacherId, Long number) {
+        this.teacherId = teacherId;
+        this.time = new Date();
+        this.number = number.intValue();
+    }
 }

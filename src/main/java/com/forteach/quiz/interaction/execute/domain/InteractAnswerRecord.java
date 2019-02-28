@@ -42,4 +42,10 @@ public class InteractAnswerRecord {
         this.right = right;
         this.time = new Date();
     }
+
+    public InteractAnswerRecord(String examineeId, String answer) {
+        this.examineeId = examineeId;
+        this.answer = answer;
+        this.time = new Date();
+    }
 }

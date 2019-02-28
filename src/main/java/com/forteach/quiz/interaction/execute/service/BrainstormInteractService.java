@@ -8,6 +8,7 @@ import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.SurveyQuestionRepository;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -41,14 +42,18 @@ public class BrainstormInteractService {
 
     private final SurveyQuestionRepository questionRepository;
 
+    private final InteractRecordExecuteService interactRecordExecuteService;
+
     public BrainstormInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                      ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                      ReactiveMongoTemplate reactiveMongoTemplate,
-                                     SurveyQuestionRepository questionRepository) {
+                                     SurveyQuestionRepository questionRepository,
+                                     InteractRecordExecuteService interactRecordExecuteService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.questionRepository = questionRepository;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -74,8 +79,8 @@ public class BrainstormInteractService {
         Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.BrainstormQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
-        return Flux.concat(set, time, clearCut).filter(flag -> !flag).count();
-//                .filterWhen(obj -> interactRecordExecuteService.releaseQuestion(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), giveVo.getInteractive()));
+        return Flux.concat(set, time, clearCut).filter(flag -> !flag).count()
+                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "brainstorms"));
 
     }
 
@@ -112,6 +117,7 @@ public class BrainstormInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
+                .filterWhen(interactRecordExecuteService::brainstormMongo)
                 .map(InteractiveSheetVo::getCut);
     }
 
