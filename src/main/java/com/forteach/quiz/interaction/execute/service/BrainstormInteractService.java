@@ -117,7 +117,7 @@ public class BrainstormInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
-                .filterWhen(interactRecordExecuteService::brainstormMongo)
+                .filterWhen(brainstorm -> interactRecordExecuteService.pushMongo(brainstorm, "brainstorms"))
                 .map(InteractiveSheetVo::getCut);
     }
 

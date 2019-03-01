@@ -109,7 +109,7 @@ public class SurveyInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.SurveyQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.SurveyQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.SurveyQuestion)))
-                .filterWhen(interactRecordExecuteService::surveyMongo)
+                .filterWhen(survey -> interactRecordExecuteService.pushMongo(survey, "surveys"))
                 .map(InteractiveSheetVo::getCut);
     }
 

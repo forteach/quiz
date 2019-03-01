@@ -68,7 +68,7 @@ public class BrainstormInteractController {
 //            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
-            @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
+            @ApiImplicitParam(value = "答案列表", name = "answ", dataType = "json", required = true, paramType = "from")
     })
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @Valid @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest request) {
         sheetVo.setExamineeId(tokenService.getStudentId(request));

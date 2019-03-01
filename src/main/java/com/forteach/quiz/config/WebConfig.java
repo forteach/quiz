@@ -1,15 +1,16 @@
 package com.forteach.quiz.config;
 
+import com.forteach.quiz.config.decorator.PayloadServerWebExchangeDecorator;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.CacheControl;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
-import org.springframework.web.reactive.resource.VersionResourceResolver;
-
-import java.util.concurrent.TimeUnit;
+import org.springframework.web.server.WebFilter;
 
 /**
  * @Description:
@@ -69,5 +70,15 @@ public class WebConfig implements WebFluxConfigurer {
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
         configurer.defaultCodecs().enableLoggingRequestDetails(true);
+    }
+
+    /**
+     * 对请求的参数进行输出显示过滤
+     * @return
+     */
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE) //过滤器顺序
+    public WebFilter webFilter() {
+        return (exchange, chain) -> chain.filter(new PayloadServerWebExchangeDecorator(exchange));
     }
 }

@@ -47,14 +47,14 @@ public class TaskInteractRecord implements Serializable {
     /**
      * 问题id
      */
-    private String[] questionsId;
+    private String questionsId;
 
     /**
      * 回答的情况
      */
     private List<InteractAnswerRecord> answerRecordList;
 
-    public TaskInteractRecord(String[] questionsId, Long index, String category, List<String> selectId) {
+    public TaskInteractRecord(String questionsId, Long index, String category, List<String> selectId) {
         this.questionsId = questionsId;
         this.index = index.intValue();
         this.category = category;

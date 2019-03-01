@@ -97,12 +97,6 @@
         <appender-ref ref="err"/>
     </logger>
 
-    <!--<logger name="com.yule.fishter.task" additivity="false" level="debug">-->
-    <!--<appender-ref ref="monitor"/>-->
-    <!--<appender-ref ref="console"/>-->
-    <!--</logger>-->
-
-
     <logger name="com.forteach.quiz" additivity="false" level="debug">
         <appender-ref ref="biz"/>
         <appender-ref ref="console"/>

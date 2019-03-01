@@ -62,6 +62,7 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, ServerHttpRequest request) {
+        MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010, "课堂圈子id不能为空");
         joinVo.setExamineeId(tokenService.getStudentId(request));
         return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
     }
@@ -84,6 +85,7 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "query", required = true)
     })
     public Mono<WebResult> findInteractiveStudents(@ApiParam(value = "查找加入课堂的学生", required = true) @RequestBody InteractiveStudentsReq interactiveReq) {
+        MyAssert.blank(interactiveReq.getCircleId(), DefineCode.ERR0010, "课堂圈子id不能为空");
         return classRoomService.findInteractiveStudents(interactiveReq.getCircleId()).map(WebResult::okResult);
     }
 

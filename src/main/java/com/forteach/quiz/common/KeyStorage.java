@@ -14,7 +14,7 @@ public class KeyStorage {
     public static final String CLASSROOM_ASK_QUESTIONS_ID = "classAsk";
 
     /**
-     *
+     * 不同的课堂加入前缀
      */
     public static final String CLASSROOM_ASK_QUESTIONS_DISTINCT = "distinctAsk";
 

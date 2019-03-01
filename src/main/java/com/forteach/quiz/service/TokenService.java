@@ -1,5 +1,6 @@
 package com.forteach.quiz.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -13,9 +14,13 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
 import javax.annotation.Resource;
+import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.forteach.quiz.common.Dic.TOKEN_TEACHER;
 import static com.forteach.quiz.common.Dic.USER_PREFIX;
@@ -80,7 +85,7 @@ public class TokenService {
      * @return
      */
     public Mono<Boolean> check(ServerRequest request){
-        String token = request.exchange().getRequest().getHeaders().getFirst("token");
+        String token = getToken(request);
         if (StringUtil.isEmpty(token)){
             log.error("token is null");
             return Mono.error(new TokenExpiredException("缺少token"));
@@ -93,5 +98,30 @@ public class TokenService {
             return Mono.error(new TokenExpiredException("401"));
         }
         return Mono.just(true);
+    }
+
+    /**
+     * 获取token
+     * @param request
+     * @return
+     */
+    private String getToken(ServerRequest request){
+        AtomicReference<String> token = new AtomicReference<>(request.exchange().getRequest().getHeaders().getFirst("token"));
+        if (StringUtil.isEmpty(token.get())){
+            Mono.zip(request.bodyToMono(String.class),
+                    Mono.just(request.remoteAddress()
+                            .map(InetSocketAddress::getHostString)
+                            .orElseThrow(RuntimeException::new)))
+                    .flatMap(tuple -> {
+                        String bodyData = tuple.getT1();
+                        String remoteIp = tuple.getT2();
+                        JSONObject jsonObject = JSONObject.parseObject(bodyData);
+                        token.set(String.valueOf(jsonObject.get("token")));
+                        log.info("BodyData =>" + bodyData);
+                        log.info("RemoteIp =>" + remoteIp);
+                        return ServerResponse.ok().body(Mono.just(bodyData + "\n" + remoteIp), String.class);
+                    });
+        }
+        return token.get();
     }
 }

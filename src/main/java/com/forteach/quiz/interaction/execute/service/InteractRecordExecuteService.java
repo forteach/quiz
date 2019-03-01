@@ -1,7 +1,5 @@
 package com.forteach.quiz.interaction.execute.service;
 
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.*;
 import com.forteach.quiz.interaction.execute.dto.BrainstormDto;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
@@ -50,6 +48,7 @@ public class InteractRecordExecuteService {
         this.studentsService = studentsService;
     }
 
+    /*------------------------------对回答的记录进行保存--------------------------------*/
     /**
      * 学生回答问题时 加入记录
      *
@@ -82,52 +81,17 @@ public class InteractRecordExecuteService {
         return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
     }
 
-    /**
-     * 保存头脑风暴记录
-     * @param sheetVo
-     * @return
-     */
-    Mono<Boolean> brainstormMongo(InteractiveSheetVo sheetVo){
+    Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
         final Query query = Query.query(Criteria.where("circleId").is(sheetVo.getCircleId())
-                .and("brainstorms.questionsId").is(sheetVo.getAnsw().getQuestionId())
-                .and("brainstorms.answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
+                .and(interactRecordType + ".questionsId").is(sheetVo.getAnsw().getQuestionId())
+                .and(interactRecordType + ".answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
         Update update = new Update();
-        update.push("brainstorms.$.answerRecordList",  new InteractAnswerRecord(sheetVo.getExamineeId(), sheetVo.getAnsw().getAnswer()));
+        update.push(interactRecordType + ".$.answerRecordList", new InteractAnswerRecord(sheetVo.getExamineeId(), sheetVo.getAnsw().getAnswer()));
         return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::isNull);
     }
 
-    /**
-     * @param sheetVo
-     * @return
-     */
-    Mono<Boolean> surveyMongo(final InteractiveSheetVo sheetVo){
-        final Query query = Query.query(Criteria.where("circleId").is(sheetVo.getCircleId())
-                .and("surveys.questionsId").is(sheetVo.getAnsw().getQuestionId())
-                .and("surveys.answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
-                .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
-        Update update = new Update();
-        update.push("surveys.$.answerRecordList", new InteractAnswerRecord(sheetVo.getExamineeId(), sheetVo.getAnsw().getAnswer()));
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::isNull);
-    }
-
-    /**
-     * 保存任务记录信息
-     * @param examineeId
-     * @param circleId
-     * @param answ
-     * @return
-     */
-    Mono<Boolean> taskMongo(final String examineeId, final String circleId, final InteractiveSheetAnsw answ){
-        final Query query = Query.query(Criteria.where("circleId").is(circleId)
-                .and("interacts.questionsId").is(answ.getQuestionId())
-                .and("interacts.answerRecordList.examineeId").ne(examineeId))
-                .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
-        Update update = new Update();
-        update.push("interacts.$.answerRecordList", new InteractAnswerRecord(examineeId, answ.getAnswer()));
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::isNull);
-    }
-
+    /*------------------------发布问题时加入记录，有就用原来，没有经新建一条记录进行保存-------------------------------*/
     /**
      * 发布问题时 加入记录
      * @param circleId
@@ -160,11 +124,10 @@ public class InteractRecordExecuteService {
 
         return Mono.zip(number, recordMono).flatMap(tuple2 -> {
 
-            if (
-                    tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0
-                            || tuple2.getT2().getSurveys() != null && tuple2.getT2().getSurveys().size() > 0
-                            || tuple2.getT2().getBrainstorms() != null && tuple2.getT2().getBrainstorms().size() > 0
-                            || tuple2.getT2().getInteracts() != null && tuple2.getT2().getInteracts().size() > 0) {
+            if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0
+                    || tuple2.getT2().getSurveys() != null && tuple2.getT2().getSurveys().size() > 0
+                    || tuple2.getT2().getBrainstorms() != null && tuple2.getT2().getBrainstorms().size() > 0
+                    || tuple2.getT2().getInteracts() != null && tuple2.getT2().getInteracts().size() > 0) {
                 return upInteractInteractRecord(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactRecordType);
             } else if ("surveys".equals(interactRecordType)) {
                 return pushInteractSurveys(selectId, circleId, questionId, tuple2.getT1(), category);
@@ -177,7 +140,7 @@ public class InteractRecordExecuteService {
             }
         }).map(Objects::nonNull);
     }
-
+    /*-----------------------------------------------------------*/
     /**
      * 学生加入互动课堂时存入记录
      *
@@ -296,6 +259,7 @@ public class InteractRecordExecuteService {
                 .switchIfEmpty(Mono.just(new InteractRecord()));
     }
 
+    /*---------------------------构建回答的记录对像--------------------------------*/
     /**
      * 获取新的发布问题(指定问题id)
      *
@@ -414,7 +378,7 @@ public class InteractRecordExecuteService {
         Query query = Query.query(Criteria.where("circleId").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
-        TaskInteractRecord records = new TaskInteractRecord(questionId.split(","), number + 1, category, Arrays.asList(selectId.split(",")));
+        TaskInteractRecord records = new TaskInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));
         update.push("interacts", records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
@@ -448,11 +412,8 @@ public class InteractRecordExecuteService {
                 .filter(list -> list != null && list.size() > 0)
                 .flatMapMany(Flux::fromIterable)
                 .filter(surveyInteractRecord -> questionsId.equals(surveyInteractRecord.getQuestionsId()))
-                .next()
-                .map(item -> {
-                    MyAssert.isNull(item, DefineCode.ERR0013,"没有找到对应的记录");
-                    return new SurveyInteractRecord();
-                });
+                .last()
+                .onErrorReturn(new SurveyInteractRecord());
     }
 
     /**
@@ -468,11 +429,8 @@ public class InteractRecordExecuteService {
                 .filter(list -> list != null && list.size() > 0)
                 .flatMapMany(Flux::fromIterable)
                 .filter(taskInteractRecord -> questionsId.equals(taskInteractRecord.getQuestionsId()))
-                .next()
-                .map(item -> {
-                    MyAssert.isNull(item, DefineCode.ERR0013,"没有找到对应的记录");
-                    return new TaskInteractRecord();
-                });
+                .last()
+                .onErrorReturn(new TaskInteractRecord());
     }
 
     /**
@@ -488,10 +446,7 @@ public class InteractRecordExecuteService {
                 .filter(list -> list != null && list.size() > 0)
                 .flatMapMany(Flux::fromIterable)
                 .filter(brainstormInteractRecord -> questionsId.equals(brainstormInteractRecord.getQuestionsId()))
-                .next()
-                .map(item -> {
-                    MyAssert.isNull(item, DefineCode.ERR0013,"没有找到对应的记录");
-                    return new BrainstormInteractRecord();
-                });
+                .last()
+                .onErrorReturn(new BrainstormInteractRecord());
     }
 }
