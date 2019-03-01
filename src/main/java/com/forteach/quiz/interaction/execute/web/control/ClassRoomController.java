@@ -36,6 +36,7 @@ public class ClassRoomController extends BaseController {
     @PostMapping(value = "/create/reuse")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(value = "(可以为“”，不能不传)已存在临时课堂ID", name = "circleId", required = false, dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> createInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
@@ -89,7 +90,8 @@ public class ClassRoomController extends BaseController {
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")
     @PostMapping(value = "/find/interactiveStudents")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "query", required = true)
+            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "query", required = true),
+            @ApiImplicitParam(value = "教师id", name = "teacherId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> findInteractiveStudents(@ApiParam(value = "查找加入课堂的学生", required = true) @RequestBody InteractiveStudentsReq interactiveReq) {
         return classRoomService.findInteractiveStudents(interactiveReq.getCircleId(),interactiveReq.getTeacherId()).map(WebResult::okResult);
