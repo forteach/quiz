@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.base.GiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
@@ -7,8 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
 
 /**
  * @Description:
@@ -38,18 +37,22 @@ public class BigQuestionGiveVo extends GiveVo {
     @ApiModelProperty(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "interactive", notes = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票")
     private String interactive;
 
+    /**
+     * 返回那个课堂的问题KEY
+     * @return
+     */
     public String getRaceAnswerFlag() {
-        return CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
     }
 
 
     /**
-     * 根据课堂 获取题目id
+     * 课堂的题目类型KEY
      *
      * @return
      */
     public String getAskQuestionsId(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
 }

@@ -2,6 +2,7 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
@@ -23,12 +24,10 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
-
 import static com.forteach.quiz.common.Dic.*;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
+
 
 /**
  * @Description: 题库 考题 互动交互
@@ -60,29 +59,6 @@ public class BigQuestionInteractService {
     }
 
     /**
-     * 课堂发布练习册提问
-     *
-     * @param giveVo
-     * @return
-     */
-    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
-
-        HashMap<String, String> map = new HashMap<>(10);
-        map.put("questionId", giveVo.getQuestionId());
-        map.put("category", giveVo.getCategory());
-        map.put("selected", giveVo.getSelected());
-        map.put("cut", giveVo.getCut());
-
-
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
-
-        //TODO 未记录
-        return Flux.concat(set, time).filter(flag -> !flag).count();
-
-    }
-
-    /**
      * 课堂提问发题
      *
      * @param giveVo
@@ -92,10 +68,10 @@ public class BigQuestionInteractService {
 
         HashMap<String, String> map = new HashMap<>(10);
         map.put("questionId", giveVo.getQuestionId());
-        map.put("interactive", giveVo.getInteractive());
-        map.put("category", giveVo.getCategory());
-        map.put("selected", giveVo.getSelected());
-        map.put("cut", giveVo.getCut());
+        map.put("interactive", giveVo.getInteractive());  //互动方式（举手、抢答等）
+        map.put("category", giveVo.getCategory());//选取类别（个人、小组）
+        map.put("selected", giveVo.getSelected());//选中人员 [逗号 分割]
+        map.put("cut", giveVo.getCut());//是否切题
 
         //如果本题和redis里的题目id不一致 视为换题 进行清理
         Mono<Boolean> clearCut = clearCut(giveVo);
@@ -230,6 +206,31 @@ public class BigQuestionInteractService {
                 });
     }
 
+
+    /**
+     * 课堂发布练习册提问
+     *
+     * @param giveVo
+     * @return
+     */
+    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
+
+        HashMap<String, String> map = new HashMap<>(10);
+        map.put("questionId", giveVo.getQuestionId());
+        map.put("category", giveVo.getCategory());
+        map.put("selected", giveVo.getSelected());
+        map.put("cut", giveVo.getCut());
+
+
+        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), map);
+        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+
+        //TODO 未记录
+        return Flux.concat(set, time).filter(flag -> !flag).count();
+
+    }
+
+
     /**
      * 验证练习册发放选中
      *
@@ -325,7 +326,7 @@ public class BigQuestionInteractService {
      * @return
      */
     private String askQuestionsId(final QuestionType type, final String circleId) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
 

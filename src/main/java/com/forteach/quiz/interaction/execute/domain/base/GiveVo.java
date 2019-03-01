@@ -1,10 +1,9 @@
 package com.forteach.quiz.interaction.execute.domain.base;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
 
 /**
  * @Description:
@@ -37,7 +36,7 @@ public class GiveVo {
     protected String selected;
 
     /**
-     * 切换
+     * 是否切题
      * 当老师重复提问问题时  但是两次的提问类型不一样  如第一次抢答 第二次提问
      * 需要传送切换标识
      * 0 : 原题目   非0 : 切题
@@ -54,6 +53,6 @@ public class GiveVo {
      * @return 拼接后的前缀
      */
     public String getExamineeIsReplyKey(QuestionType type) {
-        return EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
+        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
     }
 }

@@ -33,6 +33,25 @@ public class BigQuestionInteractController {
         this.interactService = interactService;
     }
 
+
+    /**
+     * 课堂老师发布问题
+     *
+     * @param giveVo
+     * @return
+     */
+    @ApiOperation(value = "发布问题", notes = "通过课堂id 及提问方式 进行发布问题")
+    @PostMapping("/send/question")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "问题id", name = "questionId"),
+            @ApiImplicitParam(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
+                    name = "interactive", allowableValues = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
+                    required = true, dataType = "string", paramType = "from")
+    })
+    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo) {
+        return interactService.sendQuestion(giveVo).map(WebResult::okResult);
+    }
+
     /**
      * 课堂提问
      * 重新发起举手
@@ -81,23 +100,6 @@ public class BigQuestionInteractController {
         return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
     }
 
-    /**
-     * 发布问题
-     *
-     * @param giveVo
-     * @return
-     */
-    @ApiOperation(value = "发布问题", notes = "通过课堂id 及提问方式 进行发布问题")
-    @PostMapping("/send/question")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "问题id", name = "questionId"),
-            @ApiImplicitParam(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
-                    name = "interactive", allowableValues = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
-                    required = true, dataType = "string", paramType = "from")
-    })
-    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo) {
-        return interactService.sendQuestion(giveVo).map(WebResult::okResult);
-    }
 
     /**
      * 发布本节课 练习册
