@@ -1,6 +1,7 @@
 package com.forteach.quiz.questionlibrary.service.base;
 
 import com.alibaba.fastjson.JSON;
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
@@ -77,7 +78,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
      */
     @Override
     public Mono<T> editQuestions(final T bigQuestion) {
-        bigQuestion.setUDate(new Date());
+        bigQuestion.setUDate(DataUtil.format(new Date()));
         if (bigQuestion.getRelate() == COVER_QUESTION_BANK) {
             return editQuestionsCover(bigQuestion);
         }

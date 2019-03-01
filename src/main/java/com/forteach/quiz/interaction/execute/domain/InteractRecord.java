@@ -1,6 +1,8 @@
 package com.forteach.quiz.interaction.execute.domain;
 
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.domain.BaseEntity;
+import javafx.scene.input.DataFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
@@ -64,7 +66,7 @@ public class InteractRecord extends BaseEntity {
     /**
      * 创建课堂时间
      */
-    private Date time;
+    private String ceateTime;
 
     public InteractRecord() {
     }
@@ -72,13 +74,15 @@ public class InteractRecord extends BaseEntity {
     public InteractRecord(String circleId, String teacherId, Long number) {
         this.teacherId = teacherId;
         this.id = circleId;
-        this.time = new Date();
+        this.ceateTime = DataUtil.format(new Date());
+        this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();
     }
 
     public InteractRecord( String teacherId, Long number) {
         this.teacherId = teacherId;
-        this.time = new Date();
+        this.ceateTime = DataUtil.format(new Date());
+        this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();
     }
 }

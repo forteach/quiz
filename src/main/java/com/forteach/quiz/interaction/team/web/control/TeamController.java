@@ -50,7 +50,4 @@ public class TeamController {
         return teamService.teamChange(changeVo).map(WebResult::okResult);
     }
 
-
-
-
 }

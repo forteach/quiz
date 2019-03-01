@@ -73,7 +73,7 @@ public class TeamService {
                 .filterWhen(randomVo -> allotVerify(classRoomService.studentNumber(randomVo.getCircleId()), randomVo.getNumber()))
                 .flatMap(randomVo -> {
 
-                    Mono<List<Students>> list = classRoomService.findInteractiveStudents(randomVo.getCircleId()).transform(this::shuffle);
+                    Mono<List<Students>> list = classRoomService.findInteractiveStudents(randomVo.getCircleId(),"").transform(this::shuffle);
 
                     return list.map(students -> {
                         //总数 , 组数 , 每组个数 , 余数 ,余数累加值

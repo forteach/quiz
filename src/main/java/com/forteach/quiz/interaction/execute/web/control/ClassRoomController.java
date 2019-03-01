@@ -43,7 +43,7 @@ public class ClassRoomController extends BaseController {
         MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
         //流式调用
-        return classRoomService.createInteractiveRoom1(roomVo).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
@@ -71,8 +71,20 @@ public class ClassRoomController extends BaseController {
         MyAssert.blank(joinVo.getExamineeId(), DefineCode.ERR0010 ,"学生编号不存在");
         return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
     }
+    @PostMapping(value = "/test")
+    public Mono<String> test(@RequestBody InteractiveRoomVo roomVo) {
+        //验证请求参数
+         Mono.just("ok")
+                //如果KEY存在
+                .filterWhen(str->Mono.just(true))
+                //不创建key
+                .flatMap(str->{
+                    return Mono.just("123").filterWhen(r->Mono.just(true));
+                })
+                 .subscribe(System.out::println);
 
-
+        return Mono.just("ok");
+    }
 
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")
     @PostMapping(value = "/find/interactiveStudents")
@@ -80,7 +92,7 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "query", required = true)
     })
     public Mono<WebResult> findInteractiveStudents(@ApiParam(value = "查找加入课堂的学生", required = true) @RequestBody InteractiveStudentsReq interactiveReq) {
-        return classRoomService.findInteractiveStudents(interactiveReq.getCircleId()).map(WebResult::okResult);
+        return classRoomService.findInteractiveStudents(interactiveReq.getCircleId(),interactiveReq.getTeacherId()).map(WebResult::okResult);
     }
 
 

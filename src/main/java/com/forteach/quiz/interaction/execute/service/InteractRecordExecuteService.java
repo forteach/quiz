@@ -109,7 +109,7 @@ public class InteractRecordExecuteService {
 
         //获得课堂记录信息，并更新参与的学生
 //        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
-        final Query query = Query.query(Criteria.where("circleId").is(circleId));
+        final Query query = Query.query(Criteria.where("id").is(circleId));
 
         Update update = new Update();
         update.addToSet("students", student);
@@ -143,27 +143,27 @@ public class InteractRecordExecuteService {
     }
 
 
-    /**
-     * 创建课堂时,进行初始化记录创建记录
-     * @param circleId 课堂ID
-     * @return
-     */
-    public Mono<Boolean> init(final String circleId, final String teacherId) {
-         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
-        return repository.findByIdAndTeacherId(circleId, teacherId).collectList()
-                .flatMap(list -> {
-                    if (list != null && list.size() != 0) {
-                        return executeSuccessfully;
-                    } else {
-                        //创建该课堂的互动记录
-                        return build(circleId, teacherId).map(item->{
-                            MyAssert.isNull(item, DefineCode.ERR0012,"创建互动课堂失败");
-                            return true;});
-                    }
-                });
-    }
+//    /**
+//     * 创建课堂时,进行初始化记录创建记录
+//     * @param circleId 课堂ID
+//     * @return
+//     */
+//    public Mono<Boolean> init(final String circleId, final String teacherId) {
+//         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
+//        return repository.findByIdAndTeacherId(circleId, teacherId).collectList()
+//                .flatMap(list -> {
+//                    if (list != null && list.size() != 0) {
+//                        return executeSuccessfully;
+//                    } else {
+//                        //创建该课堂的互动记录
+//                        return build(circleId, teacherId).map(item->{
+//                            MyAssert.isNull(item, DefineCode.ERR0012,"创建互动课堂失败");
+//                            return true;});
+//                    }
+//                });
+//    }
 
-    public Mono<String> init1(final String teacherId) {
+    public Mono<String> init(final String teacherId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
         return build(teacherId).flatMap(item->{
                                     MyAssert.isNull(item, DefineCode.ERR0012,"创建互动课堂失败");
@@ -174,13 +174,11 @@ public class InteractRecordExecuteService {
 
     //创建Mongo课堂信息
     private Mono<InteractRecord> build(final String circleId, final String teacherId) {
-
         return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId, teacherId, number + 1L)));
     }
 
     //创建Mongo课堂信息
     private Mono<InteractRecord> build(final String teacherId) {
-
         return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(teacherId, number + 1L)));
     }
 

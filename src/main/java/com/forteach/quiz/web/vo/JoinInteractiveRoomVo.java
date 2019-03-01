@@ -1,6 +1,8 @@
 package com.forteach.quiz.web.vo;
 
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
+import com.forteach.quiz.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,13 +30,13 @@ public class JoinInteractiveRoomVo {
     @ApiModelProperty(value = "课堂圈子id", name = "circleId")
     private String circleId;
 
-    /**
-     * 学生加入课堂前缀
-     * @return　学生加入信息 redis key
-     */
-    public String getJoinKey() {
-        return ClassRoomKey.INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
-    }
+//    /**
+//     * 学生加入课堂前缀
+//     * @return　学生加入信息 redis key
+//     */
+//    public String getJoinKey() {
+//        return StrUtil.isBlank(circleId)?"":ClassRoomKey.INTERACTIVE_CLASSROOM_STUDENTS.concat(circleId);
+//    }
 
     public JoinInteractiveRoomVo(String examineeId, String circleId) {
         this.examineeId = examineeId;

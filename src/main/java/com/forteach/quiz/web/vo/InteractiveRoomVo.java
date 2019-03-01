@@ -1,5 +1,6 @@
 package com.forteach.quiz.web.vo;
 
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,6 +15,10 @@ import lombok.Data;
 @ApiModel(value = "创建临时课堂", description = "创建临时课堂")
 public class InteractiveRoomVo {
 
+    /**
+     * 返回的课堂id
+     */
+    private String circleId;
 
     /**
      * 教师id
@@ -34,6 +39,16 @@ public class InteractiveRoomVo {
      */
     public String getRoomKey() {
         return ClassRoomKey.INTERACTIVE_CLASSROOM.concat(teacherId);
+    }
+
+    public String getQrCode() {
+        return   StrUtil.isBlank(circleId)?"":ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(circleId);
+    }
+
+    public InteractiveRoomVo(String circleId, String teacherId, String chapterId) {
+        this.circleId = circleId;
+        this.teacherId = teacherId;
+        this.chapterId = chapterId;
     }
 
     public InteractiveRoomVo(String teacherId, String chapterId) {
