@@ -33,7 +33,7 @@ public class PartnerServerHttpResponseDecorator extends ServerHttpResponseDecora
     @Override
     public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
         final MediaType contentType = super.getHeaders().getContentType();
-        if (LogUtil.legalLogMediaTypes.contains(contentType)) {
+        if (LogUtil.LEGAL_LOG_MEDIA_TYPES.contains(contentType)) {
             if (body instanceof Mono) {
                 final Mono<DataBuffer> monoBody = (Mono<DataBuffer>) body;
                 return super.writeWith(monoBody.publishOn(single()).map(dataBuffer -> LogUtil.loggingResponse(log, dataBuffer)));

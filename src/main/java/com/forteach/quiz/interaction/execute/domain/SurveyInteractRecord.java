@@ -47,14 +47,14 @@ public class SurveyInteractRecord {
     /**
      * 问题id
      */
-    private String[] questionsId;
+    private String questionsId;
 
     /**
      * 回答的情况
      */
     private List<InteractAnswerRecord> answerRecordList;
 
-    public SurveyInteractRecord(String[] questionsId, Long index, String category, List<String> selectId) {
+    public SurveyInteractRecord(String questionsId, Long index, String category, List<String> selectId) {
         this.questionsId = questionsId;
         this.index = index.intValue();
         this.category = category;

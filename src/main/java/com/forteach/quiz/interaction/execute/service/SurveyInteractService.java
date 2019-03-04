@@ -75,8 +75,9 @@ public class SurveyInteractService {
         Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.SurveyQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
-        return Flux.concat(set, time, clearCut).filter(flag -> !flag).count()
-                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "surveys"));
+        return Flux.concat(set, time, clearCut).filter(flag -> !flag)
+                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "surveys"))
+                .count();
 
     }
 

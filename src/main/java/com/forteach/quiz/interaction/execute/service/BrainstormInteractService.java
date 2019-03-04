@@ -8,7 +8,6 @@ import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.SurveyQuestionRepository;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -79,8 +78,9 @@ public class BrainstormInteractService {
         Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.BrainstormQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
-        return Flux.concat(set, time, clearCut).filter(flag -> !flag).count()
-                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "brainstorms"));
+        return Flux.concat(set, time, clearCut).filter(flag -> !flag)
+                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "brainstorms"))
+                .count();
 
     }
 
@@ -116,8 +116,8 @@ public class BrainstormInteractService {
                 .transform(this::filterSelectVerify)
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
-                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
                 .filterWhen(brainstorm -> interactRecordExecuteService.pushMongo(brainstorm, "brainstorms"))
+                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
                 .map(InteractiveSheetVo::getCut);
     }
 

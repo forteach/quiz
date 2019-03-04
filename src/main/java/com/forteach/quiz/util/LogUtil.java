@@ -1,6 +1,5 @@
 package com.forteach.quiz.util;
 
-import com.alibaba.fastjson.util.IOUtils;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -9,13 +8,10 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.MediaType;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author: zhangyy
@@ -28,7 +24,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("WeakerAccess")
 public class LogUtil {
 
-    public static final List<MediaType> legalLogMediaTypes = Arrays.asList(
+    public static final List<MediaType> LEGAL_LOG_MEDIA_TYPES = Arrays.asList(
             MediaType.TEXT_XML,
             MediaType.APPLICATION_XML,
             MediaType.APPLICATION_JSON,
@@ -52,7 +48,7 @@ public class LogUtil {
             NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(new UnpooledByteBufAllocator(false));
             if (log.isDebugEnabled()) {
                 log.debug("\n" +
-                        "{}Payload    : {}", inOrOut, new String(bytes));
+                        " {} Payload    : {}", inOrOut, new String(bytes));
             }
             DataBufferUtils.release(buffer);
             return (T) nettyDataBufferFactory.wrap(bytes);

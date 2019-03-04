@@ -369,7 +369,7 @@ public class InteractRecordExecuteService {
         Query query = Query.query(Criteria.where("circleId").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
-        SurveyInteractRecord records = new SurveyInteractRecord(questionId.split(","), number + 1, category, Arrays.asList(selectId.split(",")));
+        SurveyInteractRecord records = new SurveyInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));
         update.push("surveys", records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
