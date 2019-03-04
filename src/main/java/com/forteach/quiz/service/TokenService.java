@@ -1,48 +1,31 @@
 package com.forteach.quiz.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.forteach.quiz.config.decorator.PartnerServerHttpRequestDecorator;
-import com.forteach.quiz.util.IOUtil;
-import com.forteach.quiz.util.LogUtil;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.util.StringUtil;
-import io.netty.buffer.UnpooledByteBufAllocator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.forteach.quiz.common.Dic.TOKEN_TEACHER;
 import static com.forteach.quiz.common.Dic.USER_PREFIX;
-import static reactor.core.scheduler.Schedulers.single;
 
 /**
  * @Auther: zhangyy
@@ -74,6 +57,7 @@ public class TokenService {
         String token = request.getHeaders().getFirst("token");
 //        String token = getToken1(request);
         Assert.notNull(token, "token is null");
+        MyAssert.blank(token, DefineCode.ERR0004, "token is mull");
         return JWT.decode(token).getAudience().get(0);
     }
 

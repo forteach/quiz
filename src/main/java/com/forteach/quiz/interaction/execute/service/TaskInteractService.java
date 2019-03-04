@@ -115,8 +115,8 @@ public class TaskInteractService {
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.TaskQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.TaskQuestion)))
                 //保存到记录mongodb 集合
-                .filterWhen(tack -> interactRecordExecuteService.pushMongo(tack, "interacts"))
-                .map(InteractiveSheetVo::getCut);
+                .filterWhen(vo -> interactRecordExecuteService.pushMongo(vo, "interacts"))
+                .thenReturn(sheetVo.getCut());
     }
 
     /**

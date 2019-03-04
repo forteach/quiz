@@ -143,6 +143,7 @@ public class BigQuestionInteractController {
     })
     @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest serverHttpRequest) {
+        MyAssert.blank(sheetVo.getCut(), DefineCode.ERR0010, "课堂圈子id不为空");
         sheetVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
     }

@@ -6,7 +6,6 @@ import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import com.forteach.quiz.interaction.execute.dto.SurveysDto;
 import com.forteach.quiz.interaction.execute.dto.TaskInteractDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
@@ -81,14 +80,14 @@ public class InteractRecordExecuteService {
         return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
     }
 
-    Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
+    public Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
         final Query query = Query.query(Criteria.where("circleId").is(sheetVo.getCircleId())
                 .and(interactRecordType + ".questionsId").is(sheetVo.getAnsw().getQuestionId())
                 .and(interactRecordType + ".answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
         Update update = new Update();
         update.push(interactRecordType + ".$.answerRecordList", new InteractAnswerRecord(sheetVo.getExamineeId(), sheetVo.getAnsw().getAnswer()));
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::isNull);
+        return mongoTemplate.updateMulti(query, update, InteractRecord.class).thenReturn(true);
     }
 
     /*------------------------发布问题时加入记录，有就用原来，没有经新建一条记录进行保存-------------------------------*/
