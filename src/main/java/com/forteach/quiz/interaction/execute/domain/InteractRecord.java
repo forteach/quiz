@@ -51,6 +51,11 @@ public class InteractRecord extends BaseEntity {
     private List<InteractQuestionsRecord> questions;
 
     /**
+     * 习题册
+     */
+    private List<InteractQuestionsRecord> exerciseBooks;
+
+    /**
      * 头脑风暴记录
      */
     private List<BrainstormInteractRecord> brainstorms;

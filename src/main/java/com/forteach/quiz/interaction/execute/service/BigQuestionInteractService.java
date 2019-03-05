@@ -82,7 +82,9 @@ public class BigQuestionInteractService {
         Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
-        return Flux.concat(set, time).filter(flag -> !flag).count();
+        return Flux.concat(set, time).filter(flag -> !flag)
+                .filterWhen(obj -> interactRecordExecuteService.interactiveBook(giveVo))
+                .count();
 
     }
 
@@ -373,7 +375,8 @@ public class BigQuestionInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
-//                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
+                // Todo 提交答案保存
+                .filterWhen(right -> interactRecordExecuteService.pushMongo(sheetVo, "exerciseBooks"))
                 .thenReturn(sheetVo.getCut());
     }
 

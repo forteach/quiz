@@ -161,4 +161,17 @@ public class BigQuestionInteractController {
         return interactRecordExecuteService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
+    @ApiOperation(value = "查询课堂习题册提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
+    @PostMapping("/findExerciseBookRecord")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
+    })
+    public Mono<WebResult> findExerciseBook(@ApiParam(value = "查询课堂提交的记录", required = true) @Valid @RequestBody RecordReq recordReq){
+        //验证请求参数
+        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
+        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
+        return interactRecordExecuteService.findExerciseBookRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+    }
+
 }

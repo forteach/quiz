@@ -1,14 +1,13 @@
 package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.interaction.execute.domain.*;
-import com.forteach.quiz.interaction.execute.dto.BrainstormDto;
-import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
-import com.forteach.quiz.interaction.execute.dto.SurveysDto;
-import com.forteach.quiz.interaction.execute.dto.TaskInteractDto;
+import com.forteach.quiz.interaction.execute.dto.*;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
+import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
+import org.reactivestreams.Publisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -91,6 +90,25 @@ public class InteractRecordExecuteService {
     }
 
     /*------------------------发布问题时加入记录，有就用原来，没有经新建一条记录进行保存-------------------------------*/
+
+    /**
+     * 记录习题册
+     * @param giveVo
+     * @return
+     */
+    public Publisher<Boolean> interactiveBook(final MoreGiveVo giveVo) {
+        Mono<Long> number = exerciseBookNumber(giveVo.getCircleId());
+        Mono<InteractRecord> recordMono = findexerciseBooks(giveVo.getCircleId(), giveVo.getQuestionId());
+        return Mono.zip(number, recordMono).flatMap(tuple2 -> {
+
+            if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
+                return upInteractInteractRecord(giveVo.getSelected(), tuple2.getT2().getQuestions().get(0).getSelectId(), giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getCategory(), "exerciseBooks");
+            } else {
+                return pushExerciseBook(giveVo.getSelected(), tuple2.getT1(), giveVo.getCircleId(), giveVo.getQuestionId());
+            }
+        }).map(Objects::nonNull);
+    }
+
     /**
      * 发布问题时 加入记录
      * @param circleId
@@ -218,6 +236,7 @@ public class InteractRecordExecuteService {
         return mongoTemplate.count(Query.query(nowRecord(teacherId)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }
 
+    /*-----------------------------获取发布次数-----------------------------------*/
     /**
      * 获取本次课堂发布问题次数
      *
@@ -225,6 +244,18 @@ public class InteractRecordExecuteService {
      */
     private Mono<Long> questionNumber(final String circleId) {
         return mongoTemplate.count(Query.query(Criteria.where("circleId").is(circleId).and("questions.questionsId").ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
+    }
+
+    /**
+     * 计算习题册发布的次数
+     * @param circleId
+     * @return
+     */
+    private Mono<Long> exerciseBookNumber(final String circleId){
+        return mongoTemplate.count(Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("exerciseBooks.questionsId").ne("").ne(null)),
+                InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }
 
     /**
@@ -249,6 +280,12 @@ public class InteractRecordExecuteService {
     private Mono<InteractRecord> findInteractQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
         return mongoTemplate
                 .findOne(buildLastQuestionsRecord(circleId, questionId, category, interactive), InteractRecord.class)
+                .switchIfEmpty(Mono.just(new InteractRecord()));
+    }
+
+    private Mono<InteractRecord> findexerciseBooks(final String circleId, final String questionId) {
+        return mongoTemplate
+                .findOne(buildexerciseBooks(circleId, questionId), InteractRecord.class)
                 .switchIfEmpty(Mono.just(new InteractRecord()));
     }
 
@@ -279,6 +316,15 @@ public class InteractRecordExecuteService {
 
         query.fields().include("questions");
 
+        return query;
+    }
+
+    private Query buildexerciseBooks(final String circleId, final String questionId) {
+        final Query query = Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("exerciseBooks.questionsId").is(questionId)
+        ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+        query.fields().include("exerciseBooks");
         return query;
     }
 
@@ -355,6 +401,15 @@ public class InteractRecordExecuteService {
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 
+    private Mono<UpdateResult> pushExerciseBook(final String selectId, final Long number, final String circleId, final String questionId) {
+        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Update update = new Update();
+        //学生编号id 进行,分割
+        InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, Arrays.asList(selectId.split(",")));
+        update.push("exerciseBooks", records);
+        return mongoTemplate.updateMulti(query, update, InteractRecord.class);
+    }
+
     private Mono<UpdateResult> pushInteractBrainstorms(final String selectId, final String circleId, final String questionId, final Long number, final String category) {
         Query query = Query.query(Criteria.where("circleId").is(circleId));
         Update update = new Update();
@@ -381,6 +436,7 @@ public class InteractRecordExecuteService {
         update.push("interacts", records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
+
     /*---------------------------------- 查询记录 ------------------------------------------*/
     /**
      * 根据条件查询对应的questions 任务记录
@@ -447,5 +503,16 @@ public class InteractRecordExecuteService {
                 .filter(brainstormInteractRecord -> questionsId.equals(brainstormInteractRecord.getQuestionsId()))
                 .last()
                 .onErrorReturn(new BrainstormInteractRecord());
+    }
+
+    public Mono<InteractQuestionsRecord> findExerciseBookRecord(final String circleId, final String questionsId) {
+        return repository.findExerciseBooksByCircleIdAndQuestionsId(circleId, questionsId)
+                .filter(Objects::nonNull)
+                .map(ExerciseBooksDto::getExerciseBooks)
+                .filter(list -> list != null && list.size() > 0)
+                .flatMapMany(Flux::fromIterable)
+                .filter(interactQuestionsRecord -> questionsId.equals(interactQuestionsRecord.getQuestionsId()))
+                .last()
+                .onErrorReturn(new InteractQuestionsRecord());
     }
 }

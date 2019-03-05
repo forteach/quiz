@@ -1,10 +1,7 @@
 package com.forteach.quiz.interaction.execute.repository;
 
 import com.forteach.quiz.interaction.execute.domain.InteractRecord;
-import com.forteach.quiz.interaction.execute.dto.BrainstormDto;
-import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
-import com.forteach.quiz.interaction.execute.dto.SurveysDto;
-import com.forteach.quiz.interaction.execute.dto.TaskInteractDto;
+import com.forteach.quiz.interaction.execute.dto.*;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +26,14 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
     Flux<InteractRecord> findByCircleIdAndTeacherId(final String circleId, final String teacherId);
 
     /**
-     * 通过课堂id查找记录
+     * 通过课堂id和习题册id
      *
      * @param circleId
      * @return
      */
-    Mono<InteractRecord> findByCircleIdIs(final String circleId);
+    @Transactional(readOnly = true)
+    @Query(value = "{'circleId': ?0, 'exerciseBooks.questionsId' : ?1 }", fields = "{ '_id' : 0, 'exerciseBooks' : 1}")
+    Mono<ExerciseBooksDto> findExerciseBooksByCircleIdAndQuestionsId(final String circleId, final String questionsId);
 
     /**
      * 查询记录不为空的信息
