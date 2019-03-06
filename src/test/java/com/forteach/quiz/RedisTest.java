@@ -1,5 +1,6 @@
 package com.forteach.quiz;
 
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,9 +10,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import javax.annotation.Resource;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,11 +23,13 @@ import java.util.Map;
 @SpringBootTest
 public class RedisTest {
 
-    private ReactiveStringRedisTemplate stringRedisTemplate;
+    private final ReactiveStringRedisTemplate stringRedisTemplate;
+    private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
 
-    @Resource
-    private ReactiveHashOperations<String, String, String> reactiveHashOperations;
-
+    public RedisTest(ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations) {
+        this.stringRedisTemplate = stringRedisTemplate;
+        this.reactiveHashOperations = reactiveHashOperations;
+    }
 
     @Test
     public void studentAdd() {
@@ -51,8 +51,15 @@ public class RedisTest {
     }
 
     @Test
-    public void testDate() {
-        System.out.println(new Date());
+    public void testL() {
+        stringRedisTemplate.opsForList().leftPush("tlist","1");
+        stringRedisTemplate.opsForList().leftPush("tlist","2");
+        stringRedisTemplate.opsForList().leftPush("tlist","3");
+        stringRedisTemplate.opsForList().index("list",1).subscribe(System.out::println);
+        System.out.println("----------------------------------------");
+        stringRedisTemplate.opsForList().range("list",0,-1)
+        .subscribe(System.out::println);
+
     }
 
 

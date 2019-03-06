@@ -48,11 +48,11 @@ public class GiveVo {
     private String cut;
 
     /**
-     * 获取拼接后的课程练习册子的那个需要的前缀
+     * 获取习题练习类型在那个课堂的前缀
      * @param type 习题练习的类型
      * @return 拼接后的前缀
      */
     public String getExamineeIsReplyKey(QuestionType type) {
-        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
+        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(circleId).concat(type.name());
     }
 }

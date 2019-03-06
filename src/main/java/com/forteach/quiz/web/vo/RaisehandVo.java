@@ -1,12 +1,13 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
+
 
 /**
  * @Description:
@@ -41,7 +42,7 @@ public class RaisehandVo {
      * @return
      */
     public String getAskKey(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
 }

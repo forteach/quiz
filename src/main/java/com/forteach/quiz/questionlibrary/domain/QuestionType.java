@@ -9,23 +9,28 @@ package com.forteach.quiz.questionlibrary.domain;
 public enum QuestionType {
 
     /**
-     * 考试 练习题库
+     * 提问
      */
-    BigQuestion,
+    //BigQuestion,
+    TiWen,
     /**
      * 头脑风暴题库
      */
-    BrainstormQuestion,
+    //BrainstormQuestion,
+    FengBao,
     /**
-     * 任务题库
+     * 任务
      */
-    TaskQuestion,
+    //TaskQuestion,
+    RenWu,
     /**
-     * 问卷题库
+     * 问卷
      */
-    SurveyQuestion,
+    //SurveyQuestion,
+    WenJuan,
     /**
      * 练习册
      */
-    ExerciseBook
+    //ExerciseBook
+    LianXi
 }

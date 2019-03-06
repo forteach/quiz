@@ -13,13 +13,11 @@ import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import static com.forteach.quiz.util.StringUtil.getRandomUUID;
 
 
@@ -48,30 +46,37 @@ public class ClassRoomService {
 
 
     public Mono<String> createInteractiveRoom(final InteractiveRoomVo roomVo) {
+
         //根据互动课堂KEY值，获得课堂互动ID属性，如果为空，创建互动课堂，否则返回返回互动课堂ID
         return Mono.just(roomVo.getCircleId()).flatMap(str ->
         {
             if (StrUtil.isBlank(str)) {
                 //根据互动课堂ID和教师ID，创建Mongo或返回课堂信息
-                return interactRecordExecuteService.init(roomVo.getTeacherId())
+                return Mono.just(roomVo.getTeacherId()).flatMap(interactRecordExecuteService::init)
                         //创建Redis教室和教师信息,过期时间2小时
-                        .filterWhen(circleId -> buildRoom(circleId, roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey()));
+                        .filterWhen(circleId ->
+                                buildRoom(circleId, roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey())
+                                 //Mono.just(true)
+                        );
             } else {
                 //如果key过期，则返回不存在为true
                 Mono<Boolean> notHasKey = stringRedisTemplate.hasKey(roomVo.getQrCode()).flatMap(res -> Mono.just(!res));
                 // Mono<Boolean> HasKey = stringRedisTemplate.hasKey(roomVo.getQrCode()).flatMap(res->{MyAssert.isFalse(res.booleanValue(), DefineCode.ERR0013,"redis操作错误"); return Mono.just(!res);});
                 //如果键值过期或不存在，创建新的键值
-                return notHasKey
+
+                return Mono.just(roomVo).flatMap(obj-> notHasKey
                         .flatMap(result -> {
                             if (result) {
                                 return interactRecordExecuteService.init(roomVo.getTeacherId())
                                         //创建Mongo课堂信息,过期时间2小时
-                                        .filterWhen(circleId -> buildRoom(circleId, roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey()));
+                                        .filterWhen(circleId ->
+                                                buildRoom(circleId, roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey()));
                             } else {
                                 //如果键值不过期存在，放回当前键值
                                 return Mono.just(roomVo.getCircleId());
                             }
-                        });
+                        }));
+
             }
         });
     }
@@ -87,7 +92,9 @@ public class ClassRoomService {
     public Mono<String> createCoverInteractiveRoom(final InteractiveRoomVo roomVo) {
         return interactRecordExecuteService.init(roomVo.getTeacherId())
                 //根据互动课堂ID和教师ID，创建Mongo或返回课堂信息
-                .filterWhen(circleId -> buildRoom(circleId, roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey()));
+                .filterWhen(circleId ->  Mono.just(false)
+                        //buildRoom(circleId, roomVo.getTeacherId(), roomVo.getChapterId(), roomVo.getRoomKey())
+                );
     }
 
     /**
@@ -132,30 +139,39 @@ public class ClassRoomService {
         LocalTime failureTime = effectTime.plusHours(2);//失效时间
 
         //课堂基本信息
-        HashMap<String, String> map = new HashMap<>(5);
+        HashMap<String, String> map = new HashMap<>(6);
         //课堂Redis 键值
-        final String interactiveIdQr = ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(circleId);
+        final String interactiveIdQr = ClassRoomKey.getInteractiveIdQra(circleId);
         map.put("interactiveId", interactiveIdQr);
         map.put("effectTime", effectTime.toString());//影响时间
         map.put("failureTime", failureTime.toString());//失效时间
         map.put("teacherId", teacherId);//教师编号
         map.put("chapterId", chapterId);//章节ID
         map.put("createTime", DataUtil.format(new Date()));
-        //创建教师ID的教室，不过期
-        Mono<Boolean> set = reactiveHashOperations.putAll(roomKey, map).flatMap(item -> MyAssert.isFalse(item.booleanValue(), DefineCode.ERR0013, "redis操作错误"));
 
-        //返回课堂ID
-        return Mono.just(interactiveIdQr).flatMap(id ->
-                {
-                    //添加教室ID和教室的教师ID
-                    return stringRedisTemplate.opsForSet().add(id, teacherId)
-                            .flatMap(count -> {
-                                return MyAssert.isFalse(count > 0, DefineCode.ERR0013, "redis操作错误");
-                            })
-                            //设置加入课堂后，两小时过期
-                            .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 2)));
-                }
-        ).filterWhen(obj -> set);
+
+        //创建教师ID的教室，不过期
+        Mono<Boolean> room = reactiveHashOperations.putAll(roomKey, map)
+                .flatMap(item -> MyAssert.isFalse(item.booleanValue(), DefineCode.ERR0013, "创建教师教室失败"));
+
+        Mono<Boolean> roomUser =stringRedisTemplate.opsForSet().add(interactiveIdQr, teacherId)
+                .flatMap(count -> MyAssert.isTrue(count == 0, DefineCode.ERR0013, "添加课堂教师失败"))
+                //设置加入课堂后，两小时过期
+                .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 2)));
+
+        //正在开课的教室,先不考虑单节课过期问题
+        Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
+                .flatMap(count -> MyAssert.isTrue(count==0, DefineCode.ERR0013, "创建开课教室失败"))
+                //设置正在开课的课堂ID集合12小时过期
+                .filterWhen(count -> stringRedisTemplate.expire(ClassRoomKey.OPEN_CLASSROOM, Duration.ofSeconds(60 * 60 * 12)));
+
+        //设置上课的教室
+        Mono<Boolean> RoomTeacher =stringRedisTemplate.opsForValue()
+                .set(ClassRoomKey.getRoomTeacherKey(circleId),teacherId, Duration.ofSeconds(60 * 60 * 2))
+                .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "redis操作错误"));
+
+        //创建单个活跃课堂，并返回课堂ID
+        return Mono.just(interactiveIdQr).flatMap(id -> room).filterWhen(obj -> roomUser).filterWhen(obj->openRoomIDs).filterWhen(obj->RoomTeacher);
     }
 
     /**
@@ -165,7 +181,7 @@ public class ClassRoomService {
      * @return
      */
     public Mono<Long> joinInteractiveRoom(final JoinInteractiveRoomVo joinVo) {
-        final String interactiveIdQr = ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(joinVo.getCircleId());
+        final String interactiveIdQr = ClassRoomKey.getInteractiveIdQra(joinVo.getCircleId());
         //创建redis学生加入课堂的键值对
         return stringRedisTemplate.opsForSet().add(interactiveIdQr, joinVo.getExamineeId())
                 .filterWhen(obj -> interactRecordExecuteService.join(joinVo.getCircleId(), joinVo.getExamineeId()));
@@ -179,7 +195,7 @@ public class ClassRoomService {
      */
     public Mono<List<Students>> findInteractiveStudents(final String circleId, final String teacherId) {
         return Mono.just(circleId)
-                .flatMapMany(interactiveId -> stringRedisTemplate.opsForSet().members(ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(interactiveId)))
+                .flatMapMany(cId -> stringRedisTemplate.opsForSet().members(ClassRoomKey.getInteractiveIdQra(cId)))
                 .filter(id -> !id.equals(teacherId))//需要过滤掉教师ID
                 .flatMap(studentsService::findStudentsBrief)
                 .collectList();
@@ -193,7 +209,7 @@ public class ClassRoomService {
      */
     public Mono<List<String>> findInteractiveStudentsID(final String circleId, final String teacherId) {
         return Mono.just(circleId)
-                .flatMapMany(interactiveId -> stringRedisTemplate.opsForSet().members(ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(interactiveId)))
+                .flatMapMany(cId -> stringRedisTemplate.opsForSet().members(ClassRoomKey.getInteractiveIdQra(cId)))
                 .filter(id -> !id.equals(teacherId))
                 .collectList();
     }
@@ -205,7 +221,17 @@ public class ClassRoomService {
      * @return
      */
     public Mono<Long> studentNumber(final String circleId) {
-        return stringRedisTemplate.opsForSet().size(ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(circleId));
+        return stringRedisTemplate.opsForSet().size(ClassRoomKey.getInteractiveIdQra(circleId));
+    }
+
+    public Mono<String> listTest(){
+        return  stringRedisTemplate.opsForList().leftPush("tlist","4")
+               // .flatMap(a->stringRedisTemplate.opsForList().leftPush("tlist","2"))
+               // .flatMap(b->stringRedisTemplate.opsForList().leftPush("tlist","3"))
+                .flatMap(c-> {
+                    return stringRedisTemplate.opsForList().index("tlist",0);
+                });
+
     }
 
 }

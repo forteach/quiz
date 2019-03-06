@@ -1,11 +1,11 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import static com.forteach.quiz.common.KeyStorage.*;
 
 /**
@@ -36,7 +36,7 @@ public class AchieveAnswerVo {
     private String random;
 
     public String getExamineeIsReplyKey(final String examineeId) {
-        return EXAMINEE_IS_REPLY_KEY.concat(examineeId);
+        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(examineeId);
     }
 
     /**
@@ -45,7 +45,7 @@ public class AchieveAnswerVo {
      * @return
      */
     public String getAskKey(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
     /**
@@ -54,7 +54,7 @@ public class AchieveAnswerVo {
      * @return
      */
     public String getExamineeIsReplyKey(QuestionType type) {
-        return EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
+        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(circleId).concat(type.name());
     }
 
     /**

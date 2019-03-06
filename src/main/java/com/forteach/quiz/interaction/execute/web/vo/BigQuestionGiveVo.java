@@ -38,7 +38,7 @@ public class BigQuestionGiveVo extends GiveVo {
     private String interactive;
 
     /**
-     * 返回那个课堂的问题KEY
+     * 设置课堂提问问题ID
      * @return
      */
     public String getRaceAnswerFlag() {
@@ -47,12 +47,19 @@ public class BigQuestionGiveVo extends GiveVo {
 
 
     /**
-     * 课堂的题目类型KEY
+     * 课堂交互活动了icing，某个课堂上的某些课堂活动
      *
      * @return
      */
     public String getAskQuestionsId(QuestionType type) {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
+    public BigQuestionGiveVo(String questionId, String interactive) {
+        this.questionId = questionId;
+        this.interactive = interactive;
+    }
+
+    public BigQuestionGiveVo() {
+    }
 }

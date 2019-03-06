@@ -1,5 +1,8 @@
 package com.forteach.quiz.interaction.execute.config;
 
+import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
+import com.forteach.quiz.questionlibrary.domain.QuestionType;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -11,7 +14,7 @@ public class BigQueKey {
     /**
      * 课堂提问答案等前缀
      */
-    public static final String EXAMINEE_IS_REPLY_KEY = "askExamineeIsReply";
+    public static final String EXAMINEE_IS_REPLY_KEY = "askReply";
 
     /**
      * 课堂问题前缀
@@ -21,5 +24,53 @@ public class BigQueKey {
     /**
      * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
-    public static final String CLASSROOM_ASK_QUESTIONS_ID = "classAsk";
+    public static final String CLASSROOM_ASK_QUESTIONS_ID = "ask";
+
+
+    /**
+     * 课堂互动的hash前缀
+     *
+     * @return 问题前缀+课堂+问题类型+回答方式
+     */
+    public static String askTypeQuestionsId(final QuestionType type, BigQuestionGiveVo giveVo) {
+        return giveVo.getCircleId().concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(type.name().concat(giveVo.getInteractive()));
+    }
+
+    /**
+     * 课堂互动的hash前缀
+     *
+     * @return 当前问题前缀+课堂+问题类型+回答方式
+     */
+    public static String askTypeQuestionsIdNow(final QuestionType type, BigQuestionGiveVo giveVo) {
+        return askTypeQuestionsId(type,giveVo).concat("now");
+    }
+
+    /**
+     * 课堂互动的hash前缀
+     *
+     * @return 上一次的问题前缀+课堂+问题类型+回答方式
+     */
+    public static String askTypeQuestionsIdPrve(final QuestionType type, BigQuestionGiveVo giveVo) {
+        return askTypeQuestionsId(type,giveVo).concat("prve");
+    }
+
+    /**
+     * 课堂互动的hash前缀
+     *
+     * @return 问题前缀+课堂+问题类型+回答方式+单个题目ID，用于改题目过期判断数据依据
+     */
+    public static String askTypeQuestionsId(final QuestionType type, BigQuestionGiveVo giveVo,String questionId) {
+        return askTypeQuestionsId(type,giveVo).concat(questionId);
+    }
+
+
+    /**
+     * 课堂互动的hash前缀
+     *
+     * @return 问题前缀+课堂+问题类型+回答方式
+     */
+    public static String askQuestionsId(final QuestionType type, String circleId) {
+        return circleId.concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(type.name());
+    }
+
 }

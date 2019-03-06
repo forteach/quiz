@@ -38,11 +38,11 @@ public class InteractiveRoomVo {
      * @return string 临时课堂
      */
     public String getRoomKey() {
-        return ClassRoomKey.INTERACTIVE_CLASSROOM.concat(teacherId);
+        return ClassRoomKey.getRoomKey(teacherId);
     }
 
     public String getQrCode() {
-        return   StrUtil.isBlank(circleId)?"":ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(circleId);
+        return   StrUtil.isBlank(circleId)?"":ClassRoomKey.getInteractiveIdQra(circleId);
     }
 
     public InteractiveRoomVo(String circleId, String teacherId, String chapterId) {

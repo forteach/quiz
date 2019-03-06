@@ -2,13 +2,9 @@ package com.forteach.quiz.interaction.execute.domain;
 
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.domain.BaseEntity;
-import javafx.scene.input.DataFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +30,7 @@ public class InteractRecord extends BaseEntity {
     private Integer number;
 
     /**
-     * 参加过课堂的学生id
+     * 加入课堂的学生id
      */
     private List<String> students;
 

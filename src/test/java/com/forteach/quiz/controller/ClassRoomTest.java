@@ -27,7 +27,7 @@ public class ClassRoomTest {
 
     @Test
     public void createInteractiveRoom(){
-        InteractiveRoomVo vo=new InteractiveRoomVo("5c789b16c762c13370c0d62f","t01","cp01");
+        InteractiveRoomVo vo=new InteractiveRoomVo("","t01","cp01");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom/create/reuse")  //创建2小时内同一课堂
@@ -39,13 +39,14 @@ public class ClassRoomTest {
                 .isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
                 .returnResult(WebResult.class)
-                .getResponseBody().subscribe(System.out::println);
+                .getResponseBody()
+                .subscribe(System.out::println);
 
     }
 
     @Test
     public void joinInteractiveRoom(){
-        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("stu02","5c789bfdc762c12a908766f6");
+        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("stu02","5c7f3a9ac762c12a84010a9e");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom/join/interactiveRoom")
@@ -63,7 +64,7 @@ public class ClassRoomTest {
 
     @Test
     public void findInteractiveStudents(){
-        InteractiveStudentsReq vo=new InteractiveStudentsReq("5c789bfdc762c12a908766f6","t01");
+        InteractiveStudentsReq vo=new InteractiveStudentsReq("5c7f3a9ac762c12a84010a9e","t01");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom//find/interactiveStudents")

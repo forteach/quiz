@@ -1,5 +1,6 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 import static com.forteach.quiz.common.KeyStorage.RAISE_HAND_STUDENT_DISTINCT;
 
 /**
@@ -46,7 +46,7 @@ public class AchieveRaiseVo {
      * @return
      */
     public String getAskKey(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
     public String getRaiseKey() {

@@ -14,11 +14,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_FALSE;
 import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_TRUE;
 import static com.forteach.quiz.util.DateUtil.getEndTime;
@@ -41,6 +39,58 @@ public class InteractRecordExecuteService {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
     }
+
+    /**
+     * 学生加入互动课堂时存入记录
+     *
+     * @param circleId
+     * @param student
+     * @return
+     */
+    public Mono<Boolean> join(final String circleId, final String student) {
+
+        //获得课堂记录信息，并更新参与的学生
+//        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
+        final Query query = Query.query(Criteria.where("id").is(circleId));
+
+        Update update = new Update();
+        update.addToSet("students", student);
+        //学生数量+1
+        update.inc("participate", 1);
+
+//        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord()))
+        return mongoTemplate.findAndModify(query, update, InteractRecord.class)
+                .map(item->{MyAssert.isNull(item,DefineCode.ERR0013,"更新课堂学生信息失败");return true;});
+    }
+
+    /**
+     * 发布问题时 加入记录
+     *
+     * @param circleId
+     * @param questionId
+     * @param selectId
+     * @param category
+     * @return
+     */
+    public Mono<Boolean> releaseQuestion(final String circleId, final String questionId, final String selectId, final String category, final String interactive) {
+        //获得没有回答的问题次数
+        Mono<Long> number = questionNumber(circleId);
+
+        Mono<InteractRecord> recordMono = findInteractQuestionsRecord(circleId, questionId, category, interactive);
+
+        return Mono.zip(number, recordMono).flatMap(tuple2 -> {
+            //更新已发布的问题
+            if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
+                return upInteractQuestions(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactive);
+            } else {
+                //push一条新的发布问题记录
+                return pushInteractQuestions(selectId, circleId, questionId, tuple2.getT1(), interactive, category);
+            }
+
+        }).map(obj->{MyAssert.isNull(obj,DefineCode.ERR0012,"提问数据记录失败");return true;});
+
+    }
+
 
     /**
      * 学生回答问题时 加入记录
@@ -71,55 +121,6 @@ public class InteractRecordExecuteService {
         return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
     }
 
-    /**
-     * 发布问题时 加入记录
-     *
-     * @param circleId
-     * @param questionId
-     * @param selectId
-     * @param category
-     * @return
-     */
-    public Mono<Boolean> releaseQuestion(final String circleId, final String questionId, final String selectId, final String category, final String interactive) {
-
-        Mono<Long> number = questionNumber(circleId);
-
-        Mono<InteractRecord> recordMono = findInteractQuestionsRecord(circleId, questionId, category, interactive);
-
-        return Mono.zip(number, recordMono).flatMap(tuple2 -> {
-
-            if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
-                return upInteractQuestions(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactive);
-            } else {
-                return pushInteractQuestions(selectId, circleId, questionId, tuple2.getT1(), interactive, category);
-            }
-
-        }).map(Objects::nonNull);
-
-    }
-
-    /**
-     * 学生加入互动课堂时存入记录
-     *
-     * @param circleId
-     * @param student
-     * @return
-     */
-    public Mono<Boolean> join(final String circleId, final String student) {
-
-        //获得课堂记录信息，并更新参与的学生
-//        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
-        final Query query = Query.query(Criteria.where("id").is(circleId));
-
-        Update update = new Update();
-        update.addToSet("students", student);
-        //学生数量+1
-        update.inc("participate", 1);
-
-//        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord()))
-        return mongoTemplate.findAndModify(query, update, InteractRecord.class)
-                .map(item->{MyAssert.isNull(item,DefineCode.ERR0013,"更新课堂学生信息失败");return true;});
-    }
 
     /**
      * 学生举手时记录
@@ -165,11 +166,12 @@ public class InteractRecordExecuteService {
 
     public Mono<String> init(final String teacherId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
-        return build(teacherId).flatMap(item->{
-                                    MyAssert.isNull(item, DefineCode.ERR0012,"创建互动课堂失败");
-                                    MyAssert.blank(item.getId(), DefineCode.ERR0012,"创建互动课堂失败");
-                                    return Mono.just(item.getId());});
-                            }
+        return Mono.just(teacherId).flatMap(id ->build(id).flatMap(item -> {
+            MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败");
+            MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败");
+            return Mono.just(item.getId());
+        }));
+    }
 
 
     //创建Mongo课堂信息
@@ -192,7 +194,7 @@ public class InteractRecordExecuteService {
     }
 
     /**
-     * 获取本次课堂发布问题次数
+     * 获取本次课堂发布，并没有使用的题目次数
      *
      * @return
      */
@@ -226,10 +228,10 @@ public class InteractRecordExecuteService {
     /**
      * 获取新的发布问题(指定问题id)
      *
-     * @param circleId
-     * @param questionId
-     * @param category
-     * @param interactive
+     * @param circleId  课堂编号
+     * @param questionId  问题编号
+     * @param category  个人还是小组
+     * @param interactive  提问方式
      * @return
      */
     private Query buildLastQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
@@ -262,21 +264,21 @@ public class InteractRecordExecuteService {
         Update update = new Update();
         List<String> list = Arrays.asList(selectId.split(","));
         update.set("questions.$.selectId", list);
-        if (!list.equals(tSelectId)) {
-            update.inc("questions.$.number", 1);
-        }
+//        if (!list.equals(tSelectId)) {
+//            update.inc("questions.$.number", 1);
+//        }
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 
     /**
      * push一条新的发布问题记录
      *
-     * @param selectId
-     * @param circleId
-     * @param questionId
-     * @param number
-     * @param interactive
-     * @param category
+     * @param selectId  回答问题的人员
+     * @param circleId  课堂编号
+     * @param questionId  问题编号
+     * @param number  还没有回答的提出
+     * @param interactive  回答方式
+     * @param category  小组或个人
      * @return
      */
     private Mono<UpdateResult> pushInteractQuestions(final String selectId, final String circleId, final String questionId, final Long number, final String interactive, final String category) {

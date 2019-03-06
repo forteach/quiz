@@ -74,17 +74,21 @@ public class ClassRoomController extends BaseController {
     }
     @PostMapping(value = "/test")
     public Mono<String> test(@RequestBody InteractiveRoomVo roomVo) {
-        //验证请求参数
-         Mono.just("ok")
-                //如果KEY存在
-                .filterWhen(str->Mono.just(true))
-                //不创建key
-                .flatMap(str->{
-                    return Mono.just("123").filterWhen(r->Mono.just(true));
-                })
-                 .subscribe(System.out::println);
 
-        return Mono.just("ok");
+        Mono<Boolean> time = Mono.just("123").flatMap(item -> MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"));
+        Mono<Boolean> time1 = Mono.just("123").flatMap(item ->{System.out.println("########"); return MyAssert.isFalse(true, DefineCode.ERR0013, "操作错误");});
+
+        //验证请求参数
+        return Mono.just("ok")
+                 //不创建key
+                 .flatMap(str->{
+                     return classRoomService.listTest();
+                     //return time.flatMap(a->{System.out.println("*********"); MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"); return Mono.just("123");}).filterWhen(r->Mono.just(true));
+                 });
+                //如果KEY存在
+                //.filterWhen(str->time1);
+
+
     }
 
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")

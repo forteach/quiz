@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * @Description:
+ * @Description: 课堂问题发布
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/19  14:46
@@ -49,21 +51,11 @@ public class BigQuestionInteractController {
                     required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo) {
+        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
+        MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");
         return interactService.sendQuestion(giveVo).map(WebResult::okResult);
     }
 
-    /**
-     * 课堂提问
-     * 重新发起举手
-     * @param  askLaunchVo 重新发起学生信息id 对象
-     * @return
-     */
-    @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
-    @PostMapping("/launch/raise")
-    @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true)
-    public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody AskLaunchVo askLaunchVo) {
-        return interactService.launchRaise(askLaunchVo).map(WebResult::okResult);
-    }
 
     /**
      * 课堂提问
@@ -79,6 +71,19 @@ public class BigQuestionInteractController {
     })
     public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo) {
         return interactService.raiseHand(raisehandVo).map(WebResult::okResult);
+    }
+
+    /**
+     * 课堂提问
+     * 重新发起举手
+     * @param  askLaunchVo 重新发起学生信息id 对象
+     * @return
+     */
+    @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
+    @PostMapping("/launch/raise")
+    @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true)
+    public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody AskLaunchVo askLaunchVo) {
+        return interactService.launchRaise(askLaunchVo).map(WebResult::okResult);
     }
 
     /**
@@ -131,6 +136,4 @@ public class BigQuestionInteractController {
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
         return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
     }
-
-
 }

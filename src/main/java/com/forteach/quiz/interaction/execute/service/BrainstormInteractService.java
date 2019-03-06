@@ -1,6 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
@@ -17,11 +18,9 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
 
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
  * @Description:
@@ -70,8 +69,8 @@ public class BrainstormInteractService {
         //如果本题和redis里的题目id不一致 视为换题 进行清理
         Mono<Boolean> clearCut = clearCut(giveVo);
 
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.BrainstormQuestion, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.BrainstormQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.FengBao, giveVo.getCircleId()), map);
+        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.FengBao, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
         return Flux.concat(set, time, clearCut).filter(flag -> !flag).count();
@@ -80,14 +79,14 @@ public class BrainstormInteractService {
     }
 
     private Mono<Boolean> clearCut(final MoreGiveVo giveVo) {
-        return reactiveHashOperations.get(askQuestionsId(QuestionType.BrainstormQuestion, giveVo.getCircleId()), "questionId")
+        return reactiveHashOperations.get(askQuestionsId(QuestionType.FengBao, giveVo.getCircleId()), "questionId")
                 .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
                 .flatMap(flag -> {
                     if (flag) {
                         //清除提问标识
                         return Mono.just(false);
                     }
-                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion));
+                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.FengBao));
                 });
     }
 
@@ -97,7 +96,7 @@ public class BrainstormInteractService {
      * @return
      */
     private String askQuestionsId(QuestionType type, String circleId) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
     }
 
     /**
@@ -109,9 +108,9 @@ public class BrainstormInteractService {
     public Mono<String> sendAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
                 .transform(this::filterSelectVerify)
-                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
+                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.FengBao), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
-                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
+                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.FengBao), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.FengBao)))
                 .map(InteractiveSheetVo::getCut);
     }
 
@@ -125,7 +124,7 @@ public class BrainstormInteractService {
         Query query = Query.query(
                 Criteria.where("circleId").is(sheetVo.getCircleId())
                         .and("examineeId").is(sheetVo.getExamineeId())
-                        .and("libraryType").is(QuestionType.BrainstormQuestion));
+                        .and("libraryType").is(QuestionType.FengBao));
 
         Update update = new Update();
         sheetVo.getAnsw().setDate(new Date());
@@ -162,7 +161,7 @@ public class BrainstormInteractService {
     }
 
     private Mono<InteractiveSheetVo> filterSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
-        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.BrainstormQuestion), answer.getExamineeId()))
+        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.FengBao), answer.getExamineeId()))
                 .flatMap(tuple2 -> {
                     if (tuple2.getT2()) {
                         return Mono.just(tuple2.getT1());

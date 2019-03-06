@@ -1,12 +1,13 @@
 package com.forteach.quiz.interaction.execute.domain;
 
+import com.forteach.quiz.common.DataUtil;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 /**
- * @Description:
+ * @Description:进行提问过的问题
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/3  15:01
@@ -22,12 +23,12 @@ public class InteractQuestionsRecord {
     /**
      * 发布时间
      */
-    private Date time;
+    protected String time;
 
-    /**
-     * 发布次数
-     */
-    private Integer number;
+//    /**
+//     * 未选择的数量
+//     */
+//    private Integer number;
 
     /**
      * 发布类别 ,个人 , 小组
@@ -88,6 +89,6 @@ public class InteractQuestionsRecord {
         this.interactive = interactive;
         this.category = category;
         this.selectId = selectId;
-        this.time = new Date();
+        this.time = DataUtil.format(new Date());
     }
 }

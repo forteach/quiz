@@ -1,12 +1,11 @@
 package com.forteach.quiz.interaction.execute.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
 
 /**
  * @Description:
@@ -48,7 +47,7 @@ public class InteractiveSheetVo {
      * @return
      */
     public String getAskKey(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
     /**
@@ -57,7 +56,7 @@ public class InteractiveSheetVo {
      * @return
      */
     public String getExamineeIsReplyKey(QuestionType type) {
-        return EXAMINEE_IS_REPLY_KEY.concat(type.name()).concat(circleId);
+        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(circleId).concat(type.name());
     }
 
 }

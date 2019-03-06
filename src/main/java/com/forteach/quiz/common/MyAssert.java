@@ -79,7 +79,7 @@ public final class MyAssert {
         if (value) {
             fail(errcode, String.format(format, args));
         }
-        return Mono.just(false);
+        return Mono.just(true);
     }
 
     /**
@@ -93,7 +93,7 @@ public final class MyAssert {
         if (value) {
             fail(errcode, message);
         }
-        return Mono.just(false);
+        return Mono.just(true);
     }
 
     /**
