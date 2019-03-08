@@ -22,7 +22,7 @@ public class JoinInteractiveRoomVo {
      * 学生id
      */
     @ApiModelProperty(value = "学生id", name = "examineeId")
-    private String examineeId;
+    private String examineeId="410221199706224226";
 
     /**
      * 课堂圈子id
