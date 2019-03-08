@@ -11,7 +11,7 @@ public class ClassRoomKey {
     /**
      * 课堂相关信息ID-Redis的编码前缀
      */
-    public static final String CLASS_ROOM_QR_CODE_PREFIX = "RoomAll";
+    public static final String CLASS_ROOM_QR_CODE_PREFIX = "RoomMember";
 
     /**
      * 老师创建临时课堂前缀

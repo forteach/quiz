@@ -99,7 +99,10 @@ public class BigQuestionInteractService {
         //创建提问题目,并保存题目会的学生(学生编号逗号分隔)
         Mono<Boolean> createQuID =stringRedisTemplate.opsForValue()
                   .set(BigQueKey.askTypeQuestionsId(QuestionType.TiWen, giveVo,giveVo.getQuestionId()),giveVo.getSelected(), Duration.ofSeconds(60 * 60 * 2))
-                  .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "redis操作错误"));
+                  .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "redis操作错误"))
+                  .filterWhen(ok->stringRedisTemplate.opsForValue()
+                          //记录当前题目的成员回答类型（个人、小组）和互动方式（选人，抢答）
+                          .set(BigQueKey.askTypeQuestionsIdType(giveVo.getCircleId(),giveVo.getQuestionId()),giveVo.getCategory().concat(",").concat(giveVo.getInteractive()), Duration.ofSeconds(60 * 60 * 2)));
 
 
         //删除抢答答案（删除课堂提问的题目ID的回答信息）

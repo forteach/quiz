@@ -159,10 +159,10 @@ public class ClassRoomService {
                 //设置加入课堂后，两小时过期
                 .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 2)));
 
-        //正在开课的教室,先不考虑单节课过期问题
+        //正在开课的教室，以后可以创建个任务，清理这里无效的数据？****
         Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
                 .flatMap(count -> MyAssert.isTrue(count==0, DefineCode.ERR0013, "创建开课教室失败"))
-                //设置正在开课的课堂ID集合12小时过期
+                //设置正在开课的课堂ID集合12小时过期，如果启动清理任务，这个过期就需要去除？****
                 .filterWhen(count -> stringRedisTemplate.expire(ClassRoomKey.OPEN_CLASSROOM, Duration.ofSeconds(60 * 60 * 12)));
 
         //设置上课的教室

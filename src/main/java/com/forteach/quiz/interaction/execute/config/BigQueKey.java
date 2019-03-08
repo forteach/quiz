@@ -28,7 +28,7 @@ public class BigQueKey {
 
 
     /**
-     * 课堂互动的hash前缀
+     * 课堂互动前缀
      *
      * @return 问题前缀+课堂+问题类型+回答方式
      */
@@ -37,7 +37,7 @@ public class BigQueKey {
     }
 
     /**
-     * 课堂互动的hash前缀
+     * 课堂题目当前前缀
      *
      * @return 当前问题前缀+课堂+问题类型+回答方式
      */
@@ -46,7 +46,7 @@ public class BigQueKey {
     }
 
     /**
-     * 课堂互动的hash前缀
+     * 课堂题目上一题前缀
      *
      * @return 上一次的问题前缀+课堂+问题类型+回答方式
      */
@@ -55,7 +55,7 @@ public class BigQueKey {
     }
 
     /**
-     * 课堂互动的hash前缀
+     * 课堂题目前缀
      *
      * @return 问题前缀+课堂+问题类型+回答方式+单个题目ID，用于改题目过期判断数据依据
      */
@@ -63,6 +63,14 @@ public class BigQueKey {
         return askTypeQuestionsId(type,giveVo).concat(questionId);
     }
 
+    /**
+     * 课堂题目互动类型前缀
+     *
+     * @return 问题前缀+课堂+问题类型+回答方式+单个题目ID，用于改题目过期判断数据依据
+     */
+    public static String askTypeQuestionsIdType(final String circleId, String questionId) {
+        return  circleId.concat("asknow").concat(questionId);
+    }
 
     /**
      * 课堂互动的hash前缀

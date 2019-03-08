@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * @Description:
+ * @Description:创建课堂，加入学生
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/21  17:50
