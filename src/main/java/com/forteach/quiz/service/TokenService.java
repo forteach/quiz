@@ -57,7 +57,7 @@ public class TokenService {
         String token = request.getHeaders().getFirst("token");
 //        String token = getToken1(request);
         Assert.notNull(token, "token is null");
-        MyAssert.blank(token, DefineCode.ERR0004, "token is mull");
+        MyAssert.blank(token, DefineCode.ERR0004, "token is null");
         return JWT.decode(token).getAudience().get(0);
     }
 
@@ -67,7 +67,7 @@ public class TokenService {
      * @return
      */
     public String getStudentId(ServerHttpRequest request){
-        return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
+        return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId") != null ? this : "");
     }
 
     /**
@@ -91,16 +91,13 @@ public class TokenService {
      */
     public Mono<Boolean> check(ServerRequest request){
         String token = getToken(request);
-        if (StringUtil.isEmpty(token)){
-            log.error("token is null");
-            return Mono.error(new TokenExpiredException("缺少token"));
-        }
+        MyAssert.blank(token, DefineCode.ERR0004, "token is null");
         try {
             String openId = JWT.decode(token).getAudience().get(0);
             verifier(openId).verify(token);
         } catch (JWTVerificationException e) {
             log.error("token check false 401");
-            return Mono.error(new TokenExpiredException("401"));
+            MyAssert.fail(DefineCode.ERR0004, e, "401");
         }
         return Mono.just(true);
     }
@@ -145,12 +142,11 @@ public class TokenService {
 //                    NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(new UnpooledByteBufAllocator(false));
 //                    DataBufferUtils.release(dataBuffer);
 //                    (T) nettyDataBufferFactory.wrap(bytes);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
 //            }).then().block();
-//        }
-//        return null;
+
         return token.get();
     }
 
