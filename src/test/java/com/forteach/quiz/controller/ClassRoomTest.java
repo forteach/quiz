@@ -85,7 +85,7 @@ public class ClassRoomTest {
         InteractiveRoomVo vo=new InteractiveRoomVo("t01","cp01");
         webTestClient
                 .post().uri("/classRoom/test")
-                .contentType(MediaType.APPLICATION_JSON) // 2
+                .contentType(MediaType.APPLICATION_STREAM_JSON) // 2
                 .body(Mono.just(vo),InteractiveRoomVo.class) // 3
                 .exchange()
                 .expectStatus()

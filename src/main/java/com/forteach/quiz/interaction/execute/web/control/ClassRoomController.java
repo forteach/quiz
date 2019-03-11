@@ -9,11 +9,12 @@ import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 /**
  * @Description:创建课堂，加入学生
@@ -72,19 +73,20 @@ public class ClassRoomController extends BaseController {
         MyAssert.blank(joinVo.getExamineeId(), DefineCode.ERR0010 ,"学生编号不存在");
         return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
     }
-    @PostMapping(value = "/test")
-    public Mono<String> test(@RequestBody InteractiveRoomVo roomVo) {
+
+    @PostMapping(value = "/stream",produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<String> test(@RequestBody InteractiveRoomVo roomVo) {
 
         Mono<Boolean> time = Mono.just("123").flatMap(item -> MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"));
         Mono<Boolean> time1 = Mono.just("123").flatMap(item ->{System.out.println("########"); return MyAssert.isFalse(true, DefineCode.ERR0013, "操作错误");});
 
         //验证请求参数
-        return Mono.just("ok")
-                 //不创建key
-                 .flatMap(str->{
-                     return classRoomService.listTest();
-                     //return time.flatMap(a->{System.out.println("*********"); MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"); return Mono.just("123");}).filterWhen(r->Mono.just(true));
-                 });
+        return  Flux.interval(Duration.ofMillis(500)).flatMap(l-> Flux.just("ok"));
+//                 //不创建key
+//                 .flatMap(str->{
+//                     return classRoomService.listTest();
+//                     //return time.flatMap(a->{System.out.println("*********"); MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"); return Mono.just("123");}).filterWhen(r->Mono.just(true));
+//                 });
                 //如果KEY存在
                 //.filterWhen(str->time1);
 
