@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
 import org.springframework.data.domain.Sort;
@@ -9,7 +11,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.util.Objects;
+
 import static com.forteach.quiz.util.DateUtil.getEndTime;
 import static com.forteach.quiz.util.DateUtil.getStartTime;
 
@@ -70,23 +74,31 @@ public class InteractRecordExecuteService {
     }
 
 
-    /**
-     * 创建课堂时,进行初始化记录创建记录
-     *
-     * @return
-     */
-    public Mono<Boolean> init(final String circleId, final String teacherId) {
+//    /**
+//     * 创建课堂时,进行初始化记录创建记录
+//     *
+//     * @return
+//     */
+//    public Mono<Boolean> init(final String circleId, final String teacherId) {
+//
+//        return repository.findByCircleIdAndTeacherId(circleId, teacherId).collectList()
+//                .flatMap(list -> {
+//                    if (list != null && list.size() != 0) {
+//                        return executeSuccessfully;
+//                    } else {
+//                        return build(circleId, teacherId).map(Objects::nonNull);
+//                    }
+//                });
+//    }
 
-        return repository.findByCircleIdAndTeacherId(circleId, teacherId).collectList()
-                .flatMap(list -> {
-                    if (list != null && list.size() != 0) {
-                        return executeSuccessfully;
-                    } else {
-                        return build(circleId, teacherId).map(Objects::nonNull);
-                    }
-                });
+    public Mono<String> init(final String teacherId) {
+        //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
+        return Mono.just(teacherId).flatMap(id ->build(id).flatMap(item -> {
+            MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败");
+            MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败");
+            return Mono.just(item.getId());
+        }));
     }
-
     /**
      * 构建上课信息时默认见天上课次数为 1， 并进行记录
      * @param circleId
@@ -97,6 +109,15 @@ public class InteractRecordExecuteService {
         return todayNumber(teacherId)
                 .flatMap(number ->
                         repository.save(new InteractRecord(circleId, teacherId, number + 1L)));
+    }
+
+    /**
+     * 创建Mongo课堂信息
+     * @param teacherId
+     * @return
+     */
+    private Mono<InteractRecord> build(final String teacherId) {
+        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(teacherId, number + 1L)));
     }
 
     /**

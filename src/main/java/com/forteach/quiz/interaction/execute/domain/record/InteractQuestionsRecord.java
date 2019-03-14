@@ -95,7 +95,15 @@ public class InteractQuestionsRecord {
     public InteractQuestionsRecord(String questionsId, Long index, List<String> selectId) {
         this.questionsId = questionsId;
         this.index = index.intValue();
+//        this.interactive = interactive;
+        this.category = category;
         this.selectId = selectId;
-        this.time = new Date();
+        this.time = DataUtil.format(new Date());
     }
+//    public InteractQuestionsRecord(String questionsId, Long index, List<String> selectId) {
+//        this.questionsId = questionsId;
+//        this.index = index.intValue();
+//        this.selectId = selectId;
+//        this.time = new Date();
+//    }
 }

@@ -24,13 +24,13 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      */
     Flux<InteractRecord> findByIdAndTeacherId(final String circleId, final String teacherId);
 
-//    /**
-//     * 通过课堂id查找记录
-//     *
-//     * @param circleId
-//     * @return
-//     */
-//    Mono<InteractRecord> findByCircleIdIs(final String circleId);
+    /**
+     * 通过课堂id查找记录
+     *
+     * @param circleId
+     * @return
+     */
+    Mono<InteractRecord> findByCircleIdIs(final String circleId);
     /**
      * 通过课堂id和习题册id
      *

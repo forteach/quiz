@@ -1,11 +1,9 @@
 package com.forteach.quiz.interaction.execute.service;
 
-import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
@@ -19,10 +17,11 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 import java.util.*;
+
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 /**
  * @Description: 问卷
  * @author: liu zhenming
@@ -38,19 +37,20 @@ public class SurveyInteractService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    private final InteractRecordExecuteService interactRecordExecuteService;
+//    private final InteractRecordExecuteService interactRecordExecuteService;
 
     private final InsertInteractRecordService insertInteractRecordService;
 
     public SurveyInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                  ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                  ReactiveMongoTemplate reactiveMongoTemplate,
-                                 InsertInteractRecordService insertInteractRecordService,
-                                 InteractRecordExecuteService interactRecordExecuteService) {
+                                 InsertInteractRecordService insertInteractRecordService
+//                                 InteractRecordExecuteService interactRecordExecuteService
+    ) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+//        this.interactRecordExecuteService = interactRecordExecuteService;
         this.insertInteractRecordService = insertInteractRecordService;
     }
 

@@ -1,10 +1,11 @@
 package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
+import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
@@ -24,8 +25,12 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 import java.util.*;
+
+import static com.forteach.quiz.common.Dic.*;
+import static com.forteach.quiz.interaction.execute.config.BigQueKey.CLASSROOM_ASK_QUESTIONS_ID;
 
 
 /**
@@ -40,7 +45,6 @@ public class BigQuestionInteractService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final InteractRecordExecuteService interactRecordExecuteService;
     private final CorrectService correctService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final InsertInteractRecordService insertInteractRecordService;
@@ -49,7 +53,6 @@ public class BigQuestionInteractService {
 
     public BigQuestionInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                       ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                                      InteractRecordExecuteService interactRecordExecuteService,
                                       CorrectService correctService,
                                       InsertInteractRecordService insertInteractRecordService,
                                       InteractRecordExerciseBookService interactRecordExerciseBookService,
@@ -61,7 +64,6 @@ public class BigQuestionInteractService {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
         this.insertInteractRecordService = insertInteractRecordService;
     }
 
@@ -156,12 +158,12 @@ public class BigQuestionInteractService {
 
 
     /**
-     * 如果前后两题一致
+     * 课堂发布练习册提问
+     *  TODO 临时报错注解
      * @param giveVo
      * @return
      */
     public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
-
         HashMap<String, String> map = new HashMap<>(10);
         map.put("questionId", giveVo.getQuestionId());
         map.put("category", giveVo.getCategory());
@@ -169,16 +171,22 @@ public class BigQuestionInteractService {
         map.put("cut", giveVo.getCut());
 
 
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.LianXi, giveVo.getCircleId()), map);
+        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.LianXi, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
         return Flux.concat(set, time).filter(flag -> !flag)
                 .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
                 .count();
 
+    }
+    /**
+     * 如果前后两题一致
+     * @param giveVo
+     * @return
+     */
     private Mono<Boolean> clearCut(final BigQuestionGiveVo giveVo) {
-        return stringRedisTemplate.opsForValue().get(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen, giveVo))
+        return stringRedisTemplate.opsForValue().get(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen, giveVo.getCircleId(), giveVo.getInteractive()))
                 .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
                 .flatMap(flag -> {
                     if (!flag) {
@@ -197,7 +205,6 @@ public class BigQuestionInteractService {
      * @param giveVo
      * @return
      */
-    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
     public Mono<Long> sendQuestion(final BigQuestionGiveVo giveVo) {
 
         HashMap<String, String> map = new HashMap<>(10);
@@ -210,8 +217,8 @@ public class BigQuestionInteractService {
         //如果本题和redis里的题目id不一致 视为换题 进行清理
         Mono<Boolean> clearCut = clearCut(giveVo);
 
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.BigQuestion, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.BigQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.TiWen, giveVo.getCircleId()), map);
+        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.TiWen, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //删除抢答答案
         Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag());
@@ -221,17 +228,17 @@ public class BigQuestionInteractService {
                 .count();
     }
 
-    private Mono<Boolean> clearCut(final BigQuestionGiveVo giveVo) {
-        return reactiveHashOperations.get(askQuestionsId(QuestionType.BigQuestion, giveVo.getCircleId()), "questionId")
-                .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
-                .flatMap(flag -> {
-                    if (flag) {
-                        //清除提问标识
-                        return Mono.just(false);
-                    }
-                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.BigQuestion));
-                });
-    }
+//    private Mono<Boolean> clearCut(final BigQuestionGiveVo giveVo) {
+//        return reactiveHashOperations.get(askQuestionsId(QuestionType.TiWen, giveVo.getCircleId()), "questionId")
+//                .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
+//                .flatMap(flag -> {
+//                    if (flag) {
+//                        //清除提问标识
+//                        return Mono.just(false);
+//                    }
+//                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.TiWen));
+//                });
+//    }
 
 
     /**
@@ -247,8 +254,8 @@ public class BigQuestionInteractService {
 
         return Mono.just(answerVo)
                 .transform(this::filterSelectVerify)
-                .flatMap(answer -> askInteractiveType(answer.getAskKey(QuestionType.BigQuestion)))
-                .zipWhen(type -> sendAnswerVerify(answerVo.getAskKey(QuestionType.BigQuestion), answerVo.getQuestionId(), answerVo.getCut()))
+                .flatMap(answer -> askInteractiveType(answer.getAskKey(QuestionType.TiWen)))
+                .zipWhen(type -> sendAnswerVerify(answerVo.getAskKey(QuestionType.TiWen), answerVo.getQuestionId(), answerVo.getCut()))
                 .flatMap(tuple2 -> {
                     if (tuple2.getT2()) {
                         switch (tuple2.getT1()) {
@@ -267,43 +274,20 @@ public class BigQuestionInteractService {
                         return Mono.error(new AskException("请重新刷新获取最新题目"));
                     }
                 })
-                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
+                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.TiWen), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.TiWen)))
                 .filterWhen(right -> insertInteractRecordService.answer(answerVo.getCircleId(), answerVo.getQuestionId(), answerVo.getExamineeId(), answerVo.getAnswer(), right));
     }
 
-    /**
-     * 课堂发布练习册提问
-     *  TODO 临时报错注解
-     * @param giveVo
-     * @return
-     */
-    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
-        HashMap<String, String> map = new HashMap<>(10);
-        map.put("questionId", giveVo.getQuestionId());
-        map.put("category", giveVo.getCategory());
-        map.put("selected", giveVo.getSelected());
-        map.put("cut", giveVo.getCut());
-
-
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
-
-        //TODO 未记录
-        return Flux.concat(set, time).filter(flag -> !flag)
-                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
-                .count();
-
-    }
 
 
     /**
-     * 验证练习册发放选中
-     *  TODO 报错临时注解
+     * 验证课堂提问选中
+     *
      * @param answerVo
      * @return
      */
-    private Mono<InteractiveSheetVo> filterSheetSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
-        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.ExerciseBook), answer.getExamineeId()))
+    private Mono<InteractAnswerVo> filterSelectVerify(final Mono<InteractAnswerVo> answerVo) {
+        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.TiWen), answer.getExamineeId()))
                 .flatMap(tuple2 -> {
                     if (tuple2.getT2()) {
                         return Mono.just(tuple2.getT1());
@@ -313,6 +297,44 @@ public class BigQuestionInteractService {
                 });
     }
 
+    /**
+     * 验证练习册发放选中
+     * @param answerVo
+     * @return
+     */
+    private Mono<InteractiveSheetVo> filterSheetSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
+        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.LianXi), answer.getExamineeId()))
+                .flatMap(tuple2 -> {
+                    if (tuple2.getT2()) {
+                        return Mono.just(tuple2.getT1());
+                    } else {
+                        return Mono.error(new AskException("该题未被选中 不能答题"));
+                    }
+                });
+    }
+
+    /**
+     * 通过 提问key,判断是否是选择
+     *
+     * @param askKey
+     * @return
+     */
+    private Mono<Boolean> selectVerify(final String askKey, final String examineeId) {
+        return reactiveHashOperations.get(askKey, "selected")
+                .map(selectId ->
+                        isSelected(selectId, examineeId));
+    }
+
+    /**
+     * 验证提交的答案信息
+     *
+     * @return
+     */
+    private Mono<Boolean> sendAnswerVerify(final String askId, final String oQuestionId, final String oCut) {
+        Mono<String> questionId = reactiveHashOperations.get(askId, "questionId");
+        Mono<String> cut = reactiveHashOperations.get(askId, "cut");
+        return cut.zipWith(questionId, (c, q) -> c.equals(oCut) && q.equals(oQuestionId));
+    }
     /**
      * 抢答 回答
      * @return
@@ -440,7 +462,8 @@ public class BigQuestionInteractService {
                         right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
                 // Todo 提交答案保存
                 .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, "exerciseBooks"))
-                .map(InteractiveSheetVo::getCut);
+//                .map(InteractiveSheetVo::getCut);
+                .thenReturn(sheetVo.getCut());
     }
 
     /**

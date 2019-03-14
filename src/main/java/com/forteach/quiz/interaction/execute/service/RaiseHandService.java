@@ -2,14 +2,13 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
-import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 
 @Slf4j
@@ -17,20 +16,23 @@ import java.time.Duration;
 public class RaiseHandService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
-    private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
+
+//    private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
+
     private final InteractRecordExecuteService interactRecordExecuteService;
-    private final CorrectService correctService;
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
+//    private final CorrectService correctService;
+//    private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     public RaiseHandService(ReactiveStringRedisTemplate stringRedisTemplate,
-                            ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                            InteractRecordExecuteService interactRecordExecuteService,
-                            CorrectService correctService,
-                            ReactiveMongoTemplate reactiveMongoTemplate) {
+//                            ReactiveHashOperations<String, String, String> reactiveHashOperations,
+                            InteractRecordExecuteService interactRecordExecuteService
+//                            CorrectService correctService,
+//                            ReactiveMongoTemplate reactiveMongoTemplate
+    ) {
         this.stringRedisTemplate = stringRedisTemplate;
-        this.reactiveHashOperations = reactiveHashOperations;
-        this.correctService = correctService;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
+//        this.reactiveHashOperations = reactiveHashOperations;
+//        this.correctService = correctService;
+//        this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.interactRecordExecuteService = interactRecordExecuteService;
     }
 

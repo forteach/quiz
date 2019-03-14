@@ -2,9 +2,9 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.service.CorrectService;
@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,22 +28,19 @@ public class SendQuestService {
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final InteractRecordExecuteService interactRecordExecuteService;
-    private final CorrectService correctService;
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final BigQuestionRepository bigQuestionRepository;
+    private final InteractRecordQuestionsService interactRecordQuestionsService;
 
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
                                       ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                       InteractRecordExecuteService interactRecordExecuteService,
-                                      CorrectService correctService,
-                                      BigQuestionRepository bigQuestionRepository,
-                                      ReactiveMongoTemplate reactiveMongoTemplate) {
+                            InteractRecordQuestionsService interactRecordQuestionsService,
+                                      BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
-        this.correctService = correctService;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionRepository=bigQuestionRepository;
         this.interactRecordExecuteService = interactRecordExecuteService;
+        this.interactRecordQuestionsService = interactRecordQuestionsService;
     }
 
     /**
@@ -82,7 +80,7 @@ public class SendQuestService {
         return Flux.concat(addQuestNow,createQuest)
                 .count()
                 //创建改题目的回答者信息
-                .flatMap(ct-> interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
+                .flatMap(ct-> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive));
     }
 
 

@@ -59,14 +59,14 @@ public class InteractAnswerVo {
         this.cut = cut;
     }
 
-//    /**
-//     * 获取redis 提问 key
-//     *
-//     * @return
-//     */
-//    public String getAskKey(QuestionType type) {
-//        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
-//    }
+    /**
+     * 获取redis 提问 key
+     *
+     * @return
+     */
+    public String getAskKey(QuestionType type) {
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
+    }
 
     public String getRaceAnswerFlag() {
         return BigQueKey.CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);

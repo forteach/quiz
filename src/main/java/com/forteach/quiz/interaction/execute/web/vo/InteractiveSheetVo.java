@@ -5,12 +5,7 @@ import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
-
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-import static com.forteach.quiz.common.KeyStorage.EXAMINEE_IS_REPLY_KEY;
-
 /**
  * @Description:
  * @author: liu zhenming

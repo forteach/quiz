@@ -14,7 +14,6 @@ import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.service.TokenService;
-import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
 import io.swagger.annotations.*;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
 import javax.validation.Valid;
 /**
  * @Description: 课堂问题发布
@@ -50,11 +50,21 @@ public class BigQuestionInteractController {
 
     //课堂举手
     private final RaiseHandService raiseHandService;
+
     public BigQuestionInteractController(BigQuestionInteractService interactService,
                                          InteractRecordQuestionsService interactRecordQuestionsService,
                                          InteractRecordExerciseBookService interactRecordExerciseBookService,
+                                         SendQuestService sendQuestService,
+                                         SendAnswerService sendAnswerService,
+                                         RaiseHandService raiseHandService,
                                          TokenService tokenService) {
-
+        this.interactService = interactService;
+        this.interactRecordQuestionsService = interactRecordQuestionsService;
+        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+        this.tokenService = tokenService;
+        this.sendQuestService = sendQuestService;
+        this.sendAnswerService = sendAnswerService;
+        this.raiseHandService = raiseHandService;
     }
 
     /**
@@ -97,7 +107,7 @@ public class BigQuestionInteractController {
     @ApiOperation(value = "学生举手", notes = "课堂提问 学生举手")
     @ApiImplicitParams({
 //            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
-            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true)
+            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
