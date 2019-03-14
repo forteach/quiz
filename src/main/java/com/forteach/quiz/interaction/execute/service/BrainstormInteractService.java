@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.*;
 
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_BRAINSTORMS;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
@@ -75,7 +76,7 @@ public class BrainstormInteractService {
 
         //TODO 未记录
         return Flux.concat(set, time, clearCut).filter(flag -> !flag)
-                .filterWhen(obj -> insertInteractRecordService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "brainstorms"))
+                .filterWhen(obj -> insertInteractRecordService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), INTERACT_RECORD_BRAINSTORMS))
                 .count();
 
     }

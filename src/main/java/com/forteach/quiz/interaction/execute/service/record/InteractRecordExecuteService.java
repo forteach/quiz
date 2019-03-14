@@ -117,18 +117,6 @@ public class InteractRecordExecuteService {
     }
 
     /**
-     * 计算习题册发布的次数
-     * @param circleId
-     * @return
-     */
-    Mono<Long> exerciseBookNumber(final String circleId){
-        return mongoTemplate.count(Query.query(
-                Criteria.where("circleId").is(circleId)
-                        .and("exerciseBooks.questionsId").ne("").ne(null)),
-                InteractRecord.class).switchIfEmpty(Mono.just(0L));
-    }
-
-    /**
      * 获取今天最新的课堂记录
      *
      * @param teacherId
@@ -160,8 +148,7 @@ public class InteractRecordExecuteService {
      * @param category
      * @return
      */
-    Query buildLastInteractRecord(final String circleId, final String questionId, final String category, String interactType) {
-
+    Query buildLastInteractRecord(final String circleId, final String questionId, final String category, final String interactType) {
         final Query query = Query.query(Criteria.where("circleId")
                 .is(circleId).and(interactType + ".questionsId").is(questionId)
                 .and(interactType + ".category").is(category)

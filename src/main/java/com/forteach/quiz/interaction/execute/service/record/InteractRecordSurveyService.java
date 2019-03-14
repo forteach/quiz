@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Objects;
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
 
 /**
  * @author: zhangyy
@@ -66,7 +67,7 @@ public class InteractRecordSurveyService {
         Update update = new Update();
         //学生编号id 进行,分割
         SurveyInteractRecord records = new SurveyInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));
-        update.push("surveys", records);
+        update.push(INTERACT_RECORD_SURVEYS, records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 }

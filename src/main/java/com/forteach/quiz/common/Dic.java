@@ -177,4 +177,27 @@ public class Dic {
      */
     public final static String TOKEN_TEACHER ="teacher";
 
+    /*-------  记录的字段名字  -------*/
+
+    /**
+     *  问题　大题
+     */
+    public final static String INTERACT_RECORD_QUESTIONS = "questions";
+    /**
+     * 头脑风暴记录
+     */
+    public final static String INTERACT_RECORD_BRAINSTORMS = "brainstorms";
+    /**
+     * 问卷记录
+     */
+    public final static String INTERACT_RECORD_SURVEYS = "surveys";
+    /**
+     * 任务记录
+     */
+    public final static String INTERACT_RECORD_INTERACTS = "interacts";
+    /**
+     * 习题册
+     */
+    public final static String INTERACT_RECORD_EXERCISEBOOKS = "exerciseBooks";
+
 }

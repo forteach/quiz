@@ -11,11 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.util.Objects;
-
-import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_FALSE;
-import static com.forteach.quiz.common.Dic.QUESTION_ACCURACY_TRUE;
+import static com.forteach.quiz.common.Dic.*;
 
 /**
  * @author: zhangyy
@@ -81,11 +78,11 @@ public class InsertInteractRecordService {
                     || tuple2.getT2().getBrainstorms() != null && tuple2.getT2().getBrainstorms().size() > 0
                     || tuple2.getT2().getInteracts() != null && tuple2.getT2().getInteracts().size() > 0) {
                 return updateInteractRecordService.upInteractInteractRecord(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactRecordType);
-            } else if ("surveys".equals(interactRecordType)) {
+            } else if (INTERACT_RECORD_SURVEYS.equals(interactRecordType)) {
                 return interactRecordSurveyService.pushInteractSurveys(selectId, circleId, questionId, tuple2.getT1(), category);
-            } else if ("interacts".equals(interactRecordType)) {
+            } else if (INTERACT_RECORD_INTERACTS.equals(interactRecordType)) {
                 return interactRecordTaskService.pushInteractTask(selectId, circleId, questionId, tuple2.getT1(), category);
-            } else if ("brainstorms".equals(interactRecordType)) {
+            } else if (INTERACT_RECORD_BRAINSTORMS.equals(interactRecordType)) {
                 return interactRecordBrainstormService.pushInteractBrainstorms(selectId, circleId, questionId, tuple2.getT1(), category);
             } else {
                 return interactRecordQuestionsService.pushInteractQuestions(selectId, circleId, questionId, tuple2.getT1(), "", category);

@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
 
 /**
  * @author: zhangyy
@@ -72,7 +73,7 @@ public class InteractRecordQuestionsService {
         Update update = new Update();
         //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, interactive, category, Arrays.asList(selectId.split(",")));
-        update.push("questions", records);
+        update.push(INTERACT_RECORD_QUESTIONS, records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 
@@ -89,9 +90,9 @@ public class InteractRecordQuestionsService {
 
         final Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
-                        .and("questions.questionsId").is(questionId)
-                        .and("questions.interactive").is(interactive)
-                        .and("questions.category").is(category)
+                        .and(INTERACT_RECORD_QUESTIONS + ".questionsId").is(questionId)
+                        .and(INTERACT_RECORD_QUESTIONS + ".interactive").is(interactive)
+                        .and(INTERACT_RECORD_QUESTIONS + ".category").is(category)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         query.fields().include("questions");
@@ -114,9 +115,9 @@ public class InteractRecordQuestionsService {
         Query query = buildLastQuestionsRecord(circleId, questionId, category, interactive);
         Update update = new Update();
         List<String> list = Arrays.asList(selectId.split(","));
-        update.set("questions.$.selectId", list);
+        update.set(INTERACT_RECORD_QUESTIONS + ".$.selectId", list);
         if (!list.equals(tSelectId)) {
-            update.inc("questions.$.number", 1);
+            update.inc(INTERACT_RECORD_QUESTIONS + ".$.number", 1);
         }
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }

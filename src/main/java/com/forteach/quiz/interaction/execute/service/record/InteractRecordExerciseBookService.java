@@ -16,9 +16,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.Objects;
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_EXERCISEBOOKS;
 
 /**
  * @author: zhangyy
@@ -34,17 +34,13 @@ public class InteractRecordExerciseBookService {
 
     private final ReactiveMongoTemplate mongoTemplate;
 
-    private InteractRecordExecuteService interactRecordExecuteService;
-
     private UpdateInteractRecordService updateInteractRecordService;
 
     public InteractRecordExerciseBookService(InteractRecordRepository repository,
                                              ReactiveMongoTemplate mongoTemplate,
-                                             InteractRecordExecuteService interactRecordExecuteService,
                                              UpdateInteractRecordService updateInteractRecordService) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
-        this.interactRecordExecuteService = interactRecordExecuteService;
         this.updateInteractRecordService = updateInteractRecordService;
     }
 
@@ -78,16 +74,16 @@ public class InteractRecordExerciseBookService {
         Update update = new Update();
         //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, Arrays.asList(selectId.split(",")));
-        update.push("exerciseBooks", records);
+        update.push(INTERACT_RECORD_EXERCISEBOOKS, records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 
     private Query buildexerciseBooks(final String circleId, final String questionId) {
         final Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
-                        .and("exerciseBooks.questionsId").is(questionId)
+                        .and(INTERACT_RECORD_EXERCISEBOOKS + ".questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
-        query.fields().include("exerciseBooks");
+        query.fields().include(INTERACT_RECORD_EXERCISEBOOKS);
         return query;
     }
 
@@ -104,17 +100,29 @@ public class InteractRecordExerciseBookService {
     }
 
     /**
+     * 计算习题册发布的次数
+     * @param circleId
+     * @return
+     */
+    private Mono<Long> exerciseBookNumber(final String circleId){
+        return mongoTemplate.count(Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("exerciseBooks.questionsId").ne("").ne(null)),
+                InteractRecord.class).switchIfEmpty(Mono.just(0L));
+    }
+
+    /**
      * 记录习题册
      * @param giveVo
      * @return
      */
     public Publisher<Boolean> interactiveBook(final MoreGiveVo giveVo) {
-        Mono<Long> number = interactRecordExecuteService.exerciseBookNumber(giveVo.getCircleId());
+        Mono<Long> number = exerciseBookNumber(giveVo.getCircleId());
         Mono<InteractRecord> recordMono = findexerciseBooks(giveVo.getCircleId(), giveVo.getQuestionId());
         return Mono.zip(number, recordMono).flatMap(tuple2 -> {
 
             if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
-                return updateInteractRecordService.upInteractInteractRecord(giveVo.getSelected(), tuple2.getT2().getQuestions().get(0).getSelectId(), giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getCategory(), "exerciseBooks");
+                return updateInteractRecordService.upInteractInteractRecord(giveVo.getSelected(), tuple2.getT2().getQuestions().get(0).getSelectId(), giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getCategory(), INTERACT_RECORD_EXERCISEBOOKS);
             } else {
                 return pushExerciseBook(giveVo.getSelected(), tuple2.getT1(), giveVo.getCircleId(), giveVo.getQuestionId());
             }

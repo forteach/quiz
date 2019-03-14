@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.Objects;
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_BRAINSTORMS;
 
 /**
  * @author: zhangyy
@@ -67,7 +67,7 @@ public class InteractRecordBrainstormService {
         Update update = new Update();
         //学生编号id 进行,分割
         BrainstormInteractRecord records = new BrainstormInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));
-        update.push("brainstorms", records);
+        update.push(INTERACT_RECORD_BRAINSTORMS, records);
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 }

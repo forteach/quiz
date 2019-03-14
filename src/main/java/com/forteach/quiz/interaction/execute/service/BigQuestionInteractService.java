@@ -360,7 +360,8 @@ public class BigQuestionInteractService {
         Mono<Long> set = stringRedisTemplate.opsForSet().add(redisKey, value);
         Mono<Boolean> time = stringRedisTemplate.expire(redisKey, Duration.ofSeconds(60 * 60 * 10));
 
-        return set.zipWith(time, (c, t) -> t ? c : -1).map(monoLong -> monoLong != -1).filterWhen(take -> reactiveHashOperations.increment(askKey, "answerFlag", 1).map(Objects::nonNull));
+        return set.zipWith(time, (c, t) -> t ? c : -1).map(monoLong -> monoLong != -1)
+                .filterWhen(take -> reactiveHashOperations.increment(askKey, "answerFlag", 1).map(Objects::nonNull));
     }
 
     /**

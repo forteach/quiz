@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.*;
 
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
@@ -77,7 +79,7 @@ public class SurveyInteractService {
 
         //TODO 未记录
         return Flux.concat(set, time, clearCut).filter(flag -> !flag)
-                .filterWhen(obj -> insertInteractRecordService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "surveys"))
+                .filterWhen(obj -> insertInteractRecordService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), INTERACT_RECORD_SURVEYS))
                 .count();
 
     }
@@ -111,7 +113,7 @@ public class SurveyInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.SurveyQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.SurveyQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.SurveyQuestion)))
-                .filterWhen(survey -> insertInteractRecordService.pushMongo(survey, "surveys"))
+                .filterWhen(survey -> insertInteractRecordService.pushMongo(survey, INTERACT_RECORD_SURVEYS))
                 .thenReturn(sheetVo.getCut());
     }
 
