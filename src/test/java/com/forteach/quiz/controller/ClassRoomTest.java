@@ -1,6 +1,5 @@
 package com.forteach.quiz.controller;
 
-
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.web.req.InteractiveStudentsReq;

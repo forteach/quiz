@@ -8,6 +8,7 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.Answ;
 import com.forteach.quiz.interaction.execute.domain.AnswChildren;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
@@ -18,13 +19,12 @@ import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
 import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static com.forteach.quiz.common.Dic.*;
 import static java.util.stream.Collectors.toList;
 
@@ -42,9 +42,12 @@ public class CorrectService {
 
     private final BigQuestionRepository bigQuestionRepository;
 
-    public CorrectService(ProblemSetBackupRepository problemSetBackupRepository, BigQuestionRepository bigQuestionRepository) {
+    private final ReactiveStringRedisTemplate stringRedisTemplate;
+
+    public CorrectService(ProblemSetBackupRepository problemSetBackupRepository, BigQuestionRepository bigQuestionRepository,ReactiveStringRedisTemplate stringRedisTemplate) {
         this.problemSetBackupRepository = problemSetBackupRepository;
         this.bigQuestionRepository = bigQuestionRepository;
+        this.stringRedisTemplate=stringRedisTemplate;
     }
 
     /**
@@ -132,18 +135,18 @@ public class CorrectService {
 
     //TODO  题目回答更正回答记录
     public Mono<String> correcting(final String questionId, final String answer) {
-        //找到题目信息
-        return bigQuestionRepository.findById(questionId)
+        //找到题目信息 TODO OLD
+        //return bigQuestionRepository.findById(questionId)
+        return getBigQuestion(questionId)
                 .flatMap(bigQuestion -> {
-
                     JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
-
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
                         case QUESTION_CHOICE_OPTIONS_SINGLE:
                             //选择题
                         case QUESTION_CHOICE_MULTIPLE_SINGLE:
                             ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
-                            return Mono.just(String.valueOf(choice(choiceQst, answer)));
+                            String result=String.valueOf(choice(choiceQst, answer));
+                            return Mono.just(result);
                             //判断
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
                             TrueOrFalse trueOrFalse = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), TrueOrFalse.class);
@@ -156,7 +159,13 @@ public class CorrectService {
                             throw new ExamQuestionsException("非法参数 错误的题目类型");
                     }
                 });
+    }
 
+    //从Redis或Mongo获得题目内容
+    public Mono<BigQuestion> getBigQuestion(String questionId){
+        String key= BigQueKey.QuestionsNow(questionId);
+        return stringRedisTemplate.hasKey(key)
+                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(BigQueKey.QuestionsNow(questionId)).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId));
     }
 
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {
