@@ -22,7 +22,7 @@ import static com.forteach.quiz.util.StringUtil.getRandomUUID;
 
 
 /**
- * @Description:
+ * @Description: 创建课堂
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/12/21  17:53
@@ -159,7 +159,7 @@ public class ClassRoomService {
                 //设置加入课堂后，两小时过期
                 .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 2)));
 
-        //正在开课的教室，以后可以创建个任务，清理这里无效的数据？****
+        // TODO 正在开课的教室，以后可以创建个任务，清理这里无效的数据？****
         Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
                 .flatMap(count -> MyAssert.isTrue(count==0, DefineCode.ERR0013, "创建开课教室失败"))
                 //设置正在开课的课堂ID集合12小时过期，如果启动清理任务，这个过期就需要去除？****

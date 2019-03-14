@@ -42,8 +42,9 @@ public class Dic {
 
     public static final String BIG_QUESTION_EXAM_CHILDREN_TYPE_CHOICE = "choice";
 
+    //单选
     public static final String QUESTION_CHOICE_OPTIONS_SINGLE = "single";
-
+    //多选
     public static final String QUESTION_CHOICE_MULTIPLE_SINGLE = "multiple";
 
     public static final String BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE = "trueOrFalse";
@@ -81,7 +82,7 @@ public class Dic {
     public static final String ASK_INTERACTIVE_RACE = "race";
 
     public static final String ASK_INTERACTIVE_RAISE = "raise";
-
+    //选人
     public static final String ASK_INTERACTIVE_SELECT = "select";
 
     public static final String ASK_INTERACTIVE_VOTE = "vote";

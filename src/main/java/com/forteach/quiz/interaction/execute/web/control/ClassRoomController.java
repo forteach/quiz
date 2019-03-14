@@ -24,7 +24,7 @@ import java.time.Duration;
  */
 @RestController
 @Api(value = "课堂", tags = {"课堂,上课相关处理"})
-@RequestMapping(path = "/classRoom")
+@RequestMapping(path = "/classRoom", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ClassRoomController extends BaseController {
 
     private final ClassRoomService classRoomService;
@@ -74,14 +74,14 @@ public class ClassRoomController extends BaseController {
         return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
     }
 
-    @PostMapping(value = "/stream",produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux<String> test(@RequestBody InteractiveRoomVo roomVo) {
+    @PostMapping(value = "/test")
+    public Mono<String> test(@RequestBody InteractiveRoomVo roomVo) {
 
-        Mono<Boolean> time = Mono.just("123").flatMap(item -> MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"));
-        Mono<Boolean> time1 = Mono.just("123").flatMap(item ->{System.out.println("########"); return MyAssert.isFalse(true, DefineCode.ERR0013, "操作错误");});
+//        Mono<Boolean> time = Mono.just("123").flatMap(item -> MyAssert.isFalse(true, DefineCode.ERR0013, "redis操作错误"));
+//        Mono<Boolean> time1 = Mono.just("123").flatMap(item ->{System.out.println("########"); return MyAssert.isFalse(true, DefineCode.ERR0013, "操作错误");});
 
         //验证请求参数
-        return  Flux.interval(Duration.ofMillis(500)).flatMap(l-> Flux.just("ok"));
+        return  Mono.just("ok");
 //                 //不创建key
 //                 .flatMap(str->{
 //                     return classRoomService.listTest();

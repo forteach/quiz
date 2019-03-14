@@ -46,7 +46,7 @@ public class ClassRoomTest {
 
     @Test
     public void joinInteractiveRoom(){
-        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("stu02","5c7f3a9ac762c12a84010a9e");
+        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("stu03","5c88b6c5c762c12414c09f49");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom/join/interactiveRoom")
@@ -64,7 +64,7 @@ public class ClassRoomTest {
 
     @Test
     public void findInteractiveStudents(){
-        InteractiveStudentsReq vo=new InteractiveStudentsReq("5c7f3a9ac762c12a84010a9e","t01");
+        InteractiveStudentsReq vo=new InteractiveStudentsReq("5c88b6c5c762c12414c09f49","t01");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom//find/interactiveStudents")

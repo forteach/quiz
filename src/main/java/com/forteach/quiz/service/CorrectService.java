@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.domain.Answ;
@@ -128,7 +130,9 @@ public class CorrectService {
         });
     }
 
+    //TODO  题目回答更正回答记录
     public Mono<String> correcting(final String questionId, final String answer) {
+        //找到题目信息
         return bigQuestionRepository.findById(questionId)
                 .flatMap(bigQuestion -> {
 
@@ -136,9 +140,11 @@ public class CorrectService {
 
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
                         case QUESTION_CHOICE_OPTIONS_SINGLE:
+                            //选择题
                         case QUESTION_CHOICE_MULTIPLE_SINGLE:
                             ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
                             return Mono.just(String.valueOf(choice(choiceQst, answer)));
+                            //判断
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
                             TrueOrFalse trueOrFalse = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), TrueOrFalse.class);
                             return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
@@ -155,8 +161,10 @@ public class CorrectService {
 
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {
         switch (choiceQst.getChoiceType()) {
+            //单选
             case QUESTION_CHOICE_OPTIONS_SINGLE:
                 return radio(choiceQst, answChildren);
+            //多选
             case QUESTION_CHOICE_MULTIPLE_SINGLE:
                 return multiple(choiceQst, answChildren);
             default:
@@ -167,13 +175,15 @@ public class CorrectService {
 
     private boolean choice(final ChoiceQst choiceQst, final String answer) {
         switch (choiceQst.getChoiceType()) {
+            //单选
             case QUESTION_CHOICE_OPTIONS_SINGLE:
                 return radio(choiceQst, answer);
+                //多选
             case QUESTION_CHOICE_MULTIPLE_SINGLE:
                 return multiple(choiceQst, answer);
             default:
-                log.error("非法参数 错误的选择题选项类型 : {}", choiceQst.getChoiceType());
-                throw new ExamQuestionsException("非法参数 错误的选择题选项类型");
+                 MyAssert.isFalse(false, DefineCode.ERR0002,"题目答案类型错误！");
+                 return false;
         }
     }
 

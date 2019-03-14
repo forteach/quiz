@@ -20,6 +20,9 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value = "考题 练习题库 发布课堂提问", description = "除了提问题,所有问题只有选中的学生才会收到")
 public class BigQuestionGiveVo extends GiveVo {
 
+    @ApiModelProperty(value = "教师id", name = "teacherId")
+    private String teacherId;
+
     /**
      * 问题id
      */
@@ -31,7 +34,7 @@ public class BigQuestionGiveVo extends GiveVo {
      * <p>
      * race   : 抢答
      * raise  : 举手
-     * select : 选则
+     * select : 选人
      * vote   : 投票
      */
     @ApiModelProperty(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "interactive", notes = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票")

@@ -42,15 +42,30 @@ public class MongoTemplateTest {
     @Before
     public void setUp() {
 
+//        StepVerifier.create(template.dropCollection(Design.class)).verifyComplete();
+//        Flux<Design> insertAll = template
+//                .insertAll(Flux.just(new Design("1+1= ?", "2", "幼儿园难度1", 1.1), //
+//                        new Design("1+2= ?", "3", "幼儿园难度2", 1.2), //
+//                        new Design("1+3= ?", "4", "幼儿园难度3", 1.3), //
+//                        new Design("1+4= ?", "5", "幼儿园难度4", 1.4)).collectList());
+//
+//        StepVerifier.create(insertAll).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    public void init(){
         StepVerifier.create(template.dropCollection(Design.class)).verifyComplete();
+        Flux<BigQuestion> insertAll = template
+                .insertAll(Flux.just(new BigQuestion("q01",  Arrays.asList("测试题目1")), //
+                        new BigQuestion("q02",  Arrays.asList("测试题目2"))).collectList());
 
-        Flux<Design> insertAll = template
-                .insertAll(Flux.just(new Design("1+1= ?", "2", "幼儿园难度1", 1.1), //
-                        new Design("1+2= ?", "3", "幼儿园难度2", 1.2), //
-                        new Design("1+3= ?", "4", "幼儿园难度3", 1.3), //
-                        new Design("1+4= ?", "5", "幼儿园难度4", 1.4)).collectList());
+//        Flux<Design> insertAll = template
+//                .insertAll(Flux.just(new Design("1+1= ?", "2", "幼儿园难度1", 1.1), //
+//                        new Design("1+2= ?", "3", "幼儿园难度2", 1.2), //
+//                        new Design("1+3= ?", "4", "幼儿园难度3", 1.3), //
+//                        new Design("1+4= ?", "5", "幼儿园难度4", 1.4)).collectList());
 
-        StepVerifier.create(insertAll).expectNextCount(4).verifyComplete();
+        StepVerifier.create(insertAll).expectNextCount(2).verifyComplete();
     }
 
     /**

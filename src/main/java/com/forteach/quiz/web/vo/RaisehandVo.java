@@ -31,6 +31,12 @@ public class RaisehandVo {
     @ApiModelProperty(value = "课堂圈子id", name = "circleId")
     private String circleId;
 
+    /**
+     * 课堂圈子id
+     */
+    @ApiModelProperty(value = "课堂圈子id", name = "questionId")
+    private String questionId;
+
 
     public String getRaiseKey() {
         return ASK_RAISE_HAND.concat(circleId);
