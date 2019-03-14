@@ -1,11 +1,11 @@
 package com.forteach.quiz.questionlibrary.domain;
 
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class BigQuestion<T> extends QuestionExamEntity<T> {
 
     public BigQuestion(final String id, final List<T> examChildren) {
         this.id = id;
-        this.setUDate(new Date());
+        this.setUDate(DataUtil.format(new Date()));
         this.examChildren = examChildren;
     }
 

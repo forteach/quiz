@@ -1,5 +1,6 @@
 package com.forteach.quiz.common;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.util.PropertiesUtil;
 import com.forteach.quiz.web.vo.BigQuestionView;
@@ -61,6 +62,7 @@ public class WebResult implements Serializable {
      * 成功操作 操作码默认为0   只有提示码 和 数据
      **/
     public static WebResult okResult(int code, Object data) {
+        System.out.println("oun------"+ JSON.toJSONString(data));
         return okResult(getOkCode(), String.valueOf(code), data);
     }
 

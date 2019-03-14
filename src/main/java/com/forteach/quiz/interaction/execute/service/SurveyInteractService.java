@@ -2,6 +2,7 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.exceptions.AskException;
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
@@ -18,13 +19,10 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
-
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-
 /**
  * @Description: 问卷
  * @author: liu zhenming
@@ -49,7 +47,6 @@ public class SurveyInteractService {
                                  ReactiveMongoTemplate reactiveMongoTemplate,
                                  InsertInteractRecordService insertInteractRecordService,
                                  InteractRecordExecuteService interactRecordExecuteService) {
-
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
@@ -74,8 +71,8 @@ public class SurveyInteractService {
         //如果本题和redis里的题目id不一致 视为换题 进行清理
         Mono<Boolean> clearCut = clearCut(giveVo);
 
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.SurveyQuestion, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.SurveyQuestion, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.WenJuan, giveVo.getCircleId()), map);
+        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.WenJuan, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
 
         //TODO 未记录
         return Flux.concat(set, time, clearCut).filter(flag -> !flag)
@@ -90,14 +87,14 @@ public class SurveyInteractService {
      * @return
      */
     private Mono<Boolean> clearCut(final MoreGiveVo giveVo) {
-        return reactiveHashOperations.get(askQuestionsId(QuestionType.SurveyQuestion, giveVo.getCircleId()), "questionId")
+        return reactiveHashOperations.get(askQuestionsId(QuestionType.WenJuan, giveVo.getCircleId()), "questionId")
                 .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
                 .flatMap(flag -> {
                     if (flag) {
                         //清除提问标识
                         return Mono.just(false);
                     }
-                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.SurveyQuestion));
+                    return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.WenJuan));
                 });
     }
 
@@ -110,11 +107,11 @@ public class SurveyInteractService {
     public Mono<String> sendAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
                 .transform(this::filterSelectVerify)
-                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.SurveyQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
+                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.WenJuan), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
-                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.SurveyQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.SurveyQuestion)))
+                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.WenJuan), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.WenJuan)))
                 .filterWhen(survey -> insertInteractRecordService.pushMongo(survey, INTERACT_RECORD_SURVEYS))
-                .thenReturn(sheetVo.getCut());
+                .map(InteractiveSheetVo::getCut);
     }
 
     /**
@@ -127,7 +124,7 @@ public class SurveyInteractService {
         Query query = Query.query(
                 Criteria.where("circleId").is(sheetVo.getCircleId())
                         .and("examineeId").is(sheetVo.getExamineeId())
-                        .and("libraryType").is(QuestionType.SurveyQuestion));
+                        .and("libraryType").is(QuestionType.WenJuan));
 
         Update update = new Update();
         sheetVo.getAnsw().setDate(new Date());
@@ -142,7 +139,7 @@ public class SurveyInteractService {
      * @return
      */
     private Mono<InteractiveSheetVo> filterSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
-        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.SurveyQuestion), answer.getExamineeId()))
+        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.WenJuan), answer.getExamineeId()))
                 .flatMap(tuple2 -> {
                     if (tuple2.getT2()) {
                         return Mono.just(tuple2.getT1());
@@ -178,7 +175,7 @@ public class SurveyInteractService {
      * @return
      */
     private String askQuestionsId(QuestionType type, String circleId) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
     /**

@@ -4,6 +4,9 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
+import com.forteach.quiz.interaction.execute.service.RaiseHandService;
+import com.forteach.quiz.interaction.execute.service.SendAnswerService;
+import com.forteach.quiz.interaction.execute.service.SendQuestService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
@@ -22,11 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
 import javax.validation.Valid;
-
 /**
- * @Description:
+ * @Description: 课堂问题发布
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/19  14:46
@@ -41,27 +42,49 @@ public class BigQuestionInteractController {
     private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final TokenService tokenService;
 
+    //课堂发布问题
+    private final SendQuestService sendQuestService;
+
+    //课堂问题回答
+    private final SendAnswerService sendAnswerService;
+
+    //课堂举手
+    private final RaiseHandService raiseHandService;
     public BigQuestionInteractController(BigQuestionInteractService interactService,
                                          InteractRecordQuestionsService interactRecordQuestionsService,
                                          InteractRecordExerciseBookService interactRecordExerciseBookService,
                                          TokenService tokenService) {
-        this.interactService = interactService;
-        this.interactRecordQuestionsService = interactRecordQuestionsService;
-        this.tokenService = tokenService;
-        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+
     }
 
     /**
-     * 课堂提问
-     * 重新发起举手
-     * @param  askLaunchVo 重新发起学生信息id 对象
+     * 课堂老师发布问题
+     *
+     * @param giveVo
      * @return
      */
-    @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
-    @PostMapping("/launch/raise")
-    @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true)
-    public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody AskLaunchVo askLaunchVo) {
-        return interactService.launchRaise(askLaunchVo).map(WebResult::okResult);
+    @ApiOperation(value = "发布问题", notes = "通过课堂id 及提问方式 进行发布问题")
+    @PostMapping("/send/question")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "问题id", name = "questionId"),
+            @ApiImplicitParam(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
+                    name = "interactive", allowableValues = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
+                    required = true, dataType = "string", paramType = "from")
+    })
+    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo) {
+        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
+        MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");
+        MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
+        //课堂发布题目
+        return sendQuestService.sendQuestion(
+                giveVo.getCircleId(),
+                giveVo.getTeacherId(),
+                giveVo.getQuestionId(),
+                giveVo.getInteractive(),
+                giveVo.getCategory(),
+                giveVo.getSelected(),
+                giveVo.getCut()
+        ).map(WebResult::okResult);
     }
 
     /**
@@ -75,10 +98,31 @@ public class BigQuestionInteractController {
     @ApiImplicitParams({
 //            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true)
+            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
+            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
+            @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
     })
     public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo, ServerHttpRequest serverHttpRequest) {
+        MyAssert.blank(raisehandVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
         raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        return interactService.raiseHand(raisehandVo).map(WebResult::okResult);
+        return raiseHandService.raiseHand(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId()).map(WebResult::okResult);
+    }
+
+    /**
+     * 课堂提问
+     * 删除上次的举手学生，重新发起举手
+     *
+     * @return
+     */
+    @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
+    @PostMapping("/launch/raise")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
+            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
+            @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
+    })
+    public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody RaisehandVo raisehandVo) {
+        return raiseHandService.launchRaise(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId()).map(WebResult::okResult);
     }
 
     /**
@@ -98,26 +142,13 @@ public class BigQuestionInteractController {
     })
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
         interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        return interactService.sendAnswer(interactAnswerVo).map(WebResult::okResult);
+        return sendAnswerService.sendAnswer(interactAnswerVo.getCircleId(),
+                interactAnswerVo.getExamineeId(),
+                interactAnswerVo.getQuestionId(),
+                interactAnswerVo.getAnswer(),
+                interactAnswerVo.getCut()).map(WebResult::okResult);
     }
 
-    /**
-     * 发布问题
-     *
-     * @param giveVo
-     * @return
-     */
-    @ApiOperation(value = "发布问题", notes = "通过课堂id 及提问方式 进行发布问题")
-    @PostMapping("/send/question")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "问题id", name = "questionId"),
-            @ApiImplicitParam(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
-                    name = "interactive", allowableValues = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
-                    required = true, dataType = "string", paramType = "from")
-    })
-    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo) {
-        return interactService.sendQuestion(giveVo).map(WebResult::okResult);
-    }
 
     /**
      * 发布本节课 练习册

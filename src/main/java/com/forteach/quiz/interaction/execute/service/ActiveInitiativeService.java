@@ -1,6 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.forteach.quiz.common.Dic.*;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
+
 
 /**
  * @Description: 主动推送 或者轮询调用 / 现已用websocket做替代
@@ -75,7 +76,7 @@ public class ActiveInitiativeService {
         return stringRedisTemplate.opsForSet().members(achieveRaiseVo.getRaiseKey())
                 .flatMap(studentsService::findStudentsBrief).collectList()
                 .filter(list -> list.size() > 0)
-                .transform(listMono -> raiseDistinct(achieveRaiseVo.getRaiseDistinctKey(), listMono, achieveRaiseVo.getAskKey(QuestionType.BigQuestion)));
+                .transform(listMono -> raiseDistinct(achieveRaiseVo.getRaiseDistinctKey(), listMono, achieveRaiseVo.getAskKey(QuestionType.TiWen)));
     }
 
     /**
@@ -88,12 +89,12 @@ public class ActiveInitiativeService {
             log.debug("主动推送给教师 : {}", achieves.toString());
         }
         return Mono.just(achieves)
-                .filterWhen(achieveAnswerVo -> untitled(achieveAnswerVo.getAskKey(QuestionType.BigQuestion)))
-                .flatMap(achieve -> askSelected(askQuestionsId(QuestionType.BigQuestion, achieve.getCircleId())))
+                .filterWhen(achieveAnswerVo -> untitled(achieveAnswerVo.getAskKey(QuestionType.TiWen)))
+                .flatMap(achieve -> askSelected(askQuestionsId(QuestionType.TiWen, achieve.getCircleId())))
                 .map(ids -> (Arrays.asList(ids.split(","))))
                 .flatMapMany(Flux::fromIterable)
-                .flatMap(id -> isMember(achieves.getExamineeIsReplyKey(QuestionType.BigQuestion), id)
-                        .flatMap(flag -> askQuestionId(achieves.getAskKey(QuestionType.BigQuestion))
+                .flatMap(id -> isMember(achieves.getExamineeIsReplyKey(QuestionType.TiWen), id)
+                        .flatMap(flag -> askQuestionId(achieves.getAskKey(QuestionType.TiWen))
                                 .flatMap(qid -> findAskAnswer(achieves.getCircleId(), id, qid))
                                 .zipWith(studentsService.findStudentsBrief(id), (answ, student) -> {
                                     if (flag) {
@@ -105,7 +106,7 @@ public class ActiveInitiativeService {
                                 }))
                 )
                 .collectList()
-                .filterWhen(obj -> answerDistinct(achieves.getAnswDistinctKey(), achieves.getExamineeIsReplyKey(QuestionType.BigQuestion), achieves.getAskKey(QuestionType.BigQuestion)));
+                .filterWhen(obj -> answerDistinct(achieves.getAnswDistinctKey(), achieves.getExamineeIsReplyKey(QuestionType.TiWen), achieves.getAskKey(QuestionType.TiWen)));
     }
 
     /**
@@ -117,7 +118,7 @@ public class ActiveInitiativeService {
      * @return
      */
     public Mono<AskQuestionVo> achieveQuestion(final AchieveVo achieveVo) {
-        return askCategoryType(achieveVo.getAskKey(QuestionType.BigQuestion))
+        return askCategoryType(achieveVo.getAskKey(QuestionType.TiWen))
                 .flatMap(type -> {
                     switch (type) {
                         case CATEGORY_PEOPLE:
@@ -129,9 +130,9 @@ public class ActiveInitiativeService {
                     }
                 })
                 .transform(bigQuestionMono -> askDistinct(bigQuestionMono, achieveVo))
-                .flatMap(bigQuestion -> askQuestionCut(achieveVo.getAskKey(QuestionType.BigQuestion))
+                .flatMap(bigQuestion -> askQuestionCut(achieveVo.getAskKey(QuestionType.TiWen))
                         .flatMap(cut ->
-                                askInteractiveType(achieveVo.getAskKey(QuestionType.BigQuestion))
+                                askInteractiveType(achieveVo.getAskKey(QuestionType.TiWen))
                                         .map(interactive ->
                                                 new AskQuestionVo<BigQuestion>(cut, bigQuestion, interactive))
                         ));
@@ -227,7 +228,7 @@ public class ActiveInitiativeService {
      */
     private Mono<OptBigQuestionVo> askDistinct(final Mono<OptBigQuestionVo> bigQuestionMono, final AchieveVo achieveVo) {
         return bigQuestionMono
-                .filterWhen(bigQuestion -> distinctKeyIsEmpty(achieveVo.getDistinctKey(bigQuestion.getId()), achieveVo.getAskKey(QuestionType.BigQuestion)));
+                .filterWhen(bigQuestion -> distinctKeyIsEmpty(achieveVo.getDistinctKey(bigQuestion.getId()), achieveVo.getAskKey(QuestionType.TiWen)));
     }
 
     /**
@@ -261,13 +262,13 @@ public class ActiveInitiativeService {
      * @return
      */
     private Mono<OptBigQuestionVo> askPeople(final AchieveVo achieveVo) {
-        return reactiveHashOperations.get(achieveVo.getAskKey(QuestionType.BigQuestion), ASK_INTERACTIVE)
+        return reactiveHashOperations.get(achieveVo.getAskKey(QuestionType.TiWen), ASK_INTERACTIVE)
                 .flatMap(interactive -> {
                     switch (interactive) {
                         case ASK_INTERACTIVE_RACE:
                             return selectQuestion(achieveVo).transform(this::selected);
                         case ASK_INTERACTIVE_RAISE:
-                            return findBigQuestion(achieveVo.getAskKey(QuestionType.BigQuestion)).flatMap(obj -> raiseQuestion(achieveVo, obj));
+                            return findBigQuestion(achieveVo.getAskKey(QuestionType.TiWen)).flatMap(obj -> raiseQuestion(achieveVo, obj));
                         case ASK_INTERACTIVE_SELECT:
                             return selectQuestion(achieveVo).transform(this::selected);
                         case ASK_INTERACTIVE_VOTE:
@@ -286,8 +287,8 @@ public class ActiveInitiativeService {
      */
     private Mono<BigQuestion> selectQuestion(final AchieveVo achieveVo) {
         return Mono.just(achieveVo)
-                .filterWhen(achieve -> selectVerify(achieve.getAskKey(QuestionType.BigQuestion), achieve.getExamineeId()))
-                .flatMap(achieve -> findBigQuestion(achieve.getAskKey(QuestionType.BigQuestion)));
+                .filterWhen(achieve -> selectVerify(achieve.getAskKey(QuestionType.TiWen), achieve.getExamineeId()))
+                .flatMap(achieve -> findBigQuestion(achieve.getAskKey(QuestionType.TiWen)));
     }
 
     private Mono<BigQuestion> findBigQuestion(final String askKey) {
@@ -346,7 +347,7 @@ public class ActiveInitiativeService {
     }
 
     private Mono<OptBigQuestionVo> raiseQuestion(final AchieveVo achieve, final BigQuestion bigQuestion) {
-        return selectVerify(achieve.getAskKey(QuestionType.BigQuestion), achieve.getExamineeId()).map(flag -> {
+        return selectVerify(achieve.getAskKey(QuestionType.TiWen), achieve.getExamineeId()).map(flag -> {
             if (flag) {
                 return new OptBigQuestionVo(ASK_QUESTIONS_SELECTED, bigQuestion);
             } else {
@@ -381,7 +382,7 @@ public class ActiveInitiativeService {
      * @return
      */
     private String askQuestionsId(QuestionType type, String circleId) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
     /**

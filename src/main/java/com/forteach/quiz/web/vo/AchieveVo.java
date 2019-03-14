@@ -1,11 +1,11 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import lombok.Builder;
 import lombok.Data;
 
 import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_DISTINCT;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
  * @Description:
@@ -47,7 +47,7 @@ public class AchieveVo {
      * @return
      */
     public String getAskKey(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
     /**

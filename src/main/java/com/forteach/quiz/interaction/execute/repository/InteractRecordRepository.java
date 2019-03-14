@@ -7,9 +7,8 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 /**
- * @Description:
+ * @Description: 记录课堂的交互情况 学生回答情况
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/3  15:22
@@ -23,8 +22,15 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param teacherId
      * @return
      */
-    Flux<InteractRecord> findByCircleIdAndTeacherId(final String circleId, final String teacherId);
+    Flux<InteractRecord> findByIdAndTeacherId(final String circleId, final String teacherId);
 
+//    /**
+//     * 通过课堂id查找记录
+//     *
+//     * @param circleId
+//     * @return
+//     */
+//    Mono<InteractRecord> findByCircleIdIs(final String circleId);
     /**
      * 通过课堂id和习题册id
      *

@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.web.vo;
 
+import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.base.GiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
@@ -7,8 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
 
 /**
  * @Description:
@@ -21,6 +20,9 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_RACE;
 @ApiModel(value = "考题 练习题库 发布课堂提问", description = "除了提问题,所有问题只有选中的学生才会收到")
 public class BigQuestionGiveVo extends GiveVo {
 
+    @ApiModelProperty(value = "教师id", name = "teacherId")
+    private String teacherId;
+
     /**
      * 问题id
      */
@@ -32,24 +34,35 @@ public class BigQuestionGiveVo extends GiveVo {
      * <p>
      * race   : 抢答
      * raise  : 举手
-     * select : 选则
+     * select : 选人
      * vote   : 投票
      */
     @ApiModelProperty(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "interactive", notes = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票")
     private String interactive;
 
+    /**
+     * 设置课堂提问问题ID
+     * @return
+     */
     public String getRaceAnswerFlag() {
-        return CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
     }
 
 
     /**
-     * 根据课堂 获取题目id
+     * 课堂交互活动了icing，某个课堂上的某些课堂活动
      *
      * @return
      */
     public String getAskQuestionsId(QuestionType type) {
-        return CLASSROOM_ASK_QUESTIONS_ID.concat(type.name()).concat(circleId);
+        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
     }
 
+    public BigQuestionGiveVo(String questionId, String interactive) {
+        this.questionId = questionId;
+        this.interactive = interactive;
+    }
+
+    public BigQuestionGiveVo() {
+    }
 }

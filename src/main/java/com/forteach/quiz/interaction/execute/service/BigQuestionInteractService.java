@@ -1,7 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
-import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
@@ -13,9 +12,7 @@ import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
-import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
-import com.forteach.quiz.web.vo.RaisehandVo;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -27,15 +24,12 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
 
-import static com.forteach.quiz.common.Dic.*;
-import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 
 /**
- * @Description: 题库 考题 互动交互
+ * @Description: 提问交互
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/27  15:00
@@ -71,9 +65,98 @@ public class BigQuestionInteractService {
         this.insertInteractRecordService = insertInteractRecordService;
     }
 
+//    /**
+//     * 课堂提问发题
+//     *
+//     * @param giveVo
+//     * @return
+//     */
+//    public Mono<Boolean> sendQuestion(final BigQuestionGiveVo giveVo) {
+//
+////        HashMap<String, String> map = new HashMap<>(6);
+////        map.put("questionId", giveVo.getQuestionId());//题目编号
+////        map.put("interactive", giveVo.getInteractive());  //互动方式（举手、抢答等）
+////        map.put("category", giveVo.getCategory());//选取类别（个人、小组）
+////        map.put("selected", giveVo.getSelected());//选中人员 [逗号 分割]
+////        map.put("cut", giveVo.getCut());//是否切题
+////        map.put("time", DataUtil.format(new Date()));//创建时间
+//
+//        //创建课堂提问的题目36分钟过期
+////        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.BigQuestion, giveVo.getCircleId()), map);
+//;
+//        //创建课堂提问类型，不同互动方式的提问缓存集合
+//        Mono<Boolean> createQu = stringRedisTemplate.opsForList().leftPush(BigQueKey.askTypeQuestionsId(QuestionType.TiWen, giveVo), giveVo.getQuestionId())
+//                .flatMap(item -> {
+////                    //创建当前题目
+//                         return stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen, giveVo),giveVo.getQuestionId(),Duration.ofSeconds(60 * 60 * 2));
+//                        }
+//                )
+//                .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.askTypeQuestionsId(QuestionType.TiWen, giveVo), Duration.ofSeconds(60*60*2)))
+//                //更新当前题目和上一题的题目信息
+//                .filterWhen(ok->  stringRedisTemplate.opsForValue().getAndSet(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen, giveVo),giveVo.getQuestionId())
+//                                                .flatMap(old-> stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen, giveVo),old,Duration.ofSeconds(60 * 60 * 2)))
+//                        )
+//                        //设置当前的题目编号为新值
+//                        .filterWhen(str->stringRedisTemplate.expire(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen, giveVo),Duration.ofSeconds(60 * 60 * 2)))
+//                        //如果本题和迁移题（redis里的）前题目id，不一致视为换题，进行清理
+//                       .filterWhen(str->clearCut(giveVo));
+//
+//        //创建提问题目,并保存题目回答的学生(学生编号逗号分隔)
+//        Mono<Boolean> createQuID =stringRedisTemplate.opsForValue()
+//                  .set(BigQueKey.askTypeQuestionsId(QuestionType.TiWen, giveVo,giveVo.getQuestionId()),giveVo.getSelected(), Duration.ofSeconds(60 * 60 * 2))
+//                  .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "redis操作错误"))
+//                  .filterWhen(ok->stringRedisTemplate.opsForValue()
+//                          //记录当前题目的成员回答类型（个人、小组）和互动方式（选人，抢答）
+//                          .set(BigQueKey.askTypeQuestionsIdType(giveVo.getCircleId(),giveVo.getQuestionId()),giveVo.getCategory().concat(",").concat(giveVo.getInteractive()), Duration.ofSeconds(60 * 60 * 2)));
+//
+//
+//        //删除抢答答案（删除课堂提问的题目ID的回答信息）
+//        Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag())
+//                //删除信息没找到键值失败，同样返回TRUE
+//                .flatMap(ok->Mono.just(true));
+//
+//        //执行创建提问，并返回执行结果
+//        return Flux.concat(createQu,createQuID,removeRace)
+//                .count()
+//                .flatMap(ct-> MyAssert.isTrue(ct<3, DefineCode.ERR0013, "创建提问失败"))
+//                //创建改题目的回答者信息
+//               .filterWhen(obj -> interactRecordExecuteService.releaseQuestion(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), giveVo.getInteractive()));
+//    }
+
+
+
+//    /**
+//     * 发起提问举手
+//     * 清空老师端显示的举手学生
+//     *
+//     * @param
+//     * @return
+//     */
+//
+//    public Mono<Long> launchRaise(final AskLaunchVo askLaunchVo) {
+//        Mono<Long> deleteDistinctKey = stringRedisTemplate.delete(askLaunchVo.getRaiseDistinctKey());
+//        Mono<Long> deleteRaiseExmKey = stringRedisTemplate.delete(askLaunchVo.getRaiseKey(), "examinee");
+//        return deleteDistinctKey.zipWith(deleteRaiseExmKey, (d, e) -> d + e);
+//    }
+
+//
+//    /**
+//     * 学生进行举手
+//     * 最后记录
+//     *
+//     * @return
+//     */
+//    public Mono<Long> raiseHand(final RaisehandVo raisehandVo) {
+//        Mono<Long> set = stringRedisTemplate.opsForSet().add(raisehandVo.getRaiseKey(), raisehandVo.getExamineeId());
+//        Mono<Boolean> time = stringRedisTemplate.expire(raisehandVo.getRaiseKey(), Duration.ofSeconds(60 * 60 * 10));
+//        Mono<String> questionId = askQuestionId(raisehandVo.getAskKey(QuestionType.TiWen));
+//        return set.zipWith(time, (c, t) -> t ? c : -1)
+//                .filterWhen(obj -> questionId.flatMap(qid -> interactRecordExecuteService.raiseHand(raisehandVo.getCircleId(), raisehandVo.getExamineeId(), qid)));
+//    }
+
+
     /**
-     * 课堂发布练习册提问
-     *
+     * 如果前后两题一致
      * @param giveVo
      * @return
      */
@@ -94,14 +177,27 @@ public class BigQuestionInteractService {
                 .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
                 .count();
 
+    private Mono<Boolean> clearCut(final BigQuestionGiveVo giveVo) {
+        return stringRedisTemplate.opsForValue().get(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen, giveVo))
+                .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
+                .flatMap(flag -> {
+                    if (!flag) {
+                        //清除提问标识
+                        //前后两题一致,删除该题型在这个课堂的前缀数据？？？
+                        return stringRedisTemplate.opsForValue().delete(giveVo.getExamineeIsReplyKey(QuestionType.TiWen));
+
+                    }
+                    return Mono.just(true);
+                });
     }
 
     /**
-     * 课堂提问发题
-     *
+     * 课堂发布练习册提问
+     *  TODO 临时报错注解
      * @param giveVo
      * @return
      */
+    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
     public Mono<Long> sendQuestion(final BigQuestionGiveVo giveVo) {
 
         HashMap<String, String> map = new HashMap<>(10);
@@ -176,78 +272,33 @@ public class BigQuestionInteractService {
     }
 
     /**
-     * 发起提问举手
-     * 清空老师端显示的举手学生
-     *
-     * @param
+     * 课堂发布练习册提问
+     *  TODO 临时报错注解
+     * @param giveVo
      * @return
      */
+    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
+        HashMap<String, String> map = new HashMap<>(10);
+        map.put("questionId", giveVo.getQuestionId());
+        map.put("category", giveVo.getCategory());
+        map.put("selected", giveVo.getSelected());
+        map.put("cut", giveVo.getCut());
 
-    public Mono<Long> launchRaise(final AskLaunchVo askLaunchVo) {
-        Mono<Long> deleteDistinctKey = stringRedisTemplate.delete(askLaunchVo.getRaiseDistinctKey());
-        Mono<Long> deleteRaiseExmKey = stringRedisTemplate.delete(askLaunchVo.getRaiseKey(), "examinee");
-        return deleteDistinctKey.zipWith(deleteRaiseExmKey, (d, e) -> d + e);
+
+        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), map);
+        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.ExerciseBook, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+
+        //TODO 未记录
+        return Flux.concat(set, time).filter(flag -> !flag)
+                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
+                .count();
+
     }
 
-
-    /**
-     * 学生进行举手
-     * 最后记录
-     *
-     * @return
-     */
-    public Mono<Long> raiseHand(final RaisehandVo raisehandVo) {
-        Mono<Long> set = stringRedisTemplate.opsForSet().add(raisehandVo.getRaiseKey(), raisehandVo.getExamineeId());
-        Mono<Boolean> time = stringRedisTemplate.expire(raisehandVo.getRaiseKey(), Duration.ofSeconds(60 * 60 * 10));
-        Mono<String> questionId = askQuestionId(raisehandVo.getAskKey(QuestionType.BigQuestion));
-        return set.zipWith(time, (c, t) -> t ? c : -1)
-                .filterWhen(obj -> questionId.flatMap(qid -> interactRecordExecuteService.raiseHand(raisehandVo.getCircleId(), raisehandVo.getExamineeId(), qid)));
-    }
-
-
-    /**
-     * 验证提交的答案信息
-     *
-     * @return
-     */
-    private Mono<Boolean> sendAnswerVerify(final String askId, final String oQuestionId, final String oCut) {
-        Mono<String> questionId = reactiveHashOperations.get(askId, "questionId");
-        Mono<String> cut = reactiveHashOperations.get(askId, "cut");
-        return cut.zipWith(questionId, (c, q) -> c.equals(oCut) && q.equals(oQuestionId));
-    }
-
-    /**
-     * 通过 提问key,判断是否是选择
-     *
-     * @param askKey
-     * @return
-     */
-    private Mono<Boolean> selectVerify(final String askKey, final String examineeId) {
-        return reactiveHashOperations.get(askKey, "selected")
-                .map(selectId ->
-                        isSelected(selectId, examineeId));
-    }
-
-    /**
-     * 验证课堂提问选中
-     *
-     * @param answerVo
-     * @return
-     */
-    private Mono<InteractAnswerVo> filterSelectVerify(final Mono<InteractAnswerVo> answerVo) {
-        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.BigQuestion), answer.getExamineeId()))
-                .flatMap(tuple2 -> {
-                    if (tuple2.getT2()) {
-                        return Mono.just(tuple2.getT1());
-                    } else {
-                        return Mono.error(new AskException("该题未被选中 不能答题"));
-                    }
-                });
-    }
 
     /**
      * 验证练习册发放选中
-     *
+     *  TODO 报错临时注解
      * @param answerVo
      * @return
      */
@@ -264,7 +315,6 @@ public class BigQuestionInteractService {
 
     /**
      * 抢答 回答
-     *
      * @return
      */
     private Mono<String> sendRace(final InteractAnswerVo interactAnswerVo) {
@@ -381,12 +431,16 @@ public class BigQuestionInteractService {
     public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
                 .transform(this::filterSheetSelectVerify)
-                .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.ExerciseBook), shee.getAnsw().getQuestionId(), shee.getCut()))
-                .filterWhen(set -> sendValue(sheetVo))
-                .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
+                .filterWhen(shee ->
+                        sendAnswerVerifyMore(shee.getAskKey(QuestionType.LianXi), shee.getAnsw().getQuestionId(), shee.getCut())
+                )
+                .filterWhen(
+                        set -> sendValue(sheetVo))
+                .filterWhen(
+                        right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
                 // Todo 提交答案保存
                 .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, "exerciseBooks"))
-                .thenReturn(sheetVo.getCut());
+                .map(InteractiveSheetVo::getCut);
     }
 
     /**
@@ -399,7 +453,7 @@ public class BigQuestionInteractService {
         Query query = Query.query(
                 Criteria.where("circleId").is(sheetVo.getCircleId())
                         .and("examineeId").is(sheetVo.getExamineeId())
-                        .and("libraryType").is(QuestionType.ExerciseBook));
+                        .and("libraryType").is(QuestionType.LianXi));
 
         Update update = new Update();
         sheetVo.getAnsw().setDate(new Date());

@@ -1,10 +1,10 @@
 package com.forteach.quiz.interaction.execute.domain.record;
 
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.Date;
 import java.util.List;
 
@@ -25,17 +25,12 @@ public class InteractRecord extends BaseEntity {
     private String teacherId;
 
     /**
-     * 今天进行的第几次课
+     * 今天创建的第几次课
      */
     private Integer number;
 
     /**
-     * 互动课堂id
-     */
-    private String circleId;
-
-    /**
-     * 参加过课堂的学生id
+     * 加入课堂的学生id
      */
     private List<String> students;
 
@@ -70,17 +65,25 @@ public class InteractRecord extends BaseEntity {
     private List<SurveyInteractRecord> surveys;
 
     /**
-     * 上课时间
+     * 创建课堂时间
      */
-    private Date time;
+    private String ceateTime;
 
     public InteractRecord() {
     }
 
     public InteractRecord(final String circleId, final String teacherId, final Long number) {
         this.teacherId = teacherId;
-        this.circleId = circleId;
-        this.time = new Date();
+        this.id = circleId;
+        this.ceateTime = DataUtil.format(new Date());
+        this.uDate=DataUtil.format(new Date());
+        this.number = number.intValue();
+    }
+
+    public InteractRecord( String teacherId, Long number) {
+        this.teacherId = teacherId;
+        this.ceateTime = DataUtil.format(new Date());
+        this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();
     }
     public InteractRecord(final String teacherId, final Long number) {
