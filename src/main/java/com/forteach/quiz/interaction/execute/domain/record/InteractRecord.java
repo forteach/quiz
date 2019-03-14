@@ -1,27 +1,24 @@
-package com.forteach.quiz.interaction.execute.web.resp;
+package com.forteach.quiz.interaction.execute.domain.record;
 
-import com.forteach.quiz.interaction.execute.domain.BrainstormInteractRecord;
-import com.forteach.quiz.interaction.execute.domain.InteractQuestionsRecord;
-import com.forteach.quiz.interaction.execute.domain.SurveyInteractRecord;
-import com.forteach.quiz.interaction.execute.domain.TaskInteractRecord;
-import com.forteach.quiz.web.pojo.Students;
+import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
- * @author: zhangyy
- * @email: zhang10092009@hotmail.com
- * @date: 19-2-26 14:56
- * @version: 1.0
- * @description:
+ * @Description: 记录课堂的交互情况 学生回答情况
+ * @author: liu zhenming
+ * @version: V1.0
+ * @date: 2019/1/3  14:23
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
-public class InteractRecordResp implements Serializable {
+@Document(collection = "interactRecord")
+public class InteractRecord extends BaseEntity {
+
     /**
      * 上课教师id
      */
@@ -40,7 +37,7 @@ public class InteractRecordResp implements Serializable {
     /**
      * 参加过课堂的学生id
      */
-    private List<Students> students;
+    private List<String> students;
 
     /**
      * 参加的学生数
@@ -51,6 +48,11 @@ public class InteractRecordResp implements Serializable {
      * 进行提问过的问题(发布了哪些题目 发布顺序 发布时间 发布次数 选择了哪些人 哪些人进行了回答 回答情况 回答答案)
      */
     private List<InteractQuestionsRecord> questions;
+
+    /**
+     * 习题册
+     */
+    private List<InteractQuestionsRecord> exerciseBooks;
 
     /**
      * 头脑风暴记录
@@ -71,4 +73,19 @@ public class InteractRecordResp implements Serializable {
      * 上课时间
      */
     private Date time;
+
+    public InteractRecord() {
+    }
+
+    public InteractRecord(final String circleId, final String teacherId, final Long number) {
+        this.teacherId = teacherId;
+        this.circleId = circleId;
+        this.time = new Date();
+        this.number = number.intValue();
+    }
+    public InteractRecord(final String teacherId, final Long number) {
+        this.teacherId = teacherId;
+        this.time = new Date();
+        this.number = number.intValue();
+    }
 }

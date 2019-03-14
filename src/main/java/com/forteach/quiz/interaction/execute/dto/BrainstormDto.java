@@ -1,6 +1,6 @@
 package com.forteach.quiz.interaction.execute.dto;
 
-import com.forteach.quiz.interaction.execute.domain.BrainstormInteractRecord;
+import com.forteach.quiz.interaction.execute.domain.record.BrainstormInteractRecord;
 
 import java.io.Serializable;
 import java.util.List;

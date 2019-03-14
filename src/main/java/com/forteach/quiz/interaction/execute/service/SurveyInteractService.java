@@ -2,10 +2,11 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
+import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
-import com.forteach.quiz.questionlibrary.repository.SurveyQuestionRepository;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -37,21 +38,21 @@ public class SurveyInteractService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    private final SurveyQuestionRepository questionRepository;
-
     private final InteractRecordExecuteService interactRecordExecuteService;
+
+    private final InsertInteractRecordService insertInteractRecordService;
 
     public SurveyInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                  ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                  ReactiveMongoTemplate reactiveMongoTemplate,
-                                 SurveyQuestionRepository questionRepository,
+                                 InsertInteractRecordService insertInteractRecordService,
                                  InteractRecordExecuteService interactRecordExecuteService) {
 
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.questionRepository = questionRepository;
         this.interactRecordExecuteService = interactRecordExecuteService;
+        this.insertInteractRecordService = insertInteractRecordService;
     }
 
     /**
@@ -76,7 +77,7 @@ public class SurveyInteractService {
 
         //TODO 未记录
         return Flux.concat(set, time, clearCut).filter(flag -> !flag)
-                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "surveys"))
+                .filterWhen(obj -> insertInteractRecordService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "surveys"))
                 .count();
 
     }
@@ -110,7 +111,7 @@ public class SurveyInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.SurveyQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.SurveyQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.SurveyQuestion)))
-                .filterWhen(survey -> interactRecordExecuteService.pushMongo(survey, "surveys"))
+                .filterWhen(survey -> insertInteractRecordService.pushMongo(survey, "surveys"))
                 .thenReturn(sheetVo.getCut());
     }
 

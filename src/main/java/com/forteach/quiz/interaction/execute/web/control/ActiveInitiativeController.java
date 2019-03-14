@@ -5,7 +5,7 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.ActiveInitiativeService;
-import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.AchieveAnswerVo;
@@ -33,15 +33,15 @@ public class ActiveInitiativeController {
 
     private final ActiveInitiativeService interactService;
 
-    private final InteractRecordExecuteService interactRecordExecuteService;
+    private final InteractRecordQuestionsService interactRecordQuestionsService;
 
     private final TokenService tokenService;
 
     public ActiveInitiativeController(ActiveInitiativeService interactService, TokenService tokenService,
-                                      InteractRecordExecuteService interactRecordExecuteService) {
+                                      InteractRecordQuestionsService interactRecordQuestionsService) {
         this.interactService = interactService;
         this.tokenService = tokenService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+        this.interactRecordQuestionsService = interactRecordQuestionsService;
     }
 
 
@@ -101,7 +101,7 @@ public class ActiveInitiativeController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExecuteService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordQuestionsService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
 }

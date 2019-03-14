@@ -4,7 +4,7 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BrainstormInteractService;
-import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordBrainstormService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
@@ -33,13 +33,13 @@ public class BrainstormInteractController {
 
     private final BrainstormInteractService interactService;
     private final TokenService tokenService;
-    private final InteractRecordExecuteService interactRecordExecuteService;
+    private final InteractRecordBrainstormService interactRecordBrainstormService;
 
     public BrainstormInteractController(BrainstormInteractService interactService, TokenService tokenService,
-                                        InteractRecordExecuteService interactRecordExecuteService) {
+                                        InteractRecordBrainstormService interactRecordBrainstormService) {
         this.interactService = interactService;
         this.tokenService = tokenService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+        this.interactRecordBrainstormService = interactRecordBrainstormService;
     }
 
 
@@ -85,6 +85,6 @@ public class BrainstormInteractController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExecuteService.findBrainstorm(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordBrainstormService.findBrainstorm(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 }

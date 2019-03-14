@@ -1,20 +1,17 @@
 package com.forteach.quiz.interaction.execute.repository;
 
-import com.forteach.quiz.interaction.execute.domain.InteractRecord;
+import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
 import java.util.Objects;
 import java.util.logging.Level;
-
-import static org.junit.Assert.*;
 
 /**
  * @Auther: zhangyy

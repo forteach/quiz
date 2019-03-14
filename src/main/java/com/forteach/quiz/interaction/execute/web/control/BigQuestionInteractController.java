@@ -4,7 +4,8 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
-import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
@@ -36,15 +37,18 @@ import javax.validation.Valid;
 public class BigQuestionInteractController {
 
     private final BigQuestionInteractService interactService;
-    private final InteractRecordExecuteService interactRecordExecuteService;
+    private final InteractRecordQuestionsService interactRecordQuestionsService;
+    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final TokenService tokenService;
 
     public BigQuestionInteractController(BigQuestionInteractService interactService,
-                                         InteractRecordExecuteService interactRecordExecuteService,
+                                         InteractRecordQuestionsService interactRecordQuestionsService,
+                                         InteractRecordExerciseBookService interactRecordExerciseBookService,
                                          TokenService tokenService) {
         this.interactService = interactService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+        this.interactRecordQuestionsService = interactRecordQuestionsService;
         this.tokenService = tokenService;
+        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
     }
 
     /**
@@ -158,7 +162,7 @@ public class BigQuestionInteractController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExecuteService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordQuestionsService.findQuestionsRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "查询课堂习题册提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
@@ -171,7 +175,7 @@ public class BigQuestionInteractController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExecuteService.findExerciseBookRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordExerciseBookService.findExerciseBookRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
 }

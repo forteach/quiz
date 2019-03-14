@@ -4,12 +4,15 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
-import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.vo.AskLaunchVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
@@ -41,26 +44,31 @@ import static com.forteach.quiz.common.KeyStorage.CLASSROOM_ASK_QUESTIONS_ID;
 @Service
 public class BigQuestionInteractService {
 
-
-    private final StudentsService studentsService;
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final InteractRecordExecuteService interactRecordExecuteService;
     private final CorrectService correctService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private final InsertInteractRecordService insertInteractRecordService;
+    private final InteractRecordQuestionsService interactRecordQuestionsService;
+    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
 
     public BigQuestionInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                       ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                       InteractRecordExecuteService interactRecordExecuteService,
                                       CorrectService correctService,
-                                      ReactiveMongoTemplate reactiveMongoTemplate,
-                                      StudentsService studentsService) {
+                                      InsertInteractRecordService insertInteractRecordService,
+                                      InteractRecordExerciseBookService interactRecordExerciseBookService,
+                                      InteractRecordQuestionsService interactRecordQuestionsService,
+                                      ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+        this.interactRecordQuestionsService = interactRecordQuestionsService;
         this.interactRecordExecuteService = interactRecordExecuteService;
-        this.studentsService = studentsService;
+        this.insertInteractRecordService = insertInteractRecordService;
     }
 
     /**
@@ -83,7 +91,7 @@ public class BigQuestionInteractService {
 
         //TODO 未记录
         return Flux.concat(set, time).filter(flag -> !flag)
-                .filterWhen(obj -> interactRecordExecuteService.interactiveBook(giveVo))
+                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
                 .count();
 
     }
@@ -113,7 +121,7 @@ public class BigQuestionInteractService {
         Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag());
 
         return Flux.concat(set, time, removeRace, clearCut).filter(flag -> !flag)
-                .filterWhen(obj -> interactRecordExecuteService.releaseQuestion(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), giveVo.getInteractive()))
+                .filterWhen(obj -> interactRecordQuestionsService.releaseQuestion(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), giveVo.getInteractive()))
                 .count();
     }
 
@@ -164,7 +172,7 @@ public class BigQuestionInteractService {
                     }
                 })
                 .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
-                .filterWhen(right -> interactRecordExecuteService.answer(answerVo.getCircleId(), answerVo.getQuestionId(), answerVo.getExamineeId(), answerVo.getAnswer(), right));
+                .filterWhen(right -> insertInteractRecordService.answer(answerVo.getCircleId(), answerVo.getQuestionId(), answerVo.getExamineeId(), answerVo.getAnswer(), right));
     }
 
     /**
@@ -376,7 +384,7 @@ public class BigQuestionInteractService {
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.ExerciseBook), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.ExerciseBook)))
                 // Todo 提交答案保存
-                .filterWhen(right -> interactRecordExecuteService.pushMongo(sheetVo, "exerciseBooks"))
+                .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, "exerciseBooks"))
                 .thenReturn(sheetVo.getCut());
     }
 

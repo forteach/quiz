@@ -3,8 +3,8 @@ package com.forteach.quiz.interaction.execute.web.control;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.service.TaskInteractService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordTaskService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
@@ -30,18 +30,17 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/TaskInteract", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class TaskInteractController {
 
-
     private final TaskInteractService interactService;
 
     private final TokenService tokenService;
 
-    private final InteractRecordExecuteService interactRecordExecuteService;
+    private final InteractRecordTaskService interactRecordTaskService;
 
     public TaskInteractController(TaskInteractService interactService, TokenService tokenService,
-                                  InteractRecordExecuteService interactRecordExecuteService) {
+                                  InteractRecordTaskService interactRecordTaskService) {
         this.interactService = interactService;
         this.tokenService = tokenService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+        this.interactRecordTaskService = interactRecordTaskService;
     }
 
 
@@ -89,6 +88,6 @@ public class TaskInteractController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExecuteService.findTaskRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordTaskService.findTaskRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 }

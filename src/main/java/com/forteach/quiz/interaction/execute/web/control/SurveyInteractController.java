@@ -3,8 +3,8 @@ package com.forteach.quiz.interaction.execute.web.control;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.service.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.service.SurveyInteractService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordSurveyService;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
@@ -33,13 +33,13 @@ public class SurveyInteractController {
 
     private final TokenService tokenService;
 
-    private final InteractRecordExecuteService interactRecordExecuteService;
+    private final InteractRecordSurveyService interactRecordSurveyService;
 
     public SurveyInteractController(SurveyInteractService surveyService, TokenService tokenService,
-                                    InteractRecordExecuteService interactRecordExecuteService) {
+                                    InteractRecordSurveyService interactRecordSurveyService) {
         this.surveyService = surveyService;
         this.tokenService = tokenService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+        this.interactRecordSurveyService = interactRecordSurveyService;
     }
 
     /**
@@ -84,6 +84,6 @@ public class SurveyInteractController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExecuteService.findSurveyRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordSurveyService.findSurveyRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 }

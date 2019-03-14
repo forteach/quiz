@@ -2,10 +2,10 @@ package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
+import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
-import com.forteach.quiz.questionlibrary.repository.SurveyQuestionRepository;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -39,20 +39,16 @@ public class BrainstormInteractService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    private final SurveyQuestionRepository questionRepository;
-
-    private final InteractRecordExecuteService interactRecordExecuteService;
+    private final InsertInteractRecordService insertInteractRecordService;
 
     public BrainstormInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                      ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                      ReactiveMongoTemplate reactiveMongoTemplate,
-                                     SurveyQuestionRepository questionRepository,
-                                     InteractRecordExecuteService interactRecordExecuteService) {
+                                     InsertInteractRecordService insertInteractRecordService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.questionRepository = questionRepository;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+        this.insertInteractRecordService = insertInteractRecordService;
     }
 
     /**
@@ -79,7 +75,7 @@ public class BrainstormInteractService {
 
         //TODO 未记录
         return Flux.concat(set, time, clearCut).filter(flag -> !flag)
-                .filterWhen(obj -> interactRecordExecuteService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "brainstorms"))
+                .filterWhen(obj -> insertInteractRecordService.releaseInteractRecord(giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getSelected(), giveVo.getCategory(), "brainstorms"))
                 .count();
 
     }
@@ -117,7 +113,7 @@ public class BrainstormInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.BrainstormQuestion), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.BrainstormQuestion), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.BrainstormQuestion)))
-                .filterWhen(vo -> interactRecordExecuteService.pushMongo(vo, "brainstorms"))
+                .filterWhen(vo -> insertInteractRecordService.pushMongo(vo, "brainstorms"))
                 .thenReturn(sheetVo.getCut());
     }
 
