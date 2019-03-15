@@ -161,7 +161,11 @@ public class CorrectService {
                 });
     }
 
-    //从Redis或Mongo获得题目内容
+    /**
+     * 从Redis或Mongo获得题目内容
+     * @param questionId
+     * @return
+     */
     public Mono<BigQuestion> getBigQuestion(String questionId){
         String key= BigQueKey.QuestionsNow(questionId);
         return stringRedisTemplate.hasKey(key)
@@ -277,6 +281,12 @@ public class CorrectService {
         return answChildren.getScore();
     }
 
+    /**
+     * 判断判断是否回答正确
+     * @param trueOrFalse
+     * @param answer
+     * @return
+     */
     private boolean trueOrFalse(final TrueOrFalse trueOrFalse, final String answer) {
         if (trueOrFalse.getTrueOrFalseAnsw().equals(Boolean.valueOf(answer))) {
             return true;

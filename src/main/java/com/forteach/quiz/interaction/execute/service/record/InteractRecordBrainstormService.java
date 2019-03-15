@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_BRAINSTORMS;
-
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
@@ -63,7 +63,7 @@ public class InteractRecordBrainstormService {
      * @return
      */
     Mono<UpdateResult> pushInteractBrainstorms(final String selectId, final String circleId, final String questionId, final Long number, final String category) {
-        Query query = Query.query(Criteria.where("_id").is(circleId));
+        Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         BrainstormInteractRecord records = new BrainstormInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));

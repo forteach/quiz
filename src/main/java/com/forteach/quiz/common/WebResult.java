@@ -62,7 +62,9 @@ public class WebResult implements Serializable {
      * 成功操作 操作码默认为0   只有提示码 和 数据
      **/
     public static WebResult okResult(int code, Object data) {
-        System.out.println("oun------"+ JSON.toJSONString(data));
+//        if (log.isDebugEnabled()){
+//            log.debug("成功操作 返回数据 ==>> {}", JSON.toJSONString(data));
+//        }
         return okResult(getOkCode(), String.valueOf(code), data);
     }
 

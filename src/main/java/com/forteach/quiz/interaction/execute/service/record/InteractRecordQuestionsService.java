@@ -1,6 +1,5 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
-import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
@@ -19,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
 /**
  * @author: zhangyy
@@ -70,7 +70,7 @@ public class InteractRecordQuestionsService {
      * @return
      */
     Mono<UpdateResult> pushInteractQuestions(final String selectId, final String circleId, final String questionId, final Long number, final String interactive, final String category) {
-        Query query = Query.query(Criteria.where("_id").is(circleId));
+        Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, interactive, category, Arrays.asList(selectId.split(",")));
@@ -90,7 +90,7 @@ public class InteractRecordQuestionsService {
     private Query buildLastQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
 
         final Query query = Query.query(
-                Criteria.where("_id").is(circleId)
+                Criteria.where(MONGDB_ID).is(circleId)
                         .and(INTERACT_RECORD_QUESTIONS + ".questionsId").is(questionId)
                         .and(INTERACT_RECORD_QUESTIONS + ".interactive").is(interactive)
                         .and(INTERACT_RECORD_QUESTIONS + ".category").is(category)

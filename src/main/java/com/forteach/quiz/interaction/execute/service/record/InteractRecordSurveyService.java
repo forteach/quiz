@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
 /**
  * @author: zhangyy
@@ -63,7 +64,7 @@ public class InteractRecordSurveyService {
      * @return
      */
     Mono<UpdateResult> pushInteractSurveys(final String selectId, final String circleId, final String questionId, final Long number, final String category) {
-        Query query = Query.query(Criteria.where("_id").is(circleId));
+        Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         SurveyInteractRecord records = new SurveyInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));

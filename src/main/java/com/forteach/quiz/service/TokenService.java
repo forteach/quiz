@@ -5,12 +5,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ import static com.forteach.quiz.common.Dic.USER_PREFIX;
  * @Description:
  */
 @Slf4j
-@Service(value = "TokenService")
+@Service
 public class TokenService {
 
     @Value("${token.salt}")
@@ -43,6 +43,9 @@ public class TokenService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
 
     private JWTVerifier verifier(String openId) {
         return JWT.require(Algorithm.HMAC256(salt.concat(openId))).build();
@@ -69,6 +72,11 @@ public class TokenService {
     public String getStudentId(ServerHttpRequest request){
         return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
     }
+
+//    public Mono<String> getStudentId1(ServerHttpRequest request){
+//        return reactiveStringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId").map(String::valueOf)
+//                .switchIfEmpty(MyAssert.blank("", DefineCode.ERR0013, "获取学生id失败"));
+//    }
 
     /**
      * 通过token 类型判断转换为教师id
@@ -131,8 +139,8 @@ public class TokenService {
      * @param request
      * @return
      */
-    private String getToken1(ServerHttpRequest request) {
-        AtomicReference<String> token = new AtomicReference<>(request.getHeaders().getFirst("token"));
+//    private Mono<ServerResponse> getToken1(ServerRequest request) {
+//        AtomicReference<String> token = new AtomicReference<>(request.exchange().getRequest().getHeaders().getFirst("token"));
 //        if (StringUtil.isEmpty(token.get())) {
 //            Mono<Void> token1 = request.getBody().map(dataBuffer -> {
 //                try {
@@ -146,8 +154,17 @@ public class TokenService {
 //                            e.printStackTrace();
 //                        }
 //            }).then().block();
-
-        return token.get();
-    }
+//        System.out.println("----========-----");
+//        return request.bodyToMono(String.class).flatMap(s -> ServerResponse.ok().body(Mono.just(s), String.class));
+//        return token.get();
+//        return ServerResponse.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=test.jpeg")
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .body(BodyInserters.fromDataBuffers(Mono.create(r -> {
+//
+//                    DataBuffer buf = new DefaultDataBufferFactory().wrap(IOUtil.read(buffer.asInputStream()));
+//                    r.success(buf);
+//                    return;
+//                })));
+//    }
 
 }

@@ -11,7 +11,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.util.Objects;
+
 import static com.forteach.quiz.common.Dic.*;
 
 /**
@@ -56,7 +58,7 @@ public class InsertInteractRecordService {
     }
 
     public Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
-        final Query query = Query.query(Criteria.where("_id").is(sheetVo.getCircleId())
+        final Query query = Query.query(Criteria.where(MONGDB_ID).is(sheetVo.getCircleId())
                 .and(interactRecordType + ".questionsId").is(sheetVo.getAnsw().getQuestionId())
                 .and(interactRecordType + ".answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
@@ -102,22 +104,22 @@ public class InsertInteractRecordService {
      */
     public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
 
-        final Query query = Query.query(Criteria.where("_id").is(circleId)
-                .and("questions.questionsId").is(questionId)
-                .and("questions.answerRecordList.examineeId").ne(studentId))
+        final Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId)
+                .and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId)
+                .and(INTERACT_RECORD_QUESTIONS.concat(".answerRecordList.examineeId")).ne(studentId))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         Update update = new Update();
 
-        update.inc("questions.$.answerNumber", 1);
+        update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.answerNumber"), 1);
 
         if (QUESTION_ACCURACY_TRUE.equals(right)) {
-            update.inc("questions.$.correctNumber", 1);
+            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.correctNumber"), 1);
         } else if (QUESTION_ACCURACY_FALSE.equals(right)) {
-            update.inc("questions.$.errorNumber", 1);
+            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.errorNumber"), 1);
         }
 
-        update.push("questions.$.answerRecordList", new InteractAnswerRecord(studentId, answer, right));
+        update.push(INTERACT_RECORD_QUESTIONS.concat(".$.answerRecordList"), new InteractAnswerRecord(studentId, answer, right));
 
         return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
     }

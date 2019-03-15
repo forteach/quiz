@@ -89,14 +89,22 @@ public class SendQuestService {
      */
     private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId, final String interactive,final String category,final String selected,final String cut){
         HashMap<String, String> map = new HashMap<>(8);
-        map.put("circleId",circleId);//当前课堂ID
-        map.put("teacherId",teacherId);//当前课堂教师ID
-        map.put("questionId", questId);//题目编号
-        map.put("interactive", interactive);  //互动方式（举手、抢答等）
-        map.put("category", category);//选取类别（个人、小组）
-        map.put("selected", selected);//选中人员 [逗号 分割]
-        map.put("cut", cut);//随机数
-        map.put("time", DataUtil.format(new Date()));//创建时间
+        //当前课堂ID
+        map.put("circleId",circleId);
+        //当前课堂教师ID
+        map.put("teacherId",teacherId);
+        //题目编号
+        map.put("questionId", questId);
+        //互动方式（举手、抢答等）
+        map.put("interactive", interactive);
+        //选取类别（个人、小组）
+        map.put("category", category);
+        //选中人员 [逗号 分割]
+        map.put("selected", selected);
+        //随机数
+        map.put("cut", cut);
+        //创建时间
+        map.put("time", DataUtil.format(new Date()));
         //创建课堂提问的题目2小时过期
        return reactiveHashOperations.putAll(BigQueKey.QuestionsIdNow(circleId), map)
                .flatMap(r->setQuestInfo(questId))
@@ -105,7 +113,11 @@ public class SendQuestService {
 
     }
 
-    //设置当前题目内容到Redis
+    /**
+     * 设置当前题目内容到Redis
+     * @param questionId
+     * @return
+     */
     private Mono<Boolean> setQuestInfo(final String questionId){
         //存储当前所发布的题目信息
         final String key=BigQueKey.QuestionsNow(questionId);

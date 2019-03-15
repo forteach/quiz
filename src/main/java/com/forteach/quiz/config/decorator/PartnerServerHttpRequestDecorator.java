@@ -41,7 +41,7 @@ public class PartnerServerHttpRequestDecorator extends ServerHttpRequestDecorato
                     "HttpMethod : [{}]\n" +
                     "Uri        : [{}]\n" +
                     "Headers    : \n" +
-                    "[{}]", method, path + (StringUtils.isEmpty(query) ? "" : "?" + query), headers);
+                    "{}", method, path + (StringUtils.isEmpty(query) ? "" : "?" + query), headers);
         }
         Flux<DataBuffer> flux = super.getBody();
         if (LogUtil.LEGAL_LOG_MEDIA_TYPES.contains(contentType)) {

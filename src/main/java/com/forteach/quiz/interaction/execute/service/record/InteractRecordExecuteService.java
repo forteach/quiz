@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 import static com.forteach.quiz.util.DateUtil.getEndTime;
 import static com.forteach.quiz.util.DateUtil.getStartTime;
 
@@ -28,7 +30,6 @@ public class InteractRecordExecuteService {
 
     private final InteractRecordRepository repository;
     private final ReactiveMongoTemplate mongoTemplate;
-//    private Mono<Boolean> executeSuccessfully = Mono.just(true);
 
     public InteractRecordExecuteService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate) {
         this.repository = repository;
@@ -43,7 +44,7 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> join(final String circleId, final String student) {
 
-        final Query query = Query.query(Criteria.where("_id").is(circleId).and("students").ne(student));
+        final Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId).and("students").ne(student));
 
         Update update = new Update();
         update.addToSet("students", student);
@@ -63,33 +64,15 @@ public class InteractRecordExecuteService {
     public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
 
         final Query query = Query.query(
-                Criteria.where("_id").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
+                Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".raiseHandsId")).ne(student).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         Update update = new Update();
-        update.addToSet("questions.$.raiseHandsId", student);
-        update.inc("questions.$.raiseHandsNumber", 1);
+        update.addToSet(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsId"), student);
+        update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsNumber"), 1);
 
         return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
     }
-
-
-//    /**
-//     * 创建课堂时,进行初始化记录创建记录
-//     *
-//     * @return
-//     */
-//    public Mono<Boolean> init(final String circleId, final String teacherId) {
-//
-//        return repository.findByCircleIdAndTeacherId(circleId, teacherId).collectList()
-//                .flatMap(list -> {
-//                    if (list != null && list.size() != 0) {
-//                        return executeSuccessfully;
-//                    } else {
-//                        return build(circleId, teacherId).map(Objects::nonNull);
-//                    }
-//                });
-//    }
 
     public Mono<String> init(final String teacherId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
@@ -134,7 +117,7 @@ public class InteractRecordExecuteService {
      * @return
      */
     Mono<Long> questionNumber(final String circleId) {
-        return mongoTemplate.count(Query.query(Criteria.where("_id").is(circleId).and("questions.questionsId").ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
+        return mongoTemplate.count(Query.query(Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }
 
     /**
@@ -170,7 +153,7 @@ public class InteractRecordExecuteService {
      * @return
      */
     Query buildLastInteractRecord(final String circleId, final String questionId, final String category, final String interactType) {
-        final Query query = Query.query(Criteria.where("_id")
+        final Query query = Query.query(Criteria.where(MONGDB_ID)
                 .is(circleId).and(interactType + ".questionsId").is(questionId)
                 .and(interactType + ".category").is(category)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);

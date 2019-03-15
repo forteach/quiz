@@ -462,7 +462,6 @@ public class BigQuestionInteractService {
                         right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
                 // Todo 提交答案保存
                 .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, "exerciseBooks"))
-//                .map(InteractiveSheetVo::getCut);
                 .thenReturn(sheetVo.getCut());
     }
 

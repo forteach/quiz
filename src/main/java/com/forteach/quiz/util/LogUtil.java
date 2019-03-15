@@ -48,7 +48,7 @@ public class LogUtil {
             NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(new UnpooledByteBufAllocator(false));
             if (log.isDebugEnabled()) {
                 log.debug("\n" +
-                        " [{}] Payload    : [{}]", inOrOut, new String(bytes));
+                        " {} Payload : {}", inOrOut, new String(bytes));
             }
             DataBufferUtils.release(buffer);
             return (T) nettyDataBufferFactory.wrap(bytes);

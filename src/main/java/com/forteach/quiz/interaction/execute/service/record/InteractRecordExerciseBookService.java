@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_EXERCISEBOOKS;
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
 /**
  * @author: zhangyy
@@ -71,7 +72,7 @@ public class InteractRecordExerciseBookService {
      * @return
      */
     private Mono<UpdateResult> pushExerciseBook(final String selectId, final Long number, final String circleId, final String questionId) {
-        Query query = Query.query(Criteria.where("_id").is(circleId));
+        Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, Arrays.asList(selectId.split(",")));
@@ -123,7 +124,9 @@ public class InteractRecordExerciseBookService {
         return Mono.zip(number, recordMono).flatMap(tuple2 -> {
 
             if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
-                return updateInteractRecordService.upInteractInteractRecord(giveVo.getSelected(), tuple2.getT2().getQuestions().get(0).getSelectId(), giveVo.getCircleId(), giveVo.getQuestionId(), giveVo.getCategory(), INTERACT_RECORD_EXERCISEBOOKS);
+                return updateInteractRecordService.upInteractInteractRecord(giveVo.getSelected(),
+                        tuple2.getT2().getQuestions().get(0).getSelectId(), giveVo.getCircleId(),
+                        giveVo.getQuestionId(), giveVo.getCategory(), INTERACT_RECORD_EXERCISEBOOKS);
             } else {
                 return pushExerciseBook(giveVo.getSelected(), tuple2.getT1(), giveVo.getCircleId(), giveVo.getQuestionId());
             }
