@@ -5,6 +5,7 @@ import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.List;
 
@@ -86,9 +87,4 @@ public class InteractRecord extends BaseEntity {
         this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();
     }
-//    public InteractRecord(final String teacherId, final Long number) {
-//        this.teacherId = teacherId;
-//        this.time = new Date();
-//        this.number = number.intValue();
-//    }
 }

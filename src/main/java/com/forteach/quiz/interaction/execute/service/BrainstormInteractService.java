@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
@@ -114,7 +115,7 @@ public class BrainstormInteractService {
                 .filterWhen(shee -> sendAnswerVerifyMore(shee.getAskKey(QuestionType.FengBao), shee.getAnsw().getQuestionId(), shee.getCut()))
                 .filterWhen(set -> sendValue(sheetVo))
                 .filterWhen(right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.FengBao), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.FengBao)))
-                .filterWhen(vo -> insertInteractRecordService.pushMongo(vo, "brainstorms"))
+                .filterWhen(vo -> insertInteractRecordService.pushMongo(vo, INTERACT_RECORD_BRAINSTORMS))
                 .map(InteractiveSheetVo::getCut);
     }
 

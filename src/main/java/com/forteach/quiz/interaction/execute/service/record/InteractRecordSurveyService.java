@@ -43,7 +43,7 @@ public class InteractRecordSurveyService {
      * @return
      */
     public Mono<SurveyInteractRecord> findSurveyRecord(final String circleId, final String questionsId){
-        return repository.findRecordSurveysByCircleIdAndQuestionsId(circleId, questionsId)
+        return repository.findRecordSurveysByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(SurveysDto::getSurveys)
                 .filter(list -> list != null && list.size() > 0)
@@ -63,7 +63,7 @@ public class InteractRecordSurveyService {
      * @return
      */
     Mono<UpdateResult> pushInteractSurveys(final String selectId, final String circleId, final String questionId, final Long number, final String category) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Query query = Query.query(Criteria.where("_id").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         SurveyInteractRecord records = new SurveyInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));

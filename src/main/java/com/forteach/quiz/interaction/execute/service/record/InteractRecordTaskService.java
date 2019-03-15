@@ -43,7 +43,7 @@ public class InteractRecordTaskService {
      * @return
      */
     public Mono<TaskInteractRecord> findTaskRecord(final String circleId, final String questionsId) {
-        return repository.findRecordTaskByCircleIdAndQuestionsId(circleId, questionsId)
+        return repository.findRecordTaskByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(TaskInteractDto::getInteracts)
                 .filter(list -> list != null && list.size() > 0)
@@ -63,7 +63,7 @@ public class InteractRecordTaskService {
      * @return
      */
     Mono<UpdateResult> pushInteractTask(final String selectId, final String circleId, final String questionId, final Long number, final String category) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Query query = Query.query(Criteria.where("_id").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         TaskInteractRecord records = new TaskInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));

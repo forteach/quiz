@@ -43,7 +43,7 @@ public class InteractRecordBrainstormService {
      * @return
      */
     public Mono<BrainstormInteractRecord> findBrainstorm(String circleId, String questionsId) {
-        return repository.findBrainstormsByCircleIdAndQuestionsId(circleId, questionsId)
+        return repository.findBrainstormsByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(BrainstormDto::getBrainstorms)
                 .filter(list -> list != null && list.size() > 0)
@@ -63,7 +63,7 @@ public class InteractRecordBrainstormService {
      * @return
      */
     Mono<UpdateResult> pushInteractBrainstorms(final String selectId, final String circleId, final String questionId, final Long number, final String category) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Query query = Query.query(Criteria.where("_id").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         BrainstormInteractRecord records = new BrainstormInteractRecord(questionId, number + 1, category, Arrays.asList(selectId.split(",")));

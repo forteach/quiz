@@ -3,23 +3,18 @@ package com.forteach.quiz.interaction.execute.service;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
-import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
-
 
 @Slf4j
 @Service
@@ -27,19 +22,16 @@ public class SendQuestService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final InteractRecordExecuteService interactRecordExecuteService;
     private final BigQuestionRepository bigQuestionRepository;
     private final InteractRecordQuestionsService interactRecordQuestionsService;
 
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
-                                      ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                                      InteractRecordExecuteService interactRecordExecuteService,
+                            ReactiveHashOperations<String, String, String> reactiveHashOperations,
                             InteractRecordQuestionsService interactRecordQuestionsService,
-                                      BigQuestionRepository bigQuestionRepository) {
+                            BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
-        this.interactRecordExecuteService = interactRecordExecuteService;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
     }
 
@@ -135,7 +127,6 @@ public class SendQuestService {
                             return  stringRedisTemplate.hasKey(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen, circleId,  interactive))
                                     .flatMap(r->{
                                         if(!r.booleanValue()){
-//                                            System.out.println("00000000000000000000000000000");
                                             //如果该键值不存在，就创建键值
                                            return stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen, circleId,  interactive),questId,Duration.ofSeconds(60 * 60 * 2));
                                         }else{

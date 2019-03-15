@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.ExerciseBooksDto;
@@ -51,7 +52,7 @@ public class InteractRecordExerciseBookService {
      * @return
      */
     public Mono<InteractQuestionsRecord> findExerciseBookRecord(final String circleId, final String questionsId) {
-        return repository.findExerciseBooksByCircleIdAndQuestionsId(circleId, questionsId)
+        return repository.findExerciseBooksByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(ExerciseBooksDto::getExerciseBooks)
                 .filter(list -> list != null && list.size() > 0)
@@ -70,7 +71,7 @@ public class InteractRecordExerciseBookService {
      * @return
      */
     private Mono<UpdateResult> pushExerciseBook(final String selectId, final Long number, final String circleId, final String questionId) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Query query = Query.query(Criteria.where("_id").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, Arrays.asList(selectId.split(",")));
@@ -80,7 +81,7 @@ public class InteractRecordExerciseBookService {
 
     private Query buildexerciseBooks(final String circleId, final String questionId) {
         final Query query = Query.query(
-                Criteria.where("circleId").is(circleId)
+                Criteria.where("_id").is(circleId)
                         .and(INTERACT_RECORD_EXERCISEBOOKS + ".questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
         query.fields().include(INTERACT_RECORD_EXERCISEBOOKS);
@@ -106,8 +107,8 @@ public class InteractRecordExerciseBookService {
      */
     private Mono<Long> exerciseBookNumber(final String circleId){
         return mongoTemplate.count(Query.query(
-                Criteria.where("circleId").is(circleId)
-                        .and("exerciseBooks.questionsId").ne("").ne(null)),
+                Criteria.where("_id").is(circleId)
+                        .and(INTERACT_RECORD_EXERCISEBOOKS + ".questionsId").ne("").ne(null)),
                 InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }
 

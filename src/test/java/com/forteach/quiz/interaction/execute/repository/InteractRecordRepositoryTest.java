@@ -32,14 +32,14 @@ public class InteractRecordRepositoryTest {
     }
     @Test
     public void findByCircleIdAndQuestionsNotNull(){
-        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndQuestionsNotNull("bf7cda019c5049d18c002b502b053c46");
+        Mono<InteractRecord> interactRecordMono = recordRepository.findByIdAndQuestionsNotNull("bf7cda019c5049d18c002b502b053c46");
         interactRecordMono.filter(Objects::nonNull)
 //                .
                 .log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
     }
     @Test
     public void findByCircleIdAndRecordName(){
-        Mono<InteractRecord> interactRecordMono = recordRepository.findByCircleIdAndRecord("bf7cda019c5049d18c002b502b053c46","questions");
+        Mono<InteractRecord> interactRecordMono = recordRepository.findByIdAndRecord("bf7cda019c5049d18c002b502b053c46","questions");
         interactRecordMono.filter(Objects::nonNull)
 //                .
                 .log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
@@ -47,7 +47,7 @@ public class InteractRecordRepositoryTest {
 
     @Test
     public void findByCircleIdAndQuestionsId(){
-        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByCircleIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c10b2a9dc623b4024d693ae");
+        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c10b2a9dc623b4024d693ae");
 //        interactRecordMono.log();
 //        interactRecordMono.log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
         System.out.println(interactRecordMono.block().getQuestions().get(0).toString());

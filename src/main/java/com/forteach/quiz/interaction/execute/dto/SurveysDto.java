@@ -1,7 +1,6 @@
 package com.forteach.quiz.interaction.execute.dto;
 
 import com.forteach.quiz.interaction.execute.domain.record.SurveyInteractRecord;
-
 import java.io.Serializable;
 import java.util.List;
 

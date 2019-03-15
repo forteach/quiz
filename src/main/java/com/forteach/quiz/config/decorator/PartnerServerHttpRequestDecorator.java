@@ -38,10 +38,10 @@ public class PartnerServerHttpRequestDecorator extends ServerHttpRequestDecorato
         final MediaType contentType = delegate.getHeaders().getContentType();
         if (log.isDebugEnabled()) {
             log.debug("\n" +
-                    "HttpMethod : {}\n" +
-                    "Uri        : {}\n" +
+                    "HttpMethod : [{}]\n" +
+                    "Uri        : [{}]\n" +
                     "Headers    : \n" +
-                    "{}", method, path + (StringUtils.isEmpty(query) ? "" : "?" + query), headers);
+                    "[{}]", method, path + (StringUtils.isEmpty(query) ? "" : "?" + query), headers);
         }
         Flux<DataBuffer> flux = super.getBody();
         if (LogUtil.LEGAL_LOG_MEDIA_TYPES.contains(contentType)) {

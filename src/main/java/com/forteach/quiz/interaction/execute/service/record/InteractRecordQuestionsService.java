@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
@@ -47,7 +48,7 @@ public class InteractRecordQuestionsService {
      * @return Flux<List<InteractQuestionsRecord>>
      */
     public Mono<InteractQuestionsRecord> findQuestionsRecord(final String circleId, final String questionsId) {
-        return repository.findRecordByCircleIdAndQuestionsId(circleId, questionsId)
+        return repository.findRecordByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(QuestionsDto::getQuestions)
                 .filter(list -> list != null && list.size() > 0)
@@ -69,7 +70,7 @@ public class InteractRecordQuestionsService {
      * @return
      */
     Mono<UpdateResult> pushInteractQuestions(final String selectId, final String circleId, final String questionId, final Long number, final String interactive, final String category) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId));
+        Query query = Query.query(Criteria.where("_id").is(circleId));
         Update update = new Update();
         //学生编号id 进行,分割
         InteractQuestionsRecord records = new InteractQuestionsRecord(questionId, number + 1, interactive, category, Arrays.asList(selectId.split(",")));
@@ -89,13 +90,13 @@ public class InteractRecordQuestionsService {
     private Query buildLastQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
 
         final Query query = Query.query(
-                Criteria.where("circleId").is(circleId)
+                Criteria.where("_id").is(circleId)
                         .and(INTERACT_RECORD_QUESTIONS + ".questionsId").is(questionId)
                         .and(INTERACT_RECORD_QUESTIONS + ".interactive").is(interactive)
                         .and(INTERACT_RECORD_QUESTIONS + ".category").is(category)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
-        query.fields().include("questions");
+        query.fields().include(INTERACT_RECORD_QUESTIONS);
 
         return query;
     }

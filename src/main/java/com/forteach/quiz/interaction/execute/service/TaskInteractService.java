@@ -38,20 +38,15 @@ public class TaskInteractService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-//    private final InteractRecordExecuteService interactRecordExecuteService;
-
     private final InsertInteractRecordService insertInteractRecordService;
 
     public TaskInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                ReactiveMongoTemplate reactiveMongoTemplate,
-                               InsertInteractRecordService insertInteractRecordService
-//                               InteractRecordExecuteService interactRecordExecuteService
-    ) {
+                               InsertInteractRecordService insertInteractRecordService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-//        this.interactRecordExecuteService = interactRecordExecuteService;
         this.insertInteractRecordService = insertInteractRecordService;
     }
 

@@ -56,7 +56,7 @@ public class InsertInteractRecordService {
     }
 
     public Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
-        final Query query = Query.query(Criteria.where("circleId").is(sheetVo.getCircleId())
+        final Query query = Query.query(Criteria.where("_id").is(sheetVo.getCircleId())
                 .and(interactRecordType + ".questionsId").is(sheetVo.getAnsw().getQuestionId())
                 .and(interactRecordType + ".answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
@@ -102,7 +102,7 @@ public class InsertInteractRecordService {
      */
     public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
 
-        final Query query = Query.query(Criteria.where("circleId").is(circleId)
+        final Query query = Query.query(Criteria.where("_id").is(circleId)
                 .and("questions.questionsId").is(questionId)
                 .and("questions.answerRecordList.examineeId").ne(studentId))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);

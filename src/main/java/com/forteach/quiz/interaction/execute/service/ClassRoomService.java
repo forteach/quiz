@@ -116,10 +116,14 @@ public class ClassRoomService {
         HashMap<String, String> map = new HashMap<>(6);
         String interactiveIdQr = ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX.concat(interactiveId);
         map.put("interactiveId", interactiveIdQr);
-        map.put("effectTime", effectTime.toString());//影响时间
-        map.put("failureTime", failureTime.toString());//失效时间
-        map.put("teacherId", teacherId);//教师编号
-        map.put("chapterId", chapterId);//章节ID
+        //影响时间
+        map.put("effectTime", effectTime.toString());
+        //失效时间
+        map.put("failureTime", failureTime.toString());
+        //教师编号
+        map.put("teacherId", teacherId);
+        //章节ID
+        map.put("chapterId", chapterId);
         map.put("createTime", DataUtil.format(new Date()));
 
         Mono<Boolean> set = reactiveHashOperations.putAll(roomKey, map).flatMap(item -> MyAssert.isFalse(item.booleanValue(), DefineCode.ERR0013, "redis操作错误"));
@@ -141,10 +145,14 @@ public class ClassRoomService {
         //课堂Redis 键值
         final String interactiveIdQr = ClassRoomKey.getInteractiveIdQra(circleId);
         map.put("interactiveId", interactiveIdQr);
-        map.put("effectTime", effectTime.toString());//影响时间
-        map.put("failureTime", failureTime.toString());//失效时间
-        map.put("teacherId", teacherId);//教师编号
-        map.put("chapterId", chapterId);//章节ID
+        //影响时间
+        map.put("effectTime", effectTime.toString());
+        //失效时间
+        map.put("failureTime", failureTime.toString());
+        //教师编号
+        map.put("teacherId", teacherId);
+        //章节ID
+        map.put("chapterId", chapterId);
         map.put("createTime", DataUtil.format(new Date()));
 
 
@@ -194,7 +202,8 @@ public class ClassRoomService {
     public Mono<List<Students>> findInteractiveStudents(final String circleId, final String teacherId) {
         return Mono.just(circleId)
                 .flatMapMany(cId -> stringRedisTemplate.opsForSet().members(ClassRoomKey.getInteractiveIdQra(cId)))
-                .filter(id -> !id.equals(teacherId))//需要过滤掉教师ID
+                //需要过滤掉教师ID
+                .filter(id -> !id.equals(teacherId))
                 .flatMap(studentsService::findStudentsBrief)
                 .collectList();
     }

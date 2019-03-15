@@ -67,7 +67,7 @@ public class TokenService {
      * @return
      */
     public String getStudentId(ServerHttpRequest request){
-        return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId") != null ? this : "");
+        return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
     }
 
     /**

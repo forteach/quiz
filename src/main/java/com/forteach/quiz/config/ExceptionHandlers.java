@@ -32,55 +32,57 @@ public class ExceptionHandlers {
     @ResponseBody
     public Mono<WebResult> serverExceptionHandler(AssertErrorException ex) {
         WebResult wr=WebResult.failResult(ex.getErrorCode(), ex.getMessage());
-        System.out.println("MyAssert:"+ JSON.toJSONString(wr));
+        if (log.isDebugEnabled()){
+            log.debug("MyAssert : [{}]", JSON.toJSONString(wr));
+        }
         return  Mono.just(wr);
     }
 
     @ExceptionHandler(Exception.class)
     public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, Exception e) {
-        log.error("全局异常拦截器  {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器  [{}]   请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono();
     }
 
     @ExceptionHandler(ProblemSetException.class)
     public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, ProblemSetException e) {
-        log.error("全局异常拦截器  练习册异常 {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器  练习册异常 [{}]   请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return Mono.just(WebResult.failResult(9200, e.getMessage()));
     }
 
     @ExceptionHandler(RedisException.class)
     public Mono<WebResult> serverExceptionHandler(ServerWebExchange exchange, RedisException e) {
-        log.error("全局异常拦截器  redis 异常 {}   请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器  redis 异常 [{}]   请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono();
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public Mono<WebResult> methodArgumentNotValidException(ServerWebExchange exchange, MethodArgumentNotValidException e) {
-        log.error("全局异常拦截器 参数校验不正确  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器 参数校验不正确  [{}] 请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono(9000);
     }
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, HttpMessageNotReadableException e) {
-        log.error("全局异常拦截器 请求参数格式不正确  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器 请求参数格式不正确  [{}] 请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.failResultMono(9100);
     }
 
     @ExceptionHandler(value = AskException.class)
     public Mono<WebResult> httpMessageNotReadableException(ServerWebExchange exchange, AskException e) {
-        log.error("全局异常拦截器 课堂交互请求拦截  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器 课堂交互请求拦截  [{}] 请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.okCustomResultMono(2000, e.getMessage());
     }
 
     @ExceptionHandler(value = CustomException.class)
     public Mono<WebResult> customException(ServerWebExchange exchange, CustomException e) {
-        log.error("全局异常拦截器 校验及自反馈前端  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器 校验及自反馈前端  [{}] 请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
         return WebResult.okCustomResultMono(3000, e.getMessage());
     }
 
     @ExceptionHandler(value = NullPointerException.class)
     public Mono<WebResult> nullPointerException(ServerWebExchange exchange, NullPointerException e) {
-        log.error("全局异常拦截器 校验及自反馈前端  {} 请求地址 {}  /  异常信息  {}", e, exchange.getRequest().getPath(), e.getMessage());
+        log.error("全局异常拦截器 校验及自反馈前端  [{}] 请求地址 [{}]  /  异常信息  [{}]", e, exchange.getRequest().getPath(), e.getMessage());
 
         if (NULL_POINTEREXCEPTION_EMPTY_DATA.equals(e.getMessage())) {
             return WebResult.okCustomResultMono(3000);

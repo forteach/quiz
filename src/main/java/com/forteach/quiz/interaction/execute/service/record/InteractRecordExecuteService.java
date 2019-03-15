@@ -28,7 +28,7 @@ public class InteractRecordExecuteService {
 
     private final InteractRecordRepository repository;
     private final ReactiveMongoTemplate mongoTemplate;
-    private Mono<Boolean> executeSuccessfully = Mono.just(true);
+//    private Mono<Boolean> executeSuccessfully = Mono.just(true);
 
     public InteractRecordExecuteService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate) {
         this.repository = repository;
@@ -43,7 +43,7 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> join(final String circleId, final String student) {
 
-        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
+        final Query query = Query.query(Criteria.where("_id").is(circleId).and("students").ne(student));
 
         Update update = new Update();
         update.addToSet("students", student);
@@ -63,7 +63,7 @@ public class InteractRecordExecuteService {
     public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
 
         final Query query = Query.query(
-                Criteria.where("circleId").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
+                Criteria.where("_id").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         Update update = new Update();
@@ -134,7 +134,7 @@ public class InteractRecordExecuteService {
      * @return
      */
     Mono<Long> questionNumber(final String circleId) {
-        return mongoTemplate.count(Query.query(Criteria.where("circleId").is(circleId).and("questions.questionsId").ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
+        return mongoTemplate.count(Query.query(Criteria.where("_id").is(circleId).and("questions.questionsId").ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }
 
     /**
@@ -170,7 +170,7 @@ public class InteractRecordExecuteService {
      * @return
      */
     Query buildLastInteractRecord(final String circleId, final String questionId, final String category, final String interactType) {
-        final Query query = Query.query(Criteria.where("circleId")
+        final Query query = Query.query(Criteria.where("_id")
                 .is(circleId).and(interactType + ".questionsId").is(questionId)
                 .and(interactType + ".category").is(category)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
