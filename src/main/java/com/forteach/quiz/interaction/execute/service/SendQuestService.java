@@ -54,20 +54,6 @@ public class SendQuestService {
         //创建课堂问题列表记录
         Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
 
-//        //创建提问题目,并保存题目回答的学生(学生编号逗号分隔)
-//        Mono<Boolean> createQuID =stringRedisTemplate.opsForValue()
-//                .set(BigQueKey.askTypeQuestionsId(QuestionType.TiWen, giveVo,giveVo.getQuestionId()),giveVo.getSelected(), Duration.ofSeconds(60 * 60 * 2))
-//                .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "redis操作错误"))
-//                .filterWhen(ok->stringRedisTemplate.opsForValue()
-//                        //记录当前题目的成员回答类型（个人、小组）和互动方式（选人，抢答）
-//                        .set(BigQueKey.askTypeQuestionsIdType(giveVo.getCircleId(),giveVo.getQuestionId()),giveVo.getCategory().concat(",").concat(giveVo.getInteractive()), Duration.ofSeconds(60 * 60 * 2)));
-
-
-//        //删除抢答答案（删除课堂提问的题目ID的回答信息）
-//        Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag())
-//                //删除信息没找到键值失败，同样返回TRUE
-//                .flatMap(ok->Mono.just(true));
-
         //执行创建提问，并返回执行结果
         return Flux.concat(addQuestNow,createQuest)
                 .count()
@@ -80,7 +66,7 @@ public class SendQuestService {
      * @param circleId   课堂编号
      * @param teacherId  课堂教师
      * @param questId    问题ID
-     * @param questionType    问题ID
+     * @param questionType    问题类型  提问、任务
      * @param interactive  //互动方式（举手、抢答等）
      * @param category //选取类别（个人、小组）
      * @param selected //选中人员 [逗号 分割](stu01,sut02)
@@ -93,6 +79,8 @@ public class SendQuestService {
         map.put("circleId",circleId);
         //当前课堂教师ID
         map.put("teacherId",teacherId);
+        //题目类型
+        map.put("questionType", questionType);
         //题目编号
         map.put("questionId", questId);
         //互动方式（举手、抢答等）
@@ -143,6 +131,7 @@ public class SendQuestService {
                             return  stringRedisTemplate.hasKey(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive))
                                     .flatMap(r->{
                                         if(!r.booleanValue()){
+//                                            System.out.println("00000000000000000000000000000");
                                             //如果该键值不存在，就创建键值
                                            return stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive),questId,Duration.ofSeconds(60 * 60 * 2));
                                         }else{
