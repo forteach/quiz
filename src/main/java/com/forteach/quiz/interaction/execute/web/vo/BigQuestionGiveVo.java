@@ -23,6 +23,10 @@ public class BigQuestionGiveVo extends GiveVo {
     @ApiModelProperty(value = "教师id", name = "teacherId")
     private String teacherId;
 
+
+    @ApiModelProperty(value = "题目互动类型(TiWen，FengBao，RenWu，WenJuan，LianXi)", name = "questionType")
+    private String questionType;
+
     /**
      * 问题id
      */
