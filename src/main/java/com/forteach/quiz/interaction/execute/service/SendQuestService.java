@@ -64,20 +64,6 @@ public class SendQuestService {
         //创建课堂问题列表记录
         Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
 
-//        //创建提问题目,并保存题目回答的学生(学生编号逗号分隔)
-//        Mono<Boolean> createQuID =stringRedisTemplate.opsForValue()
-//                .set(BigQueKey.askTypeQuestionsId(QuestionType.TiWen, giveVo,giveVo.getQuestionId()),giveVo.getSelected(), Duration.ofSeconds(60 * 60 * 2))
-//                .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "redis操作错误"))
-//                .filterWhen(ok->stringRedisTemplate.opsForValue()
-//                        //记录当前题目的成员回答类型（个人、小组）和互动方式（选人，抢答）
-//                        .set(BigQueKey.askTypeQuestionsIdType(giveVo.getCircleId(),giveVo.getQuestionId()),giveVo.getCategory().concat(",").concat(giveVo.getInteractive()), Duration.ofSeconds(60 * 60 * 2)));
-
-
-//        //删除抢答答案（删除课堂提问的题目ID的回答信息）
-//        Mono<Boolean> removeRace = stringRedisTemplate.opsForValue().delete(giveVo.getRaceAnswerFlag())
-//                //删除信息没找到键值失败，同样返回TRUE
-//                .flatMap(ok->Mono.just(true));
-
         //执行创建提问，并返回执行结果
         return Flux.concat(addQuestNow,createQuest)
                 .count()

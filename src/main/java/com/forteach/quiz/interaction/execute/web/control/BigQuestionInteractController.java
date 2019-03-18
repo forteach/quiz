@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
 
 /**
@@ -108,7 +107,7 @@ public class BigQuestionInteractController {
     }
 
     /**
-     * 课堂提问
+     * 课堂提问  TODO 需要重新考虑功能实现，逻辑实现有错误
      * 删除上次的举手学生，重新发起举手
      *
      * @return

@@ -115,6 +115,17 @@ public class BigQueKey {
     }
 
     /**
+     * 课堂当前道题目回答学生前缀
+     * sutId  学生ID
+     * questionId 问题ID
+     * typeName  题目互动方式  提问、联练习。。。。
+     * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
+     */
+    public static String tiJiaoanswerTypeQuestStuSet(final String circleId,String questionId,String typeName) {
+        return questionId.concat("answerStuSet").concat(typeName).concat(circleId);
+    }
+
+    /**
      * 课堂当前道题目回答学生列表前缀
      * sutId  学生ID
      * questionId 问题ID
