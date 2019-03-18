@@ -59,7 +59,7 @@ public class SendQuestService {
     public Mono<Boolean> sendQuestion(String circleId,String teacherId,String questionType,String questId, String interactive,String category,String selected,String cut) {
 
         //创建课堂提问的题目36分钟过期
-        Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questionType,questId,interactive,category,selected,cut);
+        Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questId,questionType,interactive,category,selected,cut);
 
         //创建课堂问题列表记录
         Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
@@ -76,7 +76,7 @@ public class SendQuestService {
      * @param circleId   课堂编号
      * @param teacherId  课堂教师
      * @param questId    问题ID
-     * @param questionType    问题ID
+     * @param questionType    问题类型  提问、任务
      * @param interactive  //互动方式（举手、抢答等）
      * @param category //选取类别（个人、小组）
      * @param selected //选中人员 [逗号 分割](stu01,sut02)
@@ -87,7 +87,7 @@ public class SendQuestService {
         HashMap<String, String> map = new HashMap<>(8);
         map.put("circleId",circleId);//当前课堂ID
         map.put("teacherId",teacherId);//当前课堂教师ID
-        map.put("questionType", questionType);//题目编号
+        map.put("questionType", questionType);//题目类型
         map.put("questionId", questId);//题目编号
         map.put("interactive", interactive);  //互动方式（举手、抢答等）
         map.put("category", category);//选取类别（个人、小组）
