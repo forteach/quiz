@@ -25,10 +25,8 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
-
 import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.interaction.execute.config.BigQueKey.CLASSROOM_ASK_QUESTIONS_ID;
 
@@ -186,7 +184,7 @@ public class BigQuestionInteractService {
      * @return
      */
     private Mono<Boolean> clearCut(final BigQuestionGiveVo giveVo) {
-        return stringRedisTemplate.opsForValue().get(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen, giveVo.getCircleId(), giveVo.getInteractive()))
+        return stringRedisTemplate.opsForValue().get(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen.name(), giveVo.getCircleId(), giveVo.getInteractive()))
                 .zipWith(Mono.just(giveVo.getQuestionId()), String::equals)
                 .flatMap(flag -> {
                     if (!flag) {

@@ -89,15 +89,6 @@ public class SendQuestService {
      */
     private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,String questionType, final String interactive,final String category,final String selected,final String cut){
         HashMap<String, String> map = new HashMap<>(8);
-        map.put("circleId",circleId);//当前课堂ID
-        map.put("teacherId",teacherId);//当前课堂教师ID
-        map.put("questionType", questionType);//题目编号
-        map.put("questionId", questId);//题目编号
-        map.put("interactive", interactive);  //互动方式（举手、抢答等）
-        map.put("category", category);//选取类别（个人、小组）
-        map.put("selected", selected);//选中人员 [逗号 分割]
-        map.put("cut", cut);//随机数
-        map.put("time", DataUtil.format(new Date()));//创建时间
         //当前课堂ID
         map.put("circleId",circleId);
         //当前课堂教师ID
@@ -148,7 +139,7 @@ public class SendQuestService {
                 .flatMap(l->stringRedisTemplate.opsForSet().add(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId))
                         .filterWhen(l1->stringRedisTemplate.expire(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId), Duration.ofSeconds(60*60*2))))
                 .flatMap(item -> {
-//                    //获得当前题目ID和创建新的发布题目Key=题目ID
+                    //获得当前题目ID和创建新的发布题目Key=题目ID
                             return  stringRedisTemplate.hasKey(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive))
                                     .flatMap(r->{
                                         if(!r.booleanValue()){

@@ -1,6 +1,5 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
-import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.ExerciseBooksDto;
@@ -82,7 +81,7 @@ public class InteractRecordExerciseBookService {
 
     private Query buildexerciseBooks(final String circleId, final String questionId) {
         final Query query = Query.query(
-                Criteria.where("_id").is(circleId)
+                Criteria.where(MONGDB_ID).is(circleId)
                         .and(INTERACT_RECORD_EXERCISEBOOKS + ".questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
         query.fields().include(INTERACT_RECORD_EXERCISEBOOKS);
@@ -108,7 +107,7 @@ public class InteractRecordExerciseBookService {
      */
     private Mono<Long> exerciseBookNumber(final String circleId){
         return mongoTemplate.count(Query.query(
-                Criteria.where("_id").is(circleId)
+                Criteria.where(MONGDB_ID).is(circleId)
                         .and(INTERACT_RECORD_EXERCISEBOOKS + ".questionsId").ne("").ne(null)),
                 InteractRecord.class).switchIfEmpty(Mono.just(0L));
     }

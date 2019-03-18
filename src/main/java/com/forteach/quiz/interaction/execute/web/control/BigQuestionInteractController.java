@@ -63,8 +63,6 @@ public class BigQuestionInteractController {
                                          SendAnswerService sendAnswerService,
                                          RaiseHandService raiseHandService,
                                          FabuQuestService fabuQuestService,
-                                         SendQuestService sendQuestService
-    ) {
                                          TokenService tokenService) {
         this.interactService = interactService;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
@@ -74,8 +72,6 @@ public class BigQuestionInteractController {
         this.sendAnswerService= sendAnswerService;
         this.raiseHandService=raiseHandService;
         this.fabuQuestService=fabuQuestService;
-        this.sendAnswerService = sendAnswerService;
-        this.raiseHandService = raiseHandService;
     }
 
     /**
@@ -122,7 +118,6 @@ public class BigQuestionInteractController {
     @ApiImplicitParams({
 //            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
-            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
             @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
     })

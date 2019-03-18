@@ -1,6 +1,5 @@
 package com.forteach.quiz.interaction.execute.service;
 
-import com.forteach.quiz.common.Dic;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
@@ -19,10 +18,8 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
-
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_BRAINSTORMS;
 
 /**

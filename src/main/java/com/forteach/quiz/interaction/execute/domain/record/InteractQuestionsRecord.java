@@ -25,11 +25,6 @@ public class InteractQuestionsRecord {
      */
     protected String time;
 
-//    /**
-//     * 未选择的数量
-//     */
-//    private Integer number;
-
     /**
      * 发布类别 ,个人(people) , 小组(team)
      */
