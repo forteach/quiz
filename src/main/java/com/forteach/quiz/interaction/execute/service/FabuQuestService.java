@@ -1,11 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
-import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
-import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,23 +18,12 @@ public class FabuQuestService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final InteractRecordExecuteService interactRecordExecuteService;
-    private final CorrectService correctService;
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final BigQuestionRepository bigQuestionRepository;
 
     public FabuQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
-                            ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                            InteractRecordExecuteService interactRecordExecuteService,
-                            CorrectService correctService,
-                            BigQuestionRepository bigQuestionRepository,
-                            ReactiveMongoTemplate reactiveMongoTemplate) {
+                            ReactiveHashOperations<String, String, String> reactiveHashOperations) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
-        this.correctService = correctService;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.bigQuestionRepository=bigQuestionRepository;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+
     }
 
     /**
@@ -63,11 +48,11 @@ public class FabuQuestService {
      * @return
      */
     public Mono<Boolean> delSelectStuId(String stuId,String circleId){
-//获得当前逗号分隔的选人数据
+        //获得当前逗号分隔的选人数
         return  reactiveHashOperations.get((BigQueKey.QuestionsIdNow(circleId)),"selected")
                 //过滤掉当前的已回答的学生，并从新生成字符串数据
                 .flatMap(str->Mono.just(Arrays.stream(str.split(",")).filter(id->!id.equals(stuId)).map(str1->",".concat(str1)).collect(joining()).substring(1)))
-                  .flatMap(r->reactiveHashOperations.put((BigQueKey.QuestionsIdNow(circleId)),"selected",r));
+                .flatMap(r->reactiveHashOperations.put((BigQueKey.QuestionsIdNow(circleId)),"selected",r));
 
     }
 

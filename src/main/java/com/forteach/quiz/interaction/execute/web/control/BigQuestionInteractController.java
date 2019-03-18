@@ -4,18 +4,11 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.*;
-import com.forteach.quiz.interaction.execute.web.control.response.QuestFabuListResponse;
-import com.forteach.quiz.interaction.execute.web.vo.*;
-import com.forteach.quiz.interaction.execute.service.BigQuestionInteractService;
-import com.forteach.quiz.interaction.execute.service.RaiseHandService;
-import com.forteach.quiz.interaction.execute.service.SendAnswerService;
-import com.forteach.quiz.interaction.execute.service.SendQuestService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
+import com.forteach.quiz.interaction.execute.web.control.response.QuestFabuListResponse;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
-import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
+import com.forteach.quiz.interaction.execute.web.vo.*;
 import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
@@ -27,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import java.util.List;
 import javax.validation.Valid;
+import java.util.List;
 /**
  * @Description: 课堂问题发布
  * @author: liu zhenming
@@ -170,15 +163,24 @@ public class BigQuestionInteractController {
 
     @PostMapping("/fabu/questList")
     @ApiOperation(value = "获得已发布题目的题目列表", notes = "已发布题目列表、当前题目、以显示题目答案的列表")
-    public Mono<WebResult> questFabuList(@ApiParam(value = "提交答案", required = true) @RequestBody QuestFabuListVo questFabuListVo) {
+    @ApiImplicitParam(name = "circleId", value = "课堂id", required = true, dataType = "string", paramType = "query")
+    public Mono<WebResult> questFabuList(@RequestBody QuestFabuListVo questFabuListVo) {
+        MyAssert.blank(questFabuListVo.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
         return fabuQuestService.getFaBuQuestNow(questFabuListVo.getCircleId())
-                .flatMap(list->Mono.just(new QuestFabuListResponse(questFabuListVo.getCircleId(),(List<String>)list.get(0),list.get(1).toString())))
+                .flatMap(list -> Mono.just(new QuestFabuListResponse(questFabuListVo.getCircleId(), (List<String>) list.get(0), list.get(1).toString())))
+                .onErrorReturn(new QuestFabuListResponse())
                 .map(WebResult::okResult);
     }
 
     @PostMapping("/fabu/delSelectStu")
     @ApiOperation(value = "删除问题选人推送的学生列表", notes = "学生收到题目推送后调用")
-    public Mono<WebResult> questFabuList(@ApiParam(value = "提交答案", required = true) @RequestBody DelSelectStuVo delSelectStuVo) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "circleId", value = "课堂id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "stuId", value = "学生id", required = true, dataType = "string", paramType = "from")
+    })
+    public Mono<WebResult> questFabuList(@RequestBody DelSelectStuVo delSelectStuVo) {
+        MyAssert.blank(delSelectStuVo.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
+        MyAssert.blank(delSelectStuVo.getStuId(), DefineCode.ERR0010, "学生id不为空");
         return fabuQuestService.delSelectStuId(delSelectStuVo.getStuId(),delSelectStuVo.getCircleId())
                 .map(WebResult::okResult);
     }

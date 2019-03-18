@@ -59,14 +59,15 @@ public class ClassRoomService {
                                  //Mono.just(true)
                         );
             } else {
-                //如果key过期，则返回不存在为true
-                Mono<Boolean> notHasKey = stringRedisTemplate.hasKey(roomVo.getQrCode()).flatMap(res -> Mono.just(!res));
+                //如果key过期，则返回不存在为false
+                Mono<Boolean> hasKey = stringRedisTemplate.hasKey(roomVo.getQrCode());
+//                        .flatMap(res -> Mono.just(!res));
                 // Mono<Boolean> HasKey = stringRedisTemplate.hasKey(roomVo.getQrCode()).flatMap(res->{MyAssert.isFalse(res.booleanValue(), DefineCode.ERR0013,"redis操作错误"); return Mono.just(!res);});
                 //如果键值过期或不存在，创建新的键值
 
-                return Mono.just(roomVo).flatMap(obj-> notHasKey
+                return Mono.just(roomVo).flatMap(obj-> hasKey
                         .flatMap(result -> {
-                            if (result) {
+                            if (!result) {
                                 return interactRecordExecuteService.init(roomVo.getTeacherId())
                                         //创建Mongo课堂信息,过期时间2小时
                                         .filterWhen(circleId ->

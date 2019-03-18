@@ -49,7 +49,7 @@ public class SendQuestService {
     public Mono<Boolean> sendQuestion(String circleId,String teacherId,String questionType,String questId, String interactive,String category,String selected,String cut) {
 
         //创建课堂提问的题目36分钟过期
-        Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questionType,questId,interactive,category,selected,cut);
+        Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questId,questionType,interactive,category,selected,cut);
 
         //创建课堂问题列表记录
         Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
@@ -72,7 +72,7 @@ public class SendQuestService {
         return Flux.concat(addQuestNow,createQuest)
                 .count()
                 //创建改题目的回答者信息
-                .flatMap(ct-> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive));
+                .flatMap(ct -> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive));
     }
 
     /**
