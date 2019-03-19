@@ -165,7 +165,7 @@ public class BigQuestionInteractController {
                 interactAnswerVo.getExamineeId(),
                 interactAnswerVo.getQuestionId(),
                 interactAnswerVo.getAnswer(),
-                interactAnswerVo.getCut()).map(WebResult::okResult);
+                interactAnswerVo.getCut()).map(r-> String.valueOf(r)).map(WebResult::okResult);
     }
 
     @PostMapping("/fabu/questList")

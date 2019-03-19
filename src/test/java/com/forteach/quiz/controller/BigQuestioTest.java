@@ -30,11 +30,12 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        BigQuestionGiveVo vo=new BigQuestionGiveVo("q01","select");
-        vo.setCircleId("5c88b6c5c762c12414c09f49");
-        vo.setTeacherId("t01");
+        BigQuestionGiveVo vo=new BigQuestionGiveVo("5c73676306a38f000101b7b6","select");
+        vo.setCircleId("5c9095563230ac0c7cc129b9");
+        vo.setTeacherId("we123");
         vo.setCategory("people");
-        vo.setSelected("stu02,stu01");
+        vo.setQuestionType("TiWen");
+        vo.setSelected("410221199706224226");
         vo.setCut("0");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
@@ -61,7 +62,7 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo("stu01","5c88b6c5c762c12414c09f49","q01","answer-ok","cut");
+        InteractAnswerVo vo=new InteractAnswerVo("410221199706224226","5c9095563230ac0c7cc129b9","5c73676306a38f000101b7b6","D","cut");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient

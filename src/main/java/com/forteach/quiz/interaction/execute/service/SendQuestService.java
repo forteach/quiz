@@ -58,6 +58,9 @@ public class SendQuestService {
         return Flux.concat(addQuestNow,createQuest)
                 .filterWhen(s -> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive))
                 .next();
+        return addQuestNow.flatMap(r->createQuest)
+                //创建mongo答题日志
+                .flatMap(r->interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
     }
 
     /**
@@ -94,6 +97,7 @@ public class SendQuestService {
         map.put("time", DataUtil.format(new Date()));
         //创建课堂提问的题目2小时过期
        return reactiveHashOperations.putAll(BigQueKey.QuestionsIdNow(circleId), map)
+                //设置题目信息
                .flatMap(r->setQuestInfo(questId))
                //key:circleId+"now"
                .filterWhen(r->stringRedisTemplate.expire(BigQueKey.QuestionsIdNow(circleId), Duration.ofSeconds(60*60*2)));
@@ -109,7 +113,9 @@ public class SendQuestService {
         //存储当前所发布的题目信息
         final String key=BigQueKey.QuestionsNow(questionId);
        return stringRedisTemplate.hasKey(key)
-               .flatMap(r->r.booleanValue()?Mono.just(true):bigQuestionRepository.findById(questionId).flatMap(obj-> stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))));
+               .flatMap(r->r.booleanValue()?Mono.just(true):bigQuestionRepository.findById(questionId)
+                                                            .flatMap(obj->
+                                                                    stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))));
     }
 
     /**
@@ -122,8 +128,8 @@ public class SendQuestService {
     private Mono<Boolean> addQuestList(String circleId,String interactive,String questId){
         //创建交互题目的互动方式的先后顺序发布列表
         return stringRedisTemplate.opsForList().leftPush(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId,  interactive), questId)
-                //创建交互题目发布列表
-                .flatMap(l->stringRedisTemplate.opsForSet().add(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId))
+                //创建交互题目发布哈希列表
+                .flatMap(l->stringRedisTemplate.opsForSet().add(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId),questId)
                         .filterWhen(l1->stringRedisTemplate.expire(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId), Duration.ofSeconds(60*60*2))))
                 .flatMap(item -> {
                     //获得当前题目ID和创建新的发布题目Key=题目ID
@@ -137,8 +143,7 @@ public class SendQuestService {
                                           return  stringRedisTemplate.opsForValue().getAndSet(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive),questId)
                                                     .flatMap(old->stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdPrve(QuestionType.TiWen.name(), circleId,interactive),old,Duration.ofSeconds(60 * 60 * 2)));
                                         }
-                                    })
-                                    .filterWhen(r->stringRedisTemplate.expire(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive),Duration.ofSeconds(60 * 60 * 2)));
+                                    });
                         }
                 )
                 //设置题目列表的过期时间

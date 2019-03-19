@@ -68,7 +68,7 @@ public class BigQueKey {
     /**
      * 课堂互动前缀
      *
-     * @return 问题前缀+课堂+问题类型+回答方式  题目列表set
+     * @return 问题前缀+课堂+问题类型  题目列表set
      */
     public static String askTypeQuestionsId(final String questType,String circleId) {
         return circleId.concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questType);
@@ -145,13 +145,5 @@ public class BigQueKey {
         return  circleId.concat("asknow").concat(questionId);
     }
 
-    /**
-     * 课堂互动的hash前缀
-     *
-     * @return 问题前缀+课堂+问题类型+回答方式
-     */
-    public static String askQuestionsId(final String questType, String circleId) {
-        return circleId.concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questType);
-    }
 
 }

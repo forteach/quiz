@@ -10,7 +10,6 @@ import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecord
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
-import com.forteach.quiz.web.vo.InteractAnswerVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -61,7 +60,7 @@ public class SendAnswerService {
      * @param cut 随机数
      * @return
      */
-    public Mono<String> sendAnswer(String circleId,String examineeId,String questId,String answer,String cut) {
+    public Mono<Boolean> sendAnswer(String circleId,String examineeId,String questId,String answer,String cut) {
 
         return Mono.just(answer)
                 //验证当前回答的题目和参与回答的人员
@@ -102,11 +101,11 @@ public class SendAnswerService {
                                     .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
                 )
                 //设置学生回答题目的批改结果
-                .filterWhen(right -> reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,right)
-                                    .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
-                )
+                .filterWhen(right -> { return reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,String.valueOf(2))
+                                    .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
+                    ;})
                 //记录学生回答MONGO记录
-                .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, right));
+               .filterWhen(right -> interactRecordExecuteService.answer(circleId, questId, examineeId, answer, String.valueOf(right)));
     }
 
     /**
@@ -142,7 +141,7 @@ public class SendAnswerService {
      *
      * @return
      */
-    private Mono<String> sendSelect(String circleId,String examineeId,String questId,String answer, final String type) {
+    private Mono<Boolean> sendSelect(String circleId,String examineeId,String questId,String answer, final String type) {
 
         //创建学生回答顺序列表
 
@@ -155,10 +154,10 @@ public class SendAnswerService {
                                     .and("questionId").is(questId)
                                     .and("examineeId").is(examineeId));
                     //更新题目答案
-                    Update update = Update.update("answer", answer);
-                    update.set("interactive", type);
-                    update.set("right", String.valueOf(f));
-                    update.set("uDate", new Date());
+                    Update update = Update.update("answer", answer)
+                    .set("interactive", type)
+                    .set("right", String.valueOf(f))
+                    .set("uDate", new Date());
 
                     return reactiveMongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
                         if (result.wasAcknowledged()) {
@@ -176,7 +175,7 @@ public class SendAnswerService {
      * TODO 报错临时注解
      * @return
      */
-    private Mono<String> sendRace(String circleId,String examineeId,String questId,String answer, final String type) {
+    private Mono<Boolean> sendRace(String circleId,String examineeId,String questId,String answer, final String type) {
         //判断本次是否已经提交过该题目
         return  stringRedisTemplate.hasKey(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.TiWen.name()))
                 .flatMap(flag -> {
@@ -189,7 +188,7 @@ public class SendAnswerService {
      * TODO 报错临时注解
      * 举手 回答
      */
-    private Mono<String> sendRaise(String circleId,String examineeId,String questId,String answer, final String type) {
+    private Mono<Boolean> sendRaise(String circleId,String examineeId,String questId,String answer, final String type) {
        return Mono.just(circleId).flatMap(interactAnswerVo -> sendSelect(circleId,examineeId,questId,answer, type));
 
     }

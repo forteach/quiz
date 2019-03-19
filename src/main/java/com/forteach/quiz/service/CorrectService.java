@@ -134,26 +134,27 @@ public class CorrectService {
     }
 
     //TODO  题目回答更正回答记录
-    public Mono<String> correcting(final String questionId, final String answer) {
+    public Mono<Boolean> correcting(final String questionId, final String answer) {
         //找到题目信息 TODO OLD
         //return bigQuestionRepository.findById(questionId)
         return getBigQuestion(questionId)
                 .flatMap(bigQuestion -> {
-                    JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
+                    final JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
                         case QUESTION_CHOICE_OPTIONS_SINGLE:
                             //选择题
                         case QUESTION_CHOICE_MULTIPLE_SINGLE:
                             ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
-                            String result=String.valueOf(choice(choiceQst, answer));
-                            return Mono.just(result);
+                           // String result=String.valueOf(choice(choiceQst, answer));
+                            return Mono.just(choice(choiceQst, answer));
                             //判断
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
                             TrueOrFalse trueOrFalse = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), TrueOrFalse.class);
-                            return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
+                           //return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
+                            return  Mono.just(trueOrFalse(trueOrFalse, answer));
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
-                            //简答主观题 人工手动批改
-                            return Mono.just("");
+                            // TODO 简答主观题 人工手动批改
+                            return Mono.just(true);
                         default:
                             log.error("非法参数 错误的题目类型 : {}", String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType")));
                             throw new ExamQuestionsException("非法参数 错误的题目类型");

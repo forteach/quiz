@@ -11,12 +11,14 @@ import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
 import java.util.Optional;
 
 /**
@@ -51,7 +53,7 @@ public class ClassRoomController extends BaseController {
         Optional<String> teacherId = tokenService.getTeacherId(request);
         teacherId.ifPresent(roomVo::setTeacherId);
         //流式调用
-        return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
@@ -77,7 +79,7 @@ public class ClassRoomController extends BaseController {
         //验证请求参数
         MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
         joinVo.setExamineeId(tokenService.getStudentId(request));
-        return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
+        return classRoomService.joinInteractiveRoom(joinVo.getCircleId(),joinVo.getExamineeId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")

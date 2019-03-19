@@ -29,9 +29,9 @@ public class ClassRoomKey {
     }
 
     //课堂创建信息
-    public static String getRoomKey(String teacherId){
-        return ClassRoomKey.INTERACTIVE_CLASSROOM.concat(teacherId);
-    }
+//    public static String getRoomKey(String teacherId){
+//        return ClassRoomKey.INTERACTIVE_CLASSROOM.concat(teacherId);
+//    }
 
     //课堂的上课教师
     public static String getRoomTeacherKey(String circleId){
