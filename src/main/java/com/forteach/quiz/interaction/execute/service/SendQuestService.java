@@ -52,13 +52,12 @@ public class SendQuestService {
         Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questId,questionType,interactive,category,selected,cut);
 
         //创建课堂问题列表记录
-        Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
+        Mono<Boolean> createQuest = addQuestList(circleId, interactive, questId);
 
         //执行创建提问，并返回执行结果
         return Flux.concat(addQuestNow,createQuest)
-                .count()
-                //创建改题目的回答者信息
-                .flatMap(ct -> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive));
+                .filterWhen(s -> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive))
+                .next();
     }
 
     /**
@@ -73,8 +72,8 @@ public class SendQuestService {
      * @param cut //随机数
      * @return true or false
      */
-    private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,String questionType, final String interactive,final String category,final String selected,final String cut){
-        HashMap<String, String> map = new HashMap<>(8);
+    private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,final String questionType, final String interactive,final String category,final String selected,final String cut){
+        HashMap<String, String> map = new HashMap<>(10);
         //当前课堂ID
         map.put("circleId",circleId);
         //当前课堂教师ID
@@ -131,7 +130,6 @@ public class SendQuestService {
                             return  stringRedisTemplate.hasKey(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive))
                                     .flatMap(r->{
                                         if(!r.booleanValue()){
-//                                            System.out.println("00000000000000000000000000000");
                                             //如果该键值不存在，就创建键值
                                            return stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive),questId,Duration.ofSeconds(60 * 60 * 2));
                                         }else{

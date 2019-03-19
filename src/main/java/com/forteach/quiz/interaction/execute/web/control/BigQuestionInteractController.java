@@ -39,13 +39,19 @@ public class BigQuestionInteractController {
     private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final TokenService tokenService;
 
-    //课堂发布问题
+    /**
+     * 课堂发布问题
+     */
     private final SendQuestService sendQuestService;
 
-    //课堂问题回答
+    /**
+     * 课堂问题回答
+     */
     private final SendAnswerService sendAnswerService;
 
-    //课堂举手
+    /**
+     * 课堂举手
+     */
     private final RaiseHandService raiseHandService;
 
     private final FabuQuestService fabuQuestService;
