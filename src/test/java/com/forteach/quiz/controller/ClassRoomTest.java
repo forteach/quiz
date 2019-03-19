@@ -26,7 +26,7 @@ public class ClassRoomTest {
 
     @Test
     public void createInteractiveRoom(){
-        InteractiveRoomVo vo=new InteractiveRoomVo("","t01","cp01");
+        InteractiveRoomVo vo=new InteractiveRoomVo("","we123","2c91801769229946016922ba6b220001");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom/create/reuse")  //创建2小时内同一课堂
@@ -45,7 +45,7 @@ public class ClassRoomTest {
 
     @Test
     public void joinInteractiveRoom(){
-        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("stu03","5c88b6c5c762c12414c09f49");
+        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("410221199706224226","5c9095563230ac0c7cc129b9");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom/join/interactiveRoom")
@@ -63,7 +63,7 @@ public class ClassRoomTest {
 
     @Test
     public void findInteractiveStudents(){
-        InteractiveStudentsReq vo=new InteractiveStudentsReq("5c88b6c5c762c12414c09f49","t01");
+        InteractiveStudentsReq vo=new InteractiveStudentsReq("5c9095563230ac0c7cc129b9","t01");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom//find/interactiveStudents")

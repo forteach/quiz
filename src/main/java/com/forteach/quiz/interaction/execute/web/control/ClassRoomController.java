@@ -11,10 +11,7 @@ import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 /**
  * @Description:创建课堂，加入学生
@@ -44,8 +41,9 @@ public class ClassRoomController extends BaseController {
         //验证请求参数
         MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
+
         //流式调用
-        return classRoomService.createInteractiveRoom(roomVo).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
@@ -71,7 +69,7 @@ public class ClassRoomController extends BaseController {
         //验证请求参数
         MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
         MyAssert.blank(joinVo.getExamineeId(), DefineCode.ERR0010 ,"学生编号不存在");
-        return classRoomService.joinInteractiveRoom(joinVo).map(WebResult::okResult);
+        return classRoomService.joinInteractiveRoom(joinVo.getCircleId(),joinVo.getExamineeId()).map(WebResult::okResult);
     }
 
     @PostMapping(value = "/test")

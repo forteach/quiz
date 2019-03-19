@@ -53,12 +53,11 @@ public class InteractRecordExecuteService {
 //        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
         final Query query = Query.query(Criteria.where("id").is(circleId));
 
-        Update update = new Update();
-        update.addToSet("students", student);
+        Update update = new Update()
+         //加入学生ID
+        .addToSet("students", student)
         //学生数量+1
-        update.inc("participate", 1);
-
-//        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord()))
+        .inc("participate", 1);
         return mongoTemplate.findAndModify(query, update, InteractRecord.class)
                 .map(item->{MyAssert.isNull(item,DefineCode.ERR0013,"更新课堂学生信息失败");return true;});
     }
@@ -106,19 +105,21 @@ public class InteractRecordExecuteService {
 
         final Query query = Query.query(Criteria.where("id").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
-        Update update = new Update();
-
-        update.inc("questions.$.answerNumber", 1);
-
         if (QUESTION_ACCURACY_TRUE.equals(right)) {
-            update.inc("questions.$.correctNumber", 1);
+            Update update = new Update()
+                    .inc("questions.$.answerNumber", 1)
+                    .inc("questions.$.correctNumber", 1);
+            update.push("questions.$.answerRecordList", new InteractAnswerRecord(studentId, answer, right));
+            return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
         } else if (QUESTION_ACCURACY_FALSE.equals(right)) {
-            update.inc("questions.$.errorNumber", 1);
+            Update update = new Update()
+                    .inc("questions.$.answerNumber", 1)
+                    .inc("questions.$.errorNumber", 1);
+            update.push("questions.$.answerRecordList", new InteractAnswerRecord(studentId, answer, right));
+            return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
         }
+        return Mono.just(false);
 
-        update.push("questions.$.answerRecordList", new InteractAnswerRecord(studentId, answer, right));
-
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
     }
 
 
@@ -136,9 +137,9 @@ public class InteractRecordExecuteService {
                 Criteria.where("id").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
-        Update update = new Update();
-        update.addToSet("questions.$.raiseHandsId", student);
-        update.inc("questions.$.raiseHandsNumber", 1);
+        Update update = new Update()
+        .addToSet("questions.$.raiseHandsId", student)
+        .inc("questions.$.raiseHandsNumber", 1);
 
         return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
     }
@@ -166,11 +167,11 @@ public class InteractRecordExecuteService {
 
     public Mono<String> init(final String teacherId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
-        return Mono.just(teacherId).flatMap(id ->build(id).flatMap(item -> {
-            MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败");
-            MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败");
-            return Mono.just(item.getId());
-        }));
+        return Mono.just(teacherId)
+                //创建记录
+                .flatMap(id ->build(id)
+                .flatMap(item->MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败"))
+                .flatMap(item -> MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败")));
     }
 
 

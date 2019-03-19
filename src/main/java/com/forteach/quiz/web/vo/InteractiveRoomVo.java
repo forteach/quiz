@@ -33,18 +33,6 @@ public class InteractiveRoomVo {
     private String chapterId;
 
 
-    /**
-     * 老师创建临时课堂前缀
-     * @return string 临时课堂
-     */
-    public String getRoomKey() {
-        return ClassRoomKey.getRoomKey(teacherId);
-    }
-
-    public String getQrCode() {
-        return   StrUtil.isBlank(circleId)?"":ClassRoomKey.getInteractiveIdQra(circleId);
-    }
-
     public InteractiveRoomVo(String circleId, String teacherId, String chapterId) {
         this.circleId = circleId;
         this.teacherId = teacherId;
