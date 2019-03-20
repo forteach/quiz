@@ -11,9 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.util.Objects;
-
 import static com.forteach.quiz.common.Dic.*;
 
 /**
@@ -109,18 +107,20 @@ public class InsertInteractRecordService {
                 .and(INTERACT_RECORD_QUESTIONS.concat(".answerRecordList.examineeId")).ne(studentId))
                 .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
-        Update update = new Update();
-
-        update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.answerNumber"), 1);
-
         if (QUESTION_ACCURACY_TRUE.equals(right)) {
-            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.correctNumber"), 1);
+            Update update = new Update()
+                    .inc(INTERACT_RECORD_QUESTIONS.concat(".$.answerNumber"), 1)
+                    .inc(INTERACT_RECORD_QUESTIONS.concat(".$.correctNumber"), 1);
+            update.push(INTERACT_RECORD_QUESTIONS.concat(".$.answerRecordList"), new InteractAnswerRecord(studentId, answer, right));
+            return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
         } else if (QUESTION_ACCURACY_FALSE.equals(right)) {
-            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.errorNumber"), 1);
+            Update update = new Update()
+                    .inc(INTERACT_RECORD_QUESTIONS.concat(".$.answerNumber"), 1)
+                    .inc(INTERACT_RECORD_QUESTIONS.concat(".$.errorNumber"), 1);
+            update.push(INTERACT_RECORD_QUESTIONS.concat(".$.answerRecordList"), new InteractAnswerRecord(studentId, answer, right));
+            return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
         }
+        return Mono.just(false);
 
-        update.push(INTERACT_RECORD_QUESTIONS.concat(".$.answerRecordList"), new InteractAnswerRecord(studentId, answer, right));
-
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class).map(Objects::nonNull);
     }
 }

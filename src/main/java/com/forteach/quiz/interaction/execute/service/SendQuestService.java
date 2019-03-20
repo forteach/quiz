@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Date;
@@ -24,7 +23,6 @@ public class SendQuestService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
     private final InteractRecordQuestionsService interactRecordQuestionsService;
-
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
                             ReactiveHashOperations<String, String, String> reactiveHashOperations,
                             InteractRecordQuestionsService interactRecordQuestionsService,
@@ -55,12 +53,9 @@ public class SendQuestService {
         Mono<Boolean> createQuest = addQuestList(circleId, interactive, questId);
 
         //执行创建提问，并返回执行结果
-        return Flux.concat(addQuestNow,createQuest)
-                .filterWhen(s -> interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive))
-                .next();
         return addQuestNow.flatMap(r->createQuest)
                 //创建mongo答题日志
-                .flatMap(r->interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
+                .flatMap(r->interactRecordQuestionsService.releaseQuestion(circleId, questId, selected, category, interactive));
     }
 
     /**

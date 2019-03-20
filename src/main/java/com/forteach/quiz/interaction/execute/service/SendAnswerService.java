@@ -7,7 +7,6 @@ import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,21 +23,18 @@ import java.util.Arrays;
 import java.util.Date;
 import static com.forteach.quiz.common.Dic.*;
 
-
 @Slf4j
 @Service
 public class SendAnswerService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final InteractRecordExecuteService interactRecordExecuteService;
     private final CorrectService correctService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final InsertInteractRecordService insertInteractRecordService;
 
     public SendAnswerService(ReactiveStringRedisTemplate stringRedisTemplate,
                              ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                             InteractRecordExecuteService interactRecordExecuteService,
                              CorrectService correctService,
                              InsertInteractRecordService insertInteractRecordService,
                              ReactiveMongoTemplate reactiveMongoTemplate) {
@@ -46,7 +42,6 @@ public class SendAnswerService {
         this.reactiveHashOperations = reactiveHashOperations;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.interactRecordExecuteService = interactRecordExecuteService;
         this.insertInteractRecordService = insertInteractRecordService;
     }
 
@@ -105,7 +100,7 @@ public class SendAnswerService {
                                     .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
                     ;})
                 //记录学生回答MONGO记录
-               .filterWhen(right -> interactRecordExecuteService.answer(circleId, questId, examineeId, answer, String.valueOf(right)));
+               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right)));
     }
 
     /**

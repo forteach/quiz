@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
@@ -147,18 +149,24 @@ public class InteractRecordQuestionsService {
      * @return
      */
     public Mono<Boolean> releaseQuestion(final String circleId, final String questionId, final String selectId, final String category, final String interactive) {
-
+        //获得没有回答的问题次数
         Mono<Long> number = interactRecordExecuteService.questionNumber(circleId);
 
         Mono<InteractRecord> recordMono = findInteractQuestionsRecord(circleId, questionId, category, interactive);
 
         return Mono.zip(number, recordMono).flatMap(tuple2 -> {
-
+            //更新已发布的问题
             if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
                 return upInteractQuestions(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactive);
             } else {
+                //push一条新的发布问题记录
                 return pushInteractQuestions(selectId, circleId, questionId, tuple2.getT1(), interactive, category);
             }
-        }).map(Objects::nonNull);
+
+        }).map(obj->{
+            MyAssert.isNull(obj, DefineCode.ERR0012,"提问数据记录失败");
+            return true;
+        });
+
     }
 }
