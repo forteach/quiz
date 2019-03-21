@@ -164,9 +164,9 @@ public class CorrectService {
 
     //从Redis或Mongo获得题目内容
     public Mono<BigQuestion> getBigQuestion(String questionId){
-        String key= BigQueKey.QuestionsNow(questionId);
+        String key= BigQueKey.questionsNow(questionId);
         return stringRedisTemplate.hasKey(key)
-                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(BigQueKey.QuestionsNow(questionId)).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId));
+                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(BigQueKey.questionsNow(questionId)).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId));
     }
 
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {

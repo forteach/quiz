@@ -19,6 +19,10 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * 课堂发布提问题目
+ */
+
 
 @Slf4j
 @Service
@@ -94,18 +98,18 @@ public class SendQuestService {
         map.put("cut", cut);//随机数
         map.put("time", DataUtil.format(new Date()));//创建时间
         //创建课堂提问的题目2小时过期
-       return reactiveHashOperations.putAll(BigQueKey.QuestionsIdNow(circleId), map)
+       return reactiveHashOperations.putAll(BigQueKey.questionsIdNow(circleId), map)
                 //设置题目信息
                .flatMap(r->setQuestInfo(questId))
                //key:circleId+"now"
-               .filterWhen(r->stringRedisTemplate.expire(BigQueKey.QuestionsIdNow(circleId), Duration.ofSeconds(60*60*2)));
+               .filterWhen(r->stringRedisTemplate.expire(BigQueKey.questionsIdNow(circleId), Duration.ofSeconds(60*60*2)));
 
     }
 
     //设置当前题目内容到Redis
     private Mono<Boolean> setQuestInfo(final String questionId){
         //存储当前所发布的题目信息
-        final String key=BigQueKey.QuestionsNow(questionId);
+        final String key=BigQueKey.questionsNow(questionId);
        return stringRedisTemplate.hasKey(key)
                .flatMap(r->r.booleanValue()?Mono.just(true):bigQuestionRepository.findById(questionId)
                                                             .flatMap(obj->

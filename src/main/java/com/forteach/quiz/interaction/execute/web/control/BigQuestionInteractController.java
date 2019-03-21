@@ -6,6 +6,7 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.*;
 import com.forteach.quiz.interaction.execute.web.control.response.QuestFabuListResponse;
 import com.forteach.quiz.interaction.execute.web.vo.*;
+import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
 import io.swagger.annotations.*;
@@ -40,11 +41,14 @@ public class BigQuestionInteractController {
     private final RaiseHandService raiseHandService;
 
     private final FabuQuestService fabuQuestService;
+    //练习册
+    private  final SendQuestBookService sendQuestBookService;
 
     public BigQuestionInteractController(BigQuestionInteractService interactService,
                                          SendAnswerService sendAnswerService,
                                          RaiseHandService raiseHandService,
                                          FabuQuestService fabuQuestService,
+                                         SendQuestBookService sendQuestBookService,
                                          SendQuestService sendQuestService
     ) {
         this.interactService = interactService;
@@ -52,6 +56,7 @@ public class BigQuestionInteractController {
         this.sendAnswerService= sendAnswerService;
         this.raiseHandService=raiseHandService;
         this.fabuQuestService=fabuQuestService;
+        this.sendQuestBookService=sendQuestBookService;
     }
 
     /**
@@ -172,7 +177,8 @@ public class BigQuestionInteractController {
     @PostMapping("/send/book")
     @ApiImplicitParam(value = "问题id,多个id逗号分隔", name = "questionIds", required = true, dataType = "string", paramType = "from")
     public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo) {
-        return interactService.sendInteractiveBook(giveVo).map(WebResult::okResult);
+
+        return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected()).map(WebResult::okResult);
     }
 
     /**

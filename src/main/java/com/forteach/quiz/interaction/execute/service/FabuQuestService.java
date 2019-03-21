@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import static java.util.stream.Collectors.joining;
 
+/**
+ * 当前课堂已发布的题目列表
+ */
 
 @Slf4j
 @Service
@@ -47,11 +50,11 @@ public class FabuQuestService {
      */
     public Mono<List<Object>> getFaBuQuestNow(String circleId) {
         //获得已经发布的题目列表
-        Mono<List<String>> faBuList= reactiveHashOperations.get((BigQueKey.QuestionsIdNow(circleId)),"questionType")
+        Mono<List<String>> faBuList= reactiveHashOperations.get((BigQueKey.questionsIdNow(circleId)),"questionType")
                 .flatMap(qtype->stringRedisTemplate.opsForSet().members(BigQueKey.askTypeQuestionsId(qtype,  circleId))
                         .collectList());
         //获得当前题目的ID
-        Mono<String> nowQuest=reactiveHashOperations.get(BigQueKey.QuestionsIdNow(circleId),"questId");
+        Mono<String> nowQuest=reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId),"questId");
 
         return  Flux.concat(faBuList,nowQuest).collectList();
     }
@@ -63,10 +66,10 @@ public class FabuQuestService {
      */
     public Mono<Boolean> delSelectStuId(String stuId,String circleId){
 //获得当前逗号分隔的选人数据
-        return  reactiveHashOperations.get((BigQueKey.QuestionsIdNow(circleId)),"selected")
+        return  reactiveHashOperations.get((BigQueKey.questionsIdNow(circleId)),"selected")
                 //过滤掉当前的已回答的学生，并从新生成字符串数据
                 .flatMap(str->Mono.just(Arrays.stream(str.split(",")).filter(id->!id.equals(stuId)).map(str1->",".concat(str1)).collect(joining()).substring(1)))
-                  .flatMap(r->reactiveHashOperations.put((BigQueKey.QuestionsIdNow(circleId)),"selected",r));
+                  .flatMap(r->reactiveHashOperations.put((BigQueKey.questionsIdNow(circleId)),"selected",r));
 
     }
 

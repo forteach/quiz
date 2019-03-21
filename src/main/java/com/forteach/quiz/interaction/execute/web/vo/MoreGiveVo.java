@@ -23,4 +23,7 @@ public class MoreGiveVo extends GiveVo {
     @ApiModelProperty(value = "问题id,多个id逗号分隔", name = "questionIds")
     private String questionId;
 
+    @ApiModelProperty(value = "发布练习册的教师", name = "teacherId")
+    private String teacherId;
+
 }

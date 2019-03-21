@@ -29,13 +29,37 @@ public class BigQueKey {
     public static final String CLASSROOM_ASK_QUESTIONS_RACE = "askRace";
 
     /**
+     * 课堂练习册
+     */
+    public static final String CLASSROOM_BOOK_NOW= "nowBook";
+
+    /**
      * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
     public static final String CLASSROOM_ASK_QUESTIONS_ID = "ask";
 
+    /**
+     * 互动提问hash前缀(习题库\头脑风暴等。。。)
+     */
+    public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "bookList";
+
     //缓存当前已发布的题目题干内容，不分课堂。
-    public static String QuestionsNow(String questionId) {
+    public static String questionsNow(String questionId) {
         return CLASSROOM_ASK_NOW.concat(questionId);
+    }
+
+    //缓存当前已发布的题目题干内容，不分课堂。
+    public static String bookQuestionsNow(String questionId) {
+        return CLASSROOM_BOOK_NOW.concat(questionId);
+    }
+
+    /**
+     * 课堂提问当前前缀
+     *
+     * @return now+课堂Id=map
+     */
+    public static String questionsIdNow(String circleId) {
+        return CLASSROOM_ASK_NOW.concat(circleId);
     }
 
     /**
@@ -43,9 +67,10 @@ public class BigQueKey {
      *
      * @return now+课堂Id=map
      */
-    public static String QuestionsIdNow(String circleId) {
-        return CLASSROOM_ASK_NOW.concat(circleId);
+    public static String questionsBookNow(String circleId) {
+        return CLASSROOM_BOOK_NOW.concat(circleId);
     }
+
 
     /**
      * 课堂题目当前前缀
@@ -63,6 +88,15 @@ public class BigQueKey {
      */
     public static String askTypeQuestionsId(final String questType,String circleId, String interactive) {
         return circleId.concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questType.concat(interactive));
+    }
+
+    /**
+     * 课堂练习互动前缀
+     *
+     * @return 问题前缀+课堂+问题类型+回答方式  题目列表List
+     */
+    public static String bookTypeQuestionsList(String circleId) {
+        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_LIST);
     }
 
     /**
