@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
@@ -17,10 +18,8 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
-
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
 /**
  * @Description: 问卷
@@ -122,7 +121,7 @@ public class SurveyInteractService {
                         .and("libraryType").is(QuestionType.WenJuan));
 
         Update update = new Update();
-        sheetVo.getAnsw().setDate(new Date());
+        sheetVo.getAnsw().setDate(DataUtil.format(new Date()));
         update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);

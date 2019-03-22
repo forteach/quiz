@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @Description:
  * @author: liu zhenming
@@ -28,6 +26,6 @@ public class InteractiveSheetAnsw {
     @ApiModelProperty(value = "答案", name = "answer")
     private String answer;
 
-    private Date date;
+    private String date;
 
 }

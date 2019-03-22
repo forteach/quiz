@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.domain.record;
 
+import com.forteach.quiz.common.DataUtil;
 import lombok.Data;
 
 import java.util.Date;
@@ -31,7 +32,7 @@ public class InteractAnswerRecord {
     /**
      * 回答时间
      */
-    private Date time;
+    private String time;
 
     public InteractAnswerRecord() {
     }
@@ -40,12 +41,12 @@ public class InteractAnswerRecord {
         this.examineeId = examineeId;
         this.answer = answer;
         this.right = right;
-        this.time = new Date();
+        this.time = DataUtil.format(new Date());
     }
 
     public InteractAnswerRecord(String examineeId, String answer) {
         this.examineeId = examineeId;
         this.answer = answer;
-        this.time = new Date();
+        this.time = DataUtil.format(new Date());
     }
 }

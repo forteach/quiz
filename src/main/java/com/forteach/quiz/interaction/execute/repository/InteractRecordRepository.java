@@ -63,13 +63,13 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
 
     /**
      * 查询答题信息
-     * @param id　课堂id
+     * @param 　课堂id
      * @param questionsId 问题 id
      * @return
      */
     @Transactional(readOnly = true)
-    @Query(value = "{'_id': ?0, 'questions.questionsId' : ?1}", fields = "{ '_id' : 0, 'questions' : 1}")
-    Mono<QuestionsDto> findRecordByIdAndQuestionsId(final String id, final String questionsId);
+    @Query(value = "{'_id': ?0 , 'questions.questionsId' : ?1}", fields = "{ '_id' : 0, 'questions' : 1}")
+    Mono<QuestionsDto> findRecordByIdAndQuestionsId(final String objectId, final String questionsId);
 
     /**
      * 查询问卷记录
@@ -88,7 +88,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @return
      */
     @Transactional(readOnly = true)
-    @Query(value = "{'circleId': ?0, 'interacts.questionsId' : ?1 }", fields = "{ '_id' : 0, 'interacts' : 1}")
+    @Query(value = "{'_id': ?0, 'interacts.questionsId' : ?1 }", fields = "{ '_id' : 0, 'interacts' : 1}")
     Mono<TaskInteractDto> findRecordTaskByIdAndQuestionsId(final String id, final String questionsId);
 
     /**

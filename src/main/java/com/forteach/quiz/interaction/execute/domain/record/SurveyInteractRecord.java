@@ -1,7 +1,7 @@
 package com.forteach.quiz.interaction.execute.domain.record;
 
+import com.forteach.quiz.common.DataUtil;
 import lombok.Data;
-
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class SurveyInteractRecord {
     /**
      * 发布时间
      */
-    private Date time;
+    private String time;
 
     /**
      * 发布次数
@@ -59,7 +59,7 @@ public class SurveyInteractRecord {
         this.index = index.intValue();
         this.category = category;
         this.selectId = selectId;
-        this.time = new Date();
+        this.time = DataUtil.format(new Date());
     }
 
     public SurveyInteractRecord() {

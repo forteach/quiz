@@ -37,7 +37,7 @@ public class FabuQuestService {
                 .flatMap(qtype->stringRedisTemplate.opsForSet().members(BigQueKey.askTypeQuestionsId(qtype,  circleId))
                         .collectList());
         //获得当前题目的ID
-        Mono<String> nowQuest=reactiveHashOperations.get(BigQueKey.QuestionsIdNow(circleId),"questId");
+        Mono<String> nowQuest=reactiveHashOperations.get(BigQueKey.QuestionsIdNow(circleId),"questionId");
 
         return  Flux.concat(faBuList,nowQuest).collectList();
     }

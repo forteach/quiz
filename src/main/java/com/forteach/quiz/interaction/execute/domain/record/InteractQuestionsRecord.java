@@ -23,7 +23,7 @@ public class InteractQuestionsRecord {
     /**
      * 发布时间
      */
-    protected String time;
+    private String time;
 
     /**
      * 发布类别 ,个人(people) , 小组(team)

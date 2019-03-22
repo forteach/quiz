@@ -1,9 +1,12 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.record.BrainstormInteractRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.BrainstormDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
+import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -31,9 +34,12 @@ public class InteractRecordBrainstormService {
 
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public InteractRecordBrainstormService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate) {
+    private final InteractRecordExecuteService interactRecordExecuteService;
+
+    public InteractRecordBrainstormService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate, InteractRecordExecuteService interactRecordExecuteService) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
+        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -42,7 +48,24 @@ public class InteractRecordBrainstormService {
      * @param questionsId
      * @return
      */
-    public Mono<BrainstormInteractRecord> findBrainstorm(String circleId, String questionsId) {
+    public Mono<InteractRecordResp> findRecordBrainstorm(final String circleId, final String questionsId){
+        return findBrainstorm(circleId, questionsId)
+                .flatMap(t -> {
+                    if (t != null && t.getIndex() != null){
+                        return interactRecordExecuteService.changeRecordResp(t.getSelectId(), t.getIndex(), t.getTime(),
+                                t.getNumber(), t.getCategory(), t.getAnswerNumber(), t.getQuestionsId(), t.getAnswerRecordList());
+                    }
+                    return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
+                });
+    }
+
+    /**
+     * 查询头脑风暴记录
+     * @param circleId
+     * @param questionsId
+     * @return
+     */
+    private Mono<BrainstormInteractRecord> findBrainstorm(String circleId, String questionsId) {
         return repository.findBrainstormsByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(BrainstormDto::getBrainstorms)

@@ -78,12 +78,12 @@ public class SurveyInteractController {
     @PostMapping("/findSurveysRecord")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
     })
     public Mono<WebResult> findSurveys(@RequestBody RecordReq recordReq){
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordSurveyService.findSurveyRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordSurveyService.findRecordSurvey(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 }

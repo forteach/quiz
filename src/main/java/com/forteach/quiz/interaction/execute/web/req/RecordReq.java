@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -21,7 +19,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class RecordReq implements Serializable {
 
-    @NotBlank(message = "课堂id不为空")
     @ApiModelProperty(value = "课堂id", name = "circleId", dataType = "string", required = true)
     private String circleId;
 

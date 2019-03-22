@@ -1,5 +1,6 @@
 package com.forteach.quiz.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -37,6 +38,7 @@ public class StudentsService {
      */
     public Mono<List<Students>> exchangeStudents(List<String> strings){
         return Flux.fromIterable(strings)
+                .filter(StrUtil::isNotBlank)
                 .flatMap(this::findStudentsBrief)
                 .collectList();
     }

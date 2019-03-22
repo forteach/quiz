@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
@@ -41,16 +42,20 @@ public class InteractRecordRepositoryTest {
     public void findByCircleIdAndRecordName(){
         Mono<InteractRecord> interactRecordMono = recordRepository.findByIdAndRecord("bf7cda019c5049d18c002b502b053c46","questions");
         interactRecordMono.filter(Objects::nonNull)
-//                .
-                .log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
+                .log("---->> ")
+                .subscribe(System.out::println);
+//                .map(InteractRecord::getQuestions)
+//                .log(InteractRecord::getCeateTime,Level.INFO, SignalType.REQUEST);
     }
 
     @Test
     public void findByCircleIdAndQuestionsId(){
-        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByIdAndQuestionsId("interactionQr2d4b8477ef2b4f92943f8383d07918b3","5c10b2a9dc623b4024d693ae");
-//        interactRecordMono.log();
-//        interactRecordMono.log(interactRecordMono.toString(), Level.INFO, SignalType.REQUEST);
-        System.out.println(interactRecordMono.block().getQuestions().get(0).toString());
-        System.out.println("---->> "+interactRecordMono.hasElement());
+        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByIdAndQuestionsId("5c9352cade262d00019cf13e","5c73676306a38f000101b7b6");
+        interactRecordMono.filter(Objects::nonNull)
+                .map(QuestionsDto::getQuestions)
+                .flatMapMany(Flux::fromIterable)
+                .log("--->> ")
+                .doOnNext(System.out::println)
+                .subscribe(System.out::println);
     }
 }

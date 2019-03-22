@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.domain.record;
 
+import com.forteach.quiz.common.DataUtil;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -21,7 +22,7 @@ public class BrainstormInteractRecord implements Serializable {
     /**
      * 发布时间
      */
-    private Date time;
+    private String time;
     /**
      * 发布次数
      */
@@ -53,7 +54,7 @@ public class BrainstormInteractRecord implements Serializable {
         this.index = index.intValue();
         this.category = category;
         this.selectId = selectId;
-        this.time = new Date();
+        this.time = DataUtil.format(new Date());
     }
 
     public BrainstormInteractRecord() {

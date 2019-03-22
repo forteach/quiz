@@ -25,7 +25,6 @@ import java.util.List;
 public class LogUtil {
 
     public static final List<MediaType> LEGAL_LOG_MEDIA_TYPES = Arrays.asList(
-            MediaType.TEXT_XML,
             MediaType.APPLICATION_XML,
             MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_JSON_UTF8,

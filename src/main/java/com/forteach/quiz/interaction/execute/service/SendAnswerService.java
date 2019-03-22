@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.AskException;
@@ -152,7 +153,7 @@ public class SendAnswerService {
                     Update update = Update.update("answer", answer)
                     .set("interactive", type)
                     .set("right", String.valueOf(f))
-                    .set("uDate", new Date());
+                    .set("uDate", DataUtil.format(new Date()));
 
                     return reactiveMongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
                         if (result.wasAcknowledged()) {

@@ -68,7 +68,7 @@ public class InteractRecord extends BaseEntity {
     /**
      * 创建课堂时间
      */
-    private String ceateTime;
+    private String createTime;
 
     public InteractRecord() {
     }
@@ -76,14 +76,14 @@ public class InteractRecord extends BaseEntity {
     public InteractRecord(final String circleId, final String teacherId, final Long number) {
         this.teacherId = teacherId;
         this.id = circleId;
-        this.ceateTime = DataUtil.format(new Date());
+        this.createTime = DataUtil.format(new Date());
         this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();
     }
 
     public InteractRecord( String teacherId, Long number) {
         this.teacherId = teacherId;
-        this.ceateTime = DataUtil.format(new Date());
+        this.createTime = DataUtil.format(new Date());
         this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();
     }
