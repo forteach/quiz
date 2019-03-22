@@ -64,9 +64,10 @@ public class SendAnswerService {
                         switch (typeName) {
                             //抢答
                             case ASK_INTERACTIVE_RACE:
-                                return sendRace(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT);
+                                return sendRace(circleId,examineeId,questId,answer, ASK_INTERACTIVE_RACE);
+                                //举手
                             case ASK_INTERACTIVE_RAISE:
-                                return sendRaise(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT);
+                                return sendRaise(circleId,examineeId,questId,answer, ASK_INTERACTIVE_RAISE);
                             case ASK_INTERACTIVE_SELECT:
                                 //选人回答问题
                                 return sendSelect(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT);
@@ -110,7 +111,6 @@ public class SendAnswerService {
      * @param questId
      * @return
      */
-
     private Mono<String> filterSelectVerify(String circleId,String examineeId, final String questId ) {
         //获得题目互动类型方式
         return  reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "interactive")

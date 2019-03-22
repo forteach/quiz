@@ -56,7 +56,8 @@ public class ClassRoomController extends BaseController {
         //验证请求参数
         MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
-        return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
+        //return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom("",roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
