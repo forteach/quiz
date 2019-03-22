@@ -9,7 +9,6 @@ import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecut
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
-import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,9 @@ public class ClassRoomService {
     }
 
 
-    public Mono<String> createInteractiveRoom(final String circleId,final String teacherId,final String chapterId) {
+    public Mono<String> createInteractiveRoom(final String circleId,final String teacherId) {
+
+        //TODO 创建课堂ID，REDIS键值，安课堂ID过期键值处理过期
 
         //根据互动课堂KEY值，获得课堂互动ID属性，如果为空，创建互动课堂，否则返回返回互动课堂ID
         return Mono.just(circleId).flatMap(cid ->
@@ -99,9 +100,10 @@ public class ClassRoomService {
     private Mono<String> buildRoom(final String teacherId, final String chapterId, final String roomKey) {
 
         //获取当前时间和两个小时时间后的时间
-        LocalTime effectTime = LocalTime.now();//影响时间
-        LocalTime failureTime = effectTime.plusHours(2);//失效时间
-
+        //影响时间
+        LocalTime effectTime = LocalTime.now();
+        //失效时间
+        LocalTime failureTime = effectTime.plusHours(2);
         //教室redis唯一编号
         final String interactiveId = getRandomUUID();
 
@@ -130,9 +132,10 @@ public class ClassRoomService {
     private Mono<Boolean> buildRoom(final String circleId, final String teacherId) {
 
         //获取当前时间和两个小时时间后的时间
-        LocalTime effectTime = LocalTime.now();//影响时间
-        LocalTime failureTime = effectTime.plusHours(2);//失效时间
-
+        //影响时间
+        final  LocalTime effectTime = LocalTime.now();
+        //失效时间
+        final LocalTime failureTime = effectTime.plusHours(2);
 //        //课堂基本信息
 //        HashMap<String, String> map = new HashMap<>(6);
 //        //课堂Redis 键值
@@ -149,19 +152,19 @@ public class ClassRoomService {
 //        Mono<Boolean> room = reactiveHashOperations.putAll(roomKey, map)
 //                .flatMap(item -> MyAssert.isFalse(item.booleanValue(), DefineCode.ERR0013, "创建教师教室失败"));
 
-        Mono<Boolean> roomUser =stringRedisTemplate.opsForSet().add(interactiveIdQr, teacherId)
+        final Mono<Boolean> roomUser =stringRedisTemplate.opsForSet().add(interactiveIdQr, teacherId)
                 .flatMap(count -> MyAssert.isTrue(count == 0, DefineCode.ERR0013, "添加课堂教师失败"))
                 //设置加入课堂后，两小时过期
                 .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 2)));
 
         // TODO 正在开课的教室，以后可以创建个任务，清理这里无效的数据？****
-        Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
+        final Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
                 .flatMap(count -> MyAssert.isTrue(count==0, DefineCode.ERR0013, "创建课堂失败"))
                 //设置正在开课的课堂ID集合12小时过期，如果启动清理任务，这个过期就需要去除？****
                 .filterWhen(count -> stringRedisTemplate.expire(ClassRoomKey.OPEN_CLASSROOM, Duration.ofSeconds(60 * 60 * 12)));
 
         //设置上课的教室
-        Mono<Boolean> RoomTeacher =stringRedisTemplate.opsForValue()
+        final Mono<Boolean> RoomTeacher =stringRedisTemplate.opsForValue()
                 .set(ClassRoomKey.getRoomTeacherKey(circleId),teacherId, Duration.ofSeconds(60 * 60 * 2))
                 .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "创建课堂记录教师失败"));
 

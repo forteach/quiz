@@ -29,13 +29,37 @@ public class BigQueKey {
     public static final String CLASSROOM_ASK_QUESTIONS_RACE = "askRace";
 
     /**
+     * 课堂练习册
+     */
+    public static final String CLASSROOM_BOOK_NOW= "nowBook";
+
+    /**
      * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
     public static final String CLASSROOM_ASK_QUESTIONS_ID = "ask";
 
+    /**
+     * 互动提问hash前缀(习题库\头脑风暴等。。。)
+     */
+    public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "bookList";
+
     //缓存当前已发布的题目题干内容，不分课堂。
-    public static String QuestionsNow(String questionId) {
+    public static String questionsNow(final String questionId) {
         return CLASSROOM_ASK_NOW.concat(questionId);
+    }
+
+    //缓存当前已发布的题目题干内容，不分课堂。
+    public static String bookQuestionsNow(final String questionId) {
+        return CLASSROOM_BOOK_NOW.concat(questionId);
+    }
+
+    /**
+     * 课堂提问当前前缀
+     *
+     * @return now+课堂Id=map
+     */
+    public static String questionsIdNow(final String circleId) {
+        return CLASSROOM_ASK_NOW.concat(circleId);
     }
 
     /**
@@ -43,16 +67,17 @@ public class BigQueKey {
      *
      * @return now+课堂Id=map
      */
-    public static String QuestionsIdNow(String circleId) {
-        return CLASSROOM_ASK_NOW.concat(circleId);
+    public static String questionsBookNow(final String circleId) {
+        return CLASSROOM_BOOK_NOW.concat(circleId);
     }
+
 
     /**
      * 课堂题目当前前缀
      *
      * @return 当前问题前缀+课堂+问题类型+回答方式=ForValue
      */
-    public static String askTypeQuestionsIdNow(final String questType, String circleId, String interactive) {
+    public static String askTypeQuestionsIdNow(final String questType, final String circleId, final String interactive) {
         return CLASSROOM_ASK_NOW+askTypeQuestionsId(questType,circleId,interactive);
     }
 
@@ -61,8 +86,17 @@ public class BigQueKey {
      *
      * @return 问题前缀+课堂+问题类型+回答方式  题目列表List
      */
-    public static String askTypeQuestionsId(final String questType,String circleId, String interactive) {
+    public static String askTypeQuestionsId(final String questType,final String circleId,final String interactive) {
         return circleId.concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questType.concat(interactive));
+    }
+
+    /**
+     * 课堂练习互动前缀
+     *
+     * @return 问题前缀+课堂+问题类型+回答方式  题目列表List
+     */
+    public static String bookTypeQuestionsList(final String circleId) {
+        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_LIST);
     }
 
     /**
@@ -70,7 +104,7 @@ public class BigQueKey {
      *
      * @return 问题前缀+课堂+问题类型  题目列表set
      */
-    public static String askTypeQuestionsId(final String questType,String circleId) {
+    public static String askTypeQuestionsId(final String questType,final String circleId) {
         return circleId.concat(BigQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questType);
     }
 
@@ -79,7 +113,7 @@ public class BigQueKey {
      *
      * @return 上一次的问题前缀+课堂+问题类型+回答方式=ForValu
      */
-    public static String askTypeQuestionsIdPrve(final String questType, String circleId, String interactive) {
+    public static String askTypeQuestionsIdPrve(final String questType,final String circleId,final String interactive) {
         return CLASSROOM_ASK_PRVE.concat(askTypeQuestionsId(questType,circleId,interactive));
     }
 
@@ -88,7 +122,7 @@ public class BigQueKey {
      *
      * @return 问题前缀+课堂+问题类型+回答方式+单个题目ID=ForSet
      */
-    public static String askTypeQuestionsId(final String questType, String circleId, String interactive,String questionId) {
+    public static String askTypeQuestionsId(final String questType,final String circleId,final String interactive,final String questionId) {
         return askTypeQuestionsId(questType,circleId,interactive).concat(questionId);
     }
 
@@ -99,7 +133,7 @@ public class BigQueKey {
      * typeName  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案  Hashmap
      */
-    public static String answerTypeQuestionsId(final String circleId,String questionId,String typeName) {
+    public static String answerTypeQuestionsId(final String circleId,final String questionId,final String typeName) {
         return questionId.concat("answer").concat(typeName).concat(circleId);
     }
 
@@ -110,7 +144,7 @@ public class BigQueKey {
      * typeName  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
      */
-    public static String piGaiTypeQuestionsId(final String circleId,String questionId,String typeName) {
+    public static String piGaiTypeQuestionsId(final String circleId,final String questionId,final String typeName) {
         return questionId.concat("pigai").concat(typeName).concat(circleId);
     }
 
@@ -121,7 +155,7 @@ public class BigQueKey {
      * typeName  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
      */
-    public static String tiJiaoanswerTypeQuestStuSet(final String circleId,String questionId,String typeName) {
+    public static String tiJiaoanswerTypeQuestStuSet(final String circleId,final String questionId,final String typeName) {
         return questionId.concat("answerStuSet").concat(typeName).concat(circleId);
     }
 
@@ -132,7 +166,7 @@ public class BigQueKey {
      * typeName  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
      */
-    public static String answerTypeQuestStuList(final String circleId,String questionId,String typeName) {
+    public static String answerTypeQuestStuList(final String circleId,final String questionId,final String typeName) {
         return questionId.concat("answerlist").concat(typeName).concat(circleId);
     }
 
@@ -141,7 +175,7 @@ public class BigQueKey {
      *
      * @return 问题前缀+课堂+问题类型+回答方式+单个题目ID，用于改题目过期判断数据依据
      */
-    public static String askTypeQuestionsIdType(final String circleId, String questionId) {
+    public static String askTypeQuestionsIdType(final String circleId,final String questionId) {
         return  circleId.concat("asknow").concat(questionId);
     }
 
