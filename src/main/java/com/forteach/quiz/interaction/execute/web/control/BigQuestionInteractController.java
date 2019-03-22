@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
 import java.util.List;
 
 /**
@@ -68,8 +69,6 @@ public class BigQuestionInteractController {
                                          RaiseHandService raiseHandService,
                                          FabuQuestService fabuQuestService,
                                          SendQuestBookService sendQuestBookService,
-                                         SendQuestService sendQuestService
-    ) {
                                          TokenService tokenService) {
         this.interactService = interactService;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
@@ -296,7 +295,7 @@ public class BigQuestionInteractController {
         //验证请求参数
         MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExerciseBookService.findExerciseBookRecord(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+        return interactRecordExerciseBookService.findRecordExerciseBook(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
     }
 
 }

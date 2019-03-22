@@ -85,11 +85,11 @@ public class InteractRecordExecuteService {
 
     public Mono<String> init(final String teacherId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
-        return Mono.just(teacherId).flatMap(id ->build(id).flatMap(item -> {
-            MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败");
-            MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败");
-            return Mono.just(item.getId());
-        }));
+        return Mono.just(teacherId)
+                //创建记录
+                .flatMap(id ->build(id)
+                        .flatMap(item->MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败"))
+                        .flatMap(item -> MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败")));
     }
     /**
      * 构建上课信息时默认见天上课次数为 1， 并进行记录

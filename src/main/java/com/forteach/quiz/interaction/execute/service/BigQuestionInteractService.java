@@ -19,10 +19,8 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.*;
-
 import static com.forteach.quiz.interaction.execute.config.BigQueKey.CLASSROOM_ASK_QUESTIONS_ID;
 /**
  * @Description: 提问交互
@@ -70,7 +68,7 @@ public class BigQuestionInteractService {
 
         //TODO 未记录
         return Flux.concat(set, time).filter(flag -> !flag)
-                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
+//                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
                 .count();
 
     }

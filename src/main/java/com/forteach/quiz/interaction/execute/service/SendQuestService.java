@@ -26,17 +26,14 @@ public class SendQuestService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
     private final InteractRecordQuestionsService interactRecordQuestionsService;
-    private final InteractRecordExecuteService interactRecordExecuteService;
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
                             ReactiveHashOperations<String, String, String> reactiveHashOperations,
                             InteractRecordQuestionsService interactRecordQuestionsService,
-                            InteractRecordExecuteService interactRecordExecuteService,
                             BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
     /**
@@ -161,7 +158,7 @@ public class SendQuestService {
 //                    //获得当前题目ID和创建新的发布题目Key=题目ID
                             return  stringRedisTemplate.hasKey(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive))
                                     .flatMap(r->{
-                                        if(!r.booleanValue()){
+                                        if(!r){
                                             //如果该键值不存在，就创建键值
                                            return stringRedisTemplate.opsForValue().set(BigQueKey.askTypeQuestionsIdNow(QuestionType.TiWen.name(), circleId,  interactive),questId,Duration.ofSeconds(60 * 60 * 2));
                                         }else{

@@ -1,13 +1,14 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.ExerciseBooksDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
+import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
-import org.reactivestreams.Publisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -37,12 +38,66 @@ public class InteractRecordExerciseBookService {
 
     private UpdateInteractRecordService updateInteractRecordService;
 
+    private InteractRecordExecuteService interactRecordExecuteService;
+
     public InteractRecordExerciseBookService(InteractRecordRepository repository,
                                              ReactiveMongoTemplate mongoTemplate,
+                                             InteractRecordExecuteService interactRecordExecuteService,
                                              UpdateInteractRecordService updateInteractRecordService) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
         this.updateInteractRecordService = updateInteractRecordService;
+        this.interactRecordExecuteService = interactRecordExecuteService;
+    }
+
+    /**
+     * 查询问题记录
+     * @param circleId
+     * @param questionsId
+     * @return
+     */
+    public Mono<InteractRecordResp> findRecordExerciseBook(final String circleId, final String questionsId){
+        return findExerciseBookRecord(circleId, questionsId)
+                .flatMap(t -> {
+                    if (t != null && t.getIndex() != null){
+                        return selectRecord(t);
+                    }
+                    return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
+                });
+    }
+
+    /**
+     * 根据查询问题记录结果进行转换数据对象
+     * @param t
+     * @return
+     */
+    private Mono<InteractRecordResp> selectRecord(final InteractQuestionsRecord t){
+        return Mono.just(t.getSelectId())
+                .zipWith(interactRecordExecuteService.filterStudents(t.getSelectId()), (r, studentsList) ->
+                        InteractRecordResp.builder()
+                                .index(t.getIndex())
+                                .time(t.getTime())
+                                .correctNumber(t.getCorrectNumber())
+                                .category(t.getCategory())
+                                .answerNumber(t.getAnswerNumber())
+                                .questionsId(t.getQuestionsId())
+                                .students(studentsList)
+                                .errorNumber(t.getErrorNumber())
+                                .raiseHandsNumber(t.getRaiseHandsNumber())
+                                .interactive(t.getInteractive())
+                                .build())
+                .zipWith(interactRecordExecuteService.answerRecordList(t.getAnswerRecordList()), (interactRecordResp, interactAnswerRecordRespList) -> {
+                    if (interactAnswerRecordRespList != null && interactAnswerRecordRespList.size() > 0) {
+                        interactRecordResp.setAnswerRecordList(interactAnswerRecordRespList);
+                    }
+                    return interactRecordResp;
+                })
+                .zipWith(interactRecordExecuteService.filterStudents(t.getRaiseHandsId()), (s, students) -> {
+                    if (students != null && students.size() > 0) {
+                        s.setRaiseHandsId(students);
+                    }
+                    return s;
+                });
     }
 
     /**
@@ -51,7 +106,7 @@ public class InteractRecordExerciseBookService {
      * @param questionsId
      * @return
      */
-    public Mono<InteractQuestionsRecord> findExerciseBookRecord(final String circleId, final String questionsId) {
+    private Mono<InteractQuestionsRecord> findExerciseBookRecord(final String circleId, final String questionsId) {
         return repository.findExerciseBooksByIdAndQuestionsId(circleId, questionsId)
                 .filter(Objects::nonNull)
                 .map(ExerciseBooksDto::getExerciseBooks)
@@ -114,20 +169,20 @@ public class InteractRecordExerciseBookService {
 
     /**
      * 记录习题册
-     * @param giveVo
+     * @param
      * @return
      */
-    public Publisher<Boolean> interactiveBook(final MoreGiveVo giveVo) {
-        Mono<Long> number = exerciseBookNumber(giveVo.getCircleId());
-        Mono<InteractRecord> recordMono = findexerciseBooks(giveVo.getCircleId(), giveVo.getQuestionId());
+    public Mono<Boolean> interactiveBook(final String circleId, final String questionId, final String selected, final String category) {
+        Mono<Long> number = exerciseBookNumber(circleId);
+        Mono<InteractRecord> recordMono = findexerciseBooks(circleId, questionId);
         return Mono.zip(number, recordMono).flatMap(tuple2 -> {
 
             if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0) {
-                return updateInteractRecordService.upInteractInteractRecord(giveVo.getSelected(),
-                        tuple2.getT2().getQuestions().get(0).getSelectId(), giveVo.getCircleId(),
-                        giveVo.getQuestionId(), giveVo.getCategory(), INTERACT_RECORD_EXERCISEBOOKS);
+                return updateInteractRecordService.upInteractInteractRecord(selected,
+                        tuple2.getT2().getQuestions().get(0).getSelectId(), circleId,
+                        questionId, category, INTERACT_RECORD_EXERCISEBOOKS);
             } else {
-                return pushExerciseBook(giveVo.getSelected(), tuple2.getT1(), giveVo.getCircleId(), giveVo.getQuestionId());
+                return pushExerciseBook(selected, tuple2.getT1(), circleId, questionId);
             }
         }).map(Objects::nonNull);
     }
