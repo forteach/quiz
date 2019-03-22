@@ -24,17 +24,17 @@ public class ClassRoomKey {
     public static final String OPEN_CLASSROOM = "OpenRoom";
 
     //课堂所有学生
-    public static String getInteractiveIdQra(String circleId){
+    public static String getInteractiveIdQra(final String circleId){
         return circleId.concat(ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX);
     }
 
     //课堂创建信息
-//    public static String getRoomKey(String teacherId){
+//    public static String getRoomKey(final String teacherId){
 //        return ClassRoomKey.INTERACTIVE_CLASSROOM.concat(teacherId);
 //    }
 
     //课堂的上课教师
-    public static String getRoomTeacherKey(String circleId){
+    public static String getRoomTeacherKey(final String circleId){
         return circleId.concat(ClassRoomKey.INTERACTIVE_CLASSROOM);
     }
 

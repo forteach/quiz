@@ -51,7 +51,7 @@ public class InteractRecordExecuteService {
 
         //获得课堂记录信息，并更新参与的学生
 //        final Query query = Query.query(Criteria.where("circleId").is(circleId).and("students").ne(student));
-        final Query query = Query.query(Criteria.where("id").is(circleId));
+         Query query = Query.query(Criteria.where("id").is(circleId));
 
         Update update = new Update()
          //加入学生ID
@@ -103,7 +103,7 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
 
-        final Query query = Query.query(Criteria.where("id").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+         Query query = Query.query(Criteria.where("id").is(circleId).and("questions.questionsId").is(questionId).and("questions.answerRecordList.examineeId").ne(studentId)).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
         if (QUESTION_ACCURACY_TRUE.equals(right)) {
             Update update = new Update()
@@ -133,7 +133,7 @@ public class InteractRecordExecuteService {
      */
     public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
 
-        final Query query = Query.query(
+         Query query = Query.query(
                 Criteria.where("id").is(circleId).and("questions.raiseHandsId").ne(student).and("questions.questionsId").is(questionId)
         ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
 
@@ -237,7 +237,7 @@ public class InteractRecordExecuteService {
      */
     private Query buildLastQuestionsRecord(final String circleId, final String questionId, final String category, final String interactive) {
 
-        final Query query = Query.query(
+         Query query = Query.query(
                 Criteria.where("id").is(circleId)
                         .and("questions.questionsId").is(questionId)
                         .and("questions.interactive").is(interactive)

@@ -17,7 +17,7 @@ public class QuestFabuListVo {
     protected String circleId;
       //题目类型
     @ApiModelProperty(value="题目类型")
-    private String QuestType;
+    private String questType;
     @ApiModelProperty(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "interactive", notes = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票")
     private String interactive;
 }

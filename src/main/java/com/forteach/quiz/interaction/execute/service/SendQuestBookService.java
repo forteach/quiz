@@ -3,8 +3,6 @@ package com.forteach.quiz.interaction.execute.service;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;

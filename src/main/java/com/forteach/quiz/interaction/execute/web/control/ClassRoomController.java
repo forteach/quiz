@@ -39,11 +39,11 @@ public class ClassRoomController extends BaseController {
     })
     public Mono<WebResult> createInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
         //验证请求参数
-        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
+       // MyAssert.blank(roomVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
 
         //流式调用
-        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
@@ -54,10 +54,10 @@ public class ClassRoomController extends BaseController {
     })
     public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
         //验证请求参数
-        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
+        //MyAssert.blank(roomVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
         //return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
-        return classRoomService.createInteractiveRoom("",roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
+        return classRoomService.createInteractiveRoom("",roomVo.getTeacherId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")

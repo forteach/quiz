@@ -48,7 +48,7 @@ public class FabuQuestService {
      * @param circleId   课堂编号
      * @return
      */
-    public Mono<List<Object>> getFaBuQuestNow(String circleId) {
+    public Mono<List<Object>> getFaBuQuestNow(final String circleId) {
         //获得已经发布的题目列表
         Mono<List<String>> faBuList= reactiveHashOperations.get((BigQueKey.questionsIdNow(circleId)),"questionType")
                 .flatMap(qtype->stringRedisTemplate.opsForSet().members(BigQueKey.askTypeQuestionsId(qtype,  circleId))
@@ -64,7 +64,7 @@ public class FabuQuestService {
      * @param stuId
      * @return
      */
-    public Mono<Boolean> delSelectStuId(String stuId,String circleId){
+    public Mono<Boolean> delSelectStuId(final String stuId,final String circleId){
 //获得当前逗号分隔的选人数据
         return  reactiveHashOperations.get((BigQueKey.questionsIdNow(circleId)),"selected")
                 //过滤掉当前的已回答的学生，并从新生成字符串数据

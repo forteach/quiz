@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.common.DefineCode;
@@ -60,18 +61,42 @@ public class SendQuestService {
      * @param cut //随机数
      * @return
      */
-    public Mono<Boolean> sendQuestion(String circleId,String teacherId,String questionType,String questId, String interactive,String category,String selected,String cut) {
+    public Mono<Boolean> sendQuestion(final String circleId,final String teacherId,final String questionType,final String questId, final String interactive,final String category,final String selected,final String cut) {
 
         //创建课堂提问的题目36分钟过期
-        Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questId,questionType,interactive,category,selected,cut);
+        final Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questId,questionType,interactive,category,selected,cut);
 
         //创建课堂问题列表记录
-        Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
+        final Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
 
         //执行创建提问，并返回执行结果
         return addQuestNow.flatMap(r->createQuest)
                 //创建mongo答题日志
                 .flatMap(r->interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
+    }
+
+    /**
+     *
+     * @param circleId   课堂编号
+     * @param teacherId  课堂教师
+     * @param questId    问题ID
+     * @param interactive  //互动方式（举手、抢答等）
+     * @param category //选取类别（个人、小组）
+     * @param cut //随机数
+     * @return
+     */
+    public Mono<Boolean> raiseSendQuestion(final String circleId,final String teacherId,final String questionType,final String questId, final String interactive,final String category,final String cut) {
+
+        //创建课堂提问的题目36分钟过期
+        final Mono<Boolean> addQuestNow = addQuestNowInfo(circleId,teacherId,questId,questionType,interactive,category,"",cut);
+
+        //创建课堂问题列表记录
+        final Mono<Boolean> createQuest = addQuestList( circleId, interactive, questId);
+
+        //执行创建提问，并返回执行结果
+        return addQuestNow.flatMap(r->createQuest);
+                //创建mongo答题日志
+               // .flatMap(r->StrUtil.isBlank(selected)?Mono.just(true):interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
     }
 
     /**
@@ -87,6 +112,7 @@ public class SendQuestService {
      * @return true or false
      */
     private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,String questionType, final String interactive,final String category,final String selected,final String cut){
+       //TODO 需要调整final
         HashMap<String, String> map = new HashMap<>(8);
         map.put("circleId",circleId);//当前课堂ID
         map.put("teacherId",teacherId);//当前课堂教师ID
@@ -123,7 +149,7 @@ public class SendQuestService {
      * @param questId
      * @return
      */
-    private Mono<Boolean> addQuestList(String circleId,String interactive,String questId){
+    private Mono<Boolean> addQuestList(final String circleId,final String interactive,final String questId){
         //创建交互题目的互动方式的先后顺序发布列表
         return stringRedisTemplate.opsForList().leftPush(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),  circleId,  interactive), questId)
                 //创建交互题目发布哈希列表

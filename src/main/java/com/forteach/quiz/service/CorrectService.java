@@ -143,6 +143,8 @@ public class CorrectService {
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
                         case QUESTION_CHOICE_OPTIONS_SINGLE:
                             //选择题
+                            ChoiceQst choiceQst1 = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
+                            return Mono.just(choice(choiceQst1, answer));
                         case QUESTION_CHOICE_MULTIPLE_SINGLE:
                             ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
                            // String result=String.valueOf(choice(choiceQst, answer));

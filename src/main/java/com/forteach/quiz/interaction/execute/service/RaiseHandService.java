@@ -40,7 +40,7 @@ public class RaiseHandService {
      *
      * @return
      */
-    public Mono<Long> raiseHand(final String circleId,String examineeId,String questId) {
+    public Mono<Long> raiseHand(final String circleId,final String examineeId,final String questId) {
         //创建题目提问举手的KEY=学生ID
         Mono<Long> set = stringRedisTemplate.opsForSet().add(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),circleId, Dic.ASK_INTERACTIVE_RAISE,questId), examineeId);
         //设置举手过期时间30分钟
@@ -55,7 +55,7 @@ public class RaiseHandService {
      *
      * @return
      */
-    public Mono<Long> launchRaise(final String circleId,String examineeId,String questId) {
+    public Mono<Long> launchRaise(final String circleId,final String examineeId,final String questId) {
         //清空上次举手题目的信息
         return stringRedisTemplate.delete(BigQueKey.askTypeQuestionsId(QuestionType.TiWen.name(),circleId, Dic.ASK_INTERACTIVE_RAISE,questId))
                 //重新创建举手信息
