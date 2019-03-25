@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveHashOperations;
@@ -49,11 +51,22 @@ public class FabuQuestService {
      * @return
      */
     public Mono<Boolean> delSelectStuId(final String stuId,final String circleId){
-//获得当前逗号分隔的选人数据
-        return  reactiveHashOperations.get((BigQueKey.questionsIdNow(circleId)),"selected")
-                //过滤掉当前的已回答的学生，并从新生成字符串数据
-                .flatMap(str->Mono.just(Arrays.stream(str.split(",")).filter(id->!id.equals(stuId)).map(str1->",".concat(str1)).collect(joining()).substring(1)))
-                  .flatMap(r->reactiveHashOperations.put((BigQueKey.questionsIdNow(circleId)),"selected",r));
+
+        final String key=BigQueKey.questionsIdNow(circleId);//获得当前逗号分隔的选人数据
+        final Mono<Boolean> isSelelcted=reactiveHashOperations.hasKey(key,"selected");
+        return  isSelelcted
+                .flatMap(k->{
+                    if(k.booleanValue()){
+                      return  reactiveHashOperations.get(key,"selected")
+                                //过滤掉当前的已回答的学生，并从新生成字符串数据
+                                .flatMap(str->Mono.just(Arrays.stream(str.split(",")).filter(id->!id.equals(stuId))
+                                        .map(str1->",".concat(str1))
+                                        .collect(joining()).substring(1)))
+                                .flatMap(r->reactiveHashOperations.put(key,"selected",r));
+                    }else{
+                      return  MyAssert.isFalse(false, DefineCode.ERR0014,"未找到当前课堂选人的缓存数据,或许是课堂数据过期");
+                    }
+                });
 
     }
 
