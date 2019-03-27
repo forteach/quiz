@@ -6,7 +6,7 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsReco
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.ExerciseBooksDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
+import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_EXERCISEBOOKS;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
@@ -56,47 +57,13 @@ public class InteractRecordExerciseBookService {
      * @param questionsId
      * @return
      */
-    public Mono<InteractRecordResp> findRecordExerciseBook(final String circleId, final String questionsId){
+    public Mono<List<InteractAnswerRecordResp>> findRecordExerciseBook(final String circleId, final String questionsId){
         return findExerciseBookRecord(circleId, questionsId)
                 .flatMap(t -> {
                     if (t != null && t.getIndex() != null){
-                        return selectRecord(t);
+                        return interactRecordExecuteService.chengFindRecord(t.getAnswerRecordList());
                     }
                     return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
-                });
-    }
-
-    /**
-     * 根据查询问题记录结果进行转换数据对象
-     * @param t
-     * @return
-     */
-    private Mono<InteractRecordResp> selectRecord(final InteractQuestionsRecord t){
-        return Mono.just(t.getSelectId())
-                .zipWith(interactRecordExecuteService.filterStudents(t.getSelectId()), (r, studentsList) ->
-                        InteractRecordResp.builder()
-                                .index(t.getIndex())
-                                .time(t.getTime())
-                                .correctNumber(t.getCorrectNumber())
-                                .category(t.getCategory())
-                                .answerNumber(t.getAnswerNumber())
-                                .questionsId(t.getQuestionsId())
-                                .students(studentsList)
-                                .errorNumber(t.getErrorNumber())
-                                .raiseHandsNumber(t.getRaiseHandsNumber())
-                                .interactive(t.getInteractive())
-                                .build())
-                .zipWith(interactRecordExecuteService.answerRecordList(t.getAnswerRecordList()), (interactRecordResp, interactAnswerRecordRespList) -> {
-                    if (interactAnswerRecordRespList != null && interactAnswerRecordRespList.size() > 0) {
-                        interactRecordResp.setAnswerRecordList(interactAnswerRecordRespList);
-                    }
-                    return interactRecordResp;
-                })
-                .zipWith(interactRecordExecuteService.filterStudents(t.getRaiseHandsId()), (s, students) -> {
-                    if (students != null && students.size() > 0) {
-                        s.setRaiseHandsId(students);
-                    }
-                    return s;
                 });
     }
 

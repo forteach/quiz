@@ -6,7 +6,7 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.domain.record.TaskInteractRecord;
 import com.forteach.quiz.interaction.execute.dto.TaskInteractDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
+import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -16,8 +16,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_INTERACTS;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
@@ -49,12 +52,11 @@ public class InteractRecordTaskService {
      * @param questionsId
      * @return
      */
-    public Mono<InteractRecordResp> findRecordTask(final String circleId, final String questionsId){
+    public Mono<List<InteractAnswerRecordResp>> findRecordTask(final String circleId, final String questionsId){
         return findTaskRecord(circleId, questionsId)
                 .flatMap(t -> {
                     if (t != null && t.getIndex() != null){
-                        return interactRecordExecuteService.changeRecordResp(t.getSelectId(), t.getIndex(), t.getTime(),
-                                t.getNumber(), t.getCategory(), t.getAnswerNumber(), t.getQuestionsId(), t.getAnswerRecordList());
+                        return interactRecordExecuteService.chengFindRecord(t.getAnswerRecordList());
                     }
                     return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
                 });

@@ -6,7 +6,8 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsReco
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
+import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
+import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -42,10 +43,13 @@ public class InteractRecordQuestionsService {
 
     private final InteractRecordExecuteService interactRecordExecuteService;
 
-    public InteractRecordQuestionsService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate, InteractRecordExecuteService interactRecordExecuteService) {
+    private final StudentsService studentsService;
+
+    public InteractRecordQuestionsService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate, InteractRecordExecuteService interactRecordExecuteService, StudentsService studentsService) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
         this.interactRecordExecuteService = interactRecordExecuteService;
+        this.studentsService = studentsService;
     }
 
     /**
@@ -54,47 +58,13 @@ public class InteractRecordQuestionsService {
      * @param questionsId
      * @return
      */
-    public Mono<InteractRecordResp> findRecordQuestion(final String circleId, final String questionsId){
+    public Mono<List<InteractAnswerRecordResp>> findRecordQuestion(final String circleId, final String questionsId){
         return findQuestionsRecord(circleId, questionsId)
                 .flatMap(t -> {
                     if (t != null && t.getIndex() != null){
-                        return selectRecord(t);
+                        return interactRecordExecuteService.chengFindRecord(t.getAnswerRecordList());
                     }
                     return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
-                });
-    }
-
-    /**
-     * 根据查询问题记录结果进行转换数据对象
-     * @param t
-     * @return
-     */
-    private Mono<InteractRecordResp> selectRecord(final InteractQuestionsRecord t){
-        return Mono.just(t.getSelectId())
-                .zipWith(interactRecordExecuteService.filterStudents(t.getSelectId()), (r, studentsList) ->
-                        InteractRecordResp.builder()
-                                .index(t.getIndex())
-                                .time(t.getTime())
-                                .correctNumber(t.getCorrectNumber())
-                                .category(t.getCategory())
-                                .answerNumber(t.getAnswerNumber())
-                                .questionsId(t.getQuestionsId())
-                                .students(studentsList)
-                                .errorNumber(t.getErrorNumber())
-                                .raiseHandsNumber(t.getRaiseHandsNumber())
-                                .interactive(t.getInteractive())
-                                .build())
-                .zipWith(interactRecordExecuteService.answerRecordList(t.getAnswerRecordList()), (interactRecordResp, interactAnswerRecordRespList) -> {
-                    if (interactAnswerRecordRespList != null && interactAnswerRecordRespList.size() > 0) {
-                        interactRecordResp.setAnswerRecordList(interactAnswerRecordRespList);
-                    }
-                    return interactRecordResp;
-                })
-                .zipWith(interactRecordExecuteService.filterStudents(t.getRaiseHandsId()), (s, students) -> {
-                    if (students != null && students.size() > 0) {
-                        s.setRaiseHandsId(students);
-                    }
-                    return s;
                 });
     }
 

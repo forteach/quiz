@@ -1,8 +1,11 @@
 package com.forteach.quiz.interaction.execute.web.resp;
 
-import com.forteach.quiz.web.pojo.Students;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author: zhangyy
@@ -13,34 +16,36 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class InteractAnswerRecordResp {
-    /**
-     * 回答的学生id
-     */
-    private Students student;
+@ApiModel(value = "学生回答结果对象")
+public class InteractAnswerRecordResp implements Serializable {
+
+    @ApiModelProperty(name = "studentId", value = "学生id", dataType = "string")
+    private String studentId;
+
+    @ApiModelProperty(name = "name", value = "学生姓名", dataType = "string")
+    private String name;
+
+    @ApiModelProperty(name = "portrait", value = "学生头像url", dataType = "string")
+    private String portrait;
 
     /**
      * 回答的答案
      */
+    @ApiModelProperty(name = "answer", value = "回答内容", dataType = "string")
     private String answer;
 
-    /**
-     * 回答对错
-     */
-    private String right;
-
-    /**
-     * 回答时间
-     */
-    private String time;
+    @ApiModelProperty(name = "piGaiResult", value = "批改的答题结果", dataType = "boolean", notes = "true / false")
+    private boolean piGaiResult;
 
     public InteractAnswerRecordResp() {
     }
 
-    public InteractAnswerRecordResp(Students student, String answer, String right, String time) {
-        this.student = student;
+    public InteractAnswerRecordResp(String studentId, String name, String portrait, String answer, boolean piGaiResult) {
+        this.studentId = studentId;
+        this.name = name;
+        this.portrait = portrait;
         this.answer = answer;
-        this.right = right;
-        this.time = time;
+        this.piGaiResult = piGaiResult;
     }
+
 }
