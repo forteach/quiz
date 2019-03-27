@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
 
 /**
@@ -55,7 +54,9 @@ public class BigQuestionInteractController {
      */
     private final RaiseHandService raiseHandService;
 
-    //当前课堂已发布的题目列表
+    /**
+     * 当前课堂已发布的题目列表
+     */
     private final FabuQuestService fabuQuestService;
 
     //练习册
@@ -111,7 +112,7 @@ public class BigQuestionInteractController {
                 giveVo.getQuestionId(),
                 giveVo.getInteractive(),
                 giveVo.getCategory(),
-                giveVo.getSelected(),
+                giveVo.getSelected().concat(","),
                 giveVo.getCut()
         ).map(WebResult::okResult);
     }
@@ -137,7 +138,6 @@ public class BigQuestionInteractController {
         MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
         MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010,"课堂问题互动类型不能为空");
         MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题选举类型不能为空");
-        //MyAssert.blank(giveVo.getSelected(), DefineCode.ERR0010,"课堂问题选人数据不能为空");
         //课堂发布题目
         return sendQuestService.raiseSendQuestion(
                 giveVo.getCircleId(),
@@ -252,6 +252,23 @@ public class BigQuestionInteractController {
         return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected()).map(WebResult::okResult);
     }
 
+//    /**
+//     * 提交课堂练习答案
+//     *
+//     * @param sheetVo
+//     * @return
+//     */
+//    @PostMapping("/sendBook/answer")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
+//            @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
+//    })
+//    @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
+//    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+//        return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
+//    }
     /**
      * 提交课堂练习答案
      *

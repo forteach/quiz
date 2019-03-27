@@ -60,7 +60,6 @@ public class SendQuestBookService {
         return addQuestBookNowMap.map(r->createQuestBookList)
                 //  TODO 创建mongo答题日志???
                 .flatMap(r->interactRecordExerciseBookService.interactiveBook(circleId, questIds, selected, category));
-//                .flatMap(r->Mono.just(true));
     }
 
     /**
@@ -86,6 +85,8 @@ public class SendQuestBookService {
         book.put("category", category);
         //选中人员 [逗号 分割]
         book.put("selected", selected);
+        //题目数量
+        book.put("questionCount",String.valueOf(questIds.split(",").length));
         //创建时间
         book.put("time", DataUtil.format(new Date()));
         //创建课堂练习册的题目2小时过期
@@ -104,7 +105,9 @@ public class SendQuestBookService {
      */
     private List<Mono<Boolean>> setQuestInfo(final String questionIds){
         return Arrays.asList(questionIds.split(","))
+                //根据练习册题目ID，获得题目内容
                 .stream().map(bigQuestionRepository::findById)
+                //设置题目内容
                 .map(mobj->mobj.flatMap(obj-> stringRedisTemplate.opsForValue().set(BigQueKey.bookQuestionsNow(obj.getId()),JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))))
                 .collect(Collectors.toList());
     }
