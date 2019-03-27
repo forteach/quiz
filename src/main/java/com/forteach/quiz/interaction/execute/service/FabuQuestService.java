@@ -11,6 +11,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -59,15 +61,25 @@ public class FabuQuestService {
                     if(k.booleanValue()){
                       return  reactiveHashOperations.get(key,"selected")
                                 //过滤掉当前的已回答的学生，并从新生成字符串数据
-                                .flatMap(str->Mono.just(Arrays.stream(str.split(",")).filter(id->!id.equals(stuId))
-                                        .map(str1->",".concat(str1))
-                                        .collect(joining()).substring(1)))
+                                .flatMap(str-> Mono.just(getSelected(str,stuId)))
                                 .flatMap(r->reactiveHashOperations.put(key,"selected",r));
                     }else{
                       return  MyAssert.isFalse(false, DefineCode.ERR0014,"未找到当前课堂选人的缓存数据,或许是课堂数据过期");
                     }
                 });
 
+    }
+
+    //筛选字符串中所选人员
+    public String getSelected(String str,String filterStr){
+        System.out.println(str);
+       final String newStr = Arrays.stream(str.split(","))
+                .filter(id->!id.equals(filterStr))
+                .filter(Objects::nonNull)
+                .map(str1->str1.concat(","))
+                .collect(joining());
+        System.out.println(newStr);
+        return newStr;
     }
 
 }

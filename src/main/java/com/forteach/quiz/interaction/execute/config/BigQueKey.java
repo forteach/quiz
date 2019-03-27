@@ -39,9 +39,14 @@ public class BigQueKey {
     public static final String CLASSROOM_ASK_QUESTIONS_ID = "ask";
 
     /**
-     * 互动提问hash前缀(习题库\头脑风暴等。。。)
+     * 互动练习册发布
      */
     public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "bookList";
+
+    /**
+     * 互动练习册回答
+     */
+    public static final String CLASSROOM_BOOK_QUESTIONS_ANSWER_SET = "bookAnswerSet";
 
     //缓存当前已发布的题目题干内容，不分课堂。
     public static String questionsNow(final String questionId) {
@@ -93,10 +98,19 @@ public class BigQueKey {
     /**
      * 课堂练习互动前缀
      *
-     * @return 问题前缀+课堂+问题类型+回答方式  题目列表List
+     * @return  题目列表List
      */
     public static String bookTypeQuestionsList(final String circleId) {
         return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_LIST);
+    }
+
+    /**
+     * 课堂练习回答记录
+     *
+     * @return   题目列表set
+     */
+    public static String bookQuestionsAnswerSet(final String circleId) {
+        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_SET);
     }
 
     /**

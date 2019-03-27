@@ -74,20 +74,14 @@ public class SendQuestBookService {
      */
     private Mono<Boolean> addQuestBookNow(final String circleId,final String teacherId,final String questIds,String questionType, final String category,final String selected){
         HashMap<String, String> book = new HashMap<>(8);
-        //当前课堂ID
-        book.put("circleId",circleId);
-        //当前课堂教师ID
-        book.put("teacherId",teacherId);
-        //题目类型
-        book.put("questionType", questionType);
-        //练习册题目编号（逗号分隔）
-        book.put("questionId", questIds);
-        //选取类别（个人、小组）
-        book.put("category", category);
-        //选中人员 [逗号 分割]
-        book.put("selected", selected);
-        //创建时间
-        book.put("time", DataUtil.format(new Date()));
+        book.put("circleId",circleId);//当前课堂ID
+        book.put("teacherId",teacherId);//当前课堂教师ID
+        book.put("questionType", questionType);//题目类型
+        book.put("questionId", questIds);//练习册题目编号（逗号分隔）
+        book.put("category", category);//选取类别（个人、小组）
+        book.put("selected", selected);//选中人员 [逗号 分割]
+        book.put("questionCount",String.valueOf(questIds.split(",").length));//题目数量
+        book.put("time", DataUtil.format(new Date()));//创建时间
         //创建课堂练习册的题目2小时过期
        return reactiveHashOperations.putAll(BigQueKey.questionsBookNow(circleId), book)
                 //设置题目信息
@@ -104,7 +98,9 @@ public class SendQuestBookService {
      */
     private List<Mono<Boolean>> setQuestInfo(final String questionIds){
         return Arrays.asList(questionIds.split(","))
+                //根据练习册题目ID，获得题目内容
                 .stream().map(bigQuestionRepository::findById)
+                //设置题目内容
                 .map(mobj->mobj.flatMap(obj-> stringRedisTemplate.opsForValue().set(BigQueKey.bookQuestionsNow(obj.getId()),JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))))
                 .collect(Collectors.toList());
     }

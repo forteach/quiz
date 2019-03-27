@@ -59,10 +59,15 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+//        MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
         //验证请求参数
+
         Optional<String> teacherId = tokenService.getTeacherId(request);
         teacherId.ifPresent(roomVo::setTeacherId);
-        return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
+
+//        return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
+
+        return classRoomService.createInteractiveRoom("",roomVo.getTeacherId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")

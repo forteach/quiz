@@ -55,4 +55,6 @@ public class GiveVo {
     public String getExamineeIsReplyKey(QuestionType type) {
         return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(circleId).concat(type.name());
     }
+
+
 }
