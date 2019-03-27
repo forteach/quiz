@@ -58,10 +58,7 @@ public class BrainstormInteractService {
      * @return
      */
     public Mono<Long> sendQuestion(final MoreGiveVo giveVo) {
-        if (log.isDebugEnabled()){
-            log.debug("发布问卷问题 ==> MoreGiveVo : {}", giveVo);
-        }
-        HashMap<String, String> map = new HashMap<>(10);
+        HashMap<String, String> map = new HashMap<>(6);
         map.put("questionId", giveVo.getQuestionId());
         map.put("category", giveVo.getCategory());
         map.put("selected", giveVo.getSelected());

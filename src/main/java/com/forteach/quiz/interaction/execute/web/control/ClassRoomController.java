@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
 import java.util.Optional;
 
 /**
@@ -53,22 +52,20 @@ public class ClassRoomController extends BaseController {
         return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId()).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
-    @PostMapping(value = "/create/cover")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
-    })
-    public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
-//        MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
-        //验证请求参数
-
-        Optional<String> teacherId = tokenService.getTeacherId(request);
-        teacherId.ifPresent(roomVo::setTeacherId);
-
-//        return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
-
-        return classRoomService.createInteractiveRoom("",roomVo.getTeacherId()).map(WebResult::okResult);
-    }
+//    @ApiOperation(value = "老师有效期期内，创建不同临时课堂 覆写", notes = "有效期为2个小时 此方法覆盖之前数据")
+//    @PostMapping(value = "/create/cover")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
+//    })
+//    public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+////        MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
+//        //验证请求参数
+//
+//        Optional<String> teacherId = tokenService.getTeacherId(request);
+//        teacherId.ifPresent(roomVo::setTeacherId);
+//
+//        return classRoomService.createInteractiveRoom("",roomVo.getTeacherId()).map(WebResult::okResult);
+//    }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
     @PostMapping(value = "/join/interactiveRoom")

@@ -6,7 +6,9 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
 import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
+import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
 import com.forteach.quiz.service.StudentsService;
+import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -168,33 +170,75 @@ public class InteractRecordExecuteService {
     }
 
     /**
-     * 构建答题记录对象
+     * 构建答题记录详细对象
      * @param interactAnswerRecord
      * @return
      */
     private Mono<InteractAnswerRecordResp> changInteractAnswerRecord(InteractAnswerRecord interactAnswerRecord){
         return Mono.just(interactAnswerRecord)
                 .zipWith(studentsService.findStudentsBrief(interactAnswerRecord.getExamineeId()), (i, s) -> {
-                    return InteractAnswerRecordResp.builder()
-                            .answer(i.getAnswer())
-                            .name(s.getName())
-                            .studentId(s.getId())
-                            .portrait(s.getPortrait())
-                            .piGaiResult("true".equals(i.getRight()))
-                            .build();
+                    InteractAnswerRecordResp interactAnswerRecordResp = new InteractAnswerRecordResp();
+                    interactAnswerRecordResp.setStudentId(s.getId());
+                    interactAnswerRecordResp.setName(s.getName());
+                    interactAnswerRecordResp.setPortrait(s.getPortrait());
+                    if (i.getAnswer() != null){
+                        interactAnswerRecordResp.setAnswer(i.getAnswer());
+                    }
+                    if (i.getRight() != null){
+                        interactAnswerRecordResp.setPiGaiResult("true".equals(i.getRight()));
+                    }
+                    return interactAnswerRecordResp;
                 });
     }
 
+    Mono<InteractRecordResp> changeFindRecord(List<InteractAnswerRecord> answerRecordList, String interactive, String category){
+        return Mono.just(category)
+                .zipWith(changeFindRecord(answerRecordList), (c, list) -> {
+                    return InteractRecordResp.builder()
+                            .interactive(interactive)
+                            .category(c)
+                            .answerRecordList(list)
+                            .build();
+                });
+    }
     /**
      * 获取答题记录列表
      * @param answerRecordList
      * @return
      */
-    Mono<List<InteractAnswerRecordResp>> chengFindRecord(List<InteractAnswerRecord> answerRecordList){
+    private Mono<List<InteractAnswerRecordResp>> changeFindRecord(List<InteractAnswerRecord> answerRecordList){
         return Mono.just(answerRecordList)
                 .flatMapMany(Flux::fromIterable)
                 .filter(Objects::nonNull)
                 .flatMap(this::changInteractAnswerRecord)
                 .collectList();
+    }
+
+    Mono<InteractRecordResp> changeRecord(List<String> selectId, String interactive, String category){
+        return Mono.just(category)
+                .zipWith(changStudentList(selectId), (c, list) -> {
+                    return InteractRecordResp.builder()
+                           .category(c)
+                           .interactive(interactive)
+                           .answerRecordList(list)
+                           .build();
+                });
+    }
+
+    private Mono<? extends List<InteractAnswerRecordResp>> changStudentList(List<String> selectId) {
+        return studentsService.exchangeStudents(selectId)
+                .flatMapMany(Flux::fromIterable)
+                .filter(Objects::nonNull)
+                .flatMap(this::changeStudent)
+                .collectList();
+    }
+
+    /**
+     * 从学生信息转换请求详细对象信息
+     * @param students
+     * @return
+     */
+    private Mono<InteractAnswerRecordResp> changeStudent(Students students){
+        return Mono.just(new InteractAnswerRecordResp(students.getId(), students.getName(), students.getPortrait()));
     }
 }

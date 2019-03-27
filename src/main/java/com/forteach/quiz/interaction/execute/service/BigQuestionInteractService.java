@@ -4,7 +4,6 @@ import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
@@ -36,17 +35,14 @@ public class BigQuestionInteractService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final InsertInteractRecordService insertInteractRecordService;
-    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
 
     public BigQuestionInteractService(ReactiveStringRedisTemplate stringRedisTemplate,
                                       ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                       InsertInteractRecordService insertInteractRecordService,
-                                      InteractRecordExerciseBookService interactRecordExerciseBookService,
                                       ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.insertInteractRecordService = insertInteractRecordService;
     }
     /**

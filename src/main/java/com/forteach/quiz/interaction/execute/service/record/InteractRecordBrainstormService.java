@@ -6,7 +6,7 @@ import com.forteach.quiz.interaction.execute.domain.record.BrainstormInteractRec
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.BrainstormDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
+import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -16,13 +16,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_BRAINSTORMS;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
+
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
@@ -47,15 +45,18 @@ public class InteractRecordBrainstormService {
 
     /**
      * 查询头脑风暴记录
+     *
      * @param circleId
      * @param questionsId
      * @return
      */
-    public Mono<List<InteractAnswerRecordResp>> findRecordBrainstorm(final String circleId, final String questionsId){
+    public Mono<InteractRecordResp> findRecordBrainstorm(final String circleId, final String questionsId) {
         return findBrainstorm(circleId, questionsId)
                 .flatMap(t -> {
-                    if (t != null && t.getIndex() != null){
-                        return interactRecordExecuteService.chengFindRecord(t.getAnswerRecordList());
+                    if (t != null && t.getAnswerRecordList() != null) {
+                        return interactRecordExecuteService.changeFindRecord(t.getAnswerRecordList(), null, t.getCategory());
+                    } else if (t != null && t.getIndex() != null) {
+                        return interactRecordExecuteService.changeRecord(t.getSelectId(), null, t.getCategory());
                     }
                     return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
                 });
@@ -63,6 +64,7 @@ public class InteractRecordBrainstormService {
 
     /**
      * 查询头脑风暴记录
+     *
      * @param circleId
      * @param questionsId
      * @return
@@ -80,6 +82,7 @@ public class InteractRecordBrainstormService {
 
     /**
      * 发布记录
+     *
      * @param selectId
      * @param circleId
      * @param questionId

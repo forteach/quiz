@@ -116,9 +116,11 @@ public class SendAnswerService {
         //获得题目互动类型方式
         return  reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "interactive")
                 //获得题目当前id与所回答的题目比对
-                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "questionId").flatMap(qid-> MyAssert.isFalse(questId.equals(qid),DefineCode.ERR0002,"题目信息错误")))
+                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "questionId")
+                        .flatMap(qid-> MyAssert.isFalse(questId.equals(qid),DefineCode.ERR0002,"题目信息错误")))
                 //回答学生是否在所选范围内
-                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "selected").flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该名学生回答")));
+                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "selected")
+                        .flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该名学生回答")));
 
     }
 

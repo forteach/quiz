@@ -6,8 +6,7 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsReco
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.dto.QuestionsDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
-import com.forteach.quiz.service.StudentsService;
+import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -18,11 +17,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
@@ -43,13 +40,10 @@ public class InteractRecordQuestionsService {
 
     private final InteractRecordExecuteService interactRecordExecuteService;
 
-    private final StudentsService studentsService;
-
-    public InteractRecordQuestionsService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate, InteractRecordExecuteService interactRecordExecuteService, StudentsService studentsService) {
+    public InteractRecordQuestionsService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate, InteractRecordExecuteService interactRecordExecuteService) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
         this.interactRecordExecuteService = interactRecordExecuteService;
-        this.studentsService = studentsService;
     }
 
     /**
@@ -58,11 +52,13 @@ public class InteractRecordQuestionsService {
      * @param questionsId
      * @return
      */
-    public Mono<List<InteractAnswerRecordResp>> findRecordQuestion(final String circleId, final String questionsId){
+    public Mono<InteractRecordResp> findRecordQuestion(final String circleId, final String questionsId){
         return findQuestionsRecord(circleId, questionsId)
                 .flatMap(t -> {
-                    if (t != null && t.getIndex() != null){
-                        return interactRecordExecuteService.chengFindRecord(t.getAnswerRecordList());
+                    if (t != null && t.getAnswerRecordList() != null){
+                        return interactRecordExecuteService.changeFindRecord(t.getAnswerRecordList(), t.getInteractive(), t.getCategory());
+                    }else if (t != null && t.getIndex() != null){
+                        return interactRecordExecuteService.changeRecord(t.getSelectId(), t.getInteractive(), t.getCategory());
                     }
                     return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
                 });

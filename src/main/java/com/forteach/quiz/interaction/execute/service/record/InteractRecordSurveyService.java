@@ -6,7 +6,7 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.domain.record.SurveyInteractRecord;
 import com.forteach.quiz.interaction.execute.dto.SurveysDto;
 import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
+import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -16,11 +16,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
@@ -52,11 +49,13 @@ public class InteractRecordSurveyService {
      * @param questionsId
      * @return
      */
-    public Mono<List<InteractAnswerRecordResp>> findRecordSurvey(final String circleId, final String questionsId){
+    public Mono<InteractRecordResp> findRecordSurvey(final String circleId, final String questionsId){
         return findSurveyRecord(circleId, questionsId)
                 .flatMap(t -> {
-                    if (t != null && t.getIndex() != null){
-                        return interactRecordExecuteService.chengFindRecord(t.getAnswerRecordList());
+                    if (t != null && t.getAnswerRecordList() != null){
+                        return interactRecordExecuteService.changeFindRecord(t.getAnswerRecordList(), null, t.getCategory());
+                    }else if (t != null && t.getIndex() != null){
+                        return interactRecordExecuteService.changeRecord(t.getSelectId(), null, t.getCategory());
                     }
                     return MyAssert.isNull(null, DefineCode.OK, "不存在相关记录");
                 });

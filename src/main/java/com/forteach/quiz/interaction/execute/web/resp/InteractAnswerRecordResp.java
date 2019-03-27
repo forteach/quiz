@@ -2,10 +2,7 @@ package com.forteach.quiz.interaction.execute.web.resp;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @author: zhangyy
@@ -15,9 +12,8 @@ import java.io.Serializable;
  * @description:
  */
 @Data
-@Builder
-@ApiModel(value = "学生回答结果对象")
-public class InteractAnswerRecordResp implements Serializable {
+@ApiModel(value = "学生回答结果详细对象记录")
+public class InteractAnswerRecordResp {
 
     @ApiModelProperty(name = "studentId", value = "学生id", dataType = "string")
     private String studentId;
@@ -35,7 +31,7 @@ public class InteractAnswerRecordResp implements Serializable {
     private String answer;
 
     @ApiModelProperty(name = "piGaiResult", value = "批改的答题结果", dataType = "boolean", notes = "true / false")
-    private boolean piGaiResult;
+    private Boolean piGaiResult;
 
     public InteractAnswerRecordResp() {
     }
@@ -48,4 +44,9 @@ public class InteractAnswerRecordResp implements Serializable {
         this.piGaiResult = piGaiResult;
     }
 
+    public InteractAnswerRecordResp(String studentId, String name, String portrait) {
+        this.studentId = studentId;
+        this.name = name;
+        this.portrait = portrait;
+    }
 }
