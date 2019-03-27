@@ -6,6 +6,8 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
+import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
@@ -34,38 +36,23 @@ public class SendAnswerBookService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final InteractRecordExecuteService interactRecordExecuteService;
     private final CorrectService correctService;
+    private final InsertInteractRecordService insertInteractRecordService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     public SendAnswerBookService(ReactiveStringRedisTemplate stringRedisTemplate,
                                  ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                  InteractRecordExecuteService interactRecordExecuteService,
                                  CorrectService correctService,
+                                 InsertInteractRecordService insertInteractRecordService,
                                  ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.interactRecordExecuteService = interactRecordExecuteService;
+        this.insertInteractRecordService = insertInteractRecordService;
     }
 
-    /**
-     * 练习册提交答案
-     *
-     * @param sheetVo
-     * @return
-     */
-//    public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
-//        return Mono.just(sheetVo)
-//                .transform(this::filterSheetSelectVerify)
-//                .filterWhen(shee ->
-//                        sendAnswerVerifyMore(shee.getAskKey(QuestionType.LianXi), shee.getAnsw().getQuestionId(), shee.getCut())
-//                )
-//                .filterWhen(
-//                        set -> sendValue(sheetVo))
-//                .filterWhen(
-//                        right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
-//                .map(InteractiveSheetVo::getCut);
-//    }
     /**
      * 学生问题回答
      * @param circleId 课堂ID
@@ -121,7 +108,7 @@ public class SendAnswerBookService {
                                     .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
                     )
                 //记录学生回答MONGO记录
-               .filterWhen(right -> interactRecordExecuteService.answer(circleId, questId, examineeId, answer, String.valueOf(right)));
+               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right)));
     }
 
     /**

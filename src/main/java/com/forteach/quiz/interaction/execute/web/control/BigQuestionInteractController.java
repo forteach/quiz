@@ -54,7 +54,9 @@ public class BigQuestionInteractController {
      */
     private final RaiseHandService raiseHandService;
 
-    //当前课堂已发布的题目列表
+    /**
+     * 当前课堂已发布的题目列表
+     */
     private final FabuQuestService fabuQuestService;
 
     //练习册
