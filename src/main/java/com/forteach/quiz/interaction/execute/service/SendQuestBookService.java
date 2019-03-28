@@ -54,7 +54,7 @@ public class SendQuestBookService {
         Mono<Boolean> addQuestBookNowMap = addQuestBookNow(circleId,teacherId,questIds,questionType,category,selected);
 
         //创建课堂问题列表记录
-        Mono<Boolean> createQuestBookList = createQuestBook( circleId, questIds);
+        List<Mono<Boolean>> createQuestBookList = createQuestBookList( circleId, questIds);
 
         //执行创建提问，并返回执行结果
         return addQuestBookNowMap.map(r->createQuestBookList)

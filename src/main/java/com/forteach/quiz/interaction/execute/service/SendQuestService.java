@@ -97,27 +97,19 @@ public class SendQuestService {
      * @param cut //随机数
      * @return true or false
      */
-    private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,final String questionType, final String interactive,final String category,final String selected,final String cut){
+    private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,String questionType, final String interactive,final String category,final String selected,final String cut){
        //TODO 需要调整final
         HashMap<String, String> map = new HashMap<>(10);
-        //当前课堂ID
-        map.put("circleId",circleId);
-        //当前课堂教师ID
-        map.put("teacherId",teacherId);
-        //题目类型
-        map.put("questionType", questionType);
-        //题目编号
-        map.put("questionId", questId);
-        //互动方式（举手、抢答等）
-        map.put("interactive", interactive);
-        //选取类别（个人、小组）
-        map.put("category", category);
-        //选中人员 [逗号 分割]
-        map.put("selected", selected);
-        //随机数
-        map.put("cut", cut);
-        //创建时间
-        map.put("time", DataUtil.format(new Date()));
+        map.put("circleId",circleId);//当前课堂ID
+        map.put("teacherId",teacherId);//当前课堂教师ID
+        map.put("questionType", questionType);//题目类型
+        map.put("questionId", questId);//题目编号
+        map.put("interactive", interactive);  //互动方式（举手、抢答等）
+        map.put("category", category);//选取类别（个人、小组）
+        map.put("selected", selected);//选中人员 [逗号 分割]
+        map.put("noRreceiveSelected", selected);//选中未确认收到推送题目标记的人员 [逗号 分割]
+        map.put("cut", cut);//随机数
+        map.put("time", DataUtil.format(new Date()));//创建时间
         //创建课堂提问的题目2小时过期
        return reactiveHashOperations.putAll(BigQueKey.questionsIdNow(circleId), map)
                 //设置题目信息

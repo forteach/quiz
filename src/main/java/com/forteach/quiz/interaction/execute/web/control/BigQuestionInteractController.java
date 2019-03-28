@@ -59,8 +59,15 @@ public class BigQuestionInteractController {
      */
     private final FabuQuestService fabuQuestService;
 
-    //练习册
+    /**
+     * 练习册提问
+     */
     private  final SendQuestBookService sendQuestBookService;
+
+    /**
+     * 练习册回答
+     */
+    private final SendAnswerBookService sendAnswerBookService;
 
     public BigQuestionInteractController(BigQuestionInteractService interactService,
                                          InteractRecordQuestionsService interactRecordQuestionsService,
@@ -70,6 +77,9 @@ public class BigQuestionInteractController {
                                          RaiseHandService raiseHandService,
                                          FabuQuestService fabuQuestService,
                                          SendQuestBookService sendQuestBookService,
+                                         SendAnswerBookService sendAnswerBookService,
+                                         SendQuestService sendQuestService
+    ) {
                                          TokenService tokenService) {
         this.interactService = interactService;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
@@ -80,6 +90,7 @@ public class BigQuestionInteractController {
         this.raiseHandService=raiseHandService;
         this.fabuQuestService=fabuQuestService;
         this.sendQuestBookService=sendQuestBookService;
+        this.sendAnswerBookService= sendAnswerBookService;
     }
 
     /**
@@ -252,23 +263,6 @@ public class BigQuestionInteractController {
         return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected()).map(WebResult::okResult);
     }
 
-//    /**
-//     * 提交课堂练习答案
-//     *
-//     * @param sheetVo
-//     * @return
-//     */
-//    @PostMapping("/sendBook/answer")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
-//    })
-//    @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
-//    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
-//        return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
-//    }
     /**
      * 提交课堂练习答案
      *
@@ -277,42 +271,13 @@ public class BigQuestionInteractController {
      */
     @PostMapping("/sendBook/answer")
     @ApiImplicitParams({
-//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
             @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
     })
     @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
-    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo, ServerHttpRequest serverHttpRequest) {
-        MyAssert.blank(sheetVo.getCut(), DefineCode.ERR0010, "课堂圈子id不为空");
-        sheetVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+        return sendAnswerBookService.sendExerciseBookAnswer(sheetVo.getCircleId(),QuestionType.LianXi.name(),sheetVo.getAnsw(),sheetVo.getExamineeId()).map(WebResult::okResult);
     }
-
-    @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
-    @PostMapping("/findQuestionsRecord")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
-    })
-    public Mono<WebResult> findQuestionsRecord(@RequestBody RecordReq recordReq){
-        //验证请求参数
-        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
-        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordQuestionsService.findRecordQuestion(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
-    }
-
-    @ApiOperation(value = "查询课堂习题册提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
-    @PostMapping("/findExerciseBookRecord")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
-    })
-    public Mono<WebResult> findExerciseBook(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody RecordReq recordReq){
-        //验证请求参数
-        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
-        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExerciseBookService.findRecordExerciseBook(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
-    }
-
 }
