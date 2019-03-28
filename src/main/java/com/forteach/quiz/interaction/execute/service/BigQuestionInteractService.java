@@ -5,7 +5,6 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_EXERCISEBOOKS;
 import static com.forteach.quiz.interaction.execute.config.BigQueKey.CLASSROOM_ASK_QUESTIONS_ID;
 /**
  * @Description: 提问交互
@@ -51,23 +54,23 @@ public class BigQuestionInteractService {
      * @param giveVo
      * @return
      */
-    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
-        HashMap<String, String> map = new HashMap<>(10);
-        map.put("questionId", giveVo.getQuestionId());
-        map.put("category", giveVo.getCategory());
-        map.put("selected", giveVo.getSelected());
-        map.put("cut", giveVo.getCut());
-
-
-        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.LianXi, giveVo.getCircleId()), map);
-        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.LianXi, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
-
-        //TODO 未记录
-        return Flux.concat(set, time).filter(flag -> !flag)
-//                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
-                .count();
-
-    }
+//    public Mono<Long> sendInteractiveBook(final MoreGiveVo giveVo) {
+//        HashMap<String, String> map = new HashMap<>(10);
+//        map.put("questionId", giveVo.getQuestionId());
+//        map.put("category", giveVo.getCategory());
+//        map.put("selected", giveVo.getSelected());
+//        map.put("cut", giveVo.getCut());
+//
+//
+//        Mono<Boolean> set = reactiveHashOperations.putAll(askQuestionsId(QuestionType.LianXi, giveVo.getCircleId()), map);
+//        Mono<Boolean> time = stringRedisTemplate.expire(askQuestionsId(QuestionType.LianXi, giveVo.getCircleId()), Duration.ofSeconds(60 * 60 * 10));
+//
+//        //TODO 未记录
+//        return Flux.concat(set, time).filter(flag -> !flag)
+////                .filterWhen(obj -> interactRecordExerciseBookService.interactiveBook(giveVo))
+//                .count();
+//
+//    }
 
     /**
      * 验证练习册发放选中
@@ -144,7 +147,7 @@ public class BigQuestionInteractService {
                 .filterWhen(
                         right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
                 // Todo 提交答案保存
-                .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, "exerciseBooks"))
+                .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, INTERACT_RECORD_EXERCISEBOOKS))
                 .thenReturn(sheetVo.getCut());
     }
 //    /**

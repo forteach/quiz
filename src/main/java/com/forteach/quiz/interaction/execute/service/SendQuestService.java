@@ -82,7 +82,7 @@ public class SendQuestService {
         //执行创建提问，并返回执行结果
         return addQuestNow.flatMap(r->createQuest);
                 //创建mongo答题日志
-               // .flatMap(r->StrUtil.isBlank(selected)?Mono.just(true):interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
+//                .flatMap(r-> StrUtil.isBlank(selected)?Mono.just(true):interactRecordExecuteService.releaseQuestion(circleId, questId, selected, category, interactive));
     }
 
     /**
@@ -136,9 +136,8 @@ public class SendQuestService {
         //存储当前所发布的题目信息
        final String key=BigQueKey.questionsNow(questionId);
        return stringRedisTemplate.hasKey(key)
-               .flatMap(r->r.booleanValue()?Mono.just(true):bigQuestionRepository.findById(questionId)
-                                                            .flatMap(obj->
-                                                                    stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))));
+               .flatMap(r->r?Mono.just(true):bigQuestionRepository.findById(questionId)
+                       .flatMap(obj-> stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))));
     }
 
     /**

@@ -12,7 +12,6 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -54,11 +53,12 @@ public class FabuQuestService {
      */
     public Mono<Boolean> delSelectStuId(final String stuId,final String circleId){
 
-        final String key=BigQueKey.questionsIdNow(circleId);//获得当前逗号分隔的选人数据
+        //获得当前逗号分隔的选人数据
+        final String key=BigQueKey.questionsIdNow(circleId);
         final Mono<Boolean> isSelelcted=reactiveHashOperations.hasKey(key,"selected");
         return  isSelelcted
                 .flatMap(k->{
-                    if(k.booleanValue()){
+                    if(k){
                       return  reactiveHashOperations.get(key,"selected")
                                 //过滤掉当前的已回答的学生，并从新生成字符串数据
                                 .flatMap(str-> Mono.just(getSelected(str,stuId)))
@@ -70,16 +70,18 @@ public class FabuQuestService {
 
     }
 
-    //筛选字符串中所选人员
-    public String getSelected(String str,String filterStr){
-        System.out.println(str);
-       final String newStr = Arrays.stream(str.split(","))
+    /**
+     * 筛选字符串中所选人员
+     * @param str
+     * @param filterStr
+     * @return
+     */
+    private String getSelected(String str,String filterStr){
+       return Arrays.stream(str.split(","))
                 .filter(id->!id.equals(filterStr))
                 .filter(Objects::nonNull)
                 .map(str1->str1.concat(","))
                 .collect(joining());
-        System.out.println(newStr);
-        return newStr;
     }
 
 }

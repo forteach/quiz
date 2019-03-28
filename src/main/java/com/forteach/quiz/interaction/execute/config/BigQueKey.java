@@ -48,12 +48,20 @@ public class BigQueKey {
      */
     public static final String CLASSROOM_BOOK_QUESTIONS_ANSWER_SET = "bookAnswerSet";
 
-    //缓存当前已发布的题目题干内容，不分课堂。
+    /**
+     * 缓存当前已发布的题目题干内容，不分课堂。
+     * @param questionId
+     * @return
+     */
     public static String questionsNow(final String questionId) {
         return CLASSROOM_ASK_NOW.concat(questionId);
     }
 
-    //缓存当前已发布的题目题干内容，不分课堂。
+    /**
+     * 缓存当前已发布的题目题干内容，不分课堂。
+     * @param questionId
+     * @return
+     */
     public static String bookQuestionsNow(final String questionId) {
         return CLASSROOM_BOOK_NOW.concat(questionId);
     }
@@ -83,7 +91,7 @@ public class BigQueKey {
      * @return 当前问题前缀+课堂+问题类型+回答方式=ForValue
      */
     public static String askTypeQuestionsIdNow(final String questType, final String circleId, final String interactive) {
-        return CLASSROOM_ASK_NOW+askTypeQuestionsId(questType,circleId,interactive);
+        return CLASSROOM_ASK_NOW.concat(askTypeQuestionsId(questType,circleId,interactive));
     }
 
     /**
