@@ -43,14 +43,18 @@ public class BigQuestionInteractController {
     //当前课堂已发布的题目列表
     private final FabuQuestService fabuQuestService;
 
-    //练习册
+    //练习册提问
     private  final SendQuestBookService sendQuestBookService;
+
+    //练习册回答
+    private final SendAnswerBookService sendAnswerBookService;
 
     public BigQuestionInteractController(BigQuestionInteractService interactService,
                                          SendAnswerService sendAnswerService,
                                          RaiseHandService raiseHandService,
                                          FabuQuestService fabuQuestService,
                                          SendQuestBookService sendQuestBookService,
+                                         SendAnswerBookService sendAnswerBookService,
                                          SendQuestService sendQuestService
     ) {
         this.interactService = interactService;
@@ -59,6 +63,7 @@ public class BigQuestionInteractController {
         this.raiseHandService=raiseHandService;
         this.fabuQuestService=fabuQuestService;
         this.sendQuestBookService=sendQuestBookService;
+        this.sendAnswerBookService= sendAnswerBookService;
     }
 
     /**
@@ -91,7 +96,7 @@ public class BigQuestionInteractController {
                 giveVo.getQuestionId(),
                 giveVo.getInteractive(),
                 giveVo.getCategory(),
-                giveVo.getSelected(),
+                giveVo.getSelected().concat(","),
                 giveVo.getCut()
         ).map(WebResult::okResult);
     }
@@ -117,7 +122,6 @@ public class BigQuestionInteractController {
         MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
         MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010,"课堂问题互动类型不能为空");
         MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题选举类型不能为空");
-        //MyAssert.blank(giveVo.getSelected(), DefineCode.ERR0010,"课堂问题选人数据不能为空");
         //课堂发布题目
         return sendQuestService.raiseSendQuestion(
                 giveVo.getCircleId(),
@@ -237,6 +241,6 @@ public class BigQuestionInteractController {
     })
     @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
-        return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
+        return sendAnswerBookService.sendExerciseBookAnswer(sheetVo.getCircleId(),QuestionType.LianXi.name(),sheetVo.getAnsw(),sheetVo.getExamineeId()).map(WebResult::okResult);
     }
 }

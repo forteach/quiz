@@ -54,9 +54,7 @@ public class ClassRoomController extends BaseController {
     })
     public Mono<WebResult> createCoverInteractiveRoom(@ApiParam(value = "发布课堂提问", required = true) @RequestBody InteractiveRoomVo roomVo) {
         //验证请求参数
-        //MyAssert.blank(roomVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
         MyAssert.blank(roomVo.getTeacherId(), DefineCode.ERR0010 ,"教师编号不能为空");
-        //return classRoomService.createCoverInteractiveRoom(roomVo).map(WebResult::okResult);
         return classRoomService.createInteractiveRoom("",roomVo.getTeacherId()).map(WebResult::okResult);
     }
 
