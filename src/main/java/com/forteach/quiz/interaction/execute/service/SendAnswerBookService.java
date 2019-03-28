@@ -1,15 +1,20 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
+import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
+import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,6 +28,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static com.forteach.quiz.common.Dic.*;
 
@@ -89,23 +95,8 @@ public class SendAnswerBookService {
                 //验证当前回答的题目和参与回答的人员
                 .transform(an->filterSelectVerify(circleId,examineeId,questId))
                 .flatMap(typeName -> {
-                        switch (typeName) {
-                            //抢答
-                            case ASK_INTERACTIVE_RACE:
-                                return sendRace(circleId,examineeId,questId,answer, ASK_INTERACTIVE_RACE);
-                                //举手
-                            case ASK_INTERACTIVE_RAISE:
-                                return sendRaise(circleId,examineeId,questId,answer, ASK_INTERACTIVE_RAISE);
-                            case ASK_INTERACTIVE_SELECT:
-                                //选人回答问题
                                 return sendSelect(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT);
-                            case ASK_INTERACTIVE_VOTE:
-                                return Mono.empty();
-                            default:
-                                throw new ExamQuestionsException("非法参数 错误的数据类型");
-                        }
-
-                })
+                                      })
                 //设置学生回答题目答案
                 .filterWhen(right -> reactiveHashOperations.put(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,answer)
                                      .flatMap(r-> {
@@ -192,27 +183,31 @@ public class SendAnswerBookService {
                 });
     }
 
+    //获得练习册答案列表
+    private Mono<Boolean> createAnswerList(String circleId,String stuId,InteractiveSheetAnsw answ){
+        final String answJson = JSON.toJSONString(answ);
+        //存储练习册的答案
+        return reactiveHashOperations.put(BigQueKey.bookQuestionsAnswerSet(circleId,stuId),answ.getQuestionId(),answJson);
+    }
+
 
     /**
-     * 抢答（不能重复回答，只能提交一次答题结果）
-     * TODO 报错临时注解
+     * 练习册多题目回答记录MONGO
+     *
      * @return
      */
-    private Mono<Boolean> sendRace(final String circleId,final String examineeId,final String questId,final String answer, final String type) {
-        //判断本次是否已经提交过该题目
-        return  stringRedisTemplate.opsForSet().isMember(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.TiWen.name()),examineeId)
-                .flatMap(flag -> {
-                    MyAssert.isTrue(flag.booleanValue(),DefineCode.ERR0011,"该学生已提交，将不能再提交");
-                    return sendSelect(circleId,examineeId,questId,answer, type);
-                });
+    private Mono<Boolean> sendLianxiValue(final String circleId,final String examineeId,  final String questionType, final List<InteractiveSheetAnsw> answerList) {
+
+        Query query = Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("examineeId").is(examineeId)
+                        .and("libraryType").is(questionType));
+
+        Update update = new Update().
+        addToSet("answList", answerList);
+
+        return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);
     }
 
-    /**
-     * TODO 报错临时注解
-     * 举手 回答
-     */
-    private Mono<Boolean> sendRaise(final String circleId,final String examineeId,final String questId,final String answer, final String type) {
-       return Mono.just(circleId).flatMap(interactAnswerVo -> sendSelect(circleId,examineeId,questId,answer, type));
 
-    }
 }

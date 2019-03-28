@@ -1,5 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import cn.hutool.core.date.DateUnit;
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
@@ -7,6 +9,7 @@ import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.TaskQuestionRepository;
+import com.forteach.quiz.util.DateUtil;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -125,7 +128,7 @@ public class TaskInteractService {
                         .and("libraryType").is(QuestionType.RenWu));
 
         Update update = new Update();
-        sheetVo.getAnsw().setDate(new Date());
+        sheetVo.getAnsw().setDate(DataUtil.format(new Date()));
         update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);
