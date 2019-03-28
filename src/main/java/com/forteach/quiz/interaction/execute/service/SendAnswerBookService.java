@@ -6,6 +6,7 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
+import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
@@ -50,11 +51,17 @@ public class SendAnswerBookService {
 
     /**
      * 练习册提交答案
-     *
-     * @param sheetVo
+     * @param circleId  课堂Id
+     * @param questionType  题目类型  练习册
+     * @param answer  回答内容
+     * @param examineeId  学生ID
      * @return
      */
-//    public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
+    public Mono<String> sendExerciseBookAnswer(final String circleId, final String questionType, final InteractiveSheetAnsw answer, final String examineeId) {
+        //获得当前练习册基本信息 BigQueKey.questionsBookNow(circleId)  选中人员 题目 题目数量
+        //当前题目内容信息  BigQueKey.bookQuestionsNow(obj.getId())
+        //当前练习册的题目顺序列表 BigQueKey.bookTypeQuestionsList(circleId)
+
 //        return Mono.just(sheetVo)
 //                .transform(this::filterSheetSelectVerify)
 //                .filterWhen(shee ->
@@ -65,7 +72,8 @@ public class SendAnswerBookService {
 //                .filterWhen(
 //                        right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
 //                .map(InteractiveSheetVo::getCut);
-//    }
+        return null;
+    }
     /**
      * 学生问题回答
      * @param circleId 课堂ID

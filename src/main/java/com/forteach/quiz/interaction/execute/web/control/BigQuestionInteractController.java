@@ -43,14 +43,18 @@ public class BigQuestionInteractController {
     //当前课堂已发布的题目列表
     private final FabuQuestService fabuQuestService;
 
-    //练习册
+    //练习册提问
     private  final SendQuestBookService sendQuestBookService;
+
+    //练习册回答
+    private final SendAnswerBookService sendAnswerBookService;
 
     public BigQuestionInteractController(BigQuestionInteractService interactService,
                                          SendAnswerService sendAnswerService,
                                          RaiseHandService raiseHandService,
                                          FabuQuestService fabuQuestService,
                                          SendQuestBookService sendQuestBookService,
+                                         SendAnswerBookService sendAnswerBookService,
                                          SendQuestService sendQuestService
     ) {
         this.interactService = interactService;
@@ -59,6 +63,7 @@ public class BigQuestionInteractController {
         this.raiseHandService=raiseHandService;
         this.fabuQuestService=fabuQuestService;
         this.sendQuestBookService=sendQuestBookService;
+        this.sendAnswerBookService= sendAnswerBookService;
     }
 
     /**
@@ -221,21 +226,21 @@ public class BigQuestionInteractController {
         return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected()).map(WebResult::okResult);
     }
 
-//    /**
-//     * 提交课堂练习答案
-//     *
-//     * @param sheetVo
-//     * @return
-//     */
-//    @PostMapping("/sendBook/answer")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
-//    })
-//    @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
-//    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
-//        return interactService.sendExerciseBookAnswer(sheetVo).map(WebResult::okResult);
-//    }
+    /**
+     * 提交课堂练习答案
+     *
+     * @param sheetVo
+     * @return
+     */
+    @PostMapping("/sendBook/answer")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", required = true, paramType = "from"),
+            @ApiImplicitParam(value = "答案列表", name = "answList", dataType = "json", required = true, paramType = "from")
+    })
+    @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
+    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractiveSheetVo sheetVo) {
+        return sendAnswerBookService.sendExerciseBookAnswer(sheetVo.getCircleId(),QuestionType.LianXi.name(),sheetVo.getAnsw(),sheetVo.getExamineeId()).map(WebResult::okResult);
+    }
 }

@@ -113,7 +113,7 @@ public class SendQuestService {
      */
     private Mono<Boolean> addQuestNowInfo(final String circleId,final String teacherId,final String questId,String questionType, final String interactive,final String category,final String selected,final String cut){
        //TODO 需要调整final
-        HashMap<String, String> map = new HashMap<>(8);
+        HashMap<String, String> map = new HashMap<>(10);
         map.put("circleId",circleId);//当前课堂ID
         map.put("teacherId",teacherId);//当前课堂教师ID
         map.put("questionType", questionType);//题目类型
@@ -121,6 +121,7 @@ public class SendQuestService {
         map.put("interactive", interactive);  //互动方式（举手、抢答等）
         map.put("category", category);//选取类别（个人、小组）
         map.put("selected", selected);//选中人员 [逗号 分割]
+        map.put("noRreceiveSelected", selected);//选中未确认收到推送题目标记的人员 [逗号 分割]
         map.put("cut", cut);//随机数
         map.put("time", DataUtil.format(new Date()));//创建时间
         //创建课堂提问的题目2小时过期

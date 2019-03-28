@@ -64,21 +64,21 @@ public class FabuQuestService {
     }
 
     /**
-     * 当前题目回答情况，删除推送选人回答的学生ID
+     * 当前题目收到推送后，删除未收到推送标记的学生ID
      * @param stuId
      * @return
      */
     public Mono<Boolean> delSelectStuId(final String stuId,final String circleId){
 
         final String key=BigQueKey.questionsIdNow(circleId);//获得当前逗号分隔的选人数据
-        final Mono<Boolean> isSelelcted=reactiveHashOperations.hasKey(key,"selected");
+        final Mono<Boolean> isSelelcted=reactiveHashOperations.hasKey(key,"noRreceiveSelected");
         return  isSelelcted
                 .flatMap(k->{
                     if(k.booleanValue()){
                       return  reactiveHashOperations.get(key,"selected")
                                 //过滤掉当前的已回答的学生，并从新生成字符串数据
                                 .flatMap(str-> Mono.just(getSelected(str,stuId)))
-                                .flatMap(r->reactiveHashOperations.put(key,"selected",r));
+                                .flatMap(r->reactiveHashOperations.put(key,"noRreceiveSelected",r));
                     }else{
                       return  MyAssert.isFalse(false, DefineCode.ERR0014,"未找到当前课堂选人的缓存数据,或许是课堂数据过期");
                     }
