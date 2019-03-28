@@ -113,6 +113,18 @@ public class SendQuestBookService {
     }
 
     /**
+     * 创建练习册列表
+     * @param circleId
+     * @param questionIds
+     * @return
+     */
+    private  List<Mono<Boolean>>  createQuestBookList(String circleId,String questionIds){
+        return Arrays.asList(questionIds.split(","))
+                .stream()
+                .map(questionId->createQuestBook(circleId,questionId))
+                .collect(Collectors.toList());
+    }
+    /**
      * 添加当前发布题目辅助键信息
      * @param circleId
      * @param questId

@@ -150,26 +150,6 @@ public class BigQuestionInteractService {
                 .filterWhen(right -> insertInteractRecordService.pushMongo(sheetVo, INTERACT_RECORD_EXERCISEBOOKS))
                 .thenReturn(sheetVo.getCut());
     }
-//    /**
-//     * 提交答案  old
-//     *
-//     * @param sheetVo
-//     * @return
-//     */
-//    public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
-//        return Mono.just(sheetVo)
-//                .transform(this::filterSheetSelectVerify)
-//                .filterWhen(shee ->
-//                        sendAnswerVerifyMore(shee.getAskKey(QuestionType.LianXi), shee.getAnsw().getQuestionId(), shee.getCut())
-//                )
-//                .filterWhen(
-//                        set -> sendValue(sheetVo))
-//                .filterWhen(
-//                        right -> setRedis(sheetVo.getExamineeIsReplyKey(QuestionType.LianXi), sheetVo.getExamineeId(), sheetVo.getAskKey(QuestionType.LianXi)))
-//                .map(InteractiveSheetVo::getCut);
-//    }
-//                .filterWhen(right -> setRedis(answerVo.getExamineeIsReplyKey(QuestionType.BigQuestion), answerVo.getExamineeId(), answerVo.getAskKey(QuestionType.BigQuestion)))
-
     /**
      * 直接累积答案 不用给分
      *
