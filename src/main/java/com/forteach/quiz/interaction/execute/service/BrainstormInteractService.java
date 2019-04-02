@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.service;
 
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
@@ -127,7 +128,7 @@ public class BrainstormInteractService {
                         .and("libraryType").is(QuestionType.FengBao));
 
         Update update = new Update();
-        sheetVo.getAnsw().setDate(new Date());
+        sheetVo.getAnsw().setDate(DataUtil.format(new Date()));
         update.addToSet("answList", sheetVo.getAnsw());
 
         return reactiveMongoTemplate.upsert(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);

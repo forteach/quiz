@@ -53,7 +53,7 @@ public class BigQueKey {
         return CLASSROOM_ASK_NOW.concat(questionId);
     }
 
-    //缓存当前已发布的题目题干内容，不分课堂。
+    //缓存当前已发布的练习册题目题干内容，不分课堂。
     public static String bookQuestionsNow(final String questionId) {
         return CLASSROOM_BOOK_NOW.concat(questionId);
     }
@@ -109,8 +109,8 @@ public class BigQueKey {
      *
      * @return   题目列表set
      */
-    public static String bookQuestionsAnswerSet(final String circleId) {
-        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_SET);
+    public static String bookQuestionsAnswerSet(final String circleId,final String stuId) {
+        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_SET).concat(stuId);
     }
 
     /**

@@ -1,9 +1,9 @@
 package com.forteach.quiz.interaction.execute.web.vo;
 
+import com.forteach.quiz.common.DataUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.util.Date;
 
 /**
@@ -28,6 +28,17 @@ public class InteractiveSheetAnsw {
     @ApiModelProperty(value = "答案", name = "answer")
     private String answer;
 
-    private Date date;
 
+    /**
+     * 题目回答是否正确
+     */
+    private boolean answerRight;
+
+    private String date= DataUtil.format(new Date());
+
+    public InteractiveSheetAnsw(String questionId, String answer, boolean answerRight) {
+        this.questionId = questionId;
+        this.answer = answer;
+        this.answerRight = answerRight;
+    }
 }
