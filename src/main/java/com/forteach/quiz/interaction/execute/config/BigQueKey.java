@@ -58,7 +58,7 @@ public class BigQueKey {
     }
 
     /**
-     * 缓存当前已发布的题目题干内容，不分课堂。
+     * 缓存当前已发布的练习册题目题干内容，不分课堂。
      * @param questionId
      * @return
      */
@@ -117,8 +117,8 @@ public class BigQueKey {
      *
      * @return   题目列表set
      */
-    public static String bookQuestionsAnswerSet(final String circleId) {
-        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_SET);
+    public static String bookQuestionsAnswerSet(final String circleId,final String stuId) {
+        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_SET).concat(stuId);
     }
 
     /**
