@@ -102,7 +102,8 @@ public class SendAnswerService {
                                     .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
                     )
                 //记录学生回答MONGO记录
-               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right)));
+               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right))
+                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
     }
 
     /**

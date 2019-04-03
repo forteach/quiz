@@ -42,16 +42,16 @@ public class ClassRoomService {
         //TODO 创建课堂ID，REDIS键值，安课堂ID过期键值处理过期
 
         //根据互动课堂KEY值，获得课堂互动ID属性，如果为空，创建互动课堂，否则返回返回互动课堂ID
-        return Mono.just(circleId).flatMap(cid ->
+        return Mono.just(teacherId).flatMap(tid ->
         {
-            if (StrUtil.isBlank(cid)) {
+            if (StrUtil.isBlank(circleId)) {
                 //根据互动课堂ID和教师ID，创建Mongo或返回课堂信息
                 return interactRecordExecuteService.init(teacherId)
                         //创建Redis教室和教师信息,过期时间2小时
                         .filterWhen(newcircleId -> buildRoom(newcircleId, teacherId));
             } else {
                 //如果key过期，则返回不存在为true
-                Mono<Boolean> notHasKey = stringRedisTemplate.hasKey(ClassRoomKey.getInteractiveIdQra(cid)).flatMap(res -> Mono.just(!res));
+                Mono<Boolean> notHasKey = stringRedisTemplate.hasKey(ClassRoomKey.getInteractiveIdQra(circleId)).flatMap(res -> Mono.just(!res));
                 return notHasKey
                         .flatMap(result -> {
                             if (result) {
@@ -60,7 +60,7 @@ public class ClassRoomService {
                                         .filterWhen(newcircleId -> buildRoom(newcircleId, teacherId));
                             } else {
                                 //如果键值不过期存在，放回当前键值
-                                return Mono.just(cid);
+                                return Mono.just(circleId);
                             }
                         });
                 }

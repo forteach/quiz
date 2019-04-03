@@ -33,15 +33,19 @@ public class InteractAnswerRecordResp {
     @ApiModelProperty(name = "piGaiResult", value = "批改的答题结果", dataType = "boolean", notes = "true / false")
     private Boolean piGaiResult;
 
+    @ApiModelProperty(name = "updateTime", value = "回答时间", dataType = "string")
+    private String updateTime;
+
     public InteractAnswerRecordResp() {
     }
 
-    public InteractAnswerRecordResp(String studentId, String name, String portrait, String answer, boolean piGaiResult) {
+    public InteractAnswerRecordResp(String studentId, String name, String portrait, String answer, boolean piGaiResult, String updateTime) {
         this.studentId = studentId;
         this.name = name;
         this.portrait = portrait;
         this.answer = answer;
         this.piGaiResult = piGaiResult;
+        this.updateTime = updateTime;
     }
 
     public InteractAnswerRecordResp(String studentId, String name, String portrait) {

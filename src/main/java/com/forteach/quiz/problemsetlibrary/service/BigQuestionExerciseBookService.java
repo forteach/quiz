@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.EXE_BOOKTYPE_PREVIEW;
@@ -88,6 +89,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
     public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
+                .filter(Objects::nonNull)
                 .map(ExerciseBook::getQuestionChildren);
     }
 

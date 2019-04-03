@@ -181,6 +181,7 @@ public class InteractRecordExecuteService {
                     interactAnswerRecordResp.setStudentId(s.getId());
                     interactAnswerRecordResp.setName(s.getName());
                     interactAnswerRecordResp.setPortrait(s.getPortrait());
+                    interactAnswerRecordResp.setUpdateTime(i.getTime());
                     if (i.getAnswer() != null){
                         interactAnswerRecordResp.setAnswer(i.getAnswer());
                     }

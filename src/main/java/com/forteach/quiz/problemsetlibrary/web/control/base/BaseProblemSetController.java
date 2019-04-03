@@ -123,7 +123,7 @@ public abstract class BaseProblemSetController<T extends ProblemSet, R extends Q
      */
     @ApiOperation(value = "查找挂接的课堂练习题", notes = "查找挂接的课堂练习题")
     @PostMapping("/findExerciseBook")
-    public Mono<WebResult> findExerciseBook(@Valid @ApiParam(name = "ExerciseBookReq", value = "查找挂接的课堂练习题", required = true) @RequestBody ExerciseBookReq bookReq) {
+    public Mono<WebResult> findExerciseBook(@ApiParam(name = "ExerciseBookReq", value = "查找挂接的课堂练习题", required = true) @RequestBody ExerciseBookReq bookReq) {
         return exerciseBookService.findExerciseBook(bookReq).map(WebResult::okResult);
     }
 

@@ -36,9 +36,9 @@ public class UpdateInteractRecordService {
         Query query = interactRecordExecuteService.buildLastInteractRecord(circleId, questionId, category, interactRecord);
         Update update = new Update();
         List<String> list = Arrays.asList(selectId.split(","));
-        update.set(interactRecord + ".$.selectId", list);
+        update.set(interactRecord.concat(".$.selectId"), list);
         if (!list.equals(tSelectId)) {
-            update.inc(interactRecord + ".$.number", 1);
+            update.inc(interactRecord.concat(".$.number"), 1);
         }
         return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }

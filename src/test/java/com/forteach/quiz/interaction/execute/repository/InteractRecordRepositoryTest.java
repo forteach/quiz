@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,8 @@ import java.util.logging.Level;
 public class InteractRecordRepositoryTest {
     @Autowired
     private InteractRecordRepository recordRepository;
+    @Autowired
+    private ReactiveMongoTemplate mongoTemplate;
 
     @Test
     public void findAllByCircleId(){
@@ -50,12 +53,20 @@ public class InteractRecordRepositoryTest {
 
     @Test
     public void findByCircleIdAndQuestionsId(){
-        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByIdAndQuestionsId("5c9352cade262d00019cf13e","5c73676306a38f000101b7b6");
+        Mono<QuestionsDto> interactRecordMono = recordRepository.findRecordByIdAndQuestionsId("5ca4157cf3de513719fa4d65","5c9dd110c3da7a0001d12cde");
         interactRecordMono.filter(Objects::nonNull)
                 .map(QuestionsDto::getQuestions)
                 .flatMapMany(Flux::fromIterable)
                 .log("--->> ")
                 .doOnNext(System.out::println)
+                .subscribe(System.out::println);
+    }
+    @Test
+    public void findByIdTest(){
+//        Query query = Query.query(Criteria.where("_id").is("5ca4157cf3de513719fa4d65"));
+//        mongoTemplate.findOne(query, InteractRecord.class)
+        mongoTemplate.findById("5ca47029f3de514fbc4788e3", InteractRecord.class)
+                .log(" <<<==============>>> ")
                 .subscribe(System.out::println);
     }
 }

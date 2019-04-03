@@ -22,6 +22,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
@@ -94,6 +95,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
     public Mono<List<R>> findExerciseBook(final ExerciseBookReq sortVo) {
 
         return findExerciseBook(sortVo.getChapterId(), sortVo.getCourseId())
+                .filter(Objects::nonNull)
                 .map(ExerciseBook::getQuestionChildren);
     }
 
