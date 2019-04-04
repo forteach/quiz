@@ -2,6 +2,8 @@ package com.forteach.quiz.questionlibrary.service.base;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
@@ -21,6 +23,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -218,7 +221,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
 
         sortVo.queryPaging(query);
 
-        return reactiveMongoTemplate.find(query, entityClass());
+        return reactiveMongoTemplate.find(query, entityClass()).switchIfEmpty(Flux.just());
     }
 
     /**
@@ -233,7 +236,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
 
         sortVo.queryPaging(query);
 
-        return reactiveMongoTemplate.find(query, entityClass());
+        return reactiveMongoTemplate.find(query, entityClass()).switchIfEmpty(Flux.just());
     }
 
     /**
@@ -248,16 +251,16 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
         Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
 
         if (isNotEmpty(sortVo.getLevelId())) {
-            criteria.and("levelId").in(sortVo.getLevelId());
+            criteria.and("levelId").is(sortVo.getLevelId());
         }
         if (isNotEmpty(sortVo.getChapterId())) {
-            criteria.and("chapterId").in(sortVo.getChapterId());
+            criteria.and("chapterId").is(sortVo.getChapterId());
         }
         if (isNotEmpty(sortVo.getKnowledgeId())) {
-            criteria.and("knowledgeId").in(sortVo.getKnowledgeId());
+            criteria.and("knowledgeId").is(sortVo.getKnowledgeId());
         }
         if (isNotEmpty(sortVo.getQuestionType())) {
-            criteria.and("examChildren.examType").in(sortVo.getQuestionType());
+            criteria.and("examChildren.examType").is(sortVo.getQuestionType());
         }
         if (sortVo.getKeyword() != null && sortVo.getKeyword().length > 0) {
             criteria.and("keyword").all(sortVo.getKeyword());
