@@ -3,19 +3,26 @@ package com.forteach.quiz.interaction.execute.service;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
+import com.forteach.quiz.interaction.execute.domain.record.InteractQuestionsRecord;
+import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
+import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_EXERCISEBOOKS;
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
 /**
  * 课堂发布练习册题目
@@ -25,15 +32,18 @@ import java.util.stream.Collectors;
 public class SendQuestBookService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
+    private final ReactiveMongoTemplate mongoTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
     private final InteractRecordExerciseBookService interactRecordExerciseBookService;
 
     public SendQuestBookService(ReactiveStringRedisTemplate stringRedisTemplate,
+                                ReactiveMongoTemplate mongoTemplate,
                                 ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                 InteractRecordExerciseBookService interactRecordExerciseBookService,
                                 BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
+        this.mongoTemplate=mongoTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
         this.interactRecordExerciseBookService = interactRecordExerciseBookService;
@@ -58,8 +68,11 @@ public class SendQuestBookService {
 
         //执行创建提问，并返回执行结果
         return addQuestBookNowMap.map(r->createQuestBookList)
-                //  TODO 创建mongo答题日志???
-                .flatMap(r->interactRecordExerciseBookService.interactiveBook(circleId, questIds, selected, category));
+                //  TODO 创建mongo答题日志 old
+//                .flatMap(r->interactRecordExerciseBookService.interactiveBook(circleId, questIds, selected, category));
+                //拆除题目ID，创建练习册题目,记录Mongo
+                .flatMap(r-> pushExerciseBook(selected,circleId,questIds))
+                .flatMap(r->Mono.just(r.wasAcknowledged()));
     }
 
     /**
@@ -107,6 +120,8 @@ public class SendQuestBookService {
         return Arrays.asList(questionIds.split(","))
                 //根据练习册题目ID，获得题目内容
                 .stream().map(bigQuestionRepository::findById)
+                //过滤掉空题目
+                .filter(Objects::nonNull)
                 //设置题目内容
                 .map(mobj->mobj.flatMap(obj-> stringRedisTemplate.opsForValue().set(BigQueKey.bookQuestionsNow(obj.getId()),JSON.toJSONString(obj),Duration.ofSeconds(60*60*2))))
                 .collect(Collectors.toList());
@@ -136,6 +151,26 @@ public class SendQuestBookService {
                 //设置题目列表的过期时间
                 .flatMap(ok->stringRedisTemplate.expire(BigQueKey.bookTypeQuestionsList(circleId), Duration.ofSeconds(60*60*2)));
         //更新当前题目和上一题的题目信息
+    }
+
+    /**
+     * 发布记录
+     * @param selectIds
+     * @param circleId
+     * @param questionIds
+     * @return
+     */
+    private Mono<UpdateResult> pushExerciseBook(final String selectIds,  final String circleId, final String questionIds) {
+
+        List<InteractQuestionsRecord> QuestList=Arrays.asList(questionIds.split(",")).stream()
+                .map(questionId->  new InteractQuestionsRecord(questionId, 1L, Arrays.asList(selectIds.split(","))))
+                .collect(Collectors.toList());
+        Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId));
+        Update update = new Update()
+        .pullAll(INTERACT_RECORD_EXERCISEBOOKS,QuestList.toArray());
+        //课堂练习册，学生编号id 进行,分割
+        //update.push(INTERACT_RECORD_EXERCISEBOOKS, records);
+        return mongoTemplate.updateMulti(query, update, InteractRecord.class);
     }
 
 }
