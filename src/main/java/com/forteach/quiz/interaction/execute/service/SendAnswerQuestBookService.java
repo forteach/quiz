@@ -5,10 +5,14 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
+import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
+import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
+import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
+import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -19,6 +23,7 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import static com.forteach.quiz.common.Dic.*;
@@ -59,34 +64,34 @@ public class SendAnswerQuestBookService {
 
         return Mono.just(answer)
                 //验证当前回答的题目和参与回答的人员
-                .transform(an->filterSelectVerify(circleId,examineeId,questId))
+               // .transform(an->filterSelectVerify(circleId,examineeId,questId))
                 //选人回答问题
-                .flatMap(typeName -> sendSelect(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT))
-                //设置学生回答题目答案
-                .filterWhen(right -> reactiveHashOperations.put(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,answer)
-                                     .flatMap(r-> {
-                                         //设置已经回答的学生列表
-                                                //移除该学生本题回答历史记录
-                                                 return stringRedisTemplate.opsForList().remove(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.TiWen.name()),0, examineeId)
-                                                         //将答题信息添加至列表尾部
-                                                         .flatMap(r1-> stringRedisTemplate.opsForList().rightPush(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.TiWen.name()), examineeId)
-                                                                 .flatMap(r2-> Mono.just(true))
-                                                                         .filterWhen(r2->stringRedisTemplate.expire(BigQueKey.answerTypeQuestStuList(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
-                                                         )
-                                                         //记录该题目的提交记录
-                                             .filterWhen(r1->stringRedisTemplate.opsForSet().add(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.TiWen.name()),examineeId)
-                                                     .flatMap(r11->stringRedisTemplate.expire(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2))));
-    }
-                                             )
-                                    .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
-                )
-                //设置学生回答题目的批改结果
-                .filterWhen(right ->  reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,String.valueOf(right))
-                                    .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
-                    )
-                //记录学生回答MONGO记录
-               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right))
-                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
+                .flatMap(typeName -> sendSelect(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT));
+//                //设置学生回答题目答案
+//                .filterWhen(right -> reactiveHashOperations.put(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,answer)
+//                                     .flatMap(r-> {
+//                                         //设置已经回答的学生列表
+//                                                //移除该学生本题回答历史记录
+//                                                 return stringRedisTemplate.opsForList().remove(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.TiWen.name()),0, examineeId)
+//                                                         //将答题信息添加至列表尾部
+//                                                         .flatMap(r1-> stringRedisTemplate.opsForList().rightPush(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.TiWen.name()), examineeId)
+//                                                                 .flatMap(r2-> Mono.just(true))
+//                                                                         .filterWhen(r2->stringRedisTemplate.expire(BigQueKey.answerTypeQuestStuList(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
+//                                                         )
+//                                                         //记录该题目的提交记录
+//                                             .filterWhen(r1->stringRedisTemplate.opsForSet().add(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.TiWen.name()),examineeId)
+//                                                     .flatMap(r11->stringRedisTemplate.expire(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2))));
+//    }
+//                                             )
+//                                    .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
+//                )
+//                //设置学生回答题目的批改结果
+//                .filterWhen(right ->  reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,String.valueOf(right))
+//                                    .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
+//                    )
+//                //记录学生回答MONGO记录
+//               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right))
+//                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
     }
 
     /**
@@ -96,15 +101,13 @@ public class SendAnswerQuestBookService {
      * @param questId
      * @return
      */
-    private Mono<String> filterSelectVerify(final String circleId,final String examineeId, final String questId ) {
-        //获得题目互动类型方式
-        return  reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "interactive")
-                //获得题目当前id与所回答的题目比对
-                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "questionId")
-                        .flatMap(qid-> MyAssert.isFalse(questId.equals(qid),DefineCode.ERR0002,"题目信息错误")))
+    private Mono<Boolean> filterSelectVerify(final String circleId,final String examineeId, final String questId ) {
+        //判断联系册是否包含题目Id
+        return  stringRedisTemplate.opsForSet().isMember(BigQueKey.bookQuestionSet(circleId),questId)
+                        .flatMap(r-> MyAssert.isFalse(r,DefineCode.ERR0002,"练习册题目信息不存在"))
                 //回答学生是否在所选范围内
-                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "selected")
-                        .flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该名学生回答")));
+                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsBookNow(circleId), "selected")
+                        .flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该学生回答")));
 
     }
 
@@ -127,31 +130,95 @@ public class SendAnswerQuestBookService {
 
         //创建学生回答顺序列表
 
-        //TODO 发布题目答案对比 需要改成Redis，现在未改动
-        return correctService.correcting(questId, answer)
-                .flatMap(f -> {
-                    //查找学生需要回答的题目
-                    Query query = Query.query(
-                            Criteria.where("circleId").is(circleId)
-                                    .and("questionId").is(questId)
-                                    .and("examineeId").is(examineeId));
-                    //更新题目答案
-                    Update update = Update.update("answer", answer)
-                    .set("interactive", type)
-                    .set("right", String.valueOf(f))
-                    .set("uDate", DataUtil.format(new Date()));
-
-                    return reactiveMongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
-                        if (result.wasAcknowledged()) {
-                            return Mono.just(f);
-                        } else {
-                            return Mono.error(new AskException("Mongo操作失败"));
-                        }
-                    });
-                });
+        //TODO 发布题目答案对比 需要改成Redis
+        return correctService.correcting(BigQueKey.bookQuestionsNow(questId),questId, answer)
+                .flatMap(r->sendValue(circleId,examineeId,questId,answer));
+//                .flatMap(f -> {
+//                    //查找学生需要回答的题目
+//                    Query query = Query.query(
+//                            Criteria.where("circleId").is(circleId)
+//                                    .and("questionId").is(questId)
+//                                    .and("examineeId").is(examineeId));
+//                    //更新题目答案
+//                    Update update = Update.update("answer", answer)
+//                    .set("interactive", type)
+//                    .set("right", String.valueOf(f))
+//                    .set("uDate", DataUtil.format(new Date()));
+//
+//                    return reactiveMongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
+//                        if (result.wasAcknowledged()) {
+//                            return Mono.just(f);
+//                        } else {
+//                            return Mono.error(new AskException("Mongo操作失败"));
+//                        }
+//                    });
+//                });
     }
 
 
+    /**
+     * 练习册回答信息信息写入
+     *
+     * @return
+     */
+    private Mono<Boolean> sendValue(final String circleId,final String examineeId,final String questId,final String answer) {
 
+       return findExists(circleId,examineeId,questId).flatMap(r->saveOrupdate(r.booleanValue(),circleId,examineeId,questId,answer)
+               .flatMap(r1->{ System.out.println("aaaaaaaa:"+r1.booleanValue());return Mono.just(r1);}));
+
+//        Update update = new Update();
+//        sheetVo.getAnsw().setDate(DataUtil.format(new Date()));
+//        update.addToSet("answList", sheetVo.getAnsw());
+//
+//        return reactiveMongoTemplate.updateFirst(query, update, ActivityAskAnswer.class).map(UpdateResult::wasAcknowledged);
+    }
+
+    public Mono<Boolean> findExists(final String circleId,final String examineeId,final String questId){
+        Query query = Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("examineeId").is(examineeId)
+                        .and("answList.questionId").is(questId));
+        return reactiveMongoTemplate.exists(query,ActivityAskAnswer.class);
+    }
+
+    //添加题目回答信息
+    private Mono<Boolean> saveOrupdate(final boolean r,final String circleId,final String examineeId,final String questId,final String answer){
+        if(!r){
+            return add(circleId,examineeId,questId,answer);
+        }else{
+            System.out.println("***** circleId");
+            final Query query = Query.query(
+                    Criteria.where("circleId").is(circleId)
+                            .and("examineeId").is(examineeId)
+                            .and("answList.questionId").is(questId));
+            Update update = new Update()
+                    .pull("answList", new InteractiveSheetAnsw(questId));
+            return reactiveMongoTemplate.updateFirst(query,update,ActivityAskAnswer.class)
+                    //删除记录成功后
+                    .filter(r1->r1.wasAcknowledged())
+                    //添加新的信息
+                    .flatMap(r1->add(circleId,examineeId,questId,answer));
+        }
+    }
+
+    private Mono<Boolean> add(final String circleId,final String examineeId,final String questId,final String answer){
+        System.out.println("##### null");
+        Query query = Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("examineeId").is(examineeId));
+        Update update = new Update()
+                .addToSet("answList", new InteractiveSheetAnsw(questId,answer,"true"));
+        return reactiveMongoTemplate.upsert(query,update,ActivityAskAnswer.class)
+                .flatMap(r1->Mono.just(r1.wasAcknowledged()));
+    }
+
+//    public void upsetEventReads(String tenantId,Integer userId,Integer types) {
+//        Update update = new Update();
+//        update.set("eventReadTimeList.$.type", types);
+//        update.set("eventReadTimeList.$.date", new Date());
+//        Query query = Query.query(new Criteria().andOperator(Criteria.where("tenantId").is(tenantId),
+//                Criteria.where("userId").is(userId),
+//                Criteria.where("eventReadTimeList.type").is(types)));
+//        mongoTemplate.updateFirst(query, update, EventRead.class,collectionName);
 
 }

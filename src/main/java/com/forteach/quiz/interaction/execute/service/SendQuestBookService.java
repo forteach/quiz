@@ -139,6 +139,17 @@ public class SendQuestBookService {
                 .map(questionId->createQuestBook(circleId,questionId))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 创建练习测题目
+     * @param circleId
+     * @param questionId
+     * @return
+     */
+    public Mono<Boolean> createQuestBookSet(String circleId,String questionId){
+        return stringRedisTemplate.opsForSet().add(BigQueKey.bookQuestionSet(circleId),questionId)
+                .flatMap(ok->stringRedisTemplate.expire(BigQueKey.bookQuestionSet(circleId), Duration.ofSeconds(60*60*2)));
+    }
     /**
      * 添加当前发布题目辅助键信息
      * @param circleId
@@ -148,8 +159,10 @@ public class SendQuestBookService {
     private Mono<Boolean> createQuestBook(String circleId,String questId){
         //创建交互题目的互动方式的先后顺序发布列表
         return stringRedisTemplate.opsForList().leftPush(BigQueKey.bookTypeQuestionsList(circleId), questId)
+                //添加练习册题目
+                .flatMap(ok->createQuestBookSet(circleId,questId))
                 //设置题目列表的过期时间
-                .flatMap(ok->stringRedisTemplate.expire(BigQueKey.bookTypeQuestionsList(circleId), Duration.ofSeconds(60*60*2)));
+                .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.bookTypeQuestionsList(circleId), Duration.ofSeconds(60*60*2)));
         //更新当前题目和上一题的题目信息
     }
 

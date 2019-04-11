@@ -118,10 +118,10 @@ public class SendAnswerService {
         return  reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "interactive")
                 //获得题目当前id与所回答的题目比对
                 .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "questionId")
-                        .flatMap(qid-> MyAssert.isFalse(questId.equals(qid),DefineCode.ERR0002,"题目信息错误")))
+                        .flatMap(qid-> MyAssert.isFalse(questId.equals(qid),DefineCode.ERR0002,"练习册题目信息不存在")))
                 //回答学生是否在所选范围内
                 .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsIdNow(circleId), "selected")
-                        .flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该名学生回答")));
+                        .flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该学生回答")));
 
     }
 
@@ -145,7 +145,7 @@ public class SendAnswerService {
         //创建学生回答顺序列表
 
         //TODO 发布题目答案对比 需要改成Redis，现在未改动
-        return correctService.correcting(questId, answer)
+        return correctService.correcting(BigQueKey.questionsNow(questId),questId, answer)
                 .flatMap(f -> {
                     //查找学生需要回答的题目
                     Query query = Query.query(
