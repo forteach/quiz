@@ -165,7 +165,7 @@ public class BigQueKey {
      * 课堂当前道题目回答前缀
      * sutId  学生ID
      * questionId 问题ID
-     * typeName  题目互动方式  提问、联练习。。。。
+     * typeName  题目互动方式  提问、练习册。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案  Hashmap
      */
     public static String answerTypeQuestionsId(final String circleId,final String questionId,final String typeName) {
