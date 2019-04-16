@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -136,32 +137,32 @@ public class CorrectService {
     //TODO  题目回答更正回答记录
     public Mono<Boolean> correcting(final String key,final String questionId, final String answer) {
         //找到题目信息 TODO OLD
-        return Mono.just(true);
-//        return getBigQuestion(key,questionId)
-//                .flatMap(bigQuestion -> {
-//                    final JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
-//                    switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
-//                        case QUESTION_CHOICE_OPTIONS_SINGLE:
-//                            //选择题
-//                            ChoiceQst choiceQst1 = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
-//                            return Mono.just(choice(choiceQst1, answer));
-//                        case QUESTION_CHOICE_MULTIPLE_SINGLE:
-//                            ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
-//                           // String result=String.valueOf(choice(choiceQst, answer));
-//                            return Mono.just(choice(choiceQst, answer));
-//                            //判断
-//                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
-//                            TrueOrFalse trueOrFalse = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), TrueOrFalse.class);
-//                           //return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
-//                            return  Mono.just(trueOrFalse(trueOrFalse, answer));
-//                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
-//                            // TODO 简答主观题 人工手动批改
-//                            return Mono.just(true);
-//                        default:
-//                            log.error("非法参数 错误的题目类型 : {}", String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType")));
-//                            throw new ExamQuestionsException("非法参数 错误的题目类型");
-//                    }
-//                });
+//        return Mono.just(true);
+        return getBigQuestion(key,questionId)
+                .flatMap(bigQuestion -> {
+                    final JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
+                    switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
+                        case QUESTION_CHOICE_OPTIONS_SINGLE:
+                            //选择题
+                            ChoiceQst choiceQst1 = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
+                            return Mono.just(choice(choiceQst1, answer));
+                        case QUESTION_CHOICE_MULTIPLE_SINGLE:
+                            ChoiceQst choiceQst = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), ChoiceQst.class);
+                           // String result=String.valueOf(choice(choiceQst, answer));
+                            return Mono.just(choice(choiceQst, answer));
+                            //判断
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_TRUEORFALSE:
+                            TrueOrFalse trueOrFalse = JSON.parseObject(JSONPath.eval(json, "$.examChildren[0]").toString(), TrueOrFalse.class);
+                           //return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
+                            return  Mono.just(trueOrFalse(trueOrFalse, answer));
+                        case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
+                            // TODO 简答主观题 人工手动批改，应增加认为的评判对错结果
+                            return Mono.just(true);
+                        default:
+                            log.error("非法参数 错误的题目类型 : {}", String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType")));
+                            throw new ExamQuestionsException("非法参数 错误的题目类型");
+                    }
+                });
     }
 
     /**
@@ -172,7 +173,7 @@ public class CorrectService {
     public Mono<BigQuestion> getBigQuestion(String key,String questionId){
         //String key= BigQueKey.questionsNow(questionId);
         return stringRedisTemplate.hasKey(key)
-                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(key).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId));
+                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(key).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId).filterWhen(obj->stringRedisTemplate.opsForValue().set( BigQueKey.questionsNow(questionId),JSON.toJSONString(obj), Duration.ofSeconds(60*60*2))));
     }
 
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {

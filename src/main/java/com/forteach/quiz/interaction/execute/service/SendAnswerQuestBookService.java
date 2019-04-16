@@ -4,7 +4,6 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
-import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
@@ -29,18 +28,16 @@ public class SendAnswerQuestBookService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final CorrectService correctService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final InsertInteractRecordService insertInteractRecordService;
+
 
     public SendAnswerQuestBookService(ReactiveStringRedisTemplate stringRedisTemplate,
                                       ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                       CorrectService correctService,
-                                      InsertInteractRecordService insertInteractRecordService,
                                       ReactiveMongoTemplate reactiveMongoTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.insertInteractRecordService = insertInteractRecordService;
     }
 
 
@@ -57,7 +54,7 @@ public class SendAnswerQuestBookService {
 
         return Mono.just(answer)
                 //验证当前回答的题目和参与回答的人员
-               // .transform(an->filterSelectVerify(circleId,examineeId,questId))
+                .transform(an->filterSelectVerify(circleId,examineeId,questId))
                 //选人回答问题
                 .flatMap(typeName -> sendSelect(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT))
                 //设置学生练习册回答题目答案
@@ -66,7 +63,7 @@ public class SendAnswerQuestBookService {
                                          //设置已经回答的学生列表
                                                 //移除该学生本题回答历史记录
                                                  return stringRedisTemplate.opsForList().remove(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.LianXi.name()),0, examineeId)
-                                                         //将答题信息添加至列表尾部
+                                                         //将答题学生ID添加至列表尾部
                                                          .flatMap(r1-> stringRedisTemplate.opsForList().rightPush(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.LianXi.name()), examineeId)
                                                                  .flatMap(r2-> Mono.just(true))
                                                                          .filterWhen(r2->stringRedisTemplate.expire(BigQueKey.answerTypeQuestStuList(circleId,questId,QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2)))
@@ -79,8 +76,11 @@ public class SendAnswerQuestBookService {
                                     .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2)))
                 )
                 //设置学生回答题目的批改结果
-                .filterWhen(right ->  reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,String.valueOf(right))
-                                    .flatMap(ok->stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
+                .filterWhen(right -> {
+                    System.out.println(String.valueOf(right));
+                           return  reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId, questId, QuestionType.TiWen.name()), examineeId, String.valueOf(right))
+                                    .flatMap(ok -> stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId, questId, QuestionType.TiWen.name()), Duration.ofSeconds(60 * 60 * 2)));
+                        }
                     );
                 //记录学生回答MONGO记录
 //               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right))
@@ -96,7 +96,7 @@ public class SendAnswerQuestBookService {
      */
     private Mono<Boolean> filterSelectVerify(final String circleId,final String examineeId, final String questId ) {
         //判断联系册是否包含题目Id
-        return  stringRedisTemplate.opsForSet().isMember(BigQueKey.bookQuestionSet(circleId),questId)
+        return reactiveHashOperations.hasKey(BigQueKey.bookQuestionMap(circleId),questId)
                         .flatMap(r-> MyAssert.isFalse(r,DefineCode.ERR0002,"练习册题目信息不存在"))
                 //回答学生是否在所选范围内
                 .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsBookNow(circleId), "selected")
@@ -123,9 +123,9 @@ public class SendAnswerQuestBookService {
 
         //创建学生回答顺序列表
 
-        //TODO 发布题目答案对比 需要改成Redis
-        return correctService.correcting(BigQueKey.bookQuestionsNow(questId),questId, answer)
-                .flatMap(r->sendValue(circleId,examineeId,questId,answer));
+        //TODO 发布题目答案对比
+        return correctService.correcting(BigQueKey.questionsNow(questId),questId, answer)
+                .filterWhen(r->sendValue(circleId,examineeId,questId,answer,r.toString()));
     }
 
 
@@ -134,11 +134,11 @@ public class SendAnswerQuestBookService {
      *
      * @return
      */
-    private Mono<Boolean> sendValue(final String circleId,final String examineeId,final String questId,final String answer) {
+    private Mono<Boolean> sendValue(final String circleId,final String examineeId,final String questId,final String answer,final String answerRight) {
 
        return findExists(circleId,examineeId,questId)
-               .flatMap(r->saveOrupdate(r.booleanValue(),circleId,examineeId,questId,answer)
-               .flatMap(r1->{ System.out.println("aaaaaaaa:"+r1.booleanValue());return Mono.just(r1);}));
+               .flatMap(r->saveOrupdate(r.booleanValue(),circleId,examineeId,questId,answer,answerRight))
+               .flatMap(r-> Mono.just(r));
     }
 
     public Mono<Boolean> findExists(final String circleId,final String examineeId,final String questId){
@@ -150,9 +150,9 @@ public class SendAnswerQuestBookService {
     }
 
     //添加题目回答信息
-    private Mono<Boolean> saveOrupdate(final boolean r,final String circleId,final String examineeId,final String questId,final String answer){
+    private Mono<Boolean> saveOrupdate(final boolean r,final String circleId,final String examineeId,final String questId,final String answer,final String answerRight){
         if(!r){
-            return add(circleId,examineeId,questId,answer);
+            return add(circleId,examineeId,questId,answer,answerRight);
         }else{
             System.out.println("***** circleId");
             final Query query = Query.query(
@@ -165,17 +165,17 @@ public class SendAnswerQuestBookService {
                     //删除记录成功后
                     .filter(r1->r1.wasAcknowledged())
                     //添加新的信息
-                    .flatMap(r1->add(circleId,examineeId,questId,answer));
+                    .flatMap(r1->add(circleId,examineeId,questId,answer,answerRight));
         }
     }
 
-    private Mono<Boolean> add(final String circleId,final String examineeId,final String questId,final String answer){
-        System.out.println("##### null");
+    private Mono<Boolean> add(final String circleId,final String examineeId,final String questId,final String answer,final String answerRight){
+
         Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
                         .and("examineeId").is(examineeId));
         Update update = new Update()
-                .addToSet("answList", new InteractiveSheetAnsw(questId,answer,"true"));
+                .addToSet("answList", new InteractiveSheetAnsw(questId,answer,answerRight));
         return reactiveMongoTemplate.upsert(query,update,ActivityAskAnswer.class)
                 .flatMap(r1->Mono.just(r1.wasAcknowledged()));
     }

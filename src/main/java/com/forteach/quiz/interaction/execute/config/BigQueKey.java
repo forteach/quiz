@@ -33,6 +33,8 @@ public class BigQueKey {
      */
     public static final String CLASSROOM_BOOK_NOW= "nowBook";
 
+    public static final String CLASSROOM_BOOK_INFO= "nowBookInfo";
+
     /**
      * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
@@ -46,7 +48,7 @@ public class BigQueKey {
     /**
      * 互动练习册的题目
      */
-    public static final String CLASSROOM_BOOK_QUESTIONS_SET = "bookSet";
+    public static final String CLASSROOM_BOOK_QUESTIONS_MAP = "bookMap";
 
     /**
      * 互动练习册回答题目
@@ -62,14 +64,14 @@ public class BigQueKey {
         return CLASSROOM_ASK_NOW.concat(questionId);
     }
 
-    /**
-     * 缓存当前已发布的练习册题目题干内容，不分课堂。
-     * @param questionId
-     * @return
-     */
-    public static String bookQuestionsNow(final String questionId) {
-        return CLASSROOM_BOOK_NOW.concat(questionId);
-    }
+//    /**
+//     * 缓存当前已发布的练习册题目题干内容，不分课堂。
+//     * @param circleId
+//     * @return
+//     */
+//    public static String bookQuestionsInfoNow(final String circleId) {
+//        return CLASSROOM_BOOK_INFO.concat(circleId);
+//    }
 
     /**
      * 课堂提问当前前缀
@@ -122,8 +124,8 @@ public class BigQueKey {
      * @param circleId
      * @return
      */
-    public static String bookQuestionSet(final String circleId){
-        return circleId.concat(CLASSROOM_BOOK_QUESTIONS_SET);
+    public static String bookQuestionMap(final String circleId){
+        return circleId.concat(CLASSROOM_BOOK_QUESTIONS_MAP);
     }
     /**
      * 课堂练习册回答题目=回答者和答案
