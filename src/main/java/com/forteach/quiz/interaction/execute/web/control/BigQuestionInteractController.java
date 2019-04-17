@@ -258,8 +258,8 @@ public class BigQuestionInteractController {
     @PostMapping("/send/book")
     @ApiImplicitParam(value = "问题id,多个id逗号分隔", name = "questionIds", required = true, dataType = "string", paramType = "from")
     public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
-
-        return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected()) .map(WebResult::okResult);
+        giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
+        return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected().concat(",")) .map(WebResult::okResult);
     }
 
 
@@ -279,8 +279,8 @@ public class BigQuestionInteractController {
     })
     @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
     public Mono<WebResult> sendBookAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
-        //MyAssert.blank(sheetVo.getCut(), DefineCode.ERR0010, "课堂圈子id不为空");
-       // sheetVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
+
+        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         return sendAnswerQuestBookService.sendAnswer(interactAnswerVo.getCircleId(),
                 interactAnswerVo.getExamineeId(),
                 interactAnswerVo.getQuestionId(),

@@ -68,7 +68,12 @@ public class BigBookTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo("stu01","c01","5c73676306a38f000101b7b6","C","cut");
+        InteractAnswerVo vo=new InteractAnswerVo(
+                "stu01",
+                "c01",
+                "5c73676306a38f000101b7b6",
+                "C",
+                "cut");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
