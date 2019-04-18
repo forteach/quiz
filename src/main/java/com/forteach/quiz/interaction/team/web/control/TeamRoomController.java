@@ -50,7 +50,7 @@ public class TeamRoomController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "number", value = "要分几个小组", required = true, dataType = "int", paramType = "from"),
-            @ApiImplicitParam(name = "classId", value = "班级id", dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> groupRandom(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody GroupRandomReq random, ServerHttpRequest request) {
@@ -63,16 +63,21 @@ public class TeamRoomController {
 
     @ApiOperation(value = "获取当前课堂team", notes = "传入课堂id 获取当前课堂小组")
     @PostMapping(value = "/nowTeam")
-    @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "from")
-    public Mono<WebResult> nowTeam(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final CircleIdReq circleId) {
-        MyAssert.isNull(circleId.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
-        return teamRandomService.nowTeam(circleId.getCircleId()).map(WebResult::okResult);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", dataType = "string", required = true, paramType = "from")
+    })
+    public Mono<WebResult> nowTeam(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final CircleIdReq circleIdReq) {
+        MyAssert.isNull(circleIdReq.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
+        return teamRandomService.nowTeam(circleIdReq.getCircleId(), circleIdReq.getClassId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "新增或移除小组成员", notes = "1 : 增加  2 : 减少")
     @PostMapping(value = "/teamChange")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "students", value = "被 新增或移除 小组的 学生id, 逗号分割", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "moreOrLess", value = "1 : 增加  2 : 减少", required = true, dataType = "string", paramType = "from")
@@ -85,8 +90,12 @@ public class TeamRoomController {
         return teamRandomService.teamChange(changeVo).map(WebResult::okResult);
     }
 
+
+
+    /*----------------------------------*/
+
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleId", value = "课堂Id", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(name = "circleId", value = "课堂Id/课程id", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(name = "teamId", value = "小组id", dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "teamName", value = "小组名字", dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "from"),

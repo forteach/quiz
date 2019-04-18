@@ -126,8 +126,12 @@ public class ClassRoomService {
      */
     public Mono<Long> joinInteractiveRoom(final String circleId,final String examineeId) {
         //创建redis学生加入课堂的键值对
-        return Mono.just( ClassRoomKey.getInteractiveIdQra(circleId)).flatMap(key->stringRedisTemplate.opsForSet().add(key, examineeId)
-                .filterWhen(obj -> interactRecordExecuteService.join(circleId, examineeId)));
+        return Mono.just(ClassRoomKey.getInteractiveIdQra(circleId))
+                .flatMap(key->stringRedisTemplate.opsForSet().add(key, examineeId)
+                .filterWhen(obj ->
+                    stringRedisTemplate.expire(ClassRoomKey.getInteractiveIdQra(circleId), Duration.ofHours(5))
+                            .filterWhen(l -> interactRecordExecuteService.join(circleId, examineeId))
+                ));
     }
 
     /**

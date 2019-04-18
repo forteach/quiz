@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import java.io.Serializable;
 
+import static com.forteach.quiz.common.Dic.ASK_GROUP;
+
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
@@ -22,6 +24,8 @@ public class PickTeamReq implements Serializable {
     @ApiModelProperty(value = "课堂圈子id", name = "circleId", required = true, dataType = "string")
     private String circleId;
 
+    @ApiModelProperty(value = "班级id", name = "classId", dataType = "string", notes = "如果是课程必传")
+    private String classId;
     /**
      * 小组id
      */
@@ -51,10 +55,10 @@ public class PickTeamReq implements Serializable {
     @ApiModelProperty(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", dataType = "string", required = true)
     private String expType;
 
-    @JsonIgnore
+    @ApiModelProperty(hidden = true)
     private String teacherId;
 
     public String getTeamRedisKey(final String teamId){
-        return teamId.concat(expType).concat(teacherId);
+        return teamId.concat(ASK_GROUP).concat(teacherId);
     }
 }

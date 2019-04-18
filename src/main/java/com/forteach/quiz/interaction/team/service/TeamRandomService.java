@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import static com.forteach.quiz.common.Dic.ASK_GROUP_CHANGE_LESS;
-import static com.forteach.quiz.common.Dic.ASK_GROUP_CHANGE_MORE;
+
+import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.interaction.team.web.req.GroupRandomReq.groupKey;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
@@ -107,7 +107,7 @@ public class TeamRandomService {
                         return grouping;
 
                         //分组完成时保存进redis 随机分组会覆盖小组信息
-                    }).filterWhen(grouping -> saveGroup(grouping.getTeamList(), randomVo.getGroupKey()));
+                    }).filterWhen(grouping -> saveGroup(grouping.getTeamList(), randomVo.getGroupKey(), randomVo.getExpType()));
                 });
     }
 
@@ -116,8 +116,8 @@ public class TeamRandomService {
      *
      * @return
      */
-    public Mono<List<TeamResp>> nowTeam(final String circleId) {
-        return redisTemplate.opsForValue().get(groupKey(circleId)).switchIfEmpty(Mono.just(new ArrayList()))
+    public Mono<List<TeamResp>> nowTeam(final String circleId, final String classId) {
+        return redisTemplate.opsForValue().get(groupKey(circleId, classId)).switchIfEmpty(Mono.just(new ArrayList()))
                 .map(obj -> JSON.parseObject(JSON.toJSONString(obj), new TypeReference<List<TeamResp>>() {
                 }));
     }
@@ -129,8 +129,17 @@ public class TeamRandomService {
      *
      * @return
      */
-    private Mono<Boolean> saveGroup(final List<TeamResp> teamList, final String groupKey) {
-        return redisTemplate.opsForValue().set(groupKey, teamList, Duration.ofDays(1));
+    private Mono<Boolean> saveGroup(final List<TeamResp> teamList, final String groupKey, final String expType) {
+        return Mono.just(expType)
+                .flatMap(e -> {
+                    if (TEAM_TEMPORARILY.equals(expType)){
+                        return redisTemplate.opsForValue().set(groupKey, teamList, Duration.ofDays(1));
+                    }else if (TEAM_FOREVER.equals(expType)){
+                        return redisTemplate.opsForValue().set(groupKey, teamList, Duration.ofDays(365));
+                    }else {
+                        return Mono.error(new Exception("分组的有效期不正确"));
+                    }
+                });
     }
 
     /**
@@ -143,11 +152,11 @@ public class TeamRandomService {
 
         switch (changeVo.getMoreOrLess()) {
             case ASK_GROUP_CHANGE_MORE:
-                return teamMore(changeVo.getCircleId(), changeVo.getTeamId(), changeVo.getStudents())
-                        .filterWhen(grouping -> saveGroup(grouping, changeVo.getGroupKey()));
+                return teamMore(changeVo.getCircleId(), changeVo.getClassId(), changeVo.getTeamId(), changeVo.getStudents())
+                        .filterWhen(grouping -> saveGroup(grouping, changeVo.getGroupKey(), changeVo.getClassId()));
             case ASK_GROUP_CHANGE_LESS:
-                return teamLess(changeVo.getCircleId(), changeVo.getTeamId(), changeVo.getStudents())
-                        .filterWhen(grouping -> saveGroup(grouping, changeVo.getGroupKey()));
+                return teamLess(changeVo.getCircleId(), changeVo.getClassId(), changeVo.getTeamId(), changeVo.getStudents())
+                        .filterWhen(grouping -> saveGroup(grouping, changeVo.getGroupKey(), changeVo.getClassId()));
             default:
                 throw new CustomException("非法参数 错误的小组更改类型");
         }
@@ -162,9 +171,9 @@ public class TeamRandomService {
      * @param students
      * @return
      */
-    private Mono<List<TeamResp>> teamMore(final String circleId, final String teamId, final String students) {
+    private Mono<List<TeamResp>> teamMore(final String circleId, final String classId, final String teamId, final String students) {
         //获得小组list
-        Mono<List<TeamResp>> nowTeam = nowTeam(circleId);
+        Mono<List<TeamResp>> nowTeam = nowTeam(circleId, classId);
         //查询出学生信息
         Mono<List<Students>> ids = teamService.changeStudents(students);
         //组合Mono数据
@@ -181,9 +190,9 @@ public class TeamRandomService {
         });
     }
 
-    private Mono<List<TeamResp>> teamLess(final String circleId, final String teamId, final String students) {
+    private Mono<List<TeamResp>> teamLess(final String circleId, final String classId, final String teamId, final String students) {
         //获得小组list
-        Mono<List<TeamResp>> nowTeam = nowTeam(circleId);
+        Mono<List<TeamResp>> nowTeam = nowTeam(circleId, classId);
         //获得被移除的学生
         Mono<List<String>> ids = teamService.changeStringStudent(students);
         //组合Mono数据

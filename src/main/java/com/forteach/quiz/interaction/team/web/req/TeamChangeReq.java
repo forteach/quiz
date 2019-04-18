@@ -22,6 +22,9 @@ public class TeamChangeReq implements Serializable {
     @ApiModelProperty(value = "课堂圈子id", name = "circleId", dataType = "string", required = true)
     private String circleId;
 
+    @ApiModelProperty(value = "班级id", name = "classId", dataType = "string", notes = "如果是课程必传")
+    private String classId;
+
     /**
      * 小组id
      */
@@ -43,6 +46,6 @@ public class TeamChangeReq implements Serializable {
     private String moreOrLess;
 
     public String getGroupKey() {
-        return ASK_GROUP.concat(circleId);
+        return circleId.concat(ASK_GROUP).concat(classId);
     }
 }
