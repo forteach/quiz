@@ -201,4 +201,23 @@ public class Dic {
      */
     public final static String INTERACT_RECORD_EXERCISEBOOKS = "exerciseBooks";
 
+    /*--- 课堂　小组选人类型　----*/
+    /**
+     * 添加
+     */
+    public final static String TEAM_STRUDENT_MORE = "1";
+    /**
+     * 移除
+     */
+    public final static String TEAM_STUDENT_LESS = "2";
+
+    /*------------- 小组类型(临时团队，课程团队)--------------*/
+    /**
+     * 临时小组
+     */
+    public final static String TEAM_TEMPORARILY = "temporarily";
+    /**
+     * 永久小组
+     */
+    public final static String TEAM_FOREVER = "forever";
 }

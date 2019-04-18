@@ -1,15 +1,15 @@
 package com.forteach.quiz.interaction.team.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.forteach.quiz.exceptions.CustomException;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.service.ClassRoomService;
-import com.forteach.quiz.interaction.team.web.vo.GroupRandomVo;
-import com.forteach.quiz.interaction.team.web.vo.GroupTeamVo;
-import com.forteach.quiz.interaction.team.web.vo.Team;
-import com.forteach.quiz.interaction.team.web.vo.TeamChangeVo;
+import com.forteach.quiz.interaction.team.web.req.PickTeamReq;
+import com.forteach.quiz.interaction.team.web.resp.TeamResp;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -17,20 +17,10 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.forteach.quiz.common.Dic.ASK_GROUP_CHANGE_LESS;
-import static com.forteach.quiz.common.Dic.ASK_GROUP_CHANGE_MORE;
-import static com.forteach.quiz.interaction.team.web.vo.GroupRandomVo.groupKey;
-import static com.forteach.quiz.util.StringUtil.getRandomUUID;
-import static com.forteach.quiz.util.StringUtil.isNotEmpty;
+import java.util.*;
+import static com.forteach.quiz.common.Dic.TEAM_FOREVER;
+import static com.forteach.quiz.common.Dic.TEAM_TEMPORARILY;
 
 /**
  * @Description:
@@ -39,6 +29,7 @@ import static com.forteach.quiz.util.StringUtil.isNotEmpty;
  * @date: 2019/1/22  15:48
  */
 @Service
+@Slf4j
 public class TeamService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
@@ -62,181 +53,163 @@ public class TeamService {
         this.studentsService = studentsService;
     }
 
-    /**
-     * 随机分组
-     *
-     * @return
-     */
-    public Mono<GroupTeamVo> groupRandom(final Mono<GroupRandomVo> random) {
+    Mono<Boolean> checkJoinStudents(final List<String> students, final String circleId, final String teacherId){
+        //待校验的学生
+//        Mono<List<String>> checkStudent = this.changeStringStudent(students);
+        Mono<List<String>> joninCircle = classRoomService.findInteractiveStudentsID(circleId, teacherId);
 
-        return random
-                .filterWhen(randomVo -> allotVerify(classRoomService.studentNumber(randomVo.getCircleId()), randomVo.getNumber()))
-                .flatMap(randomVo -> {
-
-                    Mono<List<Students>> list = classRoomService.findInteractiveStudents(randomVo.getCircleId(),"").transform(this::shuffle);
-
-                    return list.map(students -> {
-                        //总数 , 组数 , 每组个数 , 余数 ,余数累加值
-                        int size = students.size();
-                        int teamNumber = randomVo.getNumber();
-                        int nitems = size / teamNumber;
-                        int residue = size % teamNumber;
-                        int cumulative = 0;
-
-                        GroupTeamVo grouping = new GroupTeamVo();
-
-                        //截取分组
-                        for (int i = 0; i < teamNumber; i++) {
-
-                            List<Students> studentsList;
-                            //余数累加
-                            if (residue != 0) {
-                                studentsList = students.subList(i * nitems + cumulative, i * nitems + nitems + 1 + cumulative);
-                                cumulative++;
-                                residue--;
-                            } else {
-                                studentsList = students.subList(i * nitems + cumulative, i * nitems + nitems + cumulative);
-                            }
-
-                            grouping.addTeamList(new Team(getRandomUUID(), studentsList));
-
-                        }
-
-                        return grouping;
-
-                        //分组完成时保存进redis 随机分组会覆盖小组信息
-                    }).filterWhen(grouping -> saveGroup(grouping.getTeamList(), randomVo.getGroupKey()));
-                });
-    }
-
-    /**
-     * 获取现存的team信息
-     *
-     * @return
-     */
-    public Mono<List<Team>> nowTeam(final String circleId) {
-        return redisTemplate.opsForValue().get(groupKey(circleId)).switchIfEmpty(Mono.just(new ArrayList()))
-                .map(obj -> JSON.parseObject(JSON.toJSONString(obj), new TypeReference<List<Team>>() {
-                }));
+//        joninCircle.flatMap(j -> {
+//            students.forEach(s -> {
+//                if (!j.contains(s)){
+////                    return Mono.just(false);
+//                }
+//            });
+//        });
+        return Mono.just(true);
     }
 
 
+
     /**
-     * 覆盖分组信息
-     * 保存学生分组信息至redis
-     *
+     * 构建新的选人小组
+     * @param req
+     * @param studentsList
      * @return
      */
-    private Mono<Boolean> saveGroup(final List<Team> teamList, final String groupKey) {
-
-        return redisTemplate.opsForValue().set(groupKey, teamList, Duration.ofSeconds(60 * 60));
+    Mono<TeamResp> builderTeam(final PickTeamReq req, final List<Students> studentsList){
+        final String teamId = IdUtil.objectId();
+        final String key = req.getTeamRedisKey(teamId);
+        Map<String, String> map = new HashMap<>(8);
+        map.put("students", req.getStudents());
+        map.put("teacherId", req.getTeacherId());
+        map.put("expType", req.getExpType());
+        map.put("teamName", req.getTeamName());
+        map.put("circleId", req.getCircleId());
+        map.put("teamId", teamId);
+        return reactiveHashOperations.putAll(key, map)
+                .filterWhen(f -> {
+                    if (f) {
+                        return this.setExpire(key, req.getExpType());
+                    } else {
+                        return MyAssert.isFalse(!f, DefineCode.ERR0013, "保存redis失败");
+                    }
+                })
+                .flatMap(f -> Mono.just(new TeamResp(teamId, req.getTeamName(), studentsList)));
     }
 
     /**
-     * 新增或移除小组成员
-     *
-     * @param changeVo
+     * 设置小组的有效期时间
+     * @param key
+     * @param expType
      * @return
      */
-    public Mono<List<Team>> teamChange(final TeamChangeVo changeVo) {
-
-        switch (changeVo.getMoreOrLess()) {
-            case ASK_GROUP_CHANGE_MORE:
-                return teamMore(changeVo.getCircleId(), changeVo.getTeamId(), changeVo.getStudents())
-                        .filterWhen(grouping -> saveGroup(grouping, changeVo.getGroupKey()));
-            case ASK_GROUP_CHANGE_LESS:
-                return teamLess(changeVo.getCircleId(), changeVo.getTeamId(), changeVo.getStudents())
-                        .filterWhen(grouping -> saveGroup(grouping, changeVo.getGroupKey()));
-            default:
-                throw new CustomException("非法参数 错误的小组更改类型");
-        }
-
+    private Mono<Boolean> setExpire(final String key, final String expType){
+        return Mono.just(key).flatMap(k -> {
+            if (TEAM_TEMPORARILY.equals(expType)){
+                return stringRedisTemplate.expire(key, Duration.ofDays(1));
+            }else if (TEAM_FOREVER.equals(expType)){
+                return stringRedisTemplate.expire(key, Duration.ofDays(366));
+            }else {
+                return Mono.error(new Exception("分组的有效期不正确"));
+            }
+        });
     }
 
     /**
-     * 小组增加学生
-     *
-     * @param circleId
-     * @param teamId
+     * 根据分割的学生信息转换为学生对象信息
      * @param students
      * @return
      */
-    private Mono<List<Team>> teamMore(final String circleId, final String teamId, final String students) {
-        //获得小组list
-        Mono<List<Team>> nowTeam = nowTeam(circleId);
-        //查询出学生信息
-        Mono<List<Students>> ids = Flux.fromIterable(Arrays.asList(students.split(","))).flatMap(studentsService::findStudentsBrief).collectList();
-        //组合Mono数据
-        Mono<Tuple2<List<Team>, List<Students>>> tuple2 = Mono.zip(nowTeam, ids);
-        //小组增加学生
-        return tuple2.map(tup -> {
-            //peek 增加 遍历小组 如果小组id相同 add
-            return tup.getT1().stream().peek(team -> {
-                if (team.getTeamId().equals(teamId)) {
-                    team.getStudents().addAll(tup.getT2());
-                }
-            }).collect(Collectors.toList());
-        });
-    }
-
-    private Mono<List<Team>> teamLess(final String circleId, final String teamId, final String students) {
-        //获得小组list
-        Mono<List<Team>> nowTeam = nowTeam(circleId);
-        //获得被移除的学生
-        Mono<List<String>> ids = Mono.just(Arrays.asList(students.split(",")));
-        //组合Mono数据
-        Mono<Tuple2<List<Team>, List<String>>> tuple2 = Mono.zip(nowTeam, ids);
-        //小组删除学生
-        return tuple2.map(tup -> {
-            //peek 增加 遍历小组 如果小组id相同 删除其中学生
-            return tup.getT1().stream().peek(team -> {
-                //对team的学生列表遍历 如果id一致  删除
-                if (team.getTeamId().equals(teamId)) {
-                    //对比学生id,一致 剔除
-                    team.setStudents(team.getStudents().stream().peek(now -> {
-                        if (tup.getT2().contains(now.getId())) {
-                            now.setId("");
-                        }
-                    }).filter(now -> isNotEmpty(now.getId())).collect(Collectors.toList()));
-
-                }
-
-
-            }).collect(Collectors.toList());
-        });
+    public Mono<List<Students>> changeStudents(final String students){
+        return Flux.fromIterable(Arrays.asList(students.split(","))).flatMap(studentsService::findStudentsBrief).collectList();
     }
 
     /**
-     * 至少每组两个人
-     *
-     * @param size
-     * @param number
+     * 将学生信息分割字符串转换集合
+     * @param students
      * @return
      */
-    private Mono<Boolean> allotVerify(final Mono<Long> size, final Integer number) {
-        return size
-                .map(count -> count > number * 2)
-                .map(flag -> {
-                    if (flag) {
-                        return flag;
-                    } else {
-                        throw new CustomException("分组时 至少需要条件达到每组两个人");
+    public Mono<List<String>> changeStringStudent(final String students){
+        return Mono.just(Arrays.asList(students.split(",")));
+    }
+
+    /**
+     * list --> strings
+     * @param students
+     * @return
+     */
+    String studentsListToStr(final List<String> students){
+        return String.join(",", students.toArray(new String[students.size()]));
+    }
+
+
+    Mono<Boolean> updateRedisTeamName(final String key, final String teamName) {
+        return Mono.just(key)
+                .flatMap(k -> {
+                    if (StrUtil.isNotBlank(teamName)){
+                        return reactiveHashOperations.put(key, "teamName", teamName);
                     }
+                    return Mono.just(true);
                 });
     }
 
     /**
-     * 打乱学生列表顺序
-     *
-     * @param listMono
-     * @return
+     * 添加学生
+     * @param studentsAdd 新添加的学生id字符串
+     * @param studentsJoin 原来已经加入的学生id字符串
+     * @return 全部加入的学生id字符串
      */
-    private Mono<List<Students>> shuffle(final Mono<List<Students>> listMono) {
-        return listMono
-                .map(list -> {
-                    Collections.shuffle(list);
-                    return list;
+    Mono<List<String>> moreJoinTeamStudents(final String studentsAdd, final String studentsJoin){
+        return Mono.just(studentsAdd)
+                .map(s -> new HashSet<>(Arrays.asList(s.split(","))))
+                .flatMap(set -> {
+                    set.addAll(Arrays.asList(studentsJoin.split(",")));
+                    return Mono.just(new ArrayList<>(set));
+                });
+    }
+    /**
+     * 移除已经加入的学生
+     * @param studentsLess 需要移除的学生
+     * @param stringJoin 原来加入的学生
+     * @return 移除后的学生列表
+     */
+    Mono<List<String>> lessJoinTeamStudents(final String studentsLess, final String stringJoin){
+        return Mono.just(studentsLess)
+                .map(s -> Arrays.asList(s.split(",")))
+                .flatMap(strings -> {
+                    List<String> list = Arrays.asList(stringJoin.split(","));
+                    List<String> stringList = new ArrayList<>();
+                    list.forEach(s -> {
+                        strings.forEach(ss -> {
+                            if (!s.equals(ss)){
+                                stringList.add(s);
+                            }
+                        });
+                    });
+                    return Mono.just(stringList);
                 });
     }
 
+    Mono<Boolean> saveRedisPutStudents(final String teamKey, final String students){
+        return reactiveHashOperations.put(teamKey, "students", students);
+    }
+
+    public Mono<TeamResp> updateData(final PickTeamReq req, final List<String> list, final String key) {
+        return Mono.just(list).filterWhen(stringList -> {
+            return this.saveRedisPutStudents(key, this.studentsListToStr(stringList))
+                    .flatMap(f -> MyAssert.isFalse(!f, DefineCode.ERR0013, "更新redis失败"));
+        })
+                .filterWhen(s -> {
+                    return this.updateRedisTeamName(key, req.getTeamName())
+                            .flatMap(f -> MyAssert.isFalse(!f, DefineCode.ERR0013, "更新redis失败"));
+                })
+                .flatMap(studentsService::exchangeStudents)
+                .map(studentsList -> {
+                    return TeamResp.builder()
+                            .teamId(req.getTeamId())
+                            .students(studentsList)
+                            .teamName(req.getTeamName())
+                            .build();
+                });
+    }
 }

@@ -1,8 +1,10 @@
-package com.forteach.quiz.interaction.team.web.vo;
+package com.forteach.quiz.interaction.team.web.req;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @Description:
@@ -12,7 +14,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "课堂id", description = "")
-public class CircleIdVo {
+public class CircleIdReq implements Serializable {
 
     /**
      * 课堂圈子id

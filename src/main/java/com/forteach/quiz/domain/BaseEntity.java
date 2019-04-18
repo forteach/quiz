@@ -14,7 +14,7 @@ import org.springframework.data.annotation.Id;
 public abstract class BaseEntity {
 
     @Id
-    @ApiModelProperty(value = "id", name = "id", example = "5c06d23sz8737b1dc8068da8", notes = "传入id为修改  不穿id为新增")
+    @ApiModelProperty(value = "id", name = "id", example = "5c06d23sz8737b1dc8068da8", notes = "传入id为修改  不传id为新增")
     protected String id;
 
     @ApiModelProperty(value = "更新时间", name = "uDate", example = "1543950907881", notes = "时间戳")

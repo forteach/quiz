@@ -824,6 +824,51 @@ public final class MyAssert {
         }
         return Mono.just(value);
     }
+    /**
+     * 断言value < start || value > end (左右都为开区间)，则抛出异常.
+     *
+     * @param value   待测试的值
+     * @param start   起始值
+     * @param end     结束值
+     * @param errcode 异常错误码
+     */
+    public static Mono<Integer> isExcept(int value, int start, int end, int errcode) {
+        return  isExcept(value, start, end, errcode, null);
+    }
+    /**
+     * 断言value < start || value > end (左右都为开区间)，则抛出异常.
+     *
+     * @param value   待测试的值
+     * @param start   起始值
+     * @param end     结束值
+     * @param errcode 异常错误码
+     * @param message 异常错误消息
+     */
+    public static Mono<Integer> isExcept(int value, int start, int end, int errcode,
+                                         final String message){
+        if (((value < start) || (value > end))){
+            fail(errcode, message);
+        }
+        return Mono.just(value);
+    }
+
+    /**
+     * 断言value < start || value > end (左右都为开区间)，则抛出异常.
+     *
+     * @param value   待测试的值
+     * @param start   起始值
+     * @param end     结束值
+     * @param errcode 异常错误码
+     * @param format  格式化字符串，用来生成异常信息
+     * @param args    格式化字符串的参数
+     */
+    public static Mono<Integer> isExcept(int value, int start, int end, int errcode,
+                                        String format, Object... args) {
+        if (((value < start) || (value > end))){
+            fail(errcode, String.format(format, args));
+        }
+        return Mono.just(value);
+    }
 
     /**
      * 断言item包含在collection，否则抛出异常.
