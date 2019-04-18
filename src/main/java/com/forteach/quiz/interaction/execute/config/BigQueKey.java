@@ -115,7 +115,7 @@ public class BigQueKey {
      *
      * @return  题目列表List
      */
-    public static String bookTypeQuestionsList(String typeName,final String circleId) {
+    public static String bookTypeQuestionsList(final String circleId) {
         return circleId.concat(CLASSROOM_BOOK_QUESTIONS_LIST);
     }
 
