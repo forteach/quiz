@@ -26,4 +26,5 @@ public class MoreGiveVo extends GiveVo {
     @ApiModelProperty(value = "发布练习册的教师", name = "teacherId")
     private String teacherId;
 
+
 }

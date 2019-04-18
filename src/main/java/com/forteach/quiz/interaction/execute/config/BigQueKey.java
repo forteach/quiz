@@ -33,6 +33,8 @@ public class BigQueKey {
      */
     public static final String CLASSROOM_BOOK_NOW= "nowBook";
 
+    public static final String CLASSROOM_BOOK_INFO= "nowBookInfo";
+
     /**
      * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
@@ -44,9 +46,14 @@ public class BigQueKey {
     public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "bookList";
 
     /**
-     * 互动练习册回答
+     * 互动练习册的题目
      */
-    public static final String CLASSROOM_BOOK_QUESTIONS_ANSWER_SET = "bookAnswerSet";
+    public static final String CLASSROOM_BOOK_QUESTIONS_MAP = "bookMap";
+
+    /**
+     * 互动练习册回答题目
+     */
+    public static final String CLASSROOM_BOOK_QUESTIONS_ANSWER_MAP = "bookAnswerMap";
 
     /**
      * 缓存当前已发布的题目题干内容，不分课堂。
@@ -57,14 +64,14 @@ public class BigQueKey {
         return CLASSROOM_ASK_NOW.concat(questionId);
     }
 
-    /**
-     * 缓存当前已发布的练习册题目题干内容，不分课堂。
-     * @param questionId
-     * @return
-     */
-    public static String bookQuestionsNow(final String questionId) {
-        return CLASSROOM_BOOK_NOW.concat(questionId);
-    }
+//    /**
+//     * 缓存当前已发布的练习册题目题干内容，不分课堂。
+//     * @param circleId
+//     * @return
+//     */
+//    public static String bookQuestionsInfoNow(final String circleId) {
+//        return CLASSROOM_BOOK_INFO.concat(circleId);
+//    }
 
     /**
      * 课堂提问当前前缀
@@ -109,16 +116,24 @@ public class BigQueKey {
      * @return  题目列表List
      */
     public static String bookTypeQuestionsList(final String circleId) {
-        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_LIST);
+        return circleId.concat(CLASSROOM_BOOK_QUESTIONS_LIST);
     }
 
     /**
-     * 课堂练习回答记录
-     *
-     * @return   题目列表set
+     * 课堂练习测题目
+     * @param circleId
+     * @return
      */
-    public static String bookQuestionsAnswerSet(final String circleId,final String stuId) {
-        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_SET).concat(stuId);
+    public static String bookQuestionMap(final String circleId){
+        return circleId.concat(CLASSROOM_BOOK_QUESTIONS_MAP);
+    }
+    /**
+     * 课堂练习册回答题目=回答者和答案
+     *
+     * @return   题目列表map
+     */
+    public static String bookQuestionsAnswerMap(final String circleId,final String questionId) {
+        return circleId.concat(BigQueKey.CLASSROOM_BOOK_QUESTIONS_ANSWER_MAP).concat(questionId);
     }
 
     /**
@@ -152,7 +167,7 @@ public class BigQueKey {
      * 课堂当前道题目回答前缀
      * sutId  学生ID
      * questionId 问题ID
-     * typeName  题目互动方式  提问、联练习。。。。
+     * typeName  题目互动方式  提问、练习册。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案  Hashmap
      */
     public static String answerTypeQuestionsId(final String circleId,final String questionId,final String typeName) {

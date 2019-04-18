@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,8 +30,8 @@ import static com.forteach.quiz.common.Dic.*;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @Description:
- * @author: liu zhenming
+ * @Description: 判断题目信息相关操作
+ * @author: zjw
  * @version: V1.0
  * @date: 2018/11/20  16:55
  */
@@ -134,10 +135,10 @@ public class CorrectService {
     }
 
     //TODO  题目回答更正回答记录
-    public Mono<Boolean> correcting(final String questionId, final String answer) {
+    public Mono<Boolean> correcting(final String key,final String questionId, final String answer) {
         //找到题目信息 TODO OLD
-        //return bigQuestionRepository.findById(questionId)
-        return getBigQuestion(questionId)
+//        return Mono.just(true);
+        return getBigQuestion(key,questionId)
                 .flatMap(bigQuestion -> {
                     final JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
                     switch (String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType"))) {
@@ -155,7 +156,7 @@ public class CorrectService {
                            //return Mono.just(String.valueOf(trueOrFalse(trueOrFalse, answer)));
                             return  Mono.just(trueOrFalse(trueOrFalse, answer));
                         case BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN:
-                            // TODO 简答主观题 人工手动批改
+                            // TODO 简答主观题 人工手动批改，应增加认为的评判对错结果
                             return Mono.just(true);
                         default:
                             log.error("非法参数 错误的题目类型 : {}", String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType")));
@@ -169,10 +170,10 @@ public class CorrectService {
      * @param questionId
      * @return
      */
-    public Mono<BigQuestion> getBigQuestion(String questionId){
-        String key= BigQueKey.questionsNow(questionId);
+    public Mono<BigQuestion> getBigQuestion(String key,String questionId){
+        //String key= BigQueKey.questionsNow(questionId);
         return stringRedisTemplate.hasKey(key)
-                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(BigQueKey.questionsNow(questionId)).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId));
+                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(key).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId).filterWhen(obj->stringRedisTemplate.opsForValue().set( BigQueKey.questionsNow(questionId),JSON.toJSONString(obj), Duration.ofSeconds(60*60*2))));
     }
 
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {

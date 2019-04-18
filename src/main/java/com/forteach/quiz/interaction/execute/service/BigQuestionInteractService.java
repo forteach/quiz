@@ -77,11 +77,11 @@ public class BigQuestionInteractService {
      * @param answerVo
      * @return
      */
-    private Mono<InteractiveSheetVo> filterSheetSelectVerify(final Mono<InteractiveSheetVo> answerVo) {
-        return answerVo.zipWhen(answer -> selectVerify(answer.getAskKey(QuestionType.LianXi), answer.getExamineeId()))
-                .flatMap(tuple2 -> {
-                    if (tuple2.getT2()) {
-                        return Mono.just(tuple2.getT1());
+    private Mono<Boolean> filterSheetSelectVerify(final InteractiveSheetVo answerVo) {
+        return Mono.just(answerVo).flatMap(answer -> selectVerify(answer.getAskKey(QuestionType.LianXi), answer.getExamineeId()))
+                .flatMap(r -> {
+                    if (r.booleanValue()) {
+                        return Mono.just(r.booleanValue());
                     } else {
                         return Mono.error(new AskException("该题未被选中 不能答题"));
                     }
@@ -138,8 +138,8 @@ public class BigQuestionInteractService {
      */
     public Mono<String> sendExerciseBookAnswer(final InteractiveSheetVo sheetVo) {
         return Mono.just(sheetVo)
-                .transform(this::filterSheetSelectVerify)
-                .filterWhen(shee ->
+                .filterWhen(this::filterSheetSelectVerify)
+                .flatMap(shee ->
                         sendAnswerVerifyMore(shee.getAskKey(QuestionType.LianXi), shee.getAnsw().getQuestionId(), shee.getCut())
                 )
                 .filterWhen(

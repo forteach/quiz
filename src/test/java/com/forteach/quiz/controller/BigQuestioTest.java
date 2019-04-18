@@ -81,6 +81,33 @@ public class BigQuestioTest {
     }
 
     @Test
+    public void sendBookAnswer(){
+        /**
+         * 互动方式
+         * <p>
+         * race   : 抢答
+         * raise  : 举手
+         * select : 选则
+         * vote   : 投票
+         */
+        InteractAnswerVo vo=new InteractAnswerVo("stu01","c01","q01","C","cut");
+
+        System.out.println("json------"+ JSON.toJSONString(vo));
+        webTestClient
+                .post().uri("/interact/sendBook/answer")  //创建2小时内同一课堂
+                // .post().uri("/classRoom/create/cover")//创建不同的课堂
+                .contentType(MediaType.APPLICATION_JSON) // 2
+                .body(Mono.just(vo),InteractAnswerVo.class) // 3
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .returnResult(WebResult.class)
+                .getResponseBody().subscribe(System.out::println);
+
+    }
+
+    @Test
     public void delSelectStu(){
         /**
          * 互动方式
