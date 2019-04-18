@@ -29,16 +29,16 @@ import reactor.core.publisher.Mono;
 @RestController
 @Api(value = "课堂分组", tags = {"课堂,上课相关处理"})
 @RequestMapping(path = "/classRoom/team", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class TeamController {
+public class TeamRoomController {
 
     private final TokenService tokenService;
     private final TeamPickService teamPickService;
     private final TeamRandomService teamRandomService;
 
     @Autowired
-    public TeamController(TeamPickService teamPickService,
-                          TeamRandomService teamRandomService,
-                          TokenService tokenService) {
+    public TeamRoomController(TeamPickService teamPickService,
+                              TeamRandomService teamRandomService,
+                              TokenService tokenService) {
         this.tokenService = tokenService;
         this.teamPickService = teamPickService;
         this.teamRandomService = teamRandomService;
@@ -50,6 +50,7 @@ public class TeamController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "number", value = "要分几个小组", required = true, dataType = "int", paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> groupRandom(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody GroupRandomReq random, ServerHttpRequest request) {
@@ -90,7 +91,7 @@ public class TeamController {
             @ApiImplicitParam(name = "teamName", value = "小组名字", dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "from"),
             @ApiImplicitParam(name = "moreOrLess", value = "1 : 增加  2 : 减少", example = "1" ,dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", example = "forever" ,dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", example = "forever" ,dataType = "string", required = true, paramType = "from")
     })
     @PostMapping("/pickTeam")
     @ApiOperation(value = "选人分组")

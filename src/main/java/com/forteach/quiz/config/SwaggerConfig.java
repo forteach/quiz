@@ -42,7 +42,7 @@ public class SwaggerConfig {
                 .description("教育系统文档接口")
                 //服务条款网址
                 .version("1.0")
-                .contact(new Contact("education", "https://github.com/forteach/quiz/", ""))
+                .contact(new Contact("quiz", "https://github.com/forteach/quiz/", ""))
                 .build();
     }
 }

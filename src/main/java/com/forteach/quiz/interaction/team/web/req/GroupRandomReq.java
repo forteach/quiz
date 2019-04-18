@@ -24,6 +24,9 @@ public class GroupRandomReq implements Serializable {
     @ApiModelProperty(value = "课堂圈子id/课程id", name = "circleId", dataType = "string", required = true)
     private String circleId;
 
+    @ApiModelProperty(value = "班级id", name = "classId", dataType = "string")
+    private String classId;
+
     /**
      * 共分几组
      */
