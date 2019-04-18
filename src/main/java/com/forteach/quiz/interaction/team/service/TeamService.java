@@ -5,11 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.service.ClassRoomService;
+import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
 import com.forteach.quiz.interaction.team.web.req.PickTeamReq;
 import com.forteach.quiz.interaction.team.web.resp.TeamResp;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -211,5 +213,41 @@ public class TeamService {
                             .teamName(req.getTeamName())
                             .build();
                 });
+    }
+
+
+    public Mono<Boolean> saveRedisTeams(final List<TeamResp> teamList, final GroupRandomReq randomVo) {
+        return Mono.just(teamList)
+        .flatMap(teamResps -> {
+            Set<String> stringSet = new LinkedHashSet<>();
+            teamResps.stream().forEach(teamResp -> {
+                stringSet.add(teamResp.getTeamId());
+                this.saveRedisTeam(teamResp, randomVo.getExpType(), randomVo.getCircleId(), randomVo.getClassId());
+            });
+            return redisTemplate.opsForZSet().addAll(randomVo.getGroupKey(), stringSet);
+        });
+    }
+
+    protected String studentListToStr(List<Students> studentsList) {
+        StringBuffer str = new StringBuffer();
+        studentsList.stream()
+                .forEach(s -> {
+                    str.append(s.getId()).append(",");
+                });
+        return str.toString();
+    }
+
+    private Mono<Boolean> saveRedisTeam(final TeamResp teamResp, final String expType, final String circleId, final String classId) {
+        return Mono.just(teamResp.getTeamsGroupKey(teamResp.getTeamId()))
+                .flatMap(key -> {
+                    Map<String, String> map = new HashMap<>(8);
+                    map.put("teamId", teamResp.getTeamId());
+                    map.put("teamName", teamResp.getTeamName());
+                    map.put("expType", expType);
+                    map.put("circleId", circleId);
+                    map.put("classId", classId);
+                    map.put("students", this.studentListToStr(teamResp.getStudents()));
+                    return redisTemplate.opsForHash().putAll(key, map);
+                }).filterWhen(b -> this.setExpire(teamResp.getTeamsGroupKey(teamResp.getTeamId()), expType));
     }
 }

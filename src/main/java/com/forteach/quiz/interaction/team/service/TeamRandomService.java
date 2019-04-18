@@ -107,7 +107,8 @@ public class TeamRandomService {
                         return grouping;
 
                         //分组完成时保存进redis 随机分组会覆盖小组信息
-                    }).filterWhen(grouping -> saveGroup(grouping.getTeamList(), randomVo.getGroupKey(), randomVo.getExpType()));
+                    }).filterWhen(grouping -> saveGroup(grouping.getTeamList(), randomVo.getGroupKey(), randomVo.getExpType()))
+                            .filterWhen(groupTeamResp -> teamService.saveRedisTeams(groupTeamResp.getTeamList(), randomVo));
                 });
     }
 

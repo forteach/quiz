@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.List;
 
+import static com.forteach.quiz.common.Dic.ASK_GROUP;
+
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
@@ -39,6 +41,10 @@ public class TeamResp implements Serializable {
     }
 
     public TeamResp() {
+    }
+
+    public String getTeamsGroupKey(final String teamId){
+        return teamId.concat(ASK_GROUP);
     }
 
 }
