@@ -1,8 +1,5 @@
 package com.forteach.quiz.web.vo;
 
-import cn.hutool.core.util.StrUtil;
-import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
-import com.forteach.quiz.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

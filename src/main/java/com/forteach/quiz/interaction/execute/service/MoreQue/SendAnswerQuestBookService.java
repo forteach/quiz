@@ -1,9 +1,11 @@
-package com.forteach.quiz.interaction.execute.service;
+package com.forteach.quiz.interaction.execute.service.MoreQue;
 
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
+import com.forteach.quiz.interaction.execute.service.Key.AchieveAnswerKey;
+import com.forteach.quiz.interaction.execute.service.Key.MoreQueKey;
+import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
@@ -58,28 +60,28 @@ public class SendAnswerQuestBookService {
                 //选人回答问题
                 .flatMap(typeName -> sendSelect(circleId,examineeId,questId,answer, ASK_INTERACTIVE_SELECT))
                 //设置学生练习册回答题目答案
-                .filterWhen(right -> reactiveHashOperations.put(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.LianXi.name()),examineeId,answer)
+                .filterWhen(right -> reactiveHashOperations.put(AchieveAnswerKey.answerTypeQuestionsId(circleId,questId,QuestionType.LianXi.name()),examineeId,answer)
                                      .flatMap(r-> {
                                          //设置已经回答的学生列表
                                                 //移除该学生本题回答历史记录
-                                                 return stringRedisTemplate.opsForList().remove(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.LianXi.name()),0, examineeId)
+                                                 return stringRedisTemplate.opsForList().remove(AchieveAnswerKey.answerTypeQuestStuList(circleId, questId, QuestionType.LianXi.name()),0, examineeId)
                                                          //将答题学生ID添加至列表尾部
-                                                         .flatMap(r1-> stringRedisTemplate.opsForList().rightPush(BigQueKey.answerTypeQuestStuList(circleId, questId, QuestionType.LianXi.name()), examineeId)
+                                                         .flatMap(r1-> stringRedisTemplate.opsForList().rightPush(AchieveAnswerKey.answerTypeQuestStuList(circleId, questId, QuestionType.LianXi.name()), examineeId)
                                                                  .flatMap(r2-> Mono.just(true))
-                                                                         .filterWhen(r2->stringRedisTemplate.expire(BigQueKey.answerTypeQuestStuList(circleId,questId,QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2)))
+                                                                         .filterWhen(r2->stringRedisTemplate.expire(AchieveAnswerKey.answerTypeQuestStuList(circleId,questId,QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2)))
                                                          )
                                                          //记录该题目的提交记录
-                                             .filterWhen(r1->stringRedisTemplate.opsForSet().add(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.LianXi.name()),examineeId)
-                                                     .flatMap(r11->stringRedisTemplate.expire(BigQueKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2))));
+                                             .filterWhen(r1->stringRedisTemplate.opsForSet().add(AchieveAnswerKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.LianXi.name()),examineeId)
+                                                     .flatMap(r11->stringRedisTemplate.expire(AchieveAnswerKey.tiJiaoanswerTypeQuestStuSet(circleId, questId, QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2))));
     }
                                              )
-                                    .filterWhen(ok->stringRedisTemplate.expire(BigQueKey.answerTypeQuestionsId(circleId,questId,QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2)))
+                                    .filterWhen(ok->stringRedisTemplate.expire(AchieveAnswerKey.answerTypeQuestionsId(circleId,questId,QuestionType.LianXi.name()), Duration.ofSeconds(60*60*2)))
                 )
                 //设置学生回答题目的批改结果
                 .filterWhen(right -> {
                     System.out.println(String.valueOf(right));
-                           return  reactiveHashOperations.put(BigQueKey.piGaiTypeQuestionsId(circleId, questId, QuestionType.TiWen.name()), examineeId, String.valueOf(right))
-                                    .flatMap(ok -> stringRedisTemplate.expire(BigQueKey.piGaiTypeQuestionsId(circleId, questId, QuestionType.TiWen.name()), Duration.ofSeconds(60 * 60 * 2)));
+                           return  reactiveHashOperations.put(AchieveAnswerKey.piGaiTypeQuestionsId(circleId, questId, QuestionType.TiWen.name()), examineeId, String.valueOf(right))
+                                    .flatMap(ok -> stringRedisTemplate.expire(AchieveAnswerKey.piGaiTypeQuestionsId(circleId, questId, QuestionType.TiWen.name()), Duration.ofSeconds(60 * 60 * 2)));
                         }
                     );
                 //记录学生回答MONGO记录
@@ -96,10 +98,10 @@ public class SendAnswerQuestBookService {
      */
     private Mono<Boolean> filterSelectVerify(final String circleId,final String examineeId, final String questId ) {
         //判断联系册是否包含题目Id
-        return reactiveHashOperations.hasKey(BigQueKey.bookQuestionMap(circleId),questId)
+        return reactiveHashOperations.hasKey(MoreQueKey.bookQuestionMap(circleId),questId)
                         .flatMap(r-> MyAssert.isFalse(r,DefineCode.ERR0002,"练习册题目信息不存在"))
                 //回答学生是否在所选范围内
-                .filterWhen(r->reactiveHashOperations.get(BigQueKey.questionsBookNow(circleId), "selected")
+                .filterWhen(r->reactiveHashOperations.get(MoreQueKey.questionsBookNow(circleId), "selected")
                         .flatMap(sid-> MyAssert.isFalse( isSelected(sid, examineeId),DefineCode.ERR0002,"未选择该学生回答")));
 
     }
@@ -124,10 +126,9 @@ public class SendAnswerQuestBookService {
         //创建学生回答顺序列表
 
         //TODO 发布题目答案对比
-        return correctService.correcting(BigQueKey.questionsNow(questId),questId, answer)
+        return correctService.correcting(SingleQueKey.questionsNow(questId),questId, answer)
                 .filterWhen(r->sendValue(circleId,examineeId,questId,answer,r.toString()));
     }
-
 
     /**
      * 练习册回答信息信息写入

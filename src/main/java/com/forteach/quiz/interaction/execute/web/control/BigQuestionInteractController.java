@@ -4,6 +4,12 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.*;
+import com.forteach.quiz.interaction.execute.service.SingleQue.FabuQuestService;
+import com.forteach.quiz.interaction.execute.service.MoreQue.SendAnswerQuestBookService;
+import com.forteach.quiz.interaction.execute.service.MoreQue.SendQuestBookService;
+import com.forteach.quiz.interaction.execute.service.SingleQue.RaiseHandService;
+import com.forteach.quiz.interaction.execute.service.SingleQue.SendAnswerService;
+import com.forteach.quiz.interaction.execute.service.SingleQue.SendQuestService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.interaction.execute.web.control.response.QuestFabuListResponse;
@@ -34,7 +40,6 @@ import java.util.List;
 @RequestMapping(value = "/interact", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BigQuestionInteractController {
 
-    private final BigQuestionInteractService interactService;
     private final InteractRecordQuestionsService interactRecordQuestionsService;
     private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final TokenService tokenService;
@@ -64,14 +69,12 @@ public class BigQuestionInteractController {
      */
     private  final SendQuestBookService sendQuestBookService;
 
-
     /**
      * 练习册回答
      */
     private final SendAnswerQuestBookService sendAnswerQuestBookService;
 
-    public BigQuestionInteractController(BigQuestionInteractService interactService,
-                                         InteractRecordQuestionsService interactRecordQuestionsService,
+    public BigQuestionInteractController(InteractRecordQuestionsService interactRecordQuestionsService,
                                          InteractRecordExerciseBookService interactRecordExerciseBookService,
                                          SendQuestService sendQuestService,
                                          SendAnswerService sendAnswerService,
@@ -80,7 +83,6 @@ public class BigQuestionInteractController {
                                          SendQuestBookService sendQuestBookService,
                                          SendAnswerQuestBookService sendAnswerQuestBookService,
                                          TokenService tokenService) {
-        this.interactService = interactService;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
         this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.tokenService = tokenService;
@@ -113,7 +115,6 @@ public class BigQuestionInteractController {
         MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
         MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010,"课堂问题互动类型不能为空");
         MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题选举类型不能为空");
-        //MyAssert.blank(giveVo.getSelected(), DefineCode.ERR0010,"课堂问题选人数据不能为空");
         //课堂发布题目
         return sendQuestService.sendQuestion(
                 giveVo.getCircleId(),

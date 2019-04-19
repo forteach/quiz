@@ -1,7 +1,5 @@
 package com.forteach.quiz.interaction.execute.domain.base;
 
-import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -47,14 +45,7 @@ public class GiveVo {
             "     * 0 : 原题目   非0 : 切题")
     private String cut;
 
-    /**
-     * 获取习题练习类型在那个课堂的前缀
-     * @param type 习题练习的类型
-     * @return 拼接后的前缀
-     */
-    public String getExamineeIsReplyKey(QuestionType type) {
-        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(circleId).concat(type.name());
-    }
+
 
 
 }

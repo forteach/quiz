@@ -11,6 +11,7 @@ import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.config.BigQueKey;
 import com.forteach.quiz.interaction.execute.domain.Answ;
 import com.forteach.quiz.interaction.execute.domain.AnswChildren;
+import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
@@ -173,7 +174,7 @@ public class CorrectService {
     public Mono<BigQuestion> getBigQuestion(String key,String questionId){
         //String key= BigQueKey.questionsNow(questionId);
         return stringRedisTemplate.hasKey(key)
-                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(key).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId).filterWhen(obj->stringRedisTemplate.opsForValue().set( BigQueKey.questionsNow(questionId),JSON.toJSONString(obj), Duration.ofSeconds(60*60*2))));
+                .flatMap(r->r.booleanValue()?stringRedisTemplate.opsForValue().get(key).flatMap(str->Mono.just(JSON.parseObject(str,BigQuestion.class))): bigQuestionRepository.findById(questionId).filterWhen(obj->stringRedisTemplate.opsForValue().set( SingleQueKey.questionsNow(questionId),JSON.toJSONString(obj), Duration.ofSeconds(60*60*2))));
     }
 
     private Double choice(final ChoiceQst choiceQst, final AnswChildren answChildren) {

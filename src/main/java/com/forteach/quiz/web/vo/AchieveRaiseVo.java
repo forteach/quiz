@@ -39,22 +39,4 @@ public class AchieveRaiseVo {
      */
     private String random;
 
-
-    /**
-     * 获取redis 提问 key
-     *
-     * @return
-     */
-    public String getAskKey(QuestionType type) {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
-    }
-
-    public String getRaiseKey() {
-        return ASK_RAISE_HAND.concat(circleId);
-    }
-
-    public String getRaiseDistinctKey() {
-        return RAISE_HAND_STUDENT_DISTINCT.concat(circleId).concat(random);
-    }
-
 }

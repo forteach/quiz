@@ -3,7 +3,7 @@ package com.forteach.quiz.interaction.team.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.forteach.quiz.exceptions.CustomException;
-import com.forteach.quiz.interaction.execute.service.ClassRoomService;
+import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.team.web.vo.GroupRandomVo;
 import com.forteach.quiz.interaction.team.web.vo.GroupTeamVo;
 import com.forteach.quiz.interaction.team.web.vo.Team;
