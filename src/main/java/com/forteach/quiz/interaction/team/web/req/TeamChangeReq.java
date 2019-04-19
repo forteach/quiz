@@ -48,4 +48,8 @@ public class TeamChangeReq implements Serializable {
     public String getGroupKey() {
         return circleId.concat(ASK_GROUP).concat(classId);
     }
+
+    public String getTeamKey(){
+        return teamId.concat(ASK_GROUP);
+    }
 }

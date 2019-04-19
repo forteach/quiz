@@ -55,38 +55,36 @@ public class TeamPickService {
         this.teamService = teamService;
     }
 
-    public Mono<TeamResp> pickTeam(final PickTeamReq req) {
-        return Mono.just(Arrays.asList(req.getStudents().split(",")))
-                //校验是否是加入课堂的学生
-                .filterWhen(s -> teamService.checkJoinStudents(s, req.getCircleId(), req.getTeacherId()))
-                .flatMap(studentsService::exchangeStudents)
-                .flatMap(s -> {
-                    return this.changeTeam(req, s);
-                });
-    }
+//    public Mono<TeamResp> pickTeam(final PickTeamReq req) {
+//        return Mono.just(Arrays.asList(req.getStudents().split(",")))
+//                .flatMap(studentsService::exchangeStudents)
+//                .flatMap(s -> {
+//                    return this.changeTeam(req, s);
+//                });
+//    }
 
-    Mono<TeamResp> changeTeam(final PickTeamReq req, final List<Students> studentsList){
-        if (StrUtil.isBlank(req.getTeamId())){
-            return teamService.builderTeam(req, studentsList);
-        }else if (TEAM_STRUDENT_MORE.equals(req.getMoreOrLess())){
-            //已经存在相关小组进行小组人员变更
-            //追加小组成员
-            final String key = req.getTeamRedisKey(req.getTeamId());
-            return reactiveHashOperations.get(key, "students")
-                    .filter(Objects::nonNull)
-                    .flatMap(s -> teamService.moreJoinTeamStudents(req.getStudents(), s))
-                    .flatMap(stringList -> teamService.updateData(req, stringList, key));
-        }else if (TEAM_STUDENT_LESS.equals(req.getMoreOrLess())){
-            //追加小组成员
-            final String key = req.getTeamRedisKey(req.getTeamId());
-            return reactiveHashOperations.get(key, "students")
-                    .filter(Objects::nonNull)
-                    .flatMap(s -> teamService.lessJoinTeamStudents(req.getStudents(), s))
-                    .flatMap(stringList -> teamService.updateData(req, stringList, key));
-        }else {
-            return MyAssert.isNull(null, DefineCode.ERR0002, "增加或减少 参数错误");
-        }
-    }
+//    Mono<TeamResp> changeTeam(final PickTeamReq req, final List<Students> studentsList){
+//        if (StrUtil.isBlank(req.getTeamId())){
+//            return teamService.builderTeam(req, studentsList);
+//        }else if (TEAM_STRUDENT_MORE.equals(req.getMoreOrLess())){
+//            //已经存在相关小组进行小组人员变更
+//            //追加小组成员
+//            final String key = req.getTeamRedisKey(req.getTeamId());
+//            return reactiveHashOperations.get(key, "students")
+//                    .filter(Objects::nonNull)
+//                    .flatMap(s -> teamService.moreJoinTeamStudents(req.getStudents(), s))
+//                    .flatMap(stringList -> teamService.updateData(req, stringList, key));
+//        }else if (TEAM_STUDENT_LESS.equals(req.getMoreOrLess())){
+//            //追加小组成员
+//            final String key = req.getTeamRedisKey(req.getTeamId());
+//            return reactiveHashOperations.get(key, "students")
+//                    .filter(Objects::nonNull)
+//                    .flatMap(s -> teamService.lessJoinTeamStudents(req.getStudents(), s))
+//                    .flatMap(stringList -> teamService.updateData(req, stringList, key));
+//        }else {
+//            return MyAssert.isNull(null, DefineCode.ERR0002, "增加或减少 参数错误");
+//        }
+//    }
 
 }
 

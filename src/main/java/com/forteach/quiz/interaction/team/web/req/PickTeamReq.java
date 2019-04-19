@@ -1,9 +1,9 @@
 package com.forteach.quiz.interaction.team.web.req;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.io.Serializable;
 
 import static com.forteach.quiz.common.Dic.ASK_GROUP;

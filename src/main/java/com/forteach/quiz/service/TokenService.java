@@ -1,5 +1,6 @@
 package com.forteach.quiz.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -44,9 +45,6 @@ public class TokenService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    @Resource
-    private ReactiveStringRedisTemplate reactiveStringRedisTemplate;
-
     private JWTVerifier verifier(String openId) {
         return JWT.require(Algorithm.HMAC256(salt.concat(openId))).build();
     }
@@ -70,13 +68,11 @@ public class TokenService {
      * @return
      */
     public String getStudentId(ServerHttpRequest request){
-        return  String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
+        if (!stringRedisTemplate.opsForHash().hasKey(USER_PREFIX.concat(getOpenId(request)), "studentId")){
+            MyAssert.isNull(null, DefineCode.ERR0004, "token 已经失效");
+        }
+        return String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
     }
-
-//    public Mono<String> getStudentId1(ServerHttpRequest request){
-//        return reactiveStringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId").map(String::valueOf)
-//                .switchIfEmpty(MyAssert.blank("", DefineCode.ERR0013, "获取学生id失败"));
-//    }
 
     /**
      * 通过token 类型判断转换为教师id
@@ -89,6 +85,7 @@ public class TokenService {
         if (TOKEN_TEACHER.equals(JWT.decode(token).getAudience().get(1))){
             return Optional.of(JWT.decode(token).getAudience().get(0));
         }
+        MyAssert.isNull(null, DefineCode.ERR0010, "token 非法");
         return Optional.empty();
     }
 

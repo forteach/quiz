@@ -3,10 +3,8 @@ package com.forteach.quiz.interaction.team.web.resp;
 import com.forteach.quiz.web.pojo.Students;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -38,6 +36,11 @@ public class TeamResp implements Serializable {
         this.teamId = teamId;
         this.teamName = teamName;
         this.students = students;
+    }
+
+    public TeamResp(String teamId, String teamName) {
+        this.teamId = teamId;
+        this.teamName = teamName;
     }
 
     public TeamResp() {

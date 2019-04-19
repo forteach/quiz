@@ -3,7 +3,6 @@ package com.forteach.quiz.interaction.team.web.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.Serializable;
 

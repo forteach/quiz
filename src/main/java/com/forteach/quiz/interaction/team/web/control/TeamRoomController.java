@@ -5,19 +5,15 @@ import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.team.service.TeamPickService;
 import com.forteach.quiz.interaction.team.service.TeamRandomService;
-import com.forteach.quiz.interaction.team.web.req.CircleIdReq;
-import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
-import com.forteach.quiz.interaction.team.web.req.PickTeamReq;
-import com.forteach.quiz.interaction.team.web.req.TeamChangeReq;
+import com.forteach.quiz.interaction.team.service.TeamService;
+import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -34,14 +30,17 @@ public class TeamRoomController {
     private final TokenService tokenService;
     private final TeamPickService teamPickService;
     private final TeamRandomService teamRandomService;
+    private final TeamService teamService;
 
     @Autowired
     public TeamRoomController(TeamPickService teamPickService,
                               TeamRandomService teamRandomService,
+                              TeamService teamService,
                               TokenService tokenService) {
         this.tokenService = tokenService;
         this.teamPickService = teamPickService;
         this.teamRandomService = teamRandomService;
+        this.teamService = teamService;
     }
 
 
@@ -61,54 +60,119 @@ public class TeamRoomController {
         return teamRandomService.groupRandom(random).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "获取当前课堂team", notes = "传入课堂id 获取当前课堂小组")
-    @PostMapping(value = "/nowTeam")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", dataType = "string", required = true, paramType = "from")
-    })
-    public Mono<WebResult> nowTeam(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final CircleIdReq circleIdReq) {
-        MyAssert.isNull(circleIdReq.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
-        return teamRandomService.nowTeam(circleIdReq.getCircleId(), circleIdReq.getClassId()).map(WebResult::okResult);
-    }
+//    @ApiOperation(value = "获取当前课堂team", notes = "传入课堂id 获取当前课堂小组")
+//    @PostMapping(value = "/nowTeam")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", dataType = "string", required = true, paramType = "from")
+//    })
+//    public Mono<WebResult> nowTeam(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final CircleIdReq circleIdReq) {
+//        MyAssert.isNull(circleIdReq.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
+//        return teamRandomService.nowTeam(circleIdReq.getCircleId(), circleIdReq.getClassId()).map(WebResult::okResult);
+//    }
 
-    @ApiOperation(value = "新增或移除小组成员", notes = "1 : 增加  2 : 减少")
-    @PostMapping(value = "/teamChange")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "students", value = "被 新增或移除 小组的 学生id, 逗号分割", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "moreOrLess", value = "1 : 增加  2 : 减少", required = true, dataType = "string", paramType = "from")
-    })
-    public Mono<WebResult> teamChange(@ApiParam(value = "新增或移除小组成员", required = true) @RequestBody final TeamChangeReq changeVo) {
-        MyAssert.isNull(changeVo.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
-        MyAssert.isNull(changeVo.getStudents(), DefineCode.ERR0010, "学生id不为空");
-        MyAssert.isNull(changeVo.getTeamId(), DefineCode.ERR0010, "小组id不为空");
-        MyAssert.isExcept(Integer.valueOf(changeVo.getMoreOrLess()),1, 2, DefineCode.ERR0010, "增加或减少参数不正确");
-        return teamRandomService.teamChange(changeVo).map(WebResult::okResult);
-    }
+//    @ApiOperation(value = "新增或移除小组成员", notes = "1 : 增加  2 : 减少")
+//    @PostMapping(value = "/teamChange")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "students", value = "被 新增或移除 小组的 学生id, 逗号分割", required = true, dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "moreOrLess", value = "1 : 增加  2 : 减少", required = true, dataType = "string", paramType = "from")
+//    })
+//    public Mono<WebResult> teamChange(@ApiParam(value = "新增或移除小组成员", required = true) @RequestBody final TeamChangeReq changeVo) {
+//        MyAssert.isNull(changeVo.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
+//        MyAssert.isNull(changeVo.getStudents(), DefineCode.ERR0010, "学生id不为空");
+//        MyAssert.isNull(changeVo.getTeamId(), DefineCode.ERR0010, "小组id不为空");
+//        MyAssert.isExcept(Integer.valueOf(changeVo.getMoreOrLess()),1, 2, DefineCode.ERR0010, "增加或减少参数不正确");
+//        return teamRandomService.teamChange(changeVo).map(WebResult::okResult);
+//    }
+
 
 
 
     /*----------------------------------*/
 
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "circleId", value = "课堂Id/课程id", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(name = "teamId", value = "小组id", dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "teamName", value = "小组名字", dataType = "string", paramType = "from"),
+//            @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(name = "moreOrLess", value = "1 : 增加  2 : 减少", example = "1" ,dataType = "string", required = true, paramType = "from"),
+//            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", example = "forever" ,dataType = "string", required = true, paramType = "from")
+//    })
+//    @PostMapping("/pickTeam")
+//    @ApiOperation(value = "选人分组")
+//    public Mono<WebResult> pickTeam(@ApiParam(value = "选人分组", required = true) @RequestBody PickTeamReq req, ServerHttpRequest request){
+//        MyAssert.isNull(req.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
+//        MyAssert.isNull(req.getStudents(), DefineCode.ERR0010, "学生信息不为空");
+//        MyAssert.isExcept(Integer.valueOf(req.getMoreOrLess()),1, 2, DefineCode.ERR0010, "增加或减少参数不正确");
+//        req.setTeacherId(tokenService.getTeacherId(request).get());
+//        return teamPickService.pickTeam(req).map(WebResult::okResult);
+//    }
+
+
+
+    /*---------------*/
+    @ApiOperation(value = "修改小组名称")
+    @PostMapping("/updateTeamName")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleId", value = "课堂Id/课程id", dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(name = "teamId", value = "小组id", dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "teamName", value = "小组名字", dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(name = "moreOrLess", value = "1 : 增加  2 : 减少", example = "1" ,dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", example = "forever" ,dataType = "string", required = true, paramType = "from")
+            @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "teamName", value = "小组名字", required = true, dataType = "string", paramType = "from")
     })
-    @PostMapping("/pickTeam")
-    @ApiOperation(value = "选人分组")
-    public Mono<WebResult> pickTeam(@ApiParam(value = "选人分组", required = true) @RequestBody PickTeamReq req, ServerHttpRequest request){
-        MyAssert.isNull(req.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
+    public Mono<WebResult> changeTeamName(@RequestBody ChangeTeamNameReq req){
+        MyAssert.isNull(req.getTeamId(), DefineCode.ERR0010, "小组id不为空");
+        MyAssert.isNull(req.getTeamName(), DefineCode.ERR0010, "小组名称不为空");
+        return teamService.updateTeamName(req).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "需要删除小组")
+    @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from")
+    @DeleteMapping("/delete/{teamId}")
+    public Mono<WebResult> deleteTeam(@PathVariable("teamId") String teamId){
+        MyAssert.isNull(teamId, DefineCode.ERR0010, "小组id不为空");
+        return teamService.deleteTeam(teamId).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "添加小组")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "from")
+    })
+    @PostMapping("/addTeam")
+    public Mono<WebResult> addTeam(@RequestBody AddTeamReq req){
+        MyAssert.isNull(req.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
+        MyAssert.isNull(req.getExpType(), DefineCode.ERR0010, "分组有效期不为空");
+        MyAssert.isNull(req.getClassId(), DefineCode.ERR0010, "班级id不为空");
         MyAssert.isNull(req.getStudents(), DefineCode.ERR0010, "学生信息不为空");
-        MyAssert.isExcept(Integer.valueOf(req.getMoreOrLess()),1, 2, DefineCode.ERR0010, "增加或减少参数不正确");
-        req.setTeacherId(tokenService.getTeacherId(request).get());
-        return teamPickService.pickTeam(req).map(WebResult::okResult);
+        return teamService.addTeam(req).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "移动小组成员", notes = "1 : 增加  2 : 减少")
+    @PostMapping(value = "/teamChange")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "addTeamId", value = "添加到的小组id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "removeTeamId", value = "需要移除的小组id", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "students", value = "被 新增或移除 小组的 学生id, 逗号分割", required = true, dataType = "string", paramType = "from")
+    })
+    public Mono<WebResult> teamChange(@ApiParam(value = "新增或移除小组成员", required = true) @RequestBody final ChangeTeamReq changeVo) {
+        MyAssert.isNull(changeVo.getAddTeamId(), DefineCode.ERR0010, "课堂id或课程id不为空");
+        MyAssert.isNull(changeVo.getStudents(), DefineCode.ERR0010, "学生id不为空");
+        MyAssert.isNull(changeVo.getRemoveTeamId(), DefineCode.ERR0010, "小组id不为空");
+        return teamRandomService.teamChange(changeVo).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "获取当前课堂team", notes = "传入课堂id 获取当前课堂小组")
+    @PostMapping(value = "/nowTeam")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
+    })
+    public Mono<WebResult> nowTeam(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final CircleIdReq circleIdReq) {
+        MyAssert.isNull(circleIdReq.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
+        return teamRandomService.nowTeam(circleIdReq).map(WebResult::okResult);
     }
 }
