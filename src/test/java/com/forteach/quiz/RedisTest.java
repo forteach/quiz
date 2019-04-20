@@ -4,6 +4,8 @@ package com.forteach.quiz;
 import com.forteach.quiz.web.pojo.Students;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -25,12 +27,14 @@ import java.util.Map;
  * @date: 2018/12/4  16:08
  */
 @RunWith(SpringRunner.class)
+//@RunWith(Parameterized.class)
 @SpringBootTest
 public class RedisTest {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
 
+    @Autowired
     public RedisTest(ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
@@ -90,6 +94,12 @@ public class RedisTest {
 //                    map.put("portrait", "https://cdn.v2ex.com/gravatar/cc2fa800888e12870e0739750cd9c9e7.jpg?s=100&d=identicon");
 //                    return reactiveHashOperations.putAll(("studentsData$".concat(String.valueOf(10000 + i))), map);
 //                });
+    }
+
+    @Test
+    public void deleteRedis(){
+        reactiveHashOperations.delete("*askGroup")
+                .subscribe();
     }
 
 }
