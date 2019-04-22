@@ -15,7 +15,7 @@ import static com.forteach.quiz.common.Dic.ASK_GROUP;
  * @date: 2019/1/28  18:50
  */
 @Data
-@ApiModel(value = "课堂id", description = "")
+@ApiModel(value = "课堂id", description = "{查询课堂相关信息}")
 public class CircleIdReq implements Serializable {
 
     /**

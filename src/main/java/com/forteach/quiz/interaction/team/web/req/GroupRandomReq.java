@@ -15,7 +15,7 @@ import static com.forteach.quiz.common.Dic.ASK_GROUP;
  * @date: 2019/1/23  11:00
  */
 @Data
-@ApiModel(value = "随机分组", description = "随机分组的参数")
+@ApiModel(value = "随机分组", description = "{随机分组的参数}")
 public class GroupRandomReq implements Serializable {
 
     /**

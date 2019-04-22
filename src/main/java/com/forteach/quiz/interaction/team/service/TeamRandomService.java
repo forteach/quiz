@@ -1,12 +1,9 @@
 package com.forteach.quiz.interaction.team.service;
 
 import cn.hutool.core.util.IdUtil;
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.interaction.execute.service.ClassRoomService;
 import com.forteach.quiz.interaction.team.web.req.ChangeTeamReq;
-import com.forteach.quiz.interaction.team.web.req.CircleIdReq;
 import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
 import com.forteach.quiz.interaction.team.web.resp.TeamResp;
@@ -18,15 +15,12 @@ import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import static com.forteach.quiz.common.Dic.TEAM_FOREVER;
-import static com.forteach.quiz.common.Dic.TEAM_TEMPORARILY;
 
 /**
  * @author: zhangyy

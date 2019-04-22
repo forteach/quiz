@@ -3,7 +3,6 @@ package com.forteach.quiz.interaction.team.web.control;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.team.service.TeamRandomService;
 import com.forteach.quiz.interaction.team.service.TeamService;
 import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.service.TokenService;
@@ -11,7 +10,10 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
@@ -101,11 +103,11 @@ public class TeamRoomController {
         return teamService.teamChange(changeVo).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "获取当前课堂team", notes = "传入课堂id 获取当前课堂小组")
+    @ApiOperation(value = "获取当前课堂小组信息", notes = "传入课堂/课程　id 获取当前课堂小组")
     @PostMapping(value = "/nowTeam")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "circleId", value = "课堂id/课程id", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "classId", value = "班级id", example = "如果是课程必传", dataType = "string", paramType = "query"),
     })
     public Mono<WebResult> nowTeam(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody final CircleIdReq circleIdReq) {
         MyAssert.isNull(circleIdReq.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");

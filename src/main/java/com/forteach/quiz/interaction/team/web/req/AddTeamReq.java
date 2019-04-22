@@ -1,7 +1,5 @@
 package com.forteach.quiz.interaction.team.web.req;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,7 +16,7 @@ import static com.forteach.quiz.common.Dic.ASK_GROUP;
  * @description:
  */
 @Data
-@ApiModel(value = "需要添加小组数据对象")
+@ApiModel(value = "需要添加小组数据对象", description = "{新添加小组}")
 public class AddTeamReq implements Serializable {
 
     @ApiModelProperty(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string")

@@ -7,19 +7,17 @@ import com.forteach.quiz.interaction.execute.service.ClassRoomService;
 import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
 import com.forteach.quiz.interaction.team.web.resp.TeamResp;
-import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import java.time.Duration;
+
 import java.util.*;
-import java.util.logging.Logger;
+
 import static com.forteach.quiz.common.Dic.TEAM_FOREVER;
 import static com.forteach.quiz.common.Dic.TEAM_TEMPORARILY;
 
@@ -36,27 +34,21 @@ public class TeamService {
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final ReactiveRedisTemplate redisTemplate;
     private final ClassRoomService classRoomService;
-    private final StudentsService studentsService;
     private final TeamRedisService teamRedisService;
     private final TeamRandomService teamRandomService;
 
     public TeamService(ReactiveStringRedisTemplate stringRedisTemplate,
                        ReactiveHashOperations<String, String, String> reactiveHashOperations,
                        ReactiveMongoTemplate reactiveMongoTemplate,
-                       ReactiveRedisTemplate reactiveRedisTemplate,
                        TeamRandomService teamRandomService,
                        ClassRoomService classRoomService,
-                       TeamRedisService teamRedisService,
-                       StudentsService studentsService) {
+                       TeamRedisService teamRedisService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.redisTemplate = reactiveRedisTemplate;
         this.teamRandomService = teamRandomService;
         this.classRoomService = classRoomService;
-        this.studentsService = studentsService;
         this.teamRedisService = teamRedisService;
     }
 
@@ -88,29 +80,12 @@ public class TeamService {
                     return list.flatMap(l -> teamRandomService.groupTeam(l, randomVo));
                 })
                 .filterWhen(groupTeamResp -> teamRedisService.deleteTeams(random.getGroupKey()))
-                .filterWhen(groupTeamResp -> this.saveRedisTeams(groupTeamResp.getTeamList(), random));
+                .log(" delete ====>>>>>>>>")
+                .filterWhen(groupTeamResp -> teamRedisService.saveRedisTeams(groupTeamResp.getTeamList(), random))
+                .log("save ==>>>>>>>>> ");
     }
 
-    /**
-     * 设置小组的有效期时间
-     *
-     * @param key
-     * @param expType
-     * @return
-     */
-    private Mono<Boolean> setExpire(final String key, final String expType) {
-        return Mono.just(key).flatMap(k -> {
-            if (TEAM_TEMPORARILY.equals(expType)) {
-                return stringRedisTemplate.expire(key, Duration.ofDays(1))
-                        .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
-            } else if (TEAM_FOREVER.equals(expType)) {
-                return stringRedisTemplate.expire(key, Duration.ofDays(366))
-                        .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
-            } else {
-                return Mono.error(new Exception("分组的有效期不正确"));
-            }
-        });
-    }
+
 
     /**
      * 添加学生
@@ -152,55 +127,11 @@ public class TeamService {
                 });
     }
 
-
-
-
-    private Mono<Boolean> putRedisTeam(final TeamResp teamResp, final String expType, final String circleId, final String classId) {
-        return Mono.just(studentListToStr(teamResp.getStudents()))
-                .flatMap(students -> {
-                    return saveRedisTeam(teamResp.getTeamId(), teamResp.getTeamName(), expType, students, circleId, classId);
-                }).filterWhen(b -> this.setExpire(teamResp.getTeamsGroupKey(teamResp.getTeamId()), expType))
-                .filterWhen(b -> MyAssert.isFalse(b, DefineCode.ERR0013, "保存小组信息到redis失败"));
-    }
-
-    Mono<Boolean> saveRedisTeam(final String teamId, final String teamName, final String expType,
-                                final String students, final String circleId, final String classId) {
-        Map<String, String> map = new HashMap<>(8);
-        map.put("teamId", teamId);
-        map.put("teamName", teamName);
-        map.put("expType", expType);
-        map.put("circleId", circleId);
-        map.put("classId", classId);
-        map.put("students", students);
-        return stringRedisTemplate.opsForHash().putAll(ChangeTeamReq.concatTeamKey(teamId), map).map(Objects::nonNull);
-    }
-
-    public Mono<Boolean> updateTeamName(final ChangeTeamNameReq req) {
-        return reactiveHashOperations.put(req.getTeamKey(), "teamName", req.getTeamName())
-                .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"));
-    }
-
-
-
-    public Mono<TeamResp> addTeam(final AddTeamReq req) {
-        final String teamId = IdUtil.objectId();
-        return Mono.just(req)
-                .flatMap(r -> {
-                    return stringRedisTemplate.opsForSet().add(req.getGroupKey(), teamId);
-                })
-                .log(Logger.GLOBAL_LOGGER_NAME)
-                .filterWhen(b -> saveRedisTeam(teamId, req.getTeamName(), req.getExpType(), req.getStudents(), req.getCircleId(), req.getClassId()).log())
-                .flatMap(l -> Mono.just(new TeamResp(teamId, req.getTeamName())));
-    }
-
-    private String studentListToStr(final List<Students> studentsList) {
-        StringBuffer str = new StringBuffer();
-        studentsList.forEach(s -> {
-            str.append(s.getId()).append(",");
-        });
-        return str.toString();
-    }
-
+    /**
+     * 修改移动小组信息
+     * @param changeVo
+     * @return
+     */
     public Mono<Boolean> teamChange(final ChangeTeamReq changeVo) {
         return Mono.just(changeVo.getTeamKey(changeVo.getRemoveTeamId()))
                 .flatMap(key -> {
@@ -217,6 +148,11 @@ public class TeamService {
                 }).map(Objects::nonNull);
     }
 
+    /**
+     * 删除小组信息
+     * @param req
+     * @return
+     */
     public Mono<Boolean> deleteTeam(final DeleteTeamReq req) {
         return Mono.zip(teamRedisService.findCircleId(req.getTeamKey()), teamRedisService.findClassId(req.getTeamKey()))
                 .flatMap(t -> {
@@ -225,6 +161,11 @@ public class TeamService {
                 }).filterWhen(b -> MyAssert.isFalse(b, DefineCode.ERR0013, "删除失败"));
     }
 
+    /**
+     * 查询小组信息
+     * @param req
+     * @return
+     */
     public Mono<List<TeamResp>> nowTeam(final CircleIdReq req) {
         return Mono.just(req.getGroupKey())
                 .flatMap(key -> stringRedisTemplate.opsForSet().members(key).collectList())
@@ -232,21 +173,29 @@ public class TeamService {
                 .flatMap(teamRandomService::findTeam)
                 .collectList();
     }
-    Mono<Boolean> saveRedisTeams(final List<TeamResp> teamList, final GroupRandomReq randomVo) {
-        Mono<List<Long>> addRedisGroup = Mono.just(teamList)
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(teamResp -> {
-                    String teamId = teamResp.getTeamId();
-                    return stringRedisTemplate.opsForSet().add(randomVo.getGroupKey(), teamId);
-                }).collectList();
-        Mono<List<Boolean>> teamRedis = Mono.just(teamList)
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(teamResp -> {
-                    return putRedisTeam(teamResp, randomVo.getExpType(), randomVo.getCircleId(), randomVo.getClassId());
-                }).collectList();
-        return Mono.zip(addRedisGroup, teamRedis)
-                .flatMap(g -> {
-                    return setExpire(randomVo.getGroupKey(), randomVo.getExpType());
-                });
+
+    /**
+     * 修改小组名字
+     * @param req
+     * @return
+     */
+    public Mono<Boolean> updateTeamName(final ChangeTeamNameReq req) {
+        return reactiveHashOperations.put(req.getTeamKey(), "teamName", req.getTeamName())
+                .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"));
+    }
+
+    /**
+     * 添加新的小组
+     * @param req
+     * @return
+     */
+    public Mono<TeamResp> addTeam(final AddTeamReq req) {
+        final String teamId = IdUtil.objectId();
+        return Mono.just(req)
+                .flatMap(r -> {
+                    return stringRedisTemplate.opsForSet().add(req.getGroupKey(), teamId);
+                })
+                .filterWhen(b -> teamRedisService.saveRedisTeam(teamId, req.getTeamName(), req.getExpType(), req.getStudents(), req.getCircleId(), req.getClassId()))
+                .flatMap(l -> Mono.just(new TeamResp(teamId, req.getTeamName())));
     }
 }

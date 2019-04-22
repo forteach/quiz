@@ -1,7 +1,7 @@
 package com.forteach.quiz.interaction.team.web.req;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import static com.forteach.quiz.common.Dic.ASK_GROUP;
  * @description:
  */
 @Data
-@ApiOperation(value = "修改小组成员接口参数")
+@ApiModel(value = "修改小组成员接口参数", description = "{移动小组成员}")
 public class ChangeTeamReq implements Serializable {
 
     @ApiModelProperty(value = "小组id", notes = "需要移出的小组id", name = "teamId", dataType = "string", required = true)

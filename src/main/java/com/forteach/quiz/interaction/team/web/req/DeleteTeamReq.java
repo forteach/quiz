@@ -16,7 +16,7 @@ import static com.forteach.quiz.common.Dic.ASK_GROUP;
  * @description:
  */
 @Data
-@ApiModel(value = "删除小组")
+@ApiModel(value = "删除小组", description = "{删除小组信息}")
 public class DeleteTeamReq implements Serializable {
     @ApiModelProperty(value = "小组id", notes = "小组id", name = "teamId", dataType = "string", required = true)
     private String teamId;

@@ -15,8 +15,8 @@ import static com.forteach.quiz.common.Dic.ASK_GROUP;
  * @version: 1.0
  * @description:
  */
-@ApiModel(value = "修改小组名称")
 @Data
+@ApiModel(value = "修改小组名称", description = "{修改小组名称}")
 public class ChangeTeamNameReq implements Serializable {
 
     @ApiModelProperty(value = "小组id", name = "teamId", dataType = "string", required = true)
