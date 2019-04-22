@@ -90,28 +90,7 @@ public class TeamRedisService {
                 .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"));
     }
 
-    /**
-     * 修改加入的学生id信息
-     *
-     * @param students
-     * @return
-     */
-    String studentsListToStr(final List<String> students) {
-        return String.join(",", students.toArray(new String[students.size()]));
-    }
 
-    /**
-     * 将学生列表信息转换为学生字符串信息
-     * @param studentsList
-     * @return
-     */
-    private String studentListToStr(final List<Students> studentsList) {
-        StringBuffer str = new StringBuffer();
-        studentsList.forEach(s -> {
-            str.append(s.getId()).append(",");
-        });
-        return str.toString();
-    }
 
     /**
      * 删除redis 记录的学生信息
@@ -213,5 +192,29 @@ public class TeamRedisService {
                 return Mono.error(new Exception("分组的有效期不正确"));
             }
         });
+    }
+
+
+    /**
+     * 修改加入的学生id信息
+     *
+     * @param students
+     * @return
+     */
+    String studentsListToStr(final List<String> students) {
+        return String.join(",", students.toArray(new String[students.size()]));
+    }
+
+    /**
+     * 将学生列表信息转换为学生字符串信息
+     * @param studentsList
+     * @return
+     */
+    private String studentListToStr(final List<Students> studentsList) {
+        StringBuffer str = new StringBuffer();
+        studentsList.forEach(s -> {
+            str.append(s.getId()).append(",");
+        });
+        return str.toString();
     }
 }

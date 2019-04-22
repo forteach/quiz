@@ -27,10 +27,6 @@ public class CircleIdReq implements Serializable {
     @ApiModelProperty(value = "班级id", name = "classId", dataType = "string", notes = "如果是课程必传")
     private String classId;
 
-//    @ApiModelProperty(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", dataType = "string", required = true)
-//    private String expType;
-
-
     public String getGroupKey() {
         return circleId.concat(ASK_GROUP).concat(classId);
     }

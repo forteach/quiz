@@ -33,21 +33,21 @@ public class TeamService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final ClassRoomService classRoomService;
     private final TeamRedisService teamRedisService;
     private final TeamRandomService teamRandomService;
+    private final TeamChangeService teamChangeService;
 
     public TeamService(ReactiveStringRedisTemplate stringRedisTemplate,
                        ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                       ReactiveMongoTemplate reactiveMongoTemplate,
                        TeamRandomService teamRandomService,
                        ClassRoomService classRoomService,
+                       TeamChangeService teamChangeService,
                        TeamRedisService teamRedisService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.teamRandomService = teamRandomService;
+        this.teamChangeService = teamChangeService;
         this.classRoomService = classRoomService;
         this.teamRedisService = teamRedisService;
     }
@@ -80,51 +80,7 @@ public class TeamService {
                     return list.flatMap(l -> teamRandomService.groupTeam(l, randomVo));
                 })
                 .filterWhen(groupTeamResp -> teamRedisService.deleteTeams(random.getGroupKey()))
-                .log(" delete ====>>>>>>>>")
-                .filterWhen(groupTeamResp -> teamRedisService.saveRedisTeams(groupTeamResp.getTeamList(), random))
-                .log("save ==>>>>>>>>> ");
-    }
-
-
-
-    /**
-     * 添加学生
-     *
-     * @param studentsAdd  新添加的学生id字符串
-     * @param studentsJoin 原来已经加入的学生id字符串
-     * @return 全部加入的学生id字符串
-     */
-    Mono<List<String>> moreJoinTeamStudents(final String studentsAdd, final String studentsJoin) {
-        return Mono.just(studentsAdd)
-                .map(s -> new HashSet<>(Arrays.asList(s.split(","))))
-                .flatMap(set -> {
-                    set.addAll(Arrays.asList(studentsJoin.split(",")));
-                    return Mono.just(new ArrayList<>(set));
-                });
-    }
-
-    /**
-     * 移除已经加入的学生
-     *
-     * @param studentsLess 需要移除的学生
-     * @param stringJoin   原来加入的学生
-     * @return 移除后的学生列表
-     */
-    Mono<List<String>> lessJoinTeamStudents(final String studentsLess, final String stringJoin) {
-        return Mono.just(studentsLess)
-                .map(s -> Arrays.asList(s.split(",")))
-                .flatMap(strings -> {
-                    List<String> list = Arrays.asList(stringJoin.split(","));
-                    List<String> stringList = new ArrayList<>();
-                    list.forEach(s -> {
-                        strings.forEach(ss -> {
-                            if (!s.equals(ss)) {
-                                stringList.add(s);
-                            }
-                        });
-                    });
-                    return Mono.just(stringList);
-                });
+                .filterWhen(groupTeamResp -> teamRedisService.saveRedisTeams(groupTeamResp.getTeamList(), random));
     }
 
     /**
@@ -135,15 +91,15 @@ public class TeamService {
     public Mono<Boolean> teamChange(final ChangeTeamReq changeVo) {
         return Mono.just(changeVo.getTeamKey(changeVo.getRemoveTeamId()))
                 .flatMap(key -> {
-                    return teamRedisService.redisHasKey(key)
-                            .flatMap(b -> teamRedisService.getRedisStudents(key))
-                            .filterWhen(s -> {
-                                return this.lessJoinTeamStudents(changeVo.getStudents(), s)
+                    return  teamRedisService.getRedisStudents(key)
+                            .filterWhen(j -> {
+                                return teamChangeService.lessJoinTeamStudents(changeVo.getStudents(), j)
                                         .flatMap(students -> teamRedisService.putRedisStudents(key, students));
                             })
-                            .filterWhen(s -> {
-                                return this.moreJoinTeamStudents(changeVo.getStudents(), s)
-                                        .flatMap(students -> teamRedisService.putRedisStudents(key, students));
+                            .flatMap(s -> teamRedisService.getRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId())))
+                            .filterWhen(a -> {
+                                return teamChangeService.moreJoinTeamStudents(changeVo.getStudents(), a)
+                                        .flatMap(students -> teamRedisService.putRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId()), students));
                             });
                 }).map(Objects::nonNull);
     }
