@@ -44,23 +44,6 @@ public class BigQuestionGiveVo extends GiveVo {
     @ApiModelProperty(value = "互动方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "interactive", notes = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票")
     private String interactive;
 
-    /**
-     * 设置课堂提问问题ID
-     * @return
-     */
-    public String getRaceAnswerFlag() {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
-    }
-
-
-    /**
-     * 课堂交互活动了icing，某个课堂上的某些课堂活动
-     *
-     * @return
-     */
-    public String getAskQuestionsId(QuestionType type) {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
-    }
 
     public BigQuestionGiveVo(String questionId, String interactive) {
         this.questionId = questionId;

@@ -11,7 +11,6 @@ import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
@@ -45,6 +44,7 @@ public class TokenService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+
     private JWTVerifier verifier(String openId) {
         return JWT.require(Algorithm.HMAC256(salt.concat(openId))).build();
     }
@@ -73,6 +73,7 @@ public class TokenService {
         }
         return String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
     }
+
 
     /**
      * 通过token 类型判断转换为教师id
@@ -131,37 +132,5 @@ public class TokenService {
         }
         return token.get();
     }
-    /**
-     * 获取token
-     * @param request
-     * @return
-     */
-//    private Mono<ServerResponse> getToken1(ServerRequest request) {
-//        AtomicReference<String> token = new AtomicReference<>(request.exchange().getRequest().getHeaders().getFirst("token"));
-//        if (StringUtil.isEmpty(token.get())) {
-//            Mono<Void> token1 = request.getBody().map(dataBuffer -> {
-//                try {
-//                    InputStream inputStream = dataBuffer.asInputStream();
-//                    byte[] bytes = IOUtil.read(inputStream);
-//                    token.set(String.valueOf(JSON.parseObject(new String(bytes)).get("token")));
-//                    NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(new UnpooledByteBufAllocator(false));
-//                    DataBufferUtils.release(dataBuffer);
-//                    (T) nettyDataBufferFactory.wrap(bytes);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//            }).then().block();
-//        System.out.println("----========-----");
-//        return request.bodyToMono(String.class).flatMap(s -> ServerResponse.ok().body(Mono.just(s), String.class));
-//        return token.get();
-//        return ServerResponse.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=test.jpeg")
-//                .contentType(MediaType.APPLICATION_JSON_UTF8)
-//                .body(BodyInserters.fromDataBuffers(Mono.create(r -> {
-//
-//                    DataBuffer buf = new DefaultDataBufferFactory().wrap(IOUtil.read(buffer.asInputStream()));
-//                    r.success(buf);
-//                    return;
-//                })));
-//    }
 
 }

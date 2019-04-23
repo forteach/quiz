@@ -25,7 +25,7 @@ import static com.forteach.quiz.util.DateUtil.getEndTime;
 import static com.forteach.quiz.util.DateUtil.getStartTime;
 
 /**
- * @Description: 课堂交互记录数据相关
+ * @Description: 课堂交互日志记录记录数据相关
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/4  15:33
@@ -82,24 +82,12 @@ public class InteractRecordExecuteService {
         return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
     }
 
-    public Mono<String> init(final String teacherId) {
+    public Mono<Boolean> init(final String circleId,final String teacherId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
         return Mono.just(teacherId)
                 //创建记录
-                .flatMap(id ->build(id)
-                        .flatMap(item->MyAssert.isNull(item, DefineCode.ERR0012, "创建互动课堂失败"))
-                        .flatMap(item -> MyAssert.blank(item.getId(), DefineCode.ERR0012, "创建互动课堂失败")));
-    }
-    /**
-     * 构建上课信息时默认见天上课次数为 1， 并进行记录
-     * @param circleId
-     * @param teacherId
-     * @return
-     */
-    private Mono<InteractRecord> build(final String circleId, final String teacherId) {
-        return todayNumber(teacherId)
-                .flatMap(number ->
-                        repository.save(new InteractRecord(circleId, teacherId, number + 1L)));
+                .flatMap(id ->build(circleId,id)
+                        .flatMap(item->MyAssert.isTrue(item==null, DefineCode.ERR0012, "创建互动课堂日志失败")));
     }
 
     /**
@@ -107,8 +95,8 @@ public class InteractRecordExecuteService {
      * @param teacherId
      * @return
      */
-    private Mono<InteractRecord> build(final String teacherId) {
-        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(teacherId, number + 1L)));
+    private Mono<InteractRecord> build(final String circleId, final String teacherId) {
+        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId,teacherId, number + 1L)));
     }
 
     /**

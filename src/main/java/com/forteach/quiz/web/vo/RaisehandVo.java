@@ -1,13 +1,8 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
-
 
 /**
  * @Description:
@@ -22,7 +17,7 @@ public class RaisehandVo {
     /**
      * 学生id
      */
-    @ApiModelProperty(hidden = true)
+//    @ApiModelProperty(value = "学生id", name = "examineeId")
     private String examineeId;
 
     /**
@@ -37,18 +32,5 @@ public class RaisehandVo {
     @ApiModelProperty(value = "课堂圈子id", name = "questionId")
     private String questionId;
 
-
-    public String getRaiseKey() {
-        return ASK_RAISE_HAND.concat(circleId);
-    }
-
-    /**
-     * 获取redis 提问 key
-     *
-     * @return
-     */
-    public String getAskKey(QuestionType type) {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
-    }
 
 }

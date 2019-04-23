@@ -1,6 +1,6 @@
 package com.forteach.quiz.web.req;
 
-import com.forteach.quiz.interaction.execute.config.ClassRoomKey;
+import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

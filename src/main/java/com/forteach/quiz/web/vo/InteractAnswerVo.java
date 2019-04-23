@@ -1,12 +1,8 @@
 package com.forteach.quiz.web.vo;
 
-import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import static com.forteach.quiz.common.Dic.ASK_RAISE_HAND;
-
 
 /**
  * @Description:
@@ -57,33 +53,6 @@ public class InteractAnswerVo {
         this.questionId = questionId;
         this.answer = answer;
         this.cut = cut;
-    }
-
-    /**
-     * 获取redis 提问 key
-     *
-     * @return
-     */
-    public String getAskKey(QuestionType type) {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
-    }
-
-    public String getRaceAnswerFlag() {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_RACE.concat(circleId).concat(questionId);
-    }
-
-    public String getRaiseKey() {
-        return ASK_RAISE_HAND.concat(circleId);
-    }
-
-    //获得当前题目类型回答的Redis前缀
-    public String getExamineeIsReplyKey(QuestionType type) {
-        return BigQueKey.answerTypeQuestionsId("examineeId",questionId,type.name());
-    }
-
-    //获得当前题目类型回答批改的Redis前缀
-    public String getExamineeIsPiGaiKey(QuestionType type) {
-        return BigQueKey.piGaiTypeQuestionsId("examineeId",questionId,type.name());
     }
 
 }

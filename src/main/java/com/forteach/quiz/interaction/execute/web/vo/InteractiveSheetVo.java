@@ -43,22 +43,4 @@ public class InteractiveSheetVo {
     @ApiModelProperty(value = "答案列表", name = "answ")
     private InteractiveSheetAnsw answ;
 
-    /**
-     * 获取redis 提问 key
-     *
-     * @return
-     */
-    public String getAskKey(QuestionType type) {
-        return BigQueKey.CLASSROOM_ASK_QUESTIONS_ID.concat(circleId).concat(type.name());
-    }
-
-    /**
-     * 问卷提问 问卷题库
-     * @param type
-     * @return
-     */
-    public String getExamineeIsReplyKey(QuestionType type) {
-        return BigQueKey.EXAMINEE_IS_REPLY_KEY.concat(circleId).concat(type.name());
-    }
-
 }
