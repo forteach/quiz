@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -18,12 +19,11 @@ import java.util.List;
 @Data
 @Document(collection = "teamCourse")
 @NoArgsConstructor
-//@AllArgsConstructor
-//@Builder
 public class TeamCourse extends BaseTeam{
     /**
      * 课程id
      */
-//    private String courseId;
+    @Indexed
+    private String courseId;
 
 }

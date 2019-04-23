@@ -2,11 +2,11 @@ package com.forteach.quiz.interaction.team.service;
 
 import cn.hutool.core.util.IdUtil;
 import com.forteach.quiz.exceptions.CustomException;
-import com.forteach.quiz.interaction.execute.service.ClassRoomService;
+import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
+import com.forteach.quiz.interaction.team.domain.Team;
 import com.forteach.quiz.interaction.team.web.req.ChangeTeamReq;
 import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
-import com.forteach.quiz.interaction.team.web.resp.TeamResp;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +84,7 @@ public class TeamRandomService {
                         } else {
                             studentsList = students.subList(i * tuple + cumulative, i * tuple + tuple + cumulative);
                         }
-                        grouping.addTeamList(new TeamResp(IdUtil.objectId(), "小组 ".concat(String.valueOf(i + 1)), studentsList));
+                        grouping.addTeamList(new Team(IdUtil.objectId(), "小组 ".concat(String.valueOf(i + 1)), studentsList));
                     }
                     return grouping;
                 });
@@ -92,14 +92,14 @@ public class TeamRandomService {
 
 
 
-    Mono<TeamResp> findTeam(final String teamId) {
+    Mono<Team> findTeam(final String teamId) {
         return teamRedisService.getRedisStudents(ChangeTeamReq.concatTeamKey(teamId))
                 .flatMap(this::findListStudentsByStudentStr)
                 .filter(Objects::nonNull)
                 .flatMap(studentsList -> {
                     return reactiveHashOperations.get(ChangeTeamReq.concatTeamKey(teamId), "teamName")
                             .flatMap(name -> {
-                                return Mono.just(new TeamResp(teamId, name, studentsList));
+                                return Mono.just(new Team(teamId, name, studentsList));
                             });
                 });
     }

@@ -3,6 +3,7 @@ package com.forteach.quiz.interaction.team.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -15,10 +16,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document(value = "teamCircle")
 @NoArgsConstructor
-//@AllArgsConstructor
 public class TeamCircle extends BaseTeam{
     /**
      * 课堂id
      */
-//    private String circleId;
+    @Indexed
+    private String circleId;
 }

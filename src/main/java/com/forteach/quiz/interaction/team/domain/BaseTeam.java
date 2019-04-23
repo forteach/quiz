@@ -2,6 +2,8 @@ package com.forteach.quiz.interaction.team.domain;
 
 import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
+import org.springframework.data.mongodb.core.index.Indexed;
+
 import java.util.List;
 
 /**
@@ -20,9 +22,10 @@ public abstract class BaseTeam extends BaseEntity {
     private String teacherId;
 
     /**
-     * 小组人数
+     * 班级id
      */
-    private Integer teamNumber;
+    @Indexed
+    private String classId;
 
     /**
      * 小组创建时间

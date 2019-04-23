@@ -1,34 +1,25 @@
 package com.forteach.quiz.interaction.team.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.forteach.quiz.exceptions.CustomException;
-import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
-import com.forteach.quiz.interaction.team.web.vo.GroupRandomVo;
-import com.forteach.quiz.interaction.team.web.vo.GroupTeamVo;
-import com.forteach.quiz.interaction.team.web.vo.Team;
-import com.forteach.quiz.interaction.team.web.vo.TeamChangeVo;
-import com.forteach.quiz.service.StudentsService;
 import cn.hutool.core.util.IdUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.interaction.execute.service.ClassRoomService;
+import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
+import com.forteach.quiz.interaction.team.domain.Team;
 import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
-import com.forteach.quiz.interaction.team.web.resp.TeamResp;
 import com.forteach.quiz.web.pojo.Students;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
-import static com.forteach.quiz.common.Dic.TEAM_FOREVER;
-import static com.forteach.quiz.common.Dic.TEAM_TEMPORARILY;
+import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_FOREVER;
+import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_TEMPORARILY;
 
 /**
  * @Description:
@@ -46,11 +37,13 @@ public class TeamService {
     private final TeamRedisService teamRedisService;
     private final TeamRandomService teamRandomService;
     private final TeamChangeService teamChangeService;
+    private final TeamMongoDBService teamMongoDBService;
 
     public TeamService(ReactiveStringRedisTemplate stringRedisTemplate,
                        ReactiveHashOperations<String, String, String> reactiveHashOperations,
                        TeamRandomService teamRandomService,
                        ClassRoomService classRoomService,
+                       TeamMongoDBService teamMongoDBService,
                        TeamChangeService teamChangeService,
                        TeamRedisService teamRedisService) {
         this.stringRedisTemplate = stringRedisTemplate;
@@ -58,6 +51,7 @@ public class TeamService {
         this.teamRandomService = teamRandomService;
         this.teamChangeService = teamChangeService;
         this.classRoomService = classRoomService;
+        this.teamMongoDBService = teamMongoDBService;
         this.teamRedisService = teamRedisService;
     }
 
@@ -89,7 +83,8 @@ public class TeamService {
                     return list.flatMap(l -> teamRandomService.groupTeam(l, randomVo));
                 })
                 .filterWhen(groupTeamResp -> teamRedisService.deleteTeams(random.getGroupKey()))
-                .filterWhen(groupTeamResp -> teamRedisService.saveRedisTeams(groupTeamResp.getTeamList(), random));
+                .filterWhen(groupTeamResp -> teamRedisService.saveRedisTeams(groupTeamResp.getTeamList(), random))
+                .filterWhen(groupTeamResp -> teamMongoDBService.saveTeamList(groupTeamResp, random));
     }
 
     /**
@@ -102,14 +97,15 @@ public class TeamService {
                 .flatMap(key -> {
                     return  teamRedisService.getRedisStudents(key)
                             .filterWhen(j -> {
-                                return teamChangeService.lessJoinTeamStudents(changeVo.getStudents(), j)
+                                return teamChangeService.lessJoinTeamStudentStr(changeVo.getStudents(), j)
                                         .flatMap(students -> teamRedisService.putRedisStudents(key, students));
                             })
                             .flatMap(s -> teamRedisService.getRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId())))
                             .filterWhen(a -> {
-                                return teamChangeService.moreJoinTeamStudents(changeVo.getStudents(), a)
+                                return teamChangeService.moreJoinTeamStudentStr(changeVo.getStudents(), a)
                                         .flatMap(students -> teamRedisService.putRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId()), students));
                             });
+                            //.filterWhen(a -> teamMongoDBService.teamChange(changeVo));
                 }).map(Objects::nonNull);
     }
 
@@ -131,7 +127,7 @@ public class TeamService {
      * @param req
      * @return
      */
-    public Mono<List<TeamResp>> nowTeam(final CircleIdReq req) {
+    public Mono<List<Team>> nowTeam(final CircleIdReq req) {
         return Mono.just(req.getGroupKey())
                 .flatMap(key -> stringRedisTemplate.opsForSet().members(key).collectList())
                 .flatMapMany(Flux::fromIterable)
@@ -146,7 +142,8 @@ public class TeamService {
      */
     public Mono<Boolean> updateTeamName(final ChangeTeamNameReq req) {
         return reactiveHashOperations.put(req.getTeamKey(), "teamName", req.getTeamName())
-                .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"));
+                .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"))
+                .flatMap(b -> teamMongoDBService.updateTeamName(req));
     }
 
     /**
@@ -154,13 +151,13 @@ public class TeamService {
      * @param req
      * @return
      */
-    public Mono<TeamResp> addTeam(final AddTeamReq req) {
+    public Mono<Team> addTeam(final AddTeamReq req) {
         final String teamId = IdUtil.objectId();
         return Mono.just(req)
                 .flatMap(r -> {
                     return stringRedisTemplate.opsForSet().add(req.getGroupKey(), teamId);
                 })
                 .filterWhen(b -> teamRedisService.saveRedisTeam(teamId, req.getTeamName(), req.getExpType(), req.getStudents(), req.getCircleId(), req.getClassId()))
-                .flatMap(l -> Mono.just(new TeamResp(teamId, req.getTeamName())));
+                .flatMap(l -> Mono.just(new Team(teamId, req.getTeamName())));
     }
 }

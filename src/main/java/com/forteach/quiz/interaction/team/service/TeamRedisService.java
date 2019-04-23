@@ -2,9 +2,9 @@ package com.forteach.quiz.interaction.team.service;
 
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
+import com.forteach.quiz.interaction.team.domain.Team;
 import com.forteach.quiz.interaction.team.web.req.ChangeTeamReq;
 import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
-import com.forteach.quiz.interaction.team.web.resp.TeamResp;
 import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.forteach.quiz.common.Dic.TEAM_FOREVER;
-import static com.forteach.quiz.common.Dic.TEAM_TEMPORARILY;
+import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_FOREVER;
+import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_TEMPORARILY;
 
 /**
  * @author: zhangyy
@@ -91,6 +91,10 @@ public class TeamRedisService {
     }
 
 
+    Mono<String> findHashString(final String key, final String value){
+        return reactiveHashOperations.get(key, value)
+                .flatMap(s -> MyAssert.isNull(s, DefineCode.ERR0012, "要查询的值在redis 不存在"));
+    }
 
     /**
      * 删除redis 记录的学生信息
@@ -141,7 +145,7 @@ public class TeamRedisService {
      * @param classId
      * @return
      */
-    private Mono<Boolean> putRedisTeam(final TeamResp teamResp, final String expType, final String circleId, final String classId) {
+    private Mono<Boolean> putRedisTeam(final Team teamResp, final String expType, final String circleId, final String classId) {
         return Mono.just(studentListToStr(teamResp.getStudents()))
                 .flatMap(students -> {
                     return saveRedisTeam(teamResp.getTeamId(), teamResp.getTeamName(), expType, students, circleId, classId);
@@ -155,7 +159,7 @@ public class TeamRedisService {
      * @param randomVo
      * @return
      */
-    Mono<Boolean> saveRedisTeams(final List<TeamResp> teamList, final GroupRandomReq randomVo) {
+    Mono<Boolean> saveRedisTeams(final List<Team> teamList, final GroupRandomReq randomVo) {
         Mono<List<Long>> addRedisGroup = Mono.just(teamList)
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(teamResp -> {
@@ -186,7 +190,7 @@ public class TeamRedisService {
                 return stringRedisTemplate.expire(key, Duration.ofDays(1))
                         .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
             } else if (TEAM_FOREVER.equals(expType)) {
-                return stringRedisTemplate.expire(key, Duration.ofDays(366))
+                return stringRedisTemplate.expire(key, Duration.ofDays(5))
                         .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
             } else {
                 return Mono.error(new Exception("分组的有效期不正确"));

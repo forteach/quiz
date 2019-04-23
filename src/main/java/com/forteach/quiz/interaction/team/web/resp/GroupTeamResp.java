@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.team.web.resp;
 
+import com.forteach.quiz.interaction.team.domain.Team;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,14 +16,14 @@ import java.util.List;
 @Data
 public class GroupTeamResp implements Serializable {
 
-    private List<TeamResp> teamList;
+    private List<Team> teamList;
 
-    public void addTeamList(TeamResp teamResp) {
+    public void addTeamList(Team team) {
         if (this.teamList == null) {
             this.teamList = new ArrayList<>(16);
-            this.teamList.add(teamResp);
+            this.teamList.add(team);
         } else {
-            this.teamList.add(teamResp);
+            this.teamList.add(team);
         }
     }
 
