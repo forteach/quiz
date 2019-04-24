@@ -38,7 +38,7 @@ public class Team {
     /**
      * 学生数组
      */
-    @ApiModelProperty(name = "students", dataType = "list", notes = "")
+    @ApiModelProperty(name = "students", dataType = "list", notes = "学生信息详情")
     private List<Students> students;
 
     public Team(final String teamId, final String teamName, final List<Students> students) {

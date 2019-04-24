@@ -2,9 +2,13 @@ package com.forteach.quiz.interaction.team.service;
 
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
+import com.forteach.quiz.interaction.team.domain.BaseTeam;
 import com.forteach.quiz.interaction.team.domain.Team;
+import com.forteach.quiz.interaction.team.domain.TeamCircle;
+import com.forteach.quiz.interaction.team.domain.TeamCourse;
 import com.forteach.quiz.interaction.team.web.req.ChangeTeamReq;
 import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
+import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -13,10 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_FOREVER;
 import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_TEMPORARILY;
@@ -33,10 +34,13 @@ public class TeamRedisService {
 
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final ReactiveStringRedisTemplate stringRedisTemplate;
+    private final StudentsService studentsService;
     public TeamRedisService(ReactiveHashOperations<String, String, String> reactiveHashOperations,
+                            StudentsService studentsService,
                             ReactiveStringRedisTemplate stringRedisTemplate){
         this.reactiveHashOperations = reactiveHashOperations;
         this.stringRedisTemplate = stringRedisTemplate;
+        this.studentsService = studentsService;
     }
 
     /**
@@ -187,7 +191,7 @@ public class TeamRedisService {
     private Mono<Boolean> setExpire(final String key, final String expType) {
         return Mono.just(key).flatMap(k -> {
             if (TEAM_TEMPORARILY.equals(expType)) {
-                return stringRedisTemplate.expire(key, Duration.ofDays(1))
+                return stringRedisTemplate.expire(key, Duration.ofHours(4))
                         .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
             } else if (TEAM_FOREVER.equals(expType)) {
                 return stringRedisTemplate.expire(key, Duration.ofDays(5))
@@ -220,5 +224,18 @@ public class TeamRedisService {
             str.append(s.getId()).append(",");
         });
         return str.toString();
+    }
+
+    public Mono<Boolean> saveRedisTeamList(BaseTeam baseTeam) {
+        if (baseTeam instanceof TeamCircle) {
+            return saveRedisTeams(baseTeam.getTeamList(),
+                    new GroupRandomReq(((TeamCircle) baseTeam).getCircleId(),
+                            baseTeam.getClassId(), baseTeam.getExpType(), baseTeam.getTeacherId()));
+        }else if (baseTeam instanceof TeamCourse){
+            return saveRedisTeams(baseTeam.getTeamList(),
+                    new GroupRandomReq(((TeamCourse) baseTeam).getCourseId(),
+                            baseTeam.getClassId(), baseTeam.getExpType(), baseTeam.getTeacherId()));
+        }
+        return MyAssert.isNull(null, DefineCode.ERR0013, "redis操作失败");
     }
 }

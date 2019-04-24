@@ -19,6 +19,7 @@ public abstract class BaseTeam extends BaseEntity {
     /**
      * 上课教师id
      */
+    @Indexed
     private String teacherId;
 
     /**

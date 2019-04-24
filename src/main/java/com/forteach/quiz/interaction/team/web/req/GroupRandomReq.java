@@ -46,4 +46,13 @@ public class GroupRandomReq implements Serializable {
         return circleId.concat(ASK_GROUP).concat(classId);
     }
 
+    public GroupRandomReq() {
+    }
+
+    public GroupRandomReq(final String circleId, final String classId, final String expType, final String teacherId) {
+        this.circleId = circleId;
+        this.classId = classId;
+        this.expType = expType;
+        this.teacherId = teacherId;
+    }
 }

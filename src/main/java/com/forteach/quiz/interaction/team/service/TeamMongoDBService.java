@@ -1,25 +1,27 @@
 package com.forteach.quiz.interaction.team.service;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
+import com.forteach.quiz.interaction.team.domain.BaseTeam;
+import com.forteach.quiz.interaction.team.domain.Team;
 import com.forteach.quiz.interaction.team.domain.TeamCircle;
 import com.forteach.quiz.interaction.team.domain.TeamCourse;
-import com.forteach.quiz.interaction.team.web.req.ChangeTeamNameReq;
-import com.forteach.quiz.interaction.team.web.req.ChangeTeamReq;
-import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
+import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
-import com.mongodb.client.result.UpdateResult;
-import org.reactivestreams.Publisher;
+import com.forteach.quiz.service.StudentsService;
+import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
@@ -38,13 +40,17 @@ public class TeamMongoDBService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final TeamRedisService teamRedisService;
+    private final StudentsService studentsService;
 
-    public TeamMongoDBService(ReactiveMongoTemplate reactiveMongoTemplate, TeamRedisService teamRedisService) {
+    public TeamMongoDBService(ReactiveMongoTemplate reactiveMongoTemplate,
+                              StudentsService studentsService,
+                              TeamRedisService teamRedisService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.teamRedisService = teamRedisService;
+        this.studentsService = studentsService;
     }
 
-    public Mono<Boolean> saveTeamList(final GroupTeamResp groupTeamResp, final GroupRandomReq random) {
+    Mono<Boolean> saveTeamList(final GroupTeamResp groupTeamResp, final GroupRandomReq random) {
         return Mono.just(random)
                 .flatMap(r -> {
                     Query query = Query.query(Criteria.where("circleId")
@@ -82,12 +88,10 @@ public class TeamMongoDBService {
         Query query = Query.query(Criteria.where(MONGDB_ID)
                 .is(circleId).and("classId").is(classId));
         Update update = new Update();
-        //update.set("")
-//        return reactiveMongoTemplate.
         return Mono.just(true);
     }
 
-    public Mono<Boolean> updateTeamName(final ChangeTeamNameReq req) {
+    Mono<Boolean> updateTeamName(final ChangeTeamNameReq req) {
         final String key = req.getTeamKey();
         Mono<String> circleId = teamRedisService.findHashString(key, "circleId");
         Mono<String> classId = teamRedisService.findHashString(key, "classId");
@@ -96,15 +100,19 @@ public class TeamMongoDBService {
             Query query = Query.query(Criteria.where("circleId").is(e.getT1().getT1())
                     .and("classId").is(e.getT1().getT2()).and("teamList.teamId").is(req.getTeamId()));
             Update update = new Update();
-            update.pull("teamList.teamName", req.getTeamName());
-            update.set("uDate", DateUtil.formatDateTime(new Date()));
+            update.push("teamList.teamName", req.getTeamName());
+            update.push("uDate", DateUtil.formatDateTime(new Date()));
+
             if (TEAM_TEMPORARILY.equals(e.getT2())) {
-                return reactiveMongoTemplate.updateMulti(query, Update.update("teamList.teamName", req.getTeamName()), TeamCircle.class)
+                TeamCircle teamCircle = new TeamCircle();
+
+                return reactiveMongoTemplate
+                        .updateFirst(query, update, TeamCircle.class)
                         .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "修改失败"))
                         .map(Objects::nonNull);
             } else if (TEAM_FOREVER.equals(e.getT2())) {
-                return reactiveMongoTemplate.updateMulti(query, update, TeamCourse.class)
-                        .log("updateResult ==>> ")
+                return reactiveMongoTemplate
+                        .upsert(query, update, TeamCourse.class)
                         .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "修改失败"))
                         .map(Objects::nonNull);
             }
@@ -112,13 +120,53 @@ public class TeamMongoDBService {
         });
     }
 
-//    private Mono<Boolean> removeSaveTeam(final GroupTeamResp groupTeamResp, final GroupRandomReq random){
-//        return reactiveMongoTemplate.findAndRemove(random.getCircleId())
-//                .flatMap(deleteResult -> {
-//                    if (deleteResult.wasAcknowledged()){
-//                        return builderTeamCircle(groupTeamResp, random);
-//                    }
-//                    return MyAssert.isFalse(false, DefineCode.ERR0012, "mongodb 删除原来分组失败");
-//                });
-//    }
+    Mono<Boolean> addTeam(final String teamId, final AddTeamReq req) {
+        Mono<List<Students>> students = studentsService.exchangeStudents(Arrays.asList(req.getStudents().split(",")));
+        if (TEAM_TEMPORARILY.equals(req.getExpType())){
+            return students.flatMap(studentsList -> {
+                    Query query = Query.query(Criteria.where("circleId").is(req.getCircleId()).and("classId").is(req.getClassId()));
+                    Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
+                    update.addToSet("teamList", new Team(teamId, req.getTeamName(), studentsList));
+                    return reactiveMongoTemplate.upsert(query, update, TeamCircle.class)
+                            .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "添加失败"));
+                    });
+        }else if (TEAM_FOREVER.equals(req.getExpType())){
+            return students.flatMap(studentsList -> {
+                Query query = Query.query(Criteria.where("courseId").is(req.getCircleId()).and("classId").is(req.getClassId()));
+                Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
+                update.addToSet("teamList", new Team(teamId, req.getTeamName(), studentsList));
+                return reactiveMongoTemplate.upsert(query, update, TeamCourse.class)
+                        .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "添加失败"));
+            });
+        }
+        return MyAssert.isNull(null, DefineCode.ERR0002, "参数不正确");
+    }
+
+    Mono<Boolean> deleteTeam(final String key, final String teamId, final String circleId, final String classId) {
+        return teamRedisService.findHashString(key, "expType")
+                .flatMap(e -> {
+                    if (TEAM_TEMPORARILY.equals(e)){
+                        Query query = Query.query(Criteria.where("circleId").is(circleId).and("classId").is(classId));
+                        Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
+                        update.pull("teamList", Query.query(Criteria.where("teamId").is(teamId)));
+                        return reactiveMongoTemplate.updateFirst(query, update, TeamCircle.class)
+                                .flatMap(teamCircle -> MyAssert.isNull(teamCircle, DefineCode.ERR0012, "mongodb不为空"));
+                    }else if (TEAM_FOREVER.equals(e)){
+                        Query query = Query.query(Criteria.where("courseId").is(circleId).and("classId").is(classId));
+                        Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
+                        update.pull("teamList", Query.query(Criteria.where("teamId").is(teamId)));
+                        return reactiveMongoTemplate.updateMulti(query, update, TeamCourse.class)
+                                .flatMap(teamCircle -> MyAssert.isNull(teamCircle, DefineCode.ERR0012, "mongodb不为空"));
+                    }
+                    return MyAssert.isNull(null, DefineCode.ERR0012, "参数不正确");
+                }).map(Objects::nonNull);
+    }
+
+    Mono<? extends BaseTeam> findTeamList(final CircleIdReq req) {
+        if (StrUtil.isBlank(req.getClassId())){
+            return reactiveMongoTemplate.findOne(Query.query(Criteria.where("circleId").is(req.getCircleId())), TeamCircle.class);
+        }else {
+            return reactiveMongoTemplate.findOne(Query.query(Criteria.where("courseId").is(req.getCircleId()).and("classId").is(req.getClassId())), TeamCourse.class);
+        }
+    }
 }
