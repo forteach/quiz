@@ -102,15 +102,17 @@ public class TeamService {
                 .flatMap(key -> {
                     return teamRedisService.getRedisStudents(key)
                             .filterWhen(j -> {
+                                //移除的小组减去相应的学生id
                                 return teamChangeService.lessJoinTeamStudentStr(changeVo.getStudents(), j)
                                         .flatMap(students -> teamRedisService.putRedisStudents(key, students));
                             })
                             .flatMap(s -> teamRedisService.getRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId())))
                             .filterWhen(a -> {
+                                //移入的小组添加进对应的学生id
                                 return teamChangeService.moreJoinTeamStudentStr(changeVo.getStudents(), a)
                                         .flatMap(students -> teamRedisService.putRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId()), students));
-                            });
-                    //.filterWhen(a -> teamMongoDBService.teamChange(changeVo));
+                            })
+                    .filterWhen(a -> teamMongoDBService.teamChange(changeVo));
                 }).map(Objects::nonNull);
     }
 
