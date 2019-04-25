@@ -94,7 +94,12 @@ public class TeamRedisService {
                 .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"));
     }
 
-
+    /**
+     * 获取redis hash 中对应的值
+     * @param key
+     * @param value
+     * @return
+     */
     Mono<String> findHashString(final String key, final String value){
         return reactiveHashOperations.get(key, value)
                 .flatMap(s -> MyAssert.isNull(s, DefineCode.ERR0012, "要查询的值在redis 不存在"));
@@ -204,7 +209,7 @@ public class TeamRedisService {
 
 
     /**
-     * 修改加入的学生id信息
+     * List<String> listStr ==> 123,1234,
      *
      * @param students
      * @return
@@ -212,6 +217,20 @@ public class TeamRedisService {
     String studentsListToStr(final List<String> students) {
         return String.join(",", students.toArray(new String[students.size()]));
     }
+
+    List<String> findListString(final String string){
+        return Arrays.asList(string.split(","));
+    }
+
+    /**
+     * 123,1234, ==> List<Students> listStudents
+     * @param students
+     * @return
+     */
+    Mono<List<Students>> findStudentsListByStr(final String students){
+        return studentsService.exchangeStudents(Arrays.asList(students.split(",")));
+    }
+
 
     /**
      * 将学生列表信息转换为学生字符串信息
@@ -226,6 +245,11 @@ public class TeamRedisService {
         return str.toString();
     }
 
+    /**
+     * 将从mongodb中查询道德小组信息保存到redis
+     * @param baseTeam
+     * @return
+     */
     public Mono<Boolean> saveRedisTeamList(BaseTeam baseTeam) {
         if (baseTeam instanceof TeamCircle) {
             return saveRedisTeams(baseTeam.getTeamList(),

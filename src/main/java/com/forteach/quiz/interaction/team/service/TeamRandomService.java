@@ -57,9 +57,12 @@ public class TeamRandomService {
         this.teamRedisService = teamRedisService;
     }
 
-
-
-
+    /**
+     * 随机分组 根据班级或课堂人数进行分组,从前到后排序多出部分依次从第一组到最后一组添加
+     * @param list
+     * @param randomVo
+     * @return
+     */
     Mono<GroupTeamResp> groupTeam(final List<Students> list, final GroupRandomReq randomVo) {
         return Mono.just(list)
                 .map(students -> {
@@ -90,11 +93,14 @@ public class TeamRandomService {
                 });
     }
 
-
-
+    /**
+     * 从redis中查询小组信息转换为需要数据传给前台
+     * @param teamId
+     * @return
+     */
     Mono<Team> findTeam(final String teamId) {
         return teamRedisService.getRedisStudents(ChangeTeamReq.concatTeamKey(teamId))
-                .flatMap(this::findListStudentsByStudentStr)
+                .flatMap(teamRedisService::findStudentsListByStr)
                 .filter(Objects::nonNull)
                 .flatMap(studentsList -> {
                     return reactiveHashOperations.get(ChangeTeamReq.concatTeamKey(teamId), "teamName")
@@ -103,14 +109,6 @@ public class TeamRandomService {
                             });
                 });
     }
-
-    Mono<List<Students>> findListStudentsByStudentStr(final String students) {
-        return Mono.just(Arrays.asList(students.split(",")))
-                .flatMap(studentsService::exchangeStudents);
-    }
-
-
-
 
     /**
      * 至少每组两个人
@@ -133,7 +131,6 @@ public class TeamRandomService {
 
     /**
      * 打乱学生列表顺序
-     *
      * @param listMono
      * @return
      */

@@ -53,7 +53,7 @@ public class TeamRoomController {
         return teamService.groupRandom(random).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "修改小组名称")
+    @ApiOperation(value = "修改小组名称", notes = "修改已经创建好的小组名称")
     @PostMapping("/updateTeamName")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from"),
@@ -65,7 +65,7 @@ public class TeamRoomController {
         return teamService.updateTeamName(req).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "需要删除小组")
+    @ApiOperation(value = "需要删除小组", notes = "删除不需要的小组成员")
     @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "from")
     @PostMapping("/delete")
     public Mono<WebResult> deleteTeam(@RequestBody DeleteTeamReq deleteTeamReq){
@@ -73,11 +73,11 @@ public class TeamRoomController {
         return teamService.deleteTeam(deleteTeamReq).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "添加小组")
+    @ApiOperation(value = "添加小组", notes = "已经建好的课堂新添加小组信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "classId", value = "班级id", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "circleId", value = "课堂圈子id/课程id", example = "必传", required = true, dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "classId", value = "班级id", required = true, example = "必传", dataType = "string", paramType = "from"),
+            @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", example = "必传", required = true, dataType = "string", paramType = "from"),
             @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "from")
     })
     @PostMapping("/addTeam")
@@ -89,7 +89,7 @@ public class TeamRoomController {
         return teamService.addTeam(req).map(WebResult::okResult);
     }
 
-    @ApiOperation(value = "移动小组成员", notes = "1 : 增加  2 : 减少")
+    @ApiOperation(value = "移动小组成员", notes = "对小组成员进行移动")
     @PostMapping(value = "/teamChange")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "addTeamId", value = "添加到的小组id", required = true, dataType = "string", paramType = "from"),
