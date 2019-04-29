@@ -9,11 +9,6 @@ package com.forteach.quiz.interaction.execute.service.Key;
 public class MoreQueKey {
 
     /**
-     * 互动提问hash前缀(习题库\头脑风暴等。。。)
-     */
-    public static final String CLASSROOM_ASK_QUESTIONS_ID = "ask";
-
-    /**
      * 互动练习册发布
      */
     public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "bookList";
@@ -33,8 +28,8 @@ public class MoreQueKey {
      *
      * @return now+课堂Id=map
      */
-    public static String questionsBookNow(final String circleId) {
-        return CLASSROOM_BOOK_NOW.concat(circleId);
+    public static String questionsBookNowMap(final String typeName, final String circleId) {
+        return CLASSROOM_BOOK_NOW.concat(circleId).concat(typeName);
     }
 
     /**
@@ -42,8 +37,8 @@ public class MoreQueKey {
      * @param circleId
      * @return
      */
-    public static String bookQuestionMap(final String circleId){
-        return circleId.concat(CLASSROOM_BOOK_QUESTIONS_MAP);
+    public static String bookQuestionMap(final String typeName,final String circleId){
+        return circleId.concat(CLASSROOM_BOOK_QUESTIONS_MAP).concat(typeName);
     }
 
     /**
