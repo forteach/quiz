@@ -55,9 +55,10 @@ public class SendQuestBookService {
        Mono<Boolean> addQuestBookNowMap = addQuestBookNow(circleId,teacherId,questIds,questionType,category,selected);
 
         //创建课堂问题列表记录
-        Mono<Boolean> BookMap = createQuestBookMap( circleId, questIds);
+        Mono<Boolean> BookMap = createQuestBookMap(questionType, circleId, questIds);
 
-        Mono<Boolean> BookList=createQuestBookList( circleId, questIds);
+        //创建不同类型多题目发布的题目列表
+        Mono<Boolean> BookList=createQuestBookList(questionType, circleId, questIds);
 
         //执行创建提问，并返回执行结果
         return    Flux.concat(addQuestBookNowMap,BookMap,BookList).collectList();
@@ -92,35 +93,35 @@ public class SendQuestBookService {
         //创建时间
         book.put("time", DataUtil.format(new Date()));
         //创建课堂练习册的题目2小时过期
-       return  reactiveHashOperations.putAll(MoreQueKey.questionsBookNow(circleId), book)
-               .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.questionsBookNow(circleId), Duration.ofSeconds(60*60*2)));
+       return  reactiveHashOperations.putAll(MoreQueKey.questionsBookNowMap(questionType,circleId), book)
+               .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.questionsBookNowMap(questionType,circleId), Duration.ofSeconds(60*60*2)));
     }
 
     /**
-     * 创建练习册列表
+     * 创建练习册MAP题目
      * @param circleId
      * @param questionIds
      * @return
      */
-    private  Mono<Boolean>  createQuestBookMap(String circleId,String questionIds){
+    private  Mono<Boolean>  createQuestBookMap(String questionType,String circleId,String questionIds){
 
         HashMap<String, String> questInfo = new HashMap<>();
         Arrays.stream(questionIds.split(",")).forEach(qid-> questInfo.put(qid,""));
-        return reactiveHashOperations.putAll(MoreQueKey.bookQuestionMap(circleId), questInfo)
-                .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.bookQuestionMap(circleId), Duration.ofSeconds(60*60*2)));
+        return reactiveHashOperations.putAll(MoreQueKey.bookQuestionMap(questionType,circleId), questInfo)
+                .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.bookQuestionMap(questionType,circleId), Duration.ofSeconds(60*60*2)));
     }
 
     /**
-     * 创建练习测题目
+     * 创建不同类型多题目发布的题目列表
      * @param circleId
      * @param questionIds
      * @return
      */
-    private Mono<Boolean> createQuestBookList(String circleId,String questionIds){
+    private Mono<Boolean> createQuestBookList(String typeName,String circleId,String questionIds){
         List<String> strs =Arrays.asList(questionIds.split(","));
-        return stringRedisTemplate.opsForList().rightPushAll(MoreQueKey.bookTypeQuestionsList("",circleId),strs)
+        return stringRedisTemplate.opsForList().rightPushAll(MoreQueKey.bookTypeQuestionsList(typeName,circleId),strs)
                 .flatMap(ok->Mono.just(true))
-                 .filterWhen(ok->stringRedisTemplate.expire(MoreQueKey.bookTypeQuestionsList("",circleId), Duration.ofSeconds(60*60*2)));
+                 .filterWhen(ok->stringRedisTemplate.expire(MoreQueKey.bookTypeQuestionsList(typeName,circleId), Duration.ofSeconds(60*60*2)));
     }
 
 }
