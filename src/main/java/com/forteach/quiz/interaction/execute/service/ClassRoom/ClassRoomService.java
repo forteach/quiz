@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
+import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
@@ -62,9 +63,21 @@ public class ClassRoomService {
                         });
                 }
         })
+                //设置当前课堂活动为课堂记入学生
+                .filterWhen(r->setInteractionType(circleId,ClassRoomKey.CLASSROOM_JOIN_QUESTIONS_ID))
                 //记录Mongo日志
                 .filterWhen(tid->interactRecordExecuteService.init(newcircleId,teacherId));
     }
+
+    /**
+     * 设置当前课堂当前活动主题
+     * @param circleId
+     */
+    public Mono<Boolean> setInteractionType(String circleId,String value){
+        final String key= ClassRoomKey.setInteractionType(circleId);
+        return stringRedisTemplate.opsForValue().set(key, value,Duration.ofSeconds(60*60*2));
+    }
+
 
     /**
      * 创建教室和教师

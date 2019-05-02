@@ -2,6 +2,8 @@ package com.forteach.quiz.interaction.execute.service.SingleQue;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
+import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
+import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
@@ -26,14 +28,18 @@ public class SendQuestService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
     private final InteractRecordQuestionsService interactRecordQuestionsService;
+    private final ClassRoomService classRoomService;
+
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
                             ReactiveHashOperations<String, String, String> reactiveHashOperations,
                             InteractRecordQuestionsService interactRecordQuestionsService,
+                            ClassRoomService classRoomService,
                             BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
         this.interactRecordQuestionsService = interactRecordQuestionsService;
+        this.classRoomService= classRoomService;
     }
 
     /**
@@ -112,10 +118,21 @@ public class SendQuestService {
         map.put("time", DataUtil.format(new Date()));//创建时间
         //创建课堂提问的题目2小时过期
        return reactiveHashOperations.putAll(SingleQueKey.questionsIdNow(circleId), map)
+               //设置当前课堂当前活动是提问
+               .flatMap(r->setInteractionType(circleId))
                 //设置题目信息
                .flatMap(r->setQuestInfo(questId))
                .filterWhen(r->stringRedisTemplate.expire(SingleQueKey.questionsIdNow(circleId), Duration.ofSeconds(60*60*2)));
 
+    }
+
+    /**
+     * 设置当前课堂当前活动主题为提问
+     * @param circleId
+     */
+    private Mono<Boolean> setInteractionType(String circleId){
+
+       return classRoomService.setInteractionType(circleId,SingleQueKey.CLASSROOM_ASK_QUESTIONS_ID);
     }
 
     /**

@@ -8,16 +8,10 @@ package com.forteach.quiz.interaction.execute.service.Key;
  */
 public class ClassRoomKey {
 
-
     /**
-     * 课堂SCOKET随机数YES状态,改变状态
+     * 当前课堂当前互动名称
      */
-    public static final String OPEN_CLASSROOM_RANDOM_TAG_YES = "Y";
-
-    /**
-     * 课堂SCOKET随机数NO状态，未改变状态
-     */
-    public static final String OPEN_CLASSROOM_RANDOM_TAG_NO = "N";
+    public static final String CLASSROOM_NOW_INTERACT= "nowInteract";
 
     /**
      * 课堂相关信息ID-Redis的编码前缀
@@ -53,6 +47,20 @@ public class ClassRoomKey {
      * 加入课堂，已推送过得学生回答
      */
     public static final String ROOM_JOIN_RAISE_TS = "RoomJoinRaise";
+
+    /**
+     * 互动方式为加入学生
+     */
+    public static final String CLASSROOM_JOIN_QUESTIONS_ID = "joinStu";
+
+    /**
+     * 设置当前活动KEY
+     *
+     * @return
+     */
+    public static String setInteractionType(final String circleId) {
+        return CLASSROOM_NOW_INTERACT.concat(circleId);
+    }
 
     /**
      * 课堂所有学生
