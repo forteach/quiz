@@ -46,7 +46,10 @@ public class ClassRoomService {
         {
             if (StrUtil.isBlank(circleId)) {
                 //根据互动课堂ID和教师ID，创建Mongo或返回课堂信息
-                return Mono.just(newcircleId).filterWhen(cid->buildRoom(cid, teacherId));
+                return Mono.just(newcircleId)
+                        //设置当前课堂活动为课堂记入学生
+                        .filterWhen(cid->setInteractionType(cid,ClassRoomKey.CLASSROOM_JOIN_QUESTIONS_ID))
+                        .filterWhen(cid->buildRoom(cid, teacherId));
                         //创建Redis教室和教师信息,过期时间2小时;
             } else {
                 //如果key过期，则返回不存在为true
@@ -63,8 +66,6 @@ public class ClassRoomService {
                         });
                 }
         })
-                //设置当前课堂活动为课堂记入学生
-                .filterWhen(r->setInteractionType(circleId,ClassRoomKey.CLASSROOM_JOIN_QUESTIONS_ID))
                 //记录Mongo日志
                 .filterWhen(tid->interactRecordExecuteService.init(newcircleId,teacherId));
     }
