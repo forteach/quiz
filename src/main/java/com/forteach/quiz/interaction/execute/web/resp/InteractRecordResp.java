@@ -26,5 +26,27 @@ public class InteractRecordResp implements Serializable {
     @ApiModelProperty(name = "interactive", value = "提问方式")
     private String interactive;
 
+    private String circleId;
+
+    private String questionId;
+
     private List<InteractAnswerRecordResp> answerRecordList;
+
+    public InteractRecordResp(String category, String interactive, String circleId,
+                              String questionId, List<InteractAnswerRecordResp> answerRecordList) {
+        this.category = category;
+        this.interactive = interactive;
+        this.circleId = circleId;
+        this.questionId = questionId;
+        this.answerRecordList = answerRecordList;
+    }
+
+    public InteractRecordResp() {
+    }
+
+    public InteractRecordResp(String circleId, String questionId, List<InteractAnswerRecordResp> answerRecordList) {
+        this.answerRecordList = answerRecordList;
+        this.circleId = circleId;
+        this.questionId = questionId;
+    }
 }

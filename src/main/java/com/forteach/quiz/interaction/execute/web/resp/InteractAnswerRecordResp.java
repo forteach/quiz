@@ -39,12 +39,16 @@ public class InteractAnswerRecordResp {
     public InteractAnswerRecordResp() {
     }
 
-    public InteractAnswerRecordResp(String studentId, String name, String portrait, String answer, boolean piGaiResult, String updateTime) {
+    public InteractAnswerRecordResp(String studentId, String name, String portrait, String answer, String piGaiResult, String updateTime) {
         this.studentId = studentId;
         this.name = name;
         this.portrait = portrait;
         this.answer = answer;
-        this.piGaiResult = piGaiResult;
+        if ("true".equals(piGaiResult)){
+            this.piGaiResult = true;
+        }else {
+            this.piGaiResult = false;
+        }
         this.updateTime = updateTime;
     }
 

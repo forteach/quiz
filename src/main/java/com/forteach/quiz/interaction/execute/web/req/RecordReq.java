@@ -22,6 +22,9 @@ public class RecordReq implements Serializable {
     @ApiModelProperty(value = "课堂id", name = "circleId", dataType = "string", required = true)
     private String circleId;
 
-    @ApiModelProperty(value = "问题id", name = "questionsId", dataType = "string")
-    private String questionsId;
+    @ApiModelProperty(value = "问题id", name = "questionId", dataType = "string")
+    private String questionId;
+
+//    @ApiModelProperty(value = "学生id", name = "examineeId", dataType = "string")
+//    private String examineeId;
 }
