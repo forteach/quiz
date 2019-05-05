@@ -53,6 +53,7 @@ public class ClassRoomController extends BaseController {
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
     @PostMapping(value = "/join/interactiveRoom")
+    
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂圈子id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })

@@ -45,7 +45,7 @@ public class ClassRoomTest {
 
     @Test
     public void joinInteractiveRoom(){
-        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("410922200103040900","5c9b041c3230ac0dfc54ed35");
+        JoinInteractiveRoomVo vo=new JoinInteractiveRoomVo("1301331992031827761","5ccb75e7515721528835162b");
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/classRoom/join/interactiveRoom")

@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
+import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
@@ -45,7 +46,10 @@ public class ClassRoomService {
         {
             if (StrUtil.isBlank(circleId)) {
                 //根据互动课堂ID和教师ID，创建Mongo或返回课堂信息
-                return Mono.just(newcircleId).filterWhen(cid->buildRoom(cid, teacherId));
+                return Mono.just(newcircleId)
+                        //设置当前课堂活动为课堂记入学生
+                        .filterWhen(cid->setInteractionType(cid,ClassRoomKey.CLASSROOM_JOIN_QUESTIONS_ID))
+                        .filterWhen(cid->buildRoom(cid, teacherId));
                         //创建Redis教室和教师信息,过期时间2小时;
             } else {
                 //如果key过期，则返回不存在为true
@@ -65,6 +69,16 @@ public class ClassRoomService {
                 //记录Mongo日志
                 .filterWhen(tid->interactRecordExecuteService.init(newcircleId,teacherId));
     }
+
+    /**
+     * 设置当前课堂当前活动主题
+     * @param circleId
+     */
+    public Mono<Boolean> setInteractionType(String circleId,String value){
+        final String key= ClassRoomKey.setInteractionType(circleId);
+        return stringRedisTemplate.opsForValue().set(key, value,Duration.ofSeconds(60*60*2));
+    }
+
 
     /**
      * 创建教室和教师

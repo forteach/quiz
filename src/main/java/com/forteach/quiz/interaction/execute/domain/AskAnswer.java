@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
 
 
 /**
@@ -42,6 +43,11 @@ public class AskAnswer extends BaseEntity {
      */
     @ApiModelProperty(value = "答案", name = "answer")
     private String answer;
+
+    /**
+     * 答案图片列表
+     */
+    private List<String> answerImageList;
     /**
      * 问题id
      */

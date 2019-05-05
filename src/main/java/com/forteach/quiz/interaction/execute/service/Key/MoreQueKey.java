@@ -24,6 +24,11 @@ public class MoreQueKey {
     public static final String CLASSROOM_BOOK_QUESTIONS_MAP = "bookMap";
 
     /**
+     * 互动方式为练习
+     */
+    public static final String CLASSROOM_BOOK_QUESTIONS_ID = "book";
+
+    /**
      * 课堂题目当前前缀
      *
      * @return now+课堂Id=map

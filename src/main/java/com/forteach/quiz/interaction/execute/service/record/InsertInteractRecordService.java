@@ -1,5 +1,8 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
+import com.forteach.quiz.common.DataUtil;
+import com.forteach.quiz.exceptions.AskException;
+import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
@@ -12,6 +15,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.Date;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.*;
 
@@ -91,6 +96,33 @@ public class InsertInteractRecordService {
         }).map(Objects::nonNull);
     }
 
+//    /**
+//     * 学生回答问题时 加入记录
+//     *
+//     * @param circleId
+//     * @param questionId
+//     * @param studentId
+//     * @param answer
+//     * @param right
+//     * @return
+//     */
+//    public Mono<Boolean> answerList(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
+//
+//        final Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId)
+//                .and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId));
+//        Update update = new Update()
+//                .inc(INTERACT_RECORD_QUESTIONS.concat(".$.answerNumber"), 1);
+//        if (QUESTION_ACCURACY_TRUE.equals(right)){
+//            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.correctNumber"), 1);
+//        }else if (QUESTION_ACCURACY_FALSE.equals(right)){
+//            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.errorNumber"), 1);
+//        }
+//        update.push(INTERACT_RECORD_QUESTIONS.concat(".$.answerRecordList"), new InteractAnswerRecord(studentId, answer, right));
+//        return mongoTemplate.updateMulti(query, update, InteractRecord.class)
+//                .map(UpdateResult::wasAcknowledged);
+//
+//    }
+
     /**
      * 学生回答问题时 加入记录
      *
@@ -101,20 +133,28 @@ public class InsertInteractRecordService {
      * @param right
      * @return
      */
-    public Mono<Boolean> answer(final String circleId, final String questionId, final String studentId, final String answer, final String right) {
+    public Mono<Boolean> answer(final String circleId, final String type, final String questionId, final String studentId, final String answer, final Boolean right) {
 
-        final Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId)
-                .and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId));
-        Update update = new Update()
-                .inc(INTERACT_RECORD_QUESTIONS.concat(".$.answerNumber"), 1);
-        if (QUESTION_ACCURACY_TRUE.equals(right)){
-            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.correctNumber"), 1);
-        }else if (QUESTION_ACCURACY_FALSE.equals(right)){
-            update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.errorNumber"), 1);
-        }
-        update.push(INTERACT_RECORD_QUESTIONS.concat(".$.answerRecordList"), new InteractAnswerRecord(studentId, answer, right));
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class)
-                .map(UpdateResult::wasAcknowledged);
+            //查找学生需要回答的题目
+            Query query = Query.query(
+                    Criteria.where("circleId").is(circleId)
+                            .and("questionId").is(questionId)
+                            .and("examineeId").is(studentId));
+            //更新题目答案
+            Update update = Update.update("answer", answer)
+                    .set("interactive", type)
+                    .set("right", String.valueOf(right))
+                    .set("uDate", DataUtil.format(new Date()));
+
+            return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
+                if (result.wasAcknowledged()) {
+                    return Mono.just(right);
+                } else {
+                    return Mono.error(new AskException("Mongo操作失败"));
+                }
+            });
 
     }
+
+
 }
