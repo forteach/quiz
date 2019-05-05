@@ -41,8 +41,8 @@ import java.util.List;
 @RequestMapping(value = "/interact", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BigQuestionInteractController {
 
-    private final InteractRecordQuestionsService interactRecordQuestionsService;
-    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
+//    private final InteractRecordQuestionsService interactRecordQuestionsService;
+//    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final TokenService tokenService;
     private final RecordService recordService;
 
@@ -76,8 +76,9 @@ public class BigQuestionInteractController {
      */
     private final SendAnswerQuestBookService sendAnswerQuestBookService;
 
-    public BigQuestionInteractController(InteractRecordQuestionsService interactRecordQuestionsService,
-                                         InteractRecordExerciseBookService interactRecordExerciseBookService,
+    public BigQuestionInteractController(
+//            InteractRecordQuestionsService interactRecordQuestionsService,
+//                                         InteractRecordExerciseBookService interactRecordExerciseBookService,
                                          SendQuestService sendQuestService,
                                          SendAnswerService sendAnswerService,
                                          RaiseHandService raiseHandService,
@@ -86,8 +87,8 @@ public class BigQuestionInteractController {
                                          RecordService recordService,
                                          SendAnswerQuestBookService sendAnswerQuestBookService,
                                          TokenService tokenService) {
-        this.interactRecordQuestionsService = interactRecordQuestionsService;
-        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+//        this.interactRecordQuestionsService = interactRecordQuestionsService;
+//        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.tokenService = tokenService;
         this.sendQuestService = sendQuestService;
         this.sendAnswerService= sendAnswerService;
@@ -254,31 +255,31 @@ public class BigQuestionInteractController {
     }
 
 
-    @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
-    @PostMapping("/findQuestionsRecord")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
-    })
-    public Mono<WebResult> findQuestionsRecord(@RequestBody RecordReq recordReq){
-        //验证请求参数
-        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
-        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordQuestionsService.findRecordQuestion(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
-    }
+//    @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
+//    @PostMapping("/findQuestionsRecord")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
+//            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
+//    })
+//    public Mono<WebResult> findQuestionsRecord(@RequestBody RecordReq recordReq){
+//        //验证请求参数
+//        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
+//        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
+//        return interactRecordQuestionsService.findRecordQuestion(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+//    }
 
-    @ApiOperation(value = "查询课堂习题册提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
-    @PostMapping("/findExerciseBookRecord")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
-    })
-    public Mono<WebResult> findExerciseBook(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody RecordReq recordReq){
-        //验证请求参数
-        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
-        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
-        return interactRecordExerciseBookService.findRecordExerciseBook(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
-    }
+//    @ApiOperation(value = "查询课堂习题册提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
+//    @PostMapping("/findExerciseBookRecord")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(value = "课堂id", name = "circleId", dataType = "string", required = true, paramType = "query"),
+//            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
+//    })
+//    public Mono<WebResult> findExerciseBook(@ApiParam(value = "查询课堂提交的记录", required = true) @RequestBody RecordReq recordReq){
+//        //验证请求参数
+//        MyAssert.blank(recordReq.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
+//        MyAssert.blank(recordReq.getQuestionsId(), DefineCode.ERR0010 ,"问题编号不能为空");
+//        return interactRecordExerciseBookService.findRecordExerciseBook(recordReq.getCircleId(), recordReq.getQuestionsId()).map(WebResult::okResult);
+//    }
 
 //多题目类型**********************************************************************************************
     /**
