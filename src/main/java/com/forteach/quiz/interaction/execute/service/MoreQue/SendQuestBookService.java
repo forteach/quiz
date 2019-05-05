@@ -7,6 +7,7 @@ import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -80,13 +81,15 @@ public class SendQuestBookService {
      * @return true or false
      */
     private Mono<Boolean> addQuestBookNow(final String circleId,final String teacherId,final String questIds,String questionType, final String category,final String selected){
-        HashMap<String, String> book = new HashMap<>(8);
+        HashMap<String, String> book = new HashMap<>(9);
         //当前课堂ID
         book.put("circleId",circleId);
         //当前课堂教师ID
         book.put("teacherId",teacherId);
         //题目类型
         book.put("questionType", questionType);
+        //当前联系册唯一ID
+        book.put("questBookId", ObjectId.get().toString());
         //练习册题目编号（逗号分隔）
         book.put("questionId", questIds);
         //选取类别（个人、小组）
