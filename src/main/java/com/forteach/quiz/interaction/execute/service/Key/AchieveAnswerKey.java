@@ -9,17 +9,32 @@ package com.forteach.quiz.interaction.execute.service.Key;
 public class AchieveAnswerKey {
 
     /**
-     * 已回答
+     * 加入课堂，已推送过得学生回答
      */
-    public static final String ASK_CIRCLE_ANSWER_DID = "2";
+    public static final String ROOM_JOIN_ANSW_TS = "RoomJoinAnsw";
 
     /**
-     * 互动提问hash前缀(习题库\头脑风暴等。。。)
+     * 拉取操作
      */
-    public static final String CLASSROOM_ASK_NOW= "now";
+    public static final String ASK_PUSH = "push";
 
-    //刷新清除场景命名问题回答场景
-    public static final String CLASSROOM_CLEAR_TAG_ANSWER="answer";
+    /**
+     * 推送操作
+     */
+    public static final String ASK_PULL = "pull";
+
+//    /**
+//     * 已回答
+//     */
+//    public static final String ASK_CIRCLE_ANSWER_DID = "2";
+//
+//    /**
+//     * 互动提问hash前缀(习题库\头脑风暴等。。。)
+//     */
+//    public static final String CLASSROOM_ASK_NOW= "now";
+//
+//    //刷新清除场景命名问题回答场景
+//    public static final String CLASSROOM_CLEAR_TAG_ANSWER="answer";
 
 
     /**
@@ -65,6 +80,16 @@ public class AchieveAnswerKey {
     public static String answerTypeQuestStuList(final String circleId,String questionId,String typeName) {
         //TODO 需要处理为空??
         return questionId.concat("answerlist").concat(typeName).concat(circleId);
+    }
+
+    /**
+     * 清楚题目回答的学生键值
+     * @param circleId
+     * @param questionId
+     * @return
+     */
+    public static String cleanAnswerHasJoin(String circleId,String questionId){
+        return ASK_PUSH.concat(circleId.concat(questionId).concat(ROOM_JOIN_ANSW_TS));
     }
 
 }

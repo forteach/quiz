@@ -101,10 +101,10 @@ public class SendAnswerService {
                 //设置学生回答题目的批改结果
                 .filterWhen(right ->  reactiveHashOperations.put(AchieveAnswerKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()),examineeId,String.valueOf(right))
                                     .flatMap(ok->stringRedisTemplate.expire(AchieveAnswerKey.piGaiTypeQuestionsId(circleId,questId,QuestionType.TiWen.name()), Duration.ofSeconds(60*60*2)))
-                    )
-                //记录学生回答MONGO记录
-               .filterWhen(right -> insertInteractRecordService.answer(circleId,QuestionType.TiWen.name(), questId, examineeId, answer, right)
-                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
+                    );
+//                //记录学生回答MONGO记录
+//               .filterWhen(right -> insertInteractRecordService.answer(circleId,QuestionType.TiWen.name(), questId, examineeId, answer, right)
+//                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
     }
 
     /**
@@ -146,7 +146,18 @@ public class SendAnswerService {
         //创建学生回答顺序列表
 
         //TODO 发布题目答案对比 需要改成Redis，现在未改动
-        return correctService.correcting(SingleQueKey.questionsNow(questId),questId, answer);
+        return correctService.correcting(SingleQueKey.questionsNow(questId),questId, answer)
+                .filterWhen(r->cleanAnswerHasJoinStu(circleId,examineeId,questId));
+    }
+
+    private Mono<Boolean> cleanAnswerHasJoinStu(final String circleId,final String examineeId,final String questId){
+       String key= AchieveAnswerKey.cleanAnswerHasJoin(circleId,questId);
+       String[] strarrays = new String[]{examineeId};
+       return stringRedisTemplate.opsForSet().remove(key,strarrays)
+               .flatMap(r-> {
+                   System.out.println("r-----------" + r);
+                   return Mono.just(true);
+               });
     }
 
 
