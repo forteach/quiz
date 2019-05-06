@@ -41,8 +41,8 @@ import java.util.List;
 @RequestMapping(value = "/interact", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BigQuestionInteractController {
 
-    private final InteractRecordQuestionsService interactRecordQuestionsService;
-    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
+//    private final InteractRecordQuestionsService interactRecordQuestionsService;
+//    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final TokenService tokenService;
     private final RecordService recordService;
 
@@ -76,8 +76,9 @@ public class BigQuestionInteractController {
      */
     private final SendAnswerQuestBookService sendAnswerQuestBookService;
 
-    public BigQuestionInteractController(InteractRecordQuestionsService interactRecordQuestionsService,
-                                         InteractRecordExerciseBookService interactRecordExerciseBookService,
+    public BigQuestionInteractController(
+//            InteractRecordQuestionsService interactRecordQuestionsService,
+//                                         InteractRecordExerciseBookService interactRecordExerciseBookService,
                                          SendQuestService sendQuestService,
                                          SendAnswerService sendAnswerService,
                                          RaiseHandService raiseHandService,
@@ -86,8 +87,8 @@ public class BigQuestionInteractController {
                                          RecordService recordService,
                                          SendAnswerQuestBookService sendAnswerQuestBookService,
                                          TokenService tokenService) {
-        this.interactRecordQuestionsService = interactRecordQuestionsService;
-        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+//        this.interactRecordQuestionsService = interactRecordQuestionsService;
+//        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.tokenService = tokenService;
         this.sendQuestService = sendQuestService;
         this.sendAnswerService= sendAnswerService;
@@ -291,6 +292,7 @@ public class BigQuestionInteractController {
     @PostMapping("/send/book")
     @ApiImplicitParam(value = "问题id,多个id逗号分隔", name = "questionIds", required = true, dataType = "string", paramType = "from")
     public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
+
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         return  sendQuestBookService.
                 sendQuestionBook(giveVo.getCircleId(),

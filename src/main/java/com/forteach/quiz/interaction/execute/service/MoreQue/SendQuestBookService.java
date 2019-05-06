@@ -1,10 +1,13 @@
 package com.forteach.quiz.interaction.execute.service.MoreQue;
 
 import com.forteach.quiz.common.DataUtil;
+import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.execute.service.Key.MoreQueKey;
+import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -27,17 +30,20 @@ public class SendQuestBookService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
     private final InteractRecordExerciseBookService interactRecordExerciseBookService;
+    private final ClassRoomService classRoomService;
 
     public SendQuestBookService(ReactiveStringRedisTemplate stringRedisTemplate,
                                 ReactiveMongoTemplate mongoTemplate,
                                 ReactiveHashOperations<String, String, String> reactiveHashOperations,
                                 InteractRecordExerciseBookService interactRecordExerciseBookService,
+                                ClassRoomService classRoomService,
                                 BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.mongoTemplate=mongoTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
         this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+        this.classRoomService= classRoomService;
     }
 
     /**
@@ -75,13 +81,15 @@ public class SendQuestBookService {
      * @return true or false
      */
     private Mono<Boolean> addQuestBookNow(final String circleId,final String teacherId,final String questIds,String questionType, final String category,final String selected){
-        HashMap<String, String> book = new HashMap<>(8);
+        HashMap<String, String> book = new HashMap<>(9);
         //当前课堂ID
         book.put("circleId",circleId);
         //当前课堂教师ID
         book.put("teacherId",teacherId);
         //题目类型
         book.put("questionType", questionType);
+        //当前联系册唯一ID
+        book.put("questBookId", ObjectId.get().toString());
         //练习册题目编号（逗号分隔）
         book.put("questionId", questIds);
         //选取类别（个人、小组）
@@ -94,7 +102,17 @@ public class SendQuestBookService {
         book.put("time", DataUtil.format(new Date()));
         //创建课堂练习册的题目2小时过期
        return  reactiveHashOperations.putAll(MoreQueKey.questionsBookNowMap(questionType,circleId), book)
+               //设置当前课堂当前活动是练习册
+               .flatMap(r->setInteractionType(circleId))
                .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.questionsBookNowMap(questionType,circleId), Duration.ofSeconds(60*60*2)));
+    }
+
+    /**
+     * 设置当前课堂当前活动主题为练习册
+     * @param circleId
+     */
+    private Mono<Boolean> setInteractionType(String circleId){
+        return classRoomService.setInteractionType(circleId, MoreQueKey.CLASSROOM_BOOK_QUESTIONS_ID);
     }
 
     /**
