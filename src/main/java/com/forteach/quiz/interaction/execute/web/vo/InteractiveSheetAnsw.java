@@ -1,13 +1,9 @@
 package com.forteach.quiz.interaction.execute.web.vo;
 
-import com.forteach.quiz.common.DataUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 /**
  * @Description:

@@ -20,11 +20,11 @@ import java.util.List;
 @ApiModel(value = "查询问题记录数据对象")
 public class InteractRecordResp implements Serializable {
 
-    @ApiModelProperty(name = "category", value = "发布类别")
-    private String category;
+//    @ApiModelProperty(name = "category", value = "发布类别")
+//    private String category;
 
-    @ApiModelProperty(name = "interactive", value = "提问方式")
-    private String interactive;
+//    @ApiModelProperty(name = "interactive", value = "提问方式")
+//    private String interactive;
 
     private String circleId;
 
@@ -32,14 +32,14 @@ public class InteractRecordResp implements Serializable {
 
     private List<InteractAnswerRecordResp> answerRecordList;
 
-    public InteractRecordResp(String category, String interactive, String circleId,
-                              String questionId, List<InteractAnswerRecordResp> answerRecordList) {
-        this.category = category;
-        this.interactive = interactive;
-        this.circleId = circleId;
-        this.questionId = questionId;
-        this.answerRecordList = answerRecordList;
-    }
+//    public InteractRecordResp(String category, String interactive, String circleId,
+//                              String questionId, List<InteractAnswerRecordResp> answerRecordList) {
+//        this.category = category;
+//        this.interactive = interactive;
+//        this.circleId = circleId;
+//        this.questionId = questionId;
+//        this.answerRecordList = answerRecordList;
+//    }
 
     public InteractRecordResp() {
     }

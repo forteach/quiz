@@ -184,8 +184,8 @@ public class InteractRecordExecuteService {
         return Mono.just(category)
                 .zipWith(changeFindRecord(answerRecordList), (c, list) -> {
                     return InteractRecordResp.builder()
-                            .interactive(interactive)
-                            .category(c)
+//                            .interactive(interactive)
+//                            .category(c)
                             .answerRecordList(list)
                             .build();
                 });
@@ -207,8 +207,8 @@ public class InteractRecordExecuteService {
         return Mono.just(category)
                 .zipWith(changStudentList(selectId), (c, list) -> {
                     return InteractRecordResp.builder()
-                           .category(c)
-                           .interactive(interactive)
+//                           .category(c)
+//                           .interactive(interactive)
                            .answerRecordList(list)
                            .build();
                 });

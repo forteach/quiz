@@ -15,6 +15,12 @@ import lombok.Data;
 @ApiModel(value = "学生回答结果详细对象记录")
 public class InteractAnswerRecordResp {
 
+//    @ApiModelProperty(name = "category", value = "发布类别")
+//    private String category;
+
+    @ApiModelProperty(name = "interactive", value = "提问方式")
+    private String interactive;
+
     @ApiModelProperty(name = "studentId", value = "学生id", dataType = "string")
     private String studentId;
 
@@ -39,7 +45,12 @@ public class InteractAnswerRecordResp {
     public InteractAnswerRecordResp() {
     }
 
-    public InteractAnswerRecordResp(String studentId, String name, String portrait, String answer, String piGaiResult, String updateTime) {
+    public InteractAnswerRecordResp(
+//            String category,
+            String interactive, String studentId, String name, String portrait,
+                                    String answer, String piGaiResult, String updateTime) {
+//        this.category = category;
+        this.interactive = interactive;
         this.studentId = studentId;
         this.name = name;
         this.portrait = portrait;

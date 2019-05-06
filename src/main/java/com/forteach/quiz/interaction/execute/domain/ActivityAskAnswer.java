@@ -19,10 +19,9 @@ import java.util.List;
  * @date: 2019/1/20  13:29
  */
 @Data
+@Builder
 @Document(collection = "activityAskAnswer")
 @EqualsAndHashCode(callSuper = true)
-@Builder
-@AllArgsConstructor
 @ApiModel(value = "活动 (任务,风暴,卷子) 回答信息", description = "活动 (任务,风暴,卷子) 学生回答信息")
 public class ActivityAskAnswer extends BaseEntity {
 
@@ -59,5 +58,15 @@ public class ActivityAskAnswer extends BaseEntity {
 
 
     public ActivityAskAnswer() {
+    }
+
+    public ActivityAskAnswer(String examineeId, String libraryType,
+                             String evaluate, String circleId,
+                             List<InteractiveSheetAnsw> answList) {
+        this.examineeId = examineeId;
+        this.libraryType = libraryType;
+        this.evaluate = evaluate;
+        this.circleId = circleId;
+        this.answList = answList;
     }
 }
