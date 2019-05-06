@@ -37,7 +37,7 @@ public class ClassRoomService {
     }
 
 
-    public Mono<String> createInteractiveRoom(final String circleId,final String teacherId) {
+    public Mono<String> createInteractiveRoom(final String circleId,final String teacherId,final String chapterId) {
 
         //TODO 创建课堂ID，REDIS键值，安课堂ID过期键值处理过期
         final String newcircleId=ObjectId.get().toString();
@@ -45,29 +45,31 @@ public class ClassRoomService {
         return Mono.just(teacherId).flatMap(tid ->
         {
             if (StrUtil.isBlank(circleId)) {
-                //根据互动课堂ID和教师ID，创建Mongo或返回课堂信息
+
                 return Mono.just(newcircleId)
-                        //设置当前课堂活动为课堂记入学生
+                        //设置当前课堂ID
                         .filterWhen(cid->setInteractionType(cid,ClassRoomKey.CLASSROOM_JOIN_QUESTIONS_ID))
-                        .filterWhen(cid->buildRoom(cid, teacherId));
                         //创建Redis教室和教师信息,过期时间2小时;
+                        .filterWhen(cid->buildRoom(cid, teacherId,chapterId));
+
             } else {
                 //如果key过期，则返回不存在为true
-                Mono<Boolean> notHasKey = stringRedisTemplate.hasKey(ClassRoomKey.getInteractiveIdQra(circleId)).flatMap(res -> Mono.just(!res));
+                Mono<Boolean> notHasKey = stringRedisTemplate.hasKey(ClassRoomKey.getInteractiveIdQra(circleId));
                 return notHasKey
                         .flatMap(result -> {
                             if (result) {
-                                //记录课堂创建日志记录
-                                return Mono.just(newcircleId).filterWhen(cid->buildRoom(cid, teacherId));
-                            } else {
-                                //如果键值不过期存在，放回当前键值
+                                //如果键值存在，返回当前键值
                                 return Mono.just(circleId);
+
+                            } else {
+                                //不存在，创建教室信息
+                                return Mono.just(newcircleId).filterWhen(cid->buildRoom(cid, teacherId,chapterId));
                             }
                         });
                 }
-        })
-                //记录Mongo日志
-                .filterWhen(tid->interactRecordExecuteService.init(newcircleId,teacherId));
+        });
+//                //TODO 需要修改
+//                .filterWhen(tid->interactRecordExecuteService.init(newcircleId,teacherId,chapterId));
     }
 
     /**
@@ -86,12 +88,10 @@ public class ClassRoomService {
      * @param teacherId
      * @return
      */
-    private Mono<Boolean> buildRoom(final String circleId, final String teacherId) {
+    private Mono<Boolean> buildRoom(final String circleId, final String teacherId,final String chapterId) {
 
-        //课堂Redis 键值
+        //设置课堂成员
         final String interactiveIdQr = ClassRoomKey.getInteractiveIdQra(circleId);
-
-
         final Mono<Boolean> roomUser =stringRedisTemplate.opsForSet().add(interactiveIdQr, teacherId)
                 .flatMap(count -> MyAssert.isTrue(count == 0, DefineCode.ERR0013, "添加课堂教师失败"))
                 //设置加入课堂后，两小时过期
@@ -100,7 +100,7 @@ public class ClassRoomService {
         // TODO 正在开课的教室，以后可以创建个任务，清理这里无效的数据？****
         final Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
                 .flatMap(count -> MyAssert.isTrue(count==0, DefineCode.ERR0013, "创建课堂失败"))
-                //设置正在开课的课堂ID集合12小时过期，如果启动清理任务，这个过期就需要去除？****
+                //设置正在开课的课堂ID集合2小时过期
                 .filterWhen(count -> stringRedisTemplate.expire(ClassRoomKey.OPEN_CLASSROOM, Duration.ofSeconds(60 * 60 * 12)));
 
         //设置上课的教室
@@ -108,8 +108,13 @@ public class ClassRoomService {
                 .set(ClassRoomKey.getRoomTeacherKey(circleId),teacherId, Duration.ofSeconds(60 * 60 * 2))
                 .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "创建课堂记录教师失败"));
 
+        //设置上课的教室
+        final Mono<Boolean> RoomChapter =stringRedisTemplate.opsForValue()
+                .set(ClassRoomKey.getRoomChapterKey(circleId),chapterId, Duration.ofSeconds(60 * 60 * 2))
+                .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "创建课堂章节信息失败"));
+
         //创建单个活跃课堂，并返回课堂ID
-        return  roomUser.filterWhen(obj->openRoomIDs).filterWhen(obj->RoomTeacher);
+        return  roomUser.filterWhen(obj->openRoomIDs).filterWhen(obj->RoomTeacher).filterWhen(obj->RoomChapter);
     }
 
     /**
@@ -120,8 +125,8 @@ public class ClassRoomService {
      */
     public Mono<Long> joinInteractiveRoom(final String circleId,final String examineeId) {
         //创建redis学生加入课堂的键值对
-        return Mono.just( ClassRoomKey.getInteractiveIdQra(circleId)).flatMap(key->stringRedisTemplate.opsForSet().add(key, examineeId)
-                .filterWhen(obj -> interactRecordExecuteService.join(circleId, examineeId)));
+        return Mono.just( ClassRoomKey.getInteractiveIdQra(circleId)).flatMap(key->stringRedisTemplate.opsForSet().add(key, examineeId));
+//                .filterWhen(obj -> interactRecordExecuteService.join(circleId, examineeId)));
     }
 
     /**

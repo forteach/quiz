@@ -1,4 +1,4 @@
-package com.forteach.quiz.interaction.execute.web.control.response;
+package com.forteach.quiz.interaction.execute.web.resp;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

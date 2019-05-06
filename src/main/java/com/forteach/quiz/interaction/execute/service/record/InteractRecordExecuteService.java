@@ -82,11 +82,11 @@ public class InteractRecordExecuteService {
         return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
     }
 
-    public Mono<Boolean> init(final String circleId,final String teacherId) {
+    public Mono<Boolean> init(final String circleId,final String teacherId,final String chapterId) {
         //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
         return Mono.just(teacherId)
                 //创建记录
-                .flatMap(id ->build(circleId,id)
+                .flatMap(id ->build(circleId,id,chapterId)
                         .flatMap(item->MyAssert.isTrue(item==null, DefineCode.ERR0012, "创建互动课堂日志失败")));
     }
 
@@ -95,8 +95,8 @@ public class InteractRecordExecuteService {
      * @param teacherId
      * @return
      */
-    private Mono<InteractRecord> build(final String circleId, final String teacherId) {
-        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId,teacherId, number + 1L)));
+    private Mono<InteractRecord> build(final String circleId, final String teacherId,final String chapterId) {
+        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId,teacherId,number + 1L,chapterId)));
     }
 
     /**

@@ -16,70 +16,57 @@ public class AchieveAnswerKey {
     /**
      * 拉取操作
      */
-    public static final String ASK_PUSH = "push";
+    public static final String ASK_PUSH = "Push";
 
     /**
      * 推送操作
      */
-    public static final String ASK_PULL = "pull";
-
-//    /**
-//     * 已回答
-//     */
-//    public static final String ASK_CIRCLE_ANSWER_DID = "2";
-//
-//    /**
-//     * 互动提问hash前缀(习题库\头脑风暴等。。。)
-//     */
-//    public static final String CLASSROOM_ASK_NOW= "now";
-//
-//    //刷新清除场景命名问题回答场景
-//    public static final String CLASSROOM_CLEAR_TAG_ANSWER="answer";
+    public static final String ASK_PULL = "Pull";
 
 
     /**
      * 课堂当前道题目回答前缀
      * sutId  学生ID
      * questionId 问题ID
-     * typeName  题目互动方式  提问、联练习。。。。
+     * questionType  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案  Hashmap
      */
-    public static String answerTypeQuestionsId(final String circleId,String questionId,String typeName) {
-        return questionId.concat("answer").concat(typeName).concat(circleId);
+    public static String answerTypeQuestionsId(final String circleId,String questionId,String questionType) {
+        return circleId.concat(questionId).concat("Answer").concat(questionType);
     }
 
     /**
      * 课堂当前道题目回答学生前缀
      * sutId  学生ID
      * questionId 问题ID
-     * typeName  题目互动方式  提问、联练习。。。。
+     * questionType  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
      */
-    public static String tiJiaoanswerTypeQuestStuSet(final String circleId,final String questionId,final String typeName) {
-        return questionId.concat("answerStuSet").concat(typeName).concat(circleId);
+    public static String tiJiaoanswerTypeQuestStuSet(final String circleId,final String questionId,final String questionType) {
+        return circleId.concat(questionId).concat("AnswerStuSet").concat(questionType);
     }
 
     /**
      * 课堂当前道题目回答批改前缀
      * sutId  学生ID
      * questionId 问题ID
-     * typeName  题目互动方式  提问、联练习。。。。
+     * questionType  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
      */
-    public static String piGaiTypeQuestionsId(final String circleId,String questionId,String typeName) {
-        return questionId.concat("pigai").concat(typeName).concat(circleId);
+    public static String piGaiTypeQuestionsId(final String circleId,String questionId,String questionType) {
+        return circleId.concat(questionId).concat("PiGai").concat(questionType);
     }
 
     /**
      * 课堂当前道题目回答学生列表前缀
      * sutId  学生ID
      * questionId 问题ID
-     * typeName  题目互动方式  提问、联练习。。。。
+     * questionType  题目互动方式  提问、联练习。。。。
      * @return 单个题目ID+前缀+学生编号=题目答案=Hashmap
      */
-    public static String answerTypeQuestStuList(final String circleId,String questionId,String typeName) {
+    public static String answerTypeQuestStuList(final String circleId,String questionId,String questionType) {
         //TODO 需要处理为空??
-        return questionId.concat("answerlist").concat(typeName).concat(circleId);
+        return circleId.concat(questionId).concat("AnswerList").concat(questionType);
     }
 
     /**
@@ -88,8 +75,8 @@ public class AchieveAnswerKey {
      * @param questionId
      * @return
      */
-    public static String cleanAnswerHasJoin(String circleId,String questionId){
-        return ASK_PUSH.concat(circleId.concat(questionId).concat(ROOM_JOIN_ANSW_TS));
+    public static String cleanAnswerHasJoin(String circleId,String questionId,String questionType){
+        return circleId.concat(questionId).concat(ROOM_JOIN_ANSW_TS).concat(questionType).concat(ASK_PUSH);
     }
 
 }
