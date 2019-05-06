@@ -11,22 +11,22 @@ public class MoreQueKey {
     /**
      * 互动练习册发布
      */
-    public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "bookList";
+    public static final String CLASSROOM_BOOK_QUESTIONS_LIST = "BookList";
 
     /**
      * 课堂练习册
      */
-    public static final String CLASSROOM_BOOK_NOW = "nowBook";
+    public static final String CLASSROOM_BOOK_NOW = "NowBook";
 
     /**
      * 互动练习册的题目
      */
-    public static final String CLASSROOM_BOOK_QUESTIONS_MAP = "bookMap";
+    public static final String CLASSROOM_BOOK_QUESTIONS_MAP = "BookMap";
 
     /**
      * 互动方式为练习
      */
-    public static final String CLASSROOM_BOOK_QUESTIONS_ID = "book";
+    public static final String CLASSROOM_BOOK_QUESTIONS_ID = "Book";
 
     /**
      * 课堂题目当前前缀
@@ -34,7 +34,7 @@ public class MoreQueKey {
      * @return now+课堂Id=map
      */
     public static String questionsBookNowMap(final String typeName, final String circleId) {
-        return CLASSROOM_BOOK_NOW.concat(circleId).concat(typeName);
+        return circleId.concat(typeName).concat(CLASSROOM_BOOK_NOW);
     }
 
     /**

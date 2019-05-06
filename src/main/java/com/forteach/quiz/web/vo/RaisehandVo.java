@@ -32,5 +32,9 @@ public class RaisehandVo {
     @ApiModelProperty(value = "课堂圈子id", name = "questionId")
     private String questionId;
 
-
+    /**
+     * 题目交互类型 提问、抢答
+     */
+    @ApiModelProperty(value = "课堂圈子id", name = "questionId")
+    private String questionType;
 }

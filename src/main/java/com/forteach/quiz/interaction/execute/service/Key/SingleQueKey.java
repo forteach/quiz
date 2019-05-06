@@ -10,37 +10,42 @@ package com.forteach.quiz.interaction.execute.service.Key;
 public class SingleQueKey {
 
     /**
-     * 当前课堂当前互动名称
+     * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
-    public static final String CLASSROOM_NOW_INTERACT= "nowInteract";
+    public static final String CLASSROOM_ASK_NOW = "Now";
 
     /**
      * 互动提问hash前缀(习题库\头脑风暴等。。。)
      */
-    public static final String CLASSROOM_ASK_NOW = "now";
-
-    /**
-     * 互动提问hash前缀(习题库\头脑风暴等。。。)
-     */
-    public static final String CLASSROOM_ASK_PRVE = "prve";
+    public static final String CLASSROOM_ASK_PRVE = "Prve";
 
     /**
      * 互动方式为提问
      */
-    public static final String CLASSROOM_ASK_QUESTIONS_ID = "ask";
+    public static final String CLASSROOM_ASK_QUESTIONS_ID = "Ask";
+
+    /**
+     * 加入课堂，已推送过得学生回答
+     */
+    public static final String ROOM_JOIN_SINGLE_TS = "RoomJoinSingle";
+
+    /**
+     * 推送操作
+     */
+    public static final String ASK_PULL = "Pull";
 
 
     //缓存当前已发布的题目题干内容，不分课堂。
     public static String questionsNow(String questionId) {
-        return CLASSROOM_ASK_NOW.concat(questionId);
+        return questionId.concat(CLASSROOM_ASK_NOW);
     }
     /**
-     * 课堂题目当前前缀
+     * 发布课堂互动题目
      *
      * @return now+课堂Id=map
      */
     public static String questionsIdNow(String circleId) {
-        return CLASSROOM_ASK_NOW.concat(circleId);
+        return circleId.concat(CLASSROOM_ASK_NOW);
     }
 
     /**
@@ -49,7 +54,7 @@ public class SingleQueKey {
      * @return 上一次的问题前缀+课堂+问题类型+回答方式=ForValu
      */
     public static String askTypeQuestionsIdPrve(final String questType,final String circleId,final String interactive) {
-        return CLASSROOM_ASK_PRVE.concat(askTypeQuestionsId(questType,circleId,interactive));
+        return askTypeQuestionsId(questType,circleId,interactive).concat(CLASSROOM_ASK_PRVE);
     }
 
     /**
@@ -58,7 +63,7 @@ public class SingleQueKey {
      * @return 当前问题前缀+课堂+问题类型+回答方式=ForValue
      */
     public static String askTypeQuestionsIdNow(final String questionType, String circleId, String interactive) {
-        return CLASSROOM_ASK_NOW + askTypeQuestionsId(questionType, circleId, interactive);
+        return  askTypeQuestionsId(questionType, circleId, interactive).concat(CLASSROOM_ASK_NOW);
     }
 
     /**
@@ -77,6 +82,10 @@ public class SingleQueKey {
      */
     public static String askTypeQuestionsId(final String questionType, String circleId, String interactive) {
         return circleId.concat(SingleQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questionType.concat(interactive));
+    }
+
+    public static String cleanTuiSong(String circleId,String questionId,String interactive,String pushType){
+         return circleId.concat(questionId).concat(interactive).concat(ROOM_JOIN_SINGLE_TS).concat(pushType);
     }
 
 }

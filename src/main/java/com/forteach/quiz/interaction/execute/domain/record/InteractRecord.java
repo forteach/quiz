@@ -31,6 +31,11 @@ public class InteractRecord extends BaseEntity {
     private Integer number;
 
     /**
+     * 章节ID
+     */
+    private String chapterId;
+
+    /**
      * 加入课堂的学生id
      */
     private List<String> students;
@@ -73,9 +78,10 @@ public class InteractRecord extends BaseEntity {
     public InteractRecord() {
     }
 
-    public InteractRecord(final String circleId, final String teacherId, final Long number) {
+    public InteractRecord(final String circleId, final String teacherId, final Long number,final String chapterId) {
         this.teacherId = teacherId;
         this.id = circleId;
+        this.chapterId=chapterId;
         this.createTime = DataUtil.format(new Date());
         this.uDate=DataUtil.format(new Date());
         this.number = number.intValue();

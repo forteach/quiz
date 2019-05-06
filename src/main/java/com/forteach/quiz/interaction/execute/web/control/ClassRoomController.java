@@ -43,19 +43,22 @@ public class ClassRoomController extends BaseController {
     @PostMapping(value = "/create/reuse")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "(可以为“”，不能不传)已存在临时课堂ID", name = "circleId", dataType = "string", paramType = "from"),
+            @ApiImplicitParam(value = "教室ID", name = "teacherId", dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> createInteractiveRoom(@RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
         Optional<String> teacherId = tokenService.getTeacherId(request);
         teacherId.ifPresent(roomVo::setTeacherId);
-        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId()).map(WebResult::okResult);
+        MyAssert.blank(teacherId.get(), DefineCode.ERR0010 ,"教室编号不能为空");
+        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
     @PostMapping(value = "/join/interactiveRoom")
     
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", required = true, dataType = "string", paramType = "from")
+            @ApiImplicitParam(value = "课堂Id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, ServerHttpRequest request) {
         //验证请求参数

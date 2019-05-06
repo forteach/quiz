@@ -24,31 +24,30 @@ public class RaiseHandService {
     }
 
     /**
+     * 学生进行举手
+     * 最后记录
+     * @return
+     */
+    public Mono<Long> raiseHand(final String circleId,final String examineeId,final String questId,final String questionType) {
+        //创建题目提问举手的KEY=学生ID
+        Mono<Long> set = stringRedisTemplate.opsForSet().add(AchieveRaiseKey.askTypeQuestionsId(questionType,circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId), examineeId);
+        //设置举手过期时间30分钟
+        Mono<Boolean> time = stringRedisTemplate.expire(AchieveRaiseKey.askTypeQuestionsId(questionType,circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId), Duration.ofSeconds(60 * 30 ));
+        return set.filterWhen(r->time)
+                .filterWhen(obj -> interactRecordExecuteService.raiseHand(circleId, examineeId, questId));
+    }
+
+    /**
      * 重新发起举手学生进行举手
      * 最后记录
      *
      * @return
      */
-    public Mono<Long> launchRaise(final String circleId,final String examineeId,final String questId) {
+    public Mono<Long> launchRaise(final String circleId,final String examineeId,final String questId,final String questionType) {
         //清空上次举手题目的信息
         return stringRedisTemplate.delete(AchieveRaiseKey.askTypeQuestionsId(QuestionType.TiWen.name(),circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId))
                 //重新创建举手信息
-                .flatMap(r->raiseHand(circleId,examineeId,questId));
+                .flatMap(r->raiseHand(circleId,examineeId,questId,questionType));
     }
-
-    /**
-     * 学生进行举手
-     * 最后记录
-     * @return
-     */
-    public Mono<Long> raiseHand(final String circleId,final String examineeId,final String questId) {
-        //创建题目提问举手的KEY=学生ID
-        Mono<Long> set = stringRedisTemplate.opsForSet().add(AchieveRaiseKey.askTypeQuestionsId(QuestionType.TiWen.name(),circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId), examineeId);
-        //设置举手过期时间30分钟
-        Mono<Boolean> time = stringRedisTemplate.expire(AchieveRaiseKey.askTypeQuestionsId(QuestionType.TiWen.name(),circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId), Duration.ofSeconds(60 * 30 ));
-        return set.filterWhen(r->time)
-                .filterWhen(obj -> interactRecordExecuteService.raiseHand(circleId, examineeId, questId));
-    }
-
 
 }
