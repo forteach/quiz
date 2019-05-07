@@ -100,11 +100,10 @@ public class SendQuestBookService {
         book.put("questionCount",String.valueOf(questIds.split(",").length));
         //创建时间
         book.put("time", DataUtil.format(new Date()));
-        //创建课堂练习册的题目2小时过期
-       return  reactiveHashOperations.putAll(MoreQueKey.questionsBookNowMap(questionType,circleId), book)
-               //设置当前课堂当前活动是练习册
-               .flatMap(r->setInteractionType(circleId))
-               .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.questionsBookNowMap(questionType,circleId), Duration.ofSeconds(60*60*2)));
+        return reactiveHashOperations.putAll(MoreQueKey.questionsBookNowMap(questionType,circleId), book)
+                //设置当前课堂当前活动是练习册
+                .flatMap(r->setInteractionType(circleId))
+                .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.questionsBookNowMap(questionType,circleId), Duration.ofSeconds(60*60*2)));
     }
 
     /**

@@ -2,8 +2,6 @@ package com.forteach.quiz.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
-import com.forteach.quiz.interaction.execute.web.vo.DelSelectStuVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import org.junit.Test;
@@ -37,7 +35,7 @@ public class BigBookTest {
          * vote   : 投票
          */
         MoreGiveVo vo=new MoreGiveVo();
-        vo.setCircleId("c01");
+        vo.setCircleId("5ccb75e7515721528835162b");
         vo.setQuestionId("5c73676306a38f000101b7b6,5c73679106a38f000101b7b7");
         vo.setTeacherId("t01");
         vo.setCategory("people");

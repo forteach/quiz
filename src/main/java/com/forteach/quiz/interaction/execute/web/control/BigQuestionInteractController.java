@@ -313,7 +313,11 @@ public class BigQuestionInteractController {
     @PostMapping("/send/book")
     @ApiImplicitParam(value = "问题id,多个id逗号分隔", name = "questionIds", required = true, dataType = "string", paramType = "from")
     public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
-
+        MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不能为空");
+        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010 ,"题目信息不能为空");
+        MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
+        MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题选举类型不能为空");
+        MyAssert.blank(giveVo.getSelected(), DefineCode.ERR0010,"练习册人员不能为空");
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected().concat(",")) .map(WebResult::okResult);
     }
