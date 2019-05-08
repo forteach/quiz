@@ -23,6 +23,15 @@ public class AchieveAnswerKey {
      */
     public static final String ASK_PULL = "Pull";
 
+    //抢答
+    public static final String ASK_INTERACTIVE_RACE = "race";
+    //举手
+    public static final String ASK_INTERACTIVE_RAISE = "raise";
+    //选人
+    public static final String ASK_INTERACTIVE_SELECT = "select";
+
+    public static final String ASK_INTERACTIVE_VOTE = "vote";
+
 
     /**
      * 课堂当前道题目回答前缀

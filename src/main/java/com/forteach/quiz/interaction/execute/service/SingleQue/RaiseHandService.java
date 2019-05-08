@@ -45,7 +45,7 @@ public class RaiseHandService {
      */
     public Mono<Long> launchRaise(final String circleId,final String examineeId,final String questId,final String questionType) {
         //清空上次举手题目的信息
-        return stringRedisTemplate.delete(AchieveRaiseKey.askTypeQuestionsId(QuestionType.TiWen.name(),circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId))
+        return stringRedisTemplate.delete(AchieveRaiseKey.askTypeQuestionsId(questionType,circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId))
                 //重新创建举手信息
                 .flatMap(r->raiseHand(circleId,examineeId,questId,questionType));
     }
