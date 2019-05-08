@@ -49,10 +49,9 @@ public class SendAnswerQuestBookService {
      * @param examineeId  学生ID
      * @param questId 问题ID
      * @param answer 回答内容
-     * @param cut 随机数
      * @return
      */
-    public Mono<Boolean> sendAnswer(final String questionType,final String circleId,final String examineeId,final String questId,final String answer,final String cut) {
+    public Mono<Boolean> sendAnswer(final String questionType,final String circleId,final String examineeId,final String questId,final String answer) {
 
         return Mono.just(answer)
                 //验证当前回答的题目和参与回答的人员

@@ -48,9 +48,9 @@ public class ClassRoomController extends BaseController {
     })
     public Mono<WebResult> createInteractiveRoom(@RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
         MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
-        Optional<String> teacherId = tokenService.getTeacherId(request);
-        teacherId.ifPresent(roomVo::setTeacherId);
-        MyAssert.blank(teacherId.get(), DefineCode.ERR0010 ,"教室编号不能为空");
+//        Optional<String> teacherId = tokenService.getTeacherId(request);
+//        teacherId.ifPresent(roomVo::setTeacherId);
+//        MyAssert.blank(teacherId.get(), DefineCode.ERR0010 ,"教室编号不能为空");
         return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
     }
 
@@ -61,9 +61,9 @@ public class ClassRoomController extends BaseController {
             @ApiImplicitParam(value = "课堂Id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, ServerHttpRequest request) {
-        //验证请求参数
-        MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
-        joinVo.setExamineeId(tokenService.getStudentId(request));
+//        //验证请求参数
+//        MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
+//        joinVo.setExamineeId(tokenService.getStudentId(request));
         return classRoomService.joinInteractiveRoom(joinVo.getCircleId(),joinVo.getExamineeId()).map(WebResult::okResult);
     }
 

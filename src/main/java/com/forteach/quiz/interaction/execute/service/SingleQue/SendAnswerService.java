@@ -58,15 +58,15 @@ public class SendAnswerService {
                 .flatMap(typeName -> {
                         switch (typeName) {
                             //抢答
-                            case ASK_INTERACTIVE_RACE:
+                            case AchieveAnswerKey.ASK_INTERACTIVE_RACE:
                                 return sendRace(circleId,examineeId,questId,answer,questionType);
                                 //举手
-                            case ASK_INTERACTIVE_RAISE:
+                            case AchieveAnswerKey.ASK_INTERACTIVE_RAISE:
                                 return sendRaise(circleId,examineeId,questId,answer,questionType);
-                            case ASK_INTERACTIVE_SELECT:
+                            case AchieveAnswerKey.ASK_INTERACTIVE_SELECT:
                                 //选人回答问题
                                 return sendSelect(circleId,examineeId,questId,answer,questionType);
-                            case ASK_INTERACTIVE_VOTE:
+                            case AchieveAnswerKey.ASK_INTERACTIVE_VOTE:
                                 return Mono.empty();
                             default:
                                 throw new ExamQuestionsException("非法参数 错误的数据类型");

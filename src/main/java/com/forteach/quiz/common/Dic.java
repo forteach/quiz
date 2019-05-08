@@ -78,14 +78,7 @@ public class Dic {
     public static final String CATEGORY_TEAM = "team";
 
     public static final String ASK_INTERACTIVE = "interactive";
-    //抢答
-    public static final String ASK_INTERACTIVE_RACE = "race";
-    //举手
-    public static final String ASK_INTERACTIVE_RAISE = "raise";
-    //选人
-    public static final String ASK_INTERACTIVE_SELECT = "select";
 
-    public static final String ASK_INTERACTIVE_VOTE = "vote";
 
     public static final String ASK_RAISE_HAND = "askRaiseHand";
 
