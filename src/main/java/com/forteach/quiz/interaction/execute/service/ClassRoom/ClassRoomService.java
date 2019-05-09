@@ -27,13 +27,13 @@ public class ClassRoomService {
 
     private final StudentsService studentsService;
     private final ReactiveStringRedisTemplate stringRedisTemplate;
-    private final InteractRecordExecuteService interactRecordExecuteService;
+//    private final InteractRecordExecuteService interactRecordExecuteService;
 
     public ClassRoomService(StudentsService studentsService, ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations
             , InteractRecordExecuteService interactRecordExecuteService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.studentsService = studentsService;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+//        this.interactRecordExecuteService = interactRecordExecuteService;
     }
 
 
@@ -95,7 +95,7 @@ public class ClassRoomService {
         final Mono<Boolean> roomUser =stringRedisTemplate.opsForSet().add(interactiveIdQr, teacherId)
                 .flatMap(count -> MyAssert.isTrue(count == 0, DefineCode.ERR0013, "添加课堂教师失败"))
                 //设置加入课堂后，两小时过期
-                .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 2)));
+                .filterWhen(count -> stringRedisTemplate.expire(interactiveIdQr, Duration.ofSeconds(60 * 60 * 12)));
 
         // TODO 正在开课的教室，以后可以创建个任务，清理这里无效的数据？****
         final Mono<Boolean> openRoomIDs = stringRedisTemplate.opsForSet().add(ClassRoomKey.OPEN_CLASSROOM,circleId)
@@ -103,12 +103,12 @@ public class ClassRoomService {
                 //设置正在开课的课堂ID集合2小时过期
                 .filterWhen(count -> stringRedisTemplate.expire(ClassRoomKey.OPEN_CLASSROOM, Duration.ofSeconds(60 * 60 * 12)));
 
-        //设置上课的教室
+        //设置上课的教师
         final Mono<Boolean> RoomTeacher =stringRedisTemplate.opsForValue()
-                .set(ClassRoomKey.getRoomTeacherKey(circleId),teacherId, Duration.ofSeconds(60 * 60 * 2))
+                .set(ClassRoomKey.getRoomTeacherKey(circleId),teacherId, Duration.ofSeconds(60 * 60 * 12))
                 .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "创建课堂记录教师失败"));
 
-        //设置上课的教室
+        //设置上课的章节
         final Mono<Boolean> RoomChapter =stringRedisTemplate.opsForValue()
                 .set(ClassRoomKey.getRoomChapterKey(circleId),chapterId, Duration.ofSeconds(60 * 60 * 2))
                 .flatMap(item -> MyAssert.isFalse(item, DefineCode.ERR0013, "创建课堂章节信息失败"));

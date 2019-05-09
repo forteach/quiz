@@ -111,7 +111,7 @@ public class BigQuestionInteractController {
                     required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
-        giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
+//        giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
         MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
         MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");
@@ -189,8 +189,8 @@ public class BigQuestionInteractController {
         MyAssert.blank(raisehandVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
         MyAssert.blank(raisehandVo.getQuestionType(), DefineCode.ERR0010,"题目提问类型不能为空");
 
-        raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        return raiseHandService.raiseHand(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId(),raisehandVo.getQuestionType()).map(WebResult::okResult);
+//        raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
+        return raiseHandService.raiseHand(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId(),QuestionType.TiWen.name()).map(WebResult::okResult);
     }
 
     /**
@@ -230,7 +230,7 @@ public class BigQuestionInteractController {
             @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", dataType = "string", required = true, paramType = "from")
     })
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
-        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
+//        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         MyAssert.blank(interactAnswerVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
         MyAssert.blank(interactAnswerVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
         MyAssert.blank(interactAnswerVo.getAnswer(), DefineCode.ERR0010,"题目回答内容不能为空");
@@ -310,7 +310,7 @@ public class BigQuestionInteractController {
         MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
         MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题选举类型不能为空");
         MyAssert.blank(giveVo.getSelected(), DefineCode.ERR0010,"练习册人员不能为空");
-        giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
+       // giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(), QuestionType.LianXi.name(),giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected().concat(",")) .map(WebResult::okResult);
     }
 
@@ -332,7 +332,7 @@ public class BigQuestionInteractController {
     @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
     public Mono<WebResult> sendBookAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
 
-        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
+        //interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
         return sendAnswerQuestBookService.sendAnswer(QuestionType.LianXi.name(),
                 interactAnswerVo.getCircleId(),
                 interactAnswerVo.getExamineeId(),

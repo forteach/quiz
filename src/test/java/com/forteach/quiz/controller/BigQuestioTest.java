@@ -5,6 +5,7 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.DelSelectStuVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
+import com.forteach.quiz.web.vo.RaisehandVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +33,7 @@ public class BigQuestioTest {
          * vote   : 投票
          */
         BigQuestionGiveVo vo=new BigQuestionGiveVo("5c73676306a38f000101b7b6","select");
-        vo.setCircleId("5cd24b195157212938856d4e");
+        vo.setCircleId("5cd3d58f5157212350577a58");
         vo.setTeacherId("we123");
         vo.setCategory("people");
         vo.setQuestionType("TiWen");
@@ -63,7 +64,7 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo("1301331992031827761","5cd24b195157212938856d4e","5c73676306a38f000101b7b6","D","TiWen");
+        InteractAnswerVo vo=new InteractAnswerVo("1301331992031827761","5cd3d58f5157212350577a58","5c73676306a38f000101b7b6","D","TiWen");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
@@ -90,7 +91,7 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo("stu01","c01","q01","C","cut");
+        InteractAnswerVo vo=new InteractAnswerVo("1301331992031827761","5cd3d58f5157212350577a58","5c73676306a38f000101b7b6","C","TiWen");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
@@ -108,7 +109,7 @@ public class BigQuestioTest {
     }
 
     @Test
-    public void delSelectStu(){
+    public void raiseHand(){
         /**
          * 互动方式
          * <p>
@@ -117,14 +118,14 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        DelSelectStuVo vo=new DelSelectStuVo("5c9b041c3230ac0dfc54ed35","410922200103040900");
+        RaisehandVo vo=new RaisehandVo("1301331992031827761","5cd3d58f5157212350577a58","5c73676306a38f000101b7b6","TiWen");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
-                .post().uri("/interact/fabu/delSelectStu")  //创建2小时内同一课堂
+                .post().uri("/interact/raise")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),DelSelectStuVo.class) // 3
+                .body(Mono.just(vo),RaisehandVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()

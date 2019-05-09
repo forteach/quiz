@@ -27,7 +27,6 @@ public class SendQuestService {
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
-    private final InteractRecordQuestionsService interactRecordQuestionsService;
     private final ClassRoomService classRoomService;
 
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
@@ -38,7 +37,6 @@ public class SendQuestService {
         this.stringRedisTemplate = stringRedisTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
-        this.interactRecordQuestionsService = interactRecordQuestionsService;
         this.classRoomService= classRoomService;
     }
 
@@ -123,7 +121,7 @@ public class SendQuestService {
                 //设置题目信息
                .flatMap(r->setQuestInfo(questId))
                //清除教师推送该题目的学生记录
-               .filterWhen(r->stringRedisTemplate.delete(SingleQueKey.cleanTuiSong(circleId,questId,interactive,SingleQueKey.ASK_PULL)).flatMap(l->Mono.just(true)))
+               .filterWhen(r->stringRedisTemplate.delete(SingleQueKey.cleanTuiSong(circleId,questId,interactive,SingleQueKey.ASK_PULL,questionType)).flatMap(l->Mono.just(true)))
                .filterWhen(r->stringRedisTemplate.expire(SingleQueKey.questionsIdNow(circleId), Duration.ofSeconds(60*60*2)));
 
     }

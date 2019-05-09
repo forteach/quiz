@@ -63,12 +63,12 @@ public class MoreQueKey {
     /**
      * 加入课堂，已推送过的学生题目回答
      * @param circleId
-     * @param questionId
+     * @param questBookId  册子ID
      * @param pushType  推送类型  pushQe：提问   pushAw：回答
      * @return
      */
-    public static String cleanTuiSong(String circleId,String questionId,String pushType){
-        return circleId.concat(questionId).concat(ROOM_JOIN_MORE_TS).concat(pushType);
+    public static String cleanTuiSong(String circleId,String questBookId,String pushType,String questionType){
+        return circleId.concat(questBookId).concat(ROOM_JOIN_MORE_TS).concat(questionType).concat(pushType);
     }
 
 }
