@@ -5,6 +5,7 @@ import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.execute.service.Key.MoreQueKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
+import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -81,6 +82,7 @@ public class SendQuestBookService {
      * @return true or false
      */
     private Mono<Boolean> addQuestBookNow(final String circleId,final String teacherId,final String questIds,String questionType, final String category,final String selected){
+       String questBookId=ObjectId.get().toString();
         HashMap<String, String> book = new HashMap<>(9);
         //当前课堂ID
         book.put("circleId",circleId);
@@ -89,7 +91,7 @@ public class SendQuestBookService {
         //题目类型
         book.put("questionType", questionType);
         //当前联系册唯一ID
-        book.put("questBookId", ObjectId.get().toString());
+        book.put("questBookId", questBookId);
         //练习册题目编号（逗号分隔）
         book.put("questionId", questIds);
         //选取类别（个人、小组）
@@ -103,6 +105,7 @@ public class SendQuestBookService {
         return reactiveHashOperations.putAll(MoreQueKey.questionsBookNowMap(questionType,circleId), book)
                 //设置当前课堂当前活动是练习册
                 .flatMap(r->setInteractionType(circleId))
+                .filterWhen(r->stringRedisTemplate.delete(MoreQueKey.cleanTuiSong(circleId,questBookId,SingleQueKey.ASK_PULL,questionType)).flatMap(l->Mono.just(true)))
                 .filterWhen(r->stringRedisTemplate.expire(MoreQueKey.questionsBookNowMap(questionType,circleId), Duration.ofSeconds(60*60*2)));
     }
 
@@ -111,7 +114,7 @@ public class SendQuestBookService {
      * @param circleId
      */
     private Mono<Boolean> setInteractionType(String circleId){
-        return classRoomService.setInteractionType(circleId, MoreQueKey.CLASSROOM_BOOK_QUESTIONS_ID);
+        return classRoomService.setInteractionType(circleId, QuestionType.LianXi.name());
     }
 
     /**

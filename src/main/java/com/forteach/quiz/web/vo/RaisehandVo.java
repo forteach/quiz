@@ -33,8 +33,18 @@ public class RaisehandVo {
     private String questionId;
 
     /**
-     * 题目交互类型 提问、抢答
+     * 题目交互类型 提问、练习
      */
     @ApiModelProperty(value = "课堂圈子id", name = "questionId")
     private String questionType;
+
+    public RaisehandVo(String examineeId, String circleId, String questionId, String questionType) {
+        this.examineeId = examineeId;
+        this.circleId = circleId;
+        this.questionId = questionId;
+        this.questionType = questionType;
+    }
+
+    public RaisehandVo() {
+    }
 }

@@ -57,7 +57,7 @@ public class SendAnswerQuestBookService {
                 //验证当前回答的题目和参与回答的人员
                 .transform(an->filterSelectVerify(questionType,circleId,examineeId,questId))
                 //学生回答问题
-                .flatMap(typeName -> sendSelect(questId,answer))
+                .flatMap(typeName -> sendSelect(circleId,examineeId,questId,answer,questionType))
                 //设置学生练习册回答题目答案
                 .filterWhen(right -> reactiveHashOperations.put(AchieveAnswerKey.answerTypeQuestionsId(circleId,questId,questionType),examineeId,answer)
                                      .flatMap(r-> {
@@ -123,12 +123,25 @@ public class SendAnswerQuestBookService {
      *
      * @return
      */
-    private Mono<Boolean> sendSelect(final String questId,final String answer) {
+    private Mono<Boolean> sendSelect(final String circleId,final String examineeId,final String questId,final String answer,final String questionType) {
 
         //创建学生回答顺序列表
 
         //TODO 发布题目答案对比
-        return correctService.correcting(SingleQueKey.questionsNow(questId),questId, answer);
+        return correctService.correcting(SingleQueKey.questionsNow(questId),questId, answer)
+                //清除改题目已经回答推送的记录
+                .filterWhen(r->cleanAnswerHasJoinStu(circleId,examineeId,questId,questionType));
+    }
+
+    private Mono<Boolean> cleanAnswerHasJoinStu(final String circleId,final String examineeId,final String questId,final String questionType){
+        String key= AchieveAnswerKey.cleanAnswerHasJoin(circleId,questId,questionType);
+        //从已经回答推送的列表移除
+        String[] strarrays = new String[]{examineeId};
+        return stringRedisTemplate.opsForSet().remove(key,strarrays)
+                .flatMap(r->
+//                   System.out.println("r-----------" + r);
+                                Mono.just(true)
+                );
     }
 
     /**

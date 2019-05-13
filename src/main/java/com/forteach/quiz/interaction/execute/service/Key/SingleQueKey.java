@@ -84,8 +84,8 @@ public class SingleQueKey {
         return circleId.concat(SingleQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questionType.concat(interactive));
     }
 
-    public static String cleanTuiSong(String circleId,String questionId,String interactive,String pushType){
-         return circleId.concat(questionId).concat(interactive).concat(ROOM_JOIN_SINGLE_TS).concat(pushType);
+    public static String cleanTuiSong(String circleId,String questionId,String interactive,String pushType,String questionType){
+         return circleId.concat(questionId).concat(interactive).concat(ROOM_JOIN_SINGLE_TS).concat(questionType).concat(pushType);
     }
 
 }

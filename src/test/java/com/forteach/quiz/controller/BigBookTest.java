@@ -35,11 +35,11 @@ public class BigBookTest {
          * vote   : 投票
          */
         MoreGiveVo vo=new MoreGiveVo();
-        vo.setCircleId("5ccb75e7515721528835162b");
+        vo.setCircleId("5cd3d58f5157212350577a58");
         vo.setQuestionId("5c73676306a38f000101b7b6,5c73679106a38f000101b7b7");
-        vo.setTeacherId("t01");
+        vo.setTeacherId("we123");
         vo.setCategory("people");
-        vo.setSelected("stu01,stu02");
+        vo.setSelected("1301331992031827761,1301331992031827761");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
@@ -67,11 +67,11 @@ public class BigBookTest {
          * vote   : 投票
          */
         InteractAnswerVo vo=new InteractAnswerVo(
-                "stu01",
-                "c01",
+                "1301331992031827761",
+                "5cd3d58f5157212350577a58",
                 "5c73676306a38f000101b7b6",
                 "C",
-                "cut");
+                "LianXi");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
