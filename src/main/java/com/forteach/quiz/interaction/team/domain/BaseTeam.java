@@ -2,6 +2,7 @@ package com.forteach.quiz.interaction.team.domain;
 
 import com.forteach.quiz.domain.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @description:　小组详情抽象类
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class BaseTeam extends BaseEntity {
 
     /**

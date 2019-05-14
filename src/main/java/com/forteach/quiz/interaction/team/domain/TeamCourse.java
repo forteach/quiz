@@ -1,9 +1,6 @@
 package com.forteach.quiz.interaction.team.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +14,7 @@ import java.util.List;
  * @description:　课程小组(对本课程有效)
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = "teamCourse")
 @NoArgsConstructor
 public class TeamCourse extends BaseTeam{

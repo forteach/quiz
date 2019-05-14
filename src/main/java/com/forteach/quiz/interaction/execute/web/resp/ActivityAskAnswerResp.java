@@ -4,6 +4,7 @@ import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * @description:
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ActivityAskAnswerResp extends ActivityAskAnswer {
 
     @ApiModelProperty(name = "name", value = "学生姓名", dataType = "string")
