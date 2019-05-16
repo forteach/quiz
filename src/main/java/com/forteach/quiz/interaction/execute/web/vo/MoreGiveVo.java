@@ -26,5 +26,9 @@ public class MoreGiveVo extends GiveVo {
     @ApiModelProperty(value = "发布练习册的教师", name = "teacherId")
     private String teacherId;
 
-
+    /**
+     * 题目交互活动类型  TIWEN LIANXI RENWU
+     */
+    @ApiModelProperty(value = "切换提问类型过期标识  接收的该题cut", name = "cut")
+    private String questionType;
 }

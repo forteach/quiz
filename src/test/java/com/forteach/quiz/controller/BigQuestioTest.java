@@ -64,7 +64,12 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo("1301331992031827761","5cd3d58f5157212350577a58","5c73676306a38f000101b7b6","D","TiWen");
+        InteractAnswerVo vo=new InteractAnswerVo(
+                "1301331992031827761",
+                "5cd3d58f5157212350577a58",
+                "5c73676306a38f000101b7b6",
+                "D",
+                "TiWen");
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
