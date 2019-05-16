@@ -1,6 +1,6 @@
 package com.forteach.quiz.evaluate.repository;
 
-import com.forteach.quiz.evaluate.domain.Evaluate;
+import com.forteach.quiz.evaluate.domain.Cumulative;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**
@@ -9,5 +9,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
  * @version: V1.0
  * @date: 2019/1/17  10:21
  */
-public interface EvaluateRepository extends ReactiveMongoRepository<Evaluate, String> {
+public interface EvaluateRepository extends ReactiveMongoRepository<Cumulative, String> {
 }
