@@ -2,12 +2,15 @@ package com.forteach.quiz.interaction.execute.service.SingleQue;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
+import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
-import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
+import com.forteach.quiz.questionlibrary.repository.TaskQuestionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -27,9 +30,11 @@ public class SendQuestService {
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final BigQuestionRepository bigQuestionRepository;
+    private final TaskQuestionRepository taskQuestionRepository;
     private final ClassRoomService classRoomService;
 
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
+                            TaskQuestionRepository taskQuestionRepository,
                             ReactiveHashOperations<String, String, String> reactiveHashOperations,
                             InteractRecordQuestionsService interactRecordQuestionsService,
                             ClassRoomService classRoomService,
@@ -38,6 +43,7 @@ public class SendQuestService {
         this.reactiveHashOperations = reactiveHashOperations;
         this.bigQuestionRepository=bigQuestionRepository;
         this.classRoomService= classRoomService;
+        this.taskQuestionRepository=taskQuestionRepository;
     }
 
     /**
@@ -119,7 +125,7 @@ public class SendQuestService {
                //设置当前课堂当前活动是提问
                .flatMap(r->setInteractionType(circleId,questionType))
                 //设置题目信息
-               .flatMap(r->setQuestInfo(questId))
+               .flatMap(r->setQuestInfo(questId,questionType))
                //清除教师推送该题目的学生记录
                .filterWhen(r->stringRedisTemplate.delete(SingleQueKey.cleanTuiSong(circleId,questId,interactive,SingleQueKey.ASK_PULL,questionType)).flatMap(l->Mono.just(true)))
                .filterWhen(r->stringRedisTemplate.expire(SingleQueKey.questionsIdNow(circleId), Duration.ofSeconds(60*60*2)));
@@ -140,12 +146,27 @@ public class SendQuestService {
      * @param questionId
      * @return
      */
-    private Mono<Boolean> setQuestInfo(final String questionId){
+    private Mono<Boolean> setQuestInfo(final String questionId,String questionType){
         //存储当前所发布的题目信息，有效期8小时
        final String key=SingleQueKey.questionsNow(questionId);
-       return stringRedisTemplate.hasKey(key)
-               .flatMap(r->r?Mono.just(true):bigQuestionRepository.findById(questionId)
-                       .flatMap(obj-> stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*8))));
+       switch (questionType)
+       {
+           case "TiWen" :
+               return stringRedisTemplate.hasKey(key)
+                   .flatMap(r->r?Mono.just(true):bigQuestionRepository.findById(questionId)
+                           .flatMap(obj-> stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*8))));
+           case "LianXi" :
+               return stringRedisTemplate.hasKey(key)
+                       .flatMap(r->r?Mono.just(true):bigQuestionRepository.findById(questionId)
+                               .flatMap(obj-> stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*8))));
+           case "RenWu" :
+               return stringRedisTemplate.hasKey(key)
+                       .flatMap(r->r?Mono.just(true): taskQuestionRepository.findById(questionId)
+                               .flatMap(obj-> stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(obj),Duration.ofSeconds(60*60*8))));
+           default:
+               MyAssert.isFalse(false, DefineCode.ERR0002,"没有找到课堂题目的互动类型");
+       }
+            return Mono.just(false);
     }
 
     /**
