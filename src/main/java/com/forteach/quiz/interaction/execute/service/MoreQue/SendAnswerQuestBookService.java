@@ -1,11 +1,13 @@
 package com.forteach.quiz.interaction.execute.service.MoreQue;
 
+import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
 import com.forteach.quiz.interaction.execute.service.Key.AchieveAnswerKey;
 import com.forteach.quiz.interaction.execute.service.Key.MoreQueKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
+
 import static com.forteach.quiz.common.Dic.*;
 
 @Slf4j
@@ -51,7 +55,7 @@ public class SendAnswerQuestBookService {
      * @param answer 回答内容
      * @return
      */
-    public Mono<Boolean> sendAnswer(final String questionType,final String circleId,final String examineeId,final String questId,final String answer) {
+    public Mono<Boolean> sendAnswer(final String questionType,final String circleId,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList) {
 
         return Mono.just(answer)
                 //验证当前回答的题目和参与回答的人员
@@ -60,6 +64,8 @@ public class SendAnswerQuestBookService {
                 .flatMap(typeName -> sendSelect(circleId,examineeId,questId,answer,questionType))
                 //设置学生练习册回答题目答案
                 .filterWhen(right -> reactiveHashOperations.put(AchieveAnswerKey.answerTypeQuestionsId(circleId,questId,questionType),examineeId,answer)
+                                //添加回答信息的附件内容
+                                     .flatMap(r->addAnswerFiles(circleId,examineeId,questId,questionType,fileList))
                                      .flatMap(r-> {
                                          //设置已经回答的学生列表
                                                 //移除该学生本题回答历史记录
@@ -84,11 +90,13 @@ public class SendAnswerQuestBookService {
                         }
                     )
                 //设置MONGO的题目回答值
-                .filterWhen(r->sendValue(circleId,questionType,examineeId,questId,answer,r.toString()));
+                .filterWhen(r->sendValue(circleId,questionType,examineeId,questId,answer,fileList,r.toString()));
                 //记录学生回答MONGO记录
 //               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right))
 //                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
     }
+
+
 
     /**
      * 获得课堂当前题目的互动类型，验证题目id和参与人员
@@ -149,10 +157,10 @@ public class SendAnswerQuestBookService {
      *
      * @return
      */
-    private Mono<Boolean> sendValue(final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final String answerRight) {
+    private Mono<Boolean> sendValue(final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight) {
 
        return findExists(circleId,questionType,examineeId,questId)
-               .flatMap(r->saveOrupdate(r.booleanValue(),circleId,questionType,examineeId,questId,answer,answerRight))
+               .flatMap(r->saveOrupdate(r.booleanValue(),circleId,questionType,examineeId,questId,answer,fileList,answerRight))
                .flatMap(r-> Mono.just(r));
     }
 
@@ -166,9 +174,9 @@ public class SendAnswerQuestBookService {
     }
 
     //添加题目回答信息
-    private Mono<Boolean> saveOrupdate(final boolean r,final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final String answerRight){
+    private Mono<Boolean> saveOrupdate(final boolean r,final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight){
         if(!r){
-            return add(circleId,questionType,examineeId,questId,answer,answerRight);
+            return add(circleId,questionType,examineeId,questId,answer,fileList,answerRight);
         }else{
             System.out.println("***** circleId");
             final Query query = Query.query(
@@ -182,11 +190,12 @@ public class SendAnswerQuestBookService {
                     //删除记录成功后
                     .filter(r1->r1.wasAcknowledged())
                     //添加新的信息
-                    .flatMap(r1->add(circleId,questionType,examineeId,questId,answer,answerRight));
+                    .flatMap(r1->add(circleId,questionType,examineeId,questId,answer,fileList,answerRight));
         }
     }
 
-    private Mono<Boolean> add(final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final String answerRight){
+    //修改Mongo题目信息
+    private Mono<Boolean> add(final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight){
 
         Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
@@ -194,9 +203,21 @@ public class SendAnswerQuestBookService {
                         //练习、任务
                         .and("libraryType").is(questionType));
         Update update = new Update()
-                .addToSet("answList", new InteractiveSheetAnsw(questId,answer,answerRight));
+                .addToSet("answList", new InteractiveSheetAnsw(questId,answer,fileList,answerRight));
         return reactiveMongoTemplate.upsert(query,update,ActivityAskAnswer.class)
                 .flatMap(r1->Mono.just(r1.wasAcknowledged()));
     }
 
+
+    //添加redis题目回答的附件信息
+    private Mono<Boolean> addAnswerFiles(final String circleId,final String examineeId,final String questId,final String questionType,final List<DataDatumVo> fileList) {
+        if ((fileList != null) && (fileList.size() > 0)) {
+            return Mono.just(JSON.toJSONString(fileList)).flatMap(jsonStr ->
+                    reactiveHashOperations.put(AchieveAnswerKey.answerFileTypeQuestionsId(circleId, questId, questionType), examineeId, jsonStr)
+                            .filterWhen(ok -> stringRedisTemplate.expire(AchieveAnswerKey.answerFileTypeQuestionsId(circleId, questId, questionType), Duration.ofSeconds(60 * 60 * 2)))
+                            .flatMap(r -> Mono.just(true)));
+        } else {
+            return Mono.just(true);
+        }
+    }
 }

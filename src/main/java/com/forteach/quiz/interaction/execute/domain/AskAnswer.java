@@ -1,6 +1,7 @@
 package com.forteach.quiz.interaction.execute.domain;
 
 import com.forteach.quiz.domain.BaseEntity;
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -43,6 +44,12 @@ public class AskAnswer extends BaseEntity {
      */
     @ApiModelProperty(value = "答案", name = "answer")
     private String answer;
+
+    /**
+     * 答案附件
+     */
+    @ApiModelProperty(value = "附件列表", name = "fileList")
+    private List<DataDatumVo> fileList;
 
     /**
      * 答案图片列表

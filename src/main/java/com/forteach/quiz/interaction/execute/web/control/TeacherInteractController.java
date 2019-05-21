@@ -16,7 +16,6 @@ import com.forteach.quiz.interaction.execute.web.resp.QuestFabuListResponse;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.QuestFabuListVo;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
@@ -112,7 +111,7 @@ public class TeacherInteractController {
                     required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
-        giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
+        //giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
         MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
         MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");
@@ -170,77 +169,6 @@ public class TeacherInteractController {
     }
 
 
-//###########################学生端##############################################
-//    /**
-//     * 课堂提问
-//     * 学生举手
-//     *
-//     * @return
-//     */
-//    @PostMapping("/raise")
-//    @ApiOperation(value = "学生举手", notes = "课堂提问 学生举手")
-//    @ApiImplicitParams({
-////            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
-//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
-//            @ApiImplicitParam(value = "题目提问类型", name = "questionType", dataType = "string", paramType = "from", required = true),
-//            @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
-//    })
-//    public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo, ServerHttpRequest serverHttpRequest) {
-//        MyAssert.blank(raisehandVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
-//        MyAssert.blank(raisehandVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
-//        MyAssert.blank(raisehandVo.getQuestionType(), DefineCode.ERR0010,"题目提问类型不能为空");
-//
-//        raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-//        return raiseHandService.raiseHand(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId(),raisehandVo.getQuestionType()).map(WebResult::okResult);
-//    }
-//
-//    /**
-//     * 课堂提问  TODO 需要重新考虑功能实现，逻辑实现有错误
-//     * 删除上次的举手学生，重新发起举手
-//     *
-//     * @return
-//     */
-//    @ApiOperation(value = "重新发起举手", notes = "课堂提问 重新发起举手")
-//    @PostMapping("/launch/raise")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", paramType = "from", required = true),
-//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", paramType = "from", required = true),
-//            @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
-//    })
-//    public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody RaisehandVo raisehandVo, ServerHttpRequest serverHttpRequest) {
-//        raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-//        MyAssert.blank(raisehandVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
-//        MyAssert.blank(raisehandVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
-//        MyAssert.blank(raisehandVo.getQuestionType(), DefineCode.ERR0010,"题目提问类型不能为空");
-//        return raiseHandService.launchRaise(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId(),raisehandVo.getQuestionType()).map(WebResult::okResult);
-//    }
-//
-//    /**
-//     * 提交答案
-//     *
-//     * @param interactAnswerVo
-//     * @return
-//     */
-//    @PostMapping("/send/answer")
-//    @ApiOperation(value = "提交答案", notes = "学生提交答案 只有符合规则的学生能够正确提交")
-//    @ApiImplicitParams({
-////            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "问题id", name = "questionId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "答案", name = "answer", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", dataType = "string", required = true, paramType = "from")
-//    })
-//    public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
-//        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-//        MyAssert.blank(interactAnswerVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
-//        MyAssert.blank(interactAnswerVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
-//        MyAssert.blank(interactAnswerVo.getAnswer(), DefineCode.ERR0010,"题目回答内容不能为空");
-//        return sendAnswerService.sendAnswer(interactAnswerVo.getCircleId(),
-//                interactAnswerVo.getExamineeId(),
-//                interactAnswerVo.getQuestionId(),
-//                interactAnswerVo.getAnswer(),
-//                interactAnswerVo.getQuestionType()).map(r-> String.valueOf(r)).map(WebResult::okResult);
-//    }
 
 
 
@@ -254,19 +182,6 @@ public class TeacherInteractController {
                 .onErrorReturn(new QuestFabuListResponse())
                 .map(WebResult::okResult);
     }
-
-//    @PostMapping("/fabu/delSelectStu")
-//    @ApiOperation(value = "删除问题选人推送的学生列表", notes = "学生收到题目推送后调用")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "circleId", value = "课堂id", required = true, dataType = "string", paramType = "from"),
-//            @ApiImplicitParam(name = "stuId", value = "学生id", required = true, dataType = "string", paramType = "from")
-//    })
-//    public Mono<WebResult> questFabuList(@RequestBody DelSelectStuVo delSelectStuVo) {
-//        MyAssert.blank(delSelectStuVo.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
-//        MyAssert.blank(delSelectStuVo.getStuId(), DefineCode.ERR0010, "学生id不为空");
-//        return fabuQuestService.delSelectStuId(delSelectStuVo.getStuId(),delSelectStuVo.getCircleId())
-//                .map(WebResult::okResult);
-//    }
 
 
     @ApiOperation(value = "查询课堂学生提交的答案", notes = "课堂id(必传),查询课堂答题的学生信息，问题id，查询答题各个题目学生信息")
@@ -315,32 +230,5 @@ public class TeacherInteractController {
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         return  sendQuestBookService.sendQuestionBook(giveVo.getCircleId(),giveVo.getTeacherId(),giveVo.getQuestionType() ,giveVo.getQuestionId(),giveVo.getCategory(),giveVo.getSelected().concat(",")) .map(WebResult::okResult);
     }
-
-//
-//    /**
-//     * 提交课堂练习答案
-//     *
-//     * @param interactAnswerVo
-//     * @return
-//     */
-//    @PostMapping("/sendBook/answer")
-//    @ApiImplicitParams({
-////            @ApiImplicitParam(value = "学生id", name = "examineeId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "课堂圈子id", name = "circleId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "问题id", name = "questionId", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "答案", name = "answer", dataType = "string", required = true, paramType = "from"),
-//            @ApiImplicitParam(value = "切换提问类型过期标识  接收的该题cut", name = "cut", dataType = "string", required = true, paramType = "from")
-//    })
-//    @ApiOperation(value = "提交课堂练习答案", notes = "提交课堂练习答案 只有符合规则的学生能够正确提交")
-//    public Mono<WebResult> sendBookAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
-//
-//        interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-//        return sendAnswerQuestBookService.sendAnswer(QuestionType.LianXi.name(),
-//                interactAnswerVo.getCircleId(),
-//                interactAnswerVo.getExamineeId(),
-//                interactAnswerVo.getQuestionId(),
-//                interactAnswerVo.getAnswer()
-//                ).map(WebResult::okResult);
-//    }
     
 }

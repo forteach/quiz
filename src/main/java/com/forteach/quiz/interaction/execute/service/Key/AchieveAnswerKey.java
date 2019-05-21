@@ -45,6 +45,17 @@ public class AchieveAnswerKey {
     }
 
     /**
+     * 课堂当前道题目回答前缀
+     * sutId  学生ID
+     * questionId 问题ID
+     * questionType  题目互动方式  提问、联练习。。。。
+     * @return 单个题目ID+前缀+学生编号=题目答案  Hashmap
+     */
+    public static String answerFileTypeQuestionsId(final String circleId,String questionId,String questionType) {
+        return circleId.concat(questionId).concat("AnswerFile").concat(questionType);
+    }
+
+    /**
      * 课堂当前道题目回答学生前缀
      * sutId  学生ID
      * questionId 问题ID

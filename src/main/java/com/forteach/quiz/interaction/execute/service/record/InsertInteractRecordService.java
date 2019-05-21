@@ -5,6 +5,7 @@ import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import static com.forteach.quiz.common.Dic.*;
 
@@ -133,7 +135,7 @@ public class InsertInteractRecordService {
      * @param right
      * @return
      */
-    public Mono<Boolean> answer(final String circleId, final String type, final String questionId, final String studentId, final String answer, final Boolean right) {
+    public Mono<Boolean> answer(final String circleId, final String type, final String questionId, final String studentId, final String answer, final List<DataDatumVo> fileList,final Boolean right) {
 
             //查找学生需要回答的题目
             Query query = Query.query(
@@ -144,6 +146,7 @@ public class InsertInteractRecordService {
             Update update = Update.update("answer", answer)
                     .set("interactive", type)
                     .set("right", String.valueOf(right))
+                    .set("fileList",fileList)
                     .set("uDate", DataUtil.format(new Date()));
 
             return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
