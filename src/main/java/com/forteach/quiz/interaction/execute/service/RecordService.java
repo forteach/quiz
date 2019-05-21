@@ -72,13 +72,16 @@ public class RecordService {
      * @param questionId
      * @return
      */
-    public Mono<List<ActivityAskAnswerResp>> findAskRecord(final String circleId, final String questionId, final String examineeId) {
+    public Mono<List<ActivityAskAnswerResp>> findAskRecord(final String circleId, final String questionId, final String examineeId, final String libraryType) {
         Criteria criteria = Criteria.where("circleId").is(circleId);
         if (StrUtil.isNotBlank(examineeId)){
             criteria.and("examineeId").is(examineeId);
         }
         if (StrUtil.isNotBlank(questionId)){
             criteria.and("answList.questionId").is(questionId);
+        }
+        if (StrUtil.isNotBlank(libraryType)){
+            criteria.is("libraryType").is(libraryType);
         }
         Query query = Query.query(criteria);
 

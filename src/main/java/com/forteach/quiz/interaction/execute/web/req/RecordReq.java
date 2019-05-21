@@ -28,4 +28,8 @@ public class RecordReq implements Serializable {
     @ApiModelProperty(value = "学生id", name = "examineeId", dataType = "string")
     private String examineeId;
 
+    @ApiModelProperty(name = "libraryType", value = "问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
+            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", dataType = "string")
+    private String libraryType;
+
 }
