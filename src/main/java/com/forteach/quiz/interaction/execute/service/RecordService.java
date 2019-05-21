@@ -77,11 +77,11 @@ public class RecordService {
         if (StrUtil.isNotBlank(examineeId)){
             criteria.and("examineeId").is(examineeId);
         }
+        if (StrUtil.isNotBlank(libraryType)){
+            criteria.and("libraryType").is(libraryType);
+        }
         if (StrUtil.isNotBlank(questionId)){
             criteria.and("answList.questionId").is(questionId);
-        }
-        if (StrUtil.isNotBlank(libraryType)){
-            criteria.is("libraryType").is(libraryType);
         }
         Query query = Query.query(criteria);
 
