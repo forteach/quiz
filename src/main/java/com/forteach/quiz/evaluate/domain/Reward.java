@@ -4,6 +4,7 @@ import com.forteach.quiz.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @Description: 学生的提问等被奖励  (小红花... ...)
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
  * @version: V1.0
  * @date: 2018/12/11  14:01
  */
+@Document(collection = "reward")
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Reward extends BaseEntity {

@@ -15,11 +15,11 @@ public class RewardKey {
 
         /**
      * 获得小红花的学生。
-     * @param studentId
+     * @param circleId
      * @param rewardType  奖励类型
      * @return
      */
-    public static String rewardAddKey(final  String circleId,final String studentId,final String rewardType) {
-        return circleId.concat(REWARD_KEY.concat(REWARD_FLOWER_KEY));
+    public static String rewardAddKey(final  String circleId,final String rewardType) {
+        return circleId.concat(REWARD_KEY.concat(rewardType));
     }
 }
