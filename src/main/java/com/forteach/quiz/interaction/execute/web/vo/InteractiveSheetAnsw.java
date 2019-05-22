@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,6 +48,7 @@ public class InteractiveSheetAnsw {
         this.questionId = questionId;
         this.answer = answer;
         this.answerRight = answerRight;
+        this.fileList = fileList;
     }
 
     public InteractiveSheetAnsw(String questionId) {
