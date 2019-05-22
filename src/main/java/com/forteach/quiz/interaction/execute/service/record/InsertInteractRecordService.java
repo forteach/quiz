@@ -144,7 +144,7 @@ public class InsertInteractRecordService {
                             .and("examineeId").is(studentId));
             //更新题目答案
             Update update = Update.update("answer", answer)
-                    .set("interactive", type)
+                    .set("questionType", type)
                     .set("right", String.valueOf(right))
                     .set("fileList",fileList)
                     .set("uDate", DataUtil.format(new Date()));

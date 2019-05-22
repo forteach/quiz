@@ -36,8 +36,8 @@ public class ActivityAskAnswer extends BaseEntity {
      * 问题库类别
      */
     @ApiModelProperty(value = "不需要传值 后台赋值 问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
-            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "libraryType")
-    private String libraryType;
+            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "questionType")
+    private String questionType;
 
     /**
      * 答案评价

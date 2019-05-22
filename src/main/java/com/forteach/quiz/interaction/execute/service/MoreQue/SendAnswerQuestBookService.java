@@ -168,7 +168,7 @@ public class SendAnswerQuestBookService {
         Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
                         .and("examineeId").is(examineeId)
-                        .and("libraryType").is(questionType)  //练习、提问
+                        .and("questionType").is(questionType)  //练习、提问
                         .and("answList.questionId").is(questId));
         return reactiveMongoTemplate.exists(query,ActivityAskAnswer.class);
     }
@@ -182,7 +182,7 @@ public class SendAnswerQuestBookService {
             final Query query = Query.query(
                     Criteria.where("circleId").is(circleId)
                             .and("examineeId").is(examineeId)
-                            .and("libraryType").is(questionType)  //练习、提问
+                            .and("questionType").is(questionType)  //练习、提问
                             .and("answList.questionId").is(questId));
             Update update = new Update()
                     .pull("answList", new InteractiveSheetAnsw(questId));
@@ -201,7 +201,7 @@ public class SendAnswerQuestBookService {
                 Criteria.where("circleId").is(circleId)
                         .and("examineeId").is(examineeId)
                         //练习、任务
-                        .and("libraryType").is(questionType));
+                        .and("questionType").is(questionType));
         Update update = new Update()
                 .addToSet("answList", new InteractiveSheetAnsw(questId,answer,fileList,answerRight));
         return reactiveMongoTemplate.upsert(query,update,ActivityAskAnswer.class)
