@@ -36,8 +36,8 @@ public class AskAnswer extends BaseEntity {
     /**
      * 回答参与方式
      */
-    @ApiModelProperty(value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "interactive")
-    private String interactive;
+    @ApiModelProperty(value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "questionType")
+    private String questionType;
 
     /**
      * 答案
@@ -96,9 +96,9 @@ public class AskAnswer extends BaseEntity {
     public AskAnswer() {
     }
 
-    public AskAnswer(String examineeId, String interactive, String answer, String questionId, String uDate, String right, String circleId) {
+    public AskAnswer(String examineeId, String questionType, String answer, String questionId, String uDate, String right, String circleId) {
         this.examineeId = examineeId;
-        this.interactive = interactive;
+        this.questionType = questionType;
         this.answer = answer;
         this.questionId = questionId;
         this.uDate = uDate;

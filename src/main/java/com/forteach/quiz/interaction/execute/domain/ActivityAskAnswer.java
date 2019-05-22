@@ -4,7 +4,6 @@ import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,9 +18,9 @@ import java.util.List;
  * @date: 2019/1/20  13:29
  */
 @Data
-@Builder
 @Document(collection = "activityAskAnswer")
 @EqualsAndHashCode(callSuper = true)
+@Builder
 @ApiModel(value = "活动 (任务,风暴,卷子) 回答信息", description = "活动 (任务,风暴,卷子) 学生回答信息")
 public class ActivityAskAnswer extends BaseEntity {
 
@@ -35,8 +34,8 @@ public class ActivityAskAnswer extends BaseEntity {
      * 问题库类别
      */
     @ApiModelProperty(value = "不需要传值 后台赋值 问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
-            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "libraryType", hidden = true)
-    private String libraryType;
+            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "questionType")
+    private String questionType;
 
     /**
      * 答案评价
@@ -60,11 +59,11 @@ public class ActivityAskAnswer extends BaseEntity {
     public ActivityAskAnswer() {
     }
 
-    public ActivityAskAnswer(String examineeId, String libraryType,
+    public ActivityAskAnswer(String examineeId, String questionType,
                              String evaluate, String circleId,
                              List<InteractiveSheetAnsw> answList) {
         this.examineeId = examineeId;
-        this.libraryType = libraryType;
+        this.questionType = questionType;
         this.evaluate = evaluate;
         this.circleId = circleId;
         this.answList = answList;
