@@ -89,12 +89,12 @@ public class TeacherInteractController {
     })
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
-        MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010, "课堂编号不能为空");
-        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010, "课堂问题发布不能为空");
-        MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010, "课堂问题交互方式不能为空");
-        MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010, "课堂问题发布教师不能为空");
-        MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010, "课堂问题互动类型不能为空");
-        MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010, "课堂问题人员参与类型不能为空");
+        MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
+        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
+        MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");
+        MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
+        MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010,"课堂问题互动类型不能为空");
+        MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题人员参与类型不能为空");
         //课堂发布题目
         return sendQuestService.sendQuestion(
                 giveVo.getCircleId(),
@@ -127,12 +127,12 @@ public class TeacherInteractController {
     })
     public Mono<WebResult> raiseSendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
-        MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010, "课堂编号不能为空");
-        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010, "课堂问题发布不能为空");
-        MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010, "课堂问题交互方式不能为空");
-        MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010, "课堂问题发布教师不能为空");
-        MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010, "课堂问题互动类型不能为空");
-        MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010, "课堂问题选举类型不能为空");
+        MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
+        MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
+        MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");
+        MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010,"课堂问题发布教师不能为空");
+        MyAssert.blank(giveVo.getQuestionType(), DefineCode.ERR0010,"课堂问题互动类型不能为空");
+        MyAssert.blank(giveVo.getCategory(), DefineCode.ERR0010,"课堂问题选举类型不能为空");
         //课堂发布题目
         return sendQuestService.raiseSendQuestion(
                 giveVo.getCircleId(),

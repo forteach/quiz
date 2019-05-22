@@ -9,5 +9,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
  * @version: V1.0
  * @date: 2019/1/17  10:21
  */
-public interface EvaluateRepository extends ReactiveMongoRepository<Cumulative, String> {
+public interface RewardRepository extends ReactiveMongoRepository<Cumulative, String> {
 }
