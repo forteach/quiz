@@ -1,8 +1,11 @@
 package com.forteach.quiz.web.vo;
 
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @Description:
@@ -42,10 +45,26 @@ public class InteractAnswerVo {
     private String answer;
 
     /**
+     * 答案附件
+     */
+    @ApiModelProperty(value = "附件列表", name = "fileList")
+    private List<DataDatumVo> fileList;
+
+
+    /**
      * 题目交互活动类型  TIWEN LIANXI RENWU
      */
     @ApiModelProperty(value = "切换提问类型过期标识  接收的该题cut", name = "cut")
     private String questionType;
+
+    public InteractAnswerVo(String examineeId, String circleId, String questionId, String answer, String questionType,List<DataDatumVo> fileList) {
+        this.examineeId = examineeId;
+        this.circleId = circleId;
+        this.questionId = questionId;
+        this.answer = answer;
+        this.questionType = questionType;
+        this.fileList=fileList;
+    }
 
     public InteractAnswerVo(String examineeId, String circleId, String questionId, String answer, String questionType) {
         this.examineeId = examineeId;

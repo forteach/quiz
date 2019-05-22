@@ -3,6 +3,7 @@ package com.forteach.quiz.controller;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import com.forteach.quiz.interaction.execute.web.vo.DelSelectStuVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import javax.annotation.Resource;
+import java.util.Arrays;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -64,16 +66,25 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
+
+        DataDatumVo file=new DataDatumVo();
+        file.setFileId("f01");
+        file.setFileName("testName");
+        file.setFileUrl("url");
+
+
         InteractAnswerVo vo=new InteractAnswerVo(
                 "1301331992031827761",
                 "5cd3d58f5157212350577a58",
                 "5c73676306a38f000101b7b6",
                 "D",
-                "TiWen");
+                "TiWen",
+                Arrays.asList(file)
+        );
 
         System.out.println("json------"+ JSON.toJSONString(vo));
         webTestClient
-                .post().uri("/interact/send/answer")  //创建2小时内同一课堂
+                .post().uri("/stuInteract/send/answer")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
                 .body(Mono.just(vo),InteractAnswerVo.class) // 3

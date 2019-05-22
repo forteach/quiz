@@ -5,6 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -28,6 +31,12 @@ public class InteractiveSheetAnsw {
     @ApiModelProperty(value = "答案", name = "answer")
     private String answer;
 
+    /**
+     * 答案附件
+     */
+    @ApiModelProperty(value = "附件列表", name = "fileList")
+    private List<DataDatumVo> fileList;
+
 
     /**
      * 题目回答是否正确
@@ -36,7 +45,7 @@ public class InteractiveSheetAnsw {
 
     private String date;
 
-    public InteractiveSheetAnsw(String questionId, String answer, String answerRight) {
+    public InteractiveSheetAnsw(String questionId, String answer,List<DataDatumVo> fileList, String answerRight) {
         this.questionId = questionId;
         this.answer = answer;
         this.answerRight = answerRight;

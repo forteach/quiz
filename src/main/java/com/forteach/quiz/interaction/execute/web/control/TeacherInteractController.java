@@ -146,17 +146,22 @@ public class TeacherInteractController {
     }
 
 
+
+
+
     @PostMapping("/fabu/questList")
     @ApiOperation(value = "获得当前已发布题目的题目列表", notes = "已发布题目列表、当前题目、以显示题目答案的列表")
     @ApiImplicitParam(name = "circleId", value = "课堂id", required = true, dataType = "string", paramType = "query")
     public Mono<WebResult> questFabuList(@RequestBody QuestFabuListVo questFabuListVo, ServerHttpRequest serverHttpRequest) {
         MyAssert.blank(questFabuListVo.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
         return fabuQuestService.getFaBuQuestNow(questFabuListVo.getCircleId())
-                .flatMap(list -> Mono.just(new QuestFabuListResponse(questFabuListVo.getCircleId(), (List<String>) list.get(0), list.get(1).toString())))
+                .flatMap(list->Mono.just(new QuestFabuListResponse(questFabuListVo.getCircleId(),(List<String>)list.get(0),list.get(1).toString())))
                 .onErrorReturn(new QuestFabuListResponse())
                 .map(WebResult::okResult);
     }
 
+
+//多题目类型**********************************************************************************************
     /**
      * 发布本节课 练习册
      *
@@ -176,6 +181,7 @@ public class TeacherInteractController {
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         return sendQuestBookService.sendQuestionBook(giveVo.getCircleId(), giveVo.getTeacherId(), giveVo.getQuestionType(), giveVo.getQuestionId(), giveVo.getCategory(), giveVo.getSelected().concat(",")).map(WebResult::okResult);
     }
+
 
     @ApiOperation(value = "查询回答情况", notes = "查询学生回答信息")
     @PostMapping("/findQuestionRecord")
