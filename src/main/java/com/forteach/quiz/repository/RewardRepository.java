@@ -1,6 +1,6 @@
 package com.forteach.quiz.repository;
 
-import com.forteach.quiz.domain.Reward;
+import com.forteach.quiz.evaluate.domain.Reward;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**

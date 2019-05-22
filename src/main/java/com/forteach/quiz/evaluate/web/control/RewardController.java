@@ -2,7 +2,8 @@ package com.forteach.quiz.evaluate.web.control;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.evaluate.domain.Cumulative;
-import com.forteach.quiz.service.RewardService;
+import com.forteach.quiz.evaluate.repository.Service.RewardService;
+import com.forteach.quiz.evaluate.web.control.req.CumulativeReq;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +19,12 @@ import javax.validation.Valid;
  */
 @RestController
 @Api(value = "老师奖励学生红花", tags = {"对学生的任务、提问奖励等"})
-@RequestMapping(value = "/evaluate", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class EvaluateController {
+@RequestMapping(value = "/reward", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class RewardController {
 
     private final RewardService rewardService;
 
-    public EvaluateController( RewardService rewardService) {
+    public RewardController(RewardService rewardService) {
         this.rewardService = rewardService;
     }
 
@@ -35,19 +36,19 @@ public class EvaluateController {
 //    }
 
     /**
-     * 奖励(红花等... ...) 累加
+     * 课堂奖励(红花等... ...) 累加
      *
      * @return
      */
-    @PostMapping("/reward/cumulative")
+    @PostMapping("/class/add")
     @ApiOperation(value = "奖励(红花等... ...)", notes = "对学生进行奖励等")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "被累加的学生id", name = "studentId", required = true, dataType = "string", paramType = "from"),
-            @ApiImplicitParam(value = "增加值", name = "amount", dataType = "string", required = true, paramType = "from"),
-            @ApiImplicitParam(value = "教师id", name = "teacher", dataType = "string", required = true, paramType = "from")
+            @ApiImplicitParam(value = "增加值", name = "num", dataType = "string", required = true, paramType = "from"),
+            @ApiImplicitParam(value = "奖励类型：红花：flower", name = "rewardType", dataType = "string", required = true, paramType = "from")
     })
-    public Mono<WebResult> reward(@ApiParam(value = "对学生奖励累加", required = true) @Valid @RequestBody Cumulative cumulativeVo) {
-        return rewardService.cumulative(cumulativeVo.getStudentId(), Double.valueOf(cumulativeVo.getAmount())).map(WebResult::okResult);
+    public Mono<WebResult> rewardAdd(@ApiParam(value = "对学生奖励累加", required = true) @Valid @RequestBody CumulativeReq req) {
+        return rewardService.cumulative(req.getCircleId(),req.getStudentId(), Integer.valueOf(req.getNum())).map(WebResult::okResult);
     }
 
 

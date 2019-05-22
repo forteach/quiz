@@ -52,4 +52,6 @@ public class Cumulative extends BaseEntity {
      */
 //    @ApiModelProperty(value = "教师id", name = "teacherId")
     private String teacherId;
+
+    private String rewardType;
 }
