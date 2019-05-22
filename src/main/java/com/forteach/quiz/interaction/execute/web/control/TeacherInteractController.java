@@ -111,7 +111,7 @@ public class TeacherInteractController {
                     required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
-        //giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
+        giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
         MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
         MyAssert.blank(giveVo.getInteractive(), DefineCode.ERR0010,"课堂问题交互方式不能为空");

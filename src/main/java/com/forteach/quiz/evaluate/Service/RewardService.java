@@ -1,10 +1,9 @@
-package com.forteach.quiz.evaluate.repository.Service;
+package com.forteach.quiz.evaluate.Service;
 
 import com.forteach.quiz.evaluate.config.RewardKey;
 import com.forteach.quiz.evaluate.domain.Reward;
 import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
 import com.forteach.quiz.repository.RewardRepository;
-import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
