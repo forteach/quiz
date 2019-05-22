@@ -73,7 +73,7 @@ public class RecordService {
         Mono<String> portrait = studentsService.findStudentsPortrait(askAnswer.getExamineeId());
         return name.zipWith(portrait)
                 .flatMap(t -> {
-                    return Mono.just(new InteractAnswerRecordResp(askAnswer.getInteractive(), askAnswer.getExamineeId(), t.getT1(), t.getT2(), askAnswer.getAnswer(), askAnswer.getRight(), askAnswer.getUDate()));
+                    return Mono.just(new InteractAnswerRecordResp(askAnswer.getExamineeId(), t.getT1(), t.getT2(), askAnswer.getAnswer(), askAnswer.getRight(), askAnswer.getUDate()));
                 });
     }
 
@@ -118,7 +118,7 @@ public class RecordService {
                 .flatMap(t -> {
                     return Mono.just(new ActivityAskAnswerResp(t.getT1(), t.getT2(),
                             activityAskAnswer.getExamineeId(),
-                            activityAskAnswer.getLibraryType(),
+                            activityAskAnswer.getQuestionType(),
                             activityAskAnswer.getEvaluate(),
                             activityAskAnswer.getCircleId(),
                             activityAskAnswer.getAnswList()));

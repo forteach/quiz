@@ -32,11 +32,11 @@ public class ActivityAskAnswerResp extends ActivityAskAnswer {
     public ActivityAskAnswerResp(String name,
                                  String portrait,
                                  String examineeId,
-                                 String libraryType,
+                                 String questionType,
                                  String evaluate,
                                  String circleId,
                                  List<InteractiveSheetAnsw> answList) {
-        super(examineeId, libraryType, evaluate, circleId, answList);
+        super(examineeId, questionType, evaluate, circleId, answList);
         this.name = name;
         this.portrait = portrait;
     }

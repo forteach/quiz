@@ -189,7 +189,7 @@ public class TeacherInteractController {
             @ApiImplicitParam(value = "课堂/课程 id", name = "circleId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "答题的学生id", name = "examineeId", dataType = "string", paramType = "query"),
-            @ApiImplicitParam(value = "questionType\", value = \"TiWen (提问) / FengBao(头脑风暴题库) /  RenWu (任务)　/ WenJuan (问卷) / LianXi (练习册)", name = "questionType", dataType = "string", paramType = "query")
+            @ApiImplicitParam(value = " TiWen (提问) / FengBao(头脑风暴题库) /  RenWu (任务)　/ WenJuan (问卷) / LianXi (练习册)", name = "questionType", dataType = "string", paramType = "query")
     })
     public Mono<WebResult> findQuestionRecord(@RequestBody RecordReq recordReq) {
         MyAssert.isNull(recordReq.getCircleId(), DefineCode.ERR0010, "课堂信息id不为空");
@@ -213,7 +213,8 @@ public class TeacherInteractController {
     })
     public Mono<WebResult> findAskQuestionRecord(@RequestBody RecordReq recordReq) {
         MyAssert.isNull(recordReq.getCircleId(), DefineCode.ERR0010, "课堂信息id不为空");
-        return recordService.findAskRecord(recordReq.getCircleId(),
+        return recordService.findAskRecord(
+                recordReq.getCircleId(),
                 recordReq.getQuestionId(),
                 recordReq.getExamineeId(),
                 recordReq.getQuestionType())
