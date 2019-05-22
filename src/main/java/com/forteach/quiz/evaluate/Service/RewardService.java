@@ -2,12 +2,13 @@ package com.forteach.quiz.evaluate.Service;
 
 import com.forteach.quiz.evaluate.config.RewardKey;
 import com.forteach.quiz.evaluate.domain.Reward;
+import com.forteach.quiz.evaluate.repository.RewardRepository;
 import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
-import com.forteach.quiz.repository.RewardRepository;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -29,10 +30,13 @@ public class RewardService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
 
-    public RewardService(RewardRepository rewardRepository, ReactiveMongoTemplate reactiveMongoTemplate,ReactiveStringRedisTemplate stringRedisTemplate) {
+    private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
+
+    public RewardService(RewardRepository rewardRepository, ReactiveHashOperations<String, String, String> reactiveHashOperations, ReactiveMongoTemplate reactiveMongoTemplate,ReactiveStringRedisTemplate stringRedisTemplate) {
         this.rewardRepository = rewardRepository;
         this.stringRedisTemplate=stringRedisTemplate;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.reactiveHashOperations = reactiveHashOperations;
     }
 
     /**
@@ -59,15 +63,17 @@ public class RewardService {
 
     //获得学生已存在的红花，并增加小红花
     private Mono<String> redisFlowerAdd(final  String circleId,final String sutdentId, final int amount){
-        String  key=RewardKey.rewardAddKey(circleId,sutdentId,RewardKey.REWARD_FLOWER_KEY);
-        return stringRedisTemplate.hasKey(key).flatMap(r-> {
+        //当前课堂的奖励MAP
+        String  key=RewardKey.rewardAddKey(circleId,RewardKey.REWARD_FLOWER_KEY);
+        return reactiveHashOperations.hasKey(key,sutdentId).flatMap(r-> {
             if(r) {
                 return stringRedisTemplate.opsForValue().get(key)
                         .flatMap(num->Mono.just(String.valueOf(Integer.parseInt(num)+amount)))
-                        .filterWhen(num->stringRedisTemplate.opsForValue().set(key, String.valueOf(Integer.parseInt(num)+amount), Duration.ofSeconds(60 * 60 * 12)));
+                        .filterWhen(num->reactiveHashOperations.put(key,sutdentId, String.valueOf(Integer.parseInt(num)+amount)));
             }else{
                 return Mono.just(String.valueOf(amount))
-                .filterWhen(num->stringRedisTemplate.opsForValue().set(key, num, Duration.ofSeconds(60 * 60 * 12)));
+                .filterWhen(num->reactiveHashOperations.put(key,sutdentId, num))
+                .filterWhen(num->stringRedisTemplate.expire(key, Duration.ofSeconds(60*60*2))) ;
             }
                 }
         );

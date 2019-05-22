@@ -15,8 +15,6 @@ import lombok.Data;
  * @date: 2018/12/11  14:14
  */
 @Data
-@Builder
-@AllArgsConstructor
 @ApiModel(value = "奖励累加", description = "对学生进行奖励累加")
 public class CumulativeReq  {
 
