@@ -43,9 +43,17 @@ public class RecordService {
      * @param questionsId
      * @return
      */
-    public Mono<InteractRecordResp> findQuestionRecord(final String circleId, final String questionsId) {
-        Query query = Query.query(Criteria.where("circleId").is(circleId)
-                .and("questionId").is(questionsId));
+    public Mono<InteractRecordResp> findQuestionRecord(final String circleId, final String questionsId, final String examineeId) {
+        Criteria criteria = Criteria.where("circleId").is(circleId);
+        if (StrUtil.isNotBlank(questionsId)){
+            criteria.and("questionId").is(questionsId);
+        }
+        if (StrUtil.isNotBlank(examineeId)){
+            criteria.and("examineeId").is(examineeId);
+        }
+
+        Query query = Query.query(criteria);
+
         return reactiveMongoTemplate.find(query, AskAnswer.class)
                 .collectList()
                 .flatMapMany(Flux::fromIterable)

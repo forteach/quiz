@@ -187,13 +187,14 @@ public class TeacherInteractController {
     @PostMapping("/findQuestionRecord")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂/课程 id", name = "circleId", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query")
+            @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(value = "答题的学生id", name = "examineeId", dataType = "string", paramType = "query")
     })
     public Mono<WebResult> findQuestionRecord(@RequestBody RecordReq recordReq) {
         MyAssert.isNull(recordReq.getCircleId(), DefineCode.ERR0010, "课堂信息id不为空");
         MyAssert.isNull(recordReq.getQuestionId(), DefineCode.ERR0010, "问题不为空");
         return recordService.findQuestionRecord(recordReq.getCircleId(),
-                recordReq.getQuestionId())
+                recordReq.getQuestionId(), recordReq.getExamineeId())
                 .map(WebResult::okResult);
     }
 
@@ -203,8 +204,8 @@ public class TeacherInteractController {
             @ApiImplicitParam(value = "课堂/课程 id", name = "circleId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", paramType = "query"),
             @ApiImplicitParam(value = "答题的学生id", name = "examineeId", dataType = "string", paramType = "query"),
-            @ApiImplicitParam(value = "问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
-                    " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "libraryType", dataType = "string", paramType = "query")
+            @ApiImplicitParam(value = "TiWen (提问) / FengBao(头脑风暴题库)  /  RenWu (任务)　/ WenJuan (问卷) / LianXi (练习册)",
+                    name = "libraryType", dataType = "string", paramType = "query")
     })
     public Mono<WebResult> findAskQuestionRecord(@RequestBody RecordReq recordReq) {
         MyAssert.isNull(recordReq.getCircleId(), DefineCode.ERR0010, "课堂信息id不为空");
