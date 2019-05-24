@@ -36,8 +36,8 @@ public class AskAnswer extends BaseEntity {
     /**
      * 回答参与方式
      */
-    @ApiModelProperty(value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote   : 投票", name = "questionType")
-    private String questionType;
+    @ApiModelProperty(value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote  没有参与方式：no  : 投票", name = "interactive")
+    private String interactive;
 
     /**
      * 答案
@@ -61,13 +61,13 @@ public class AskAnswer extends BaseEntity {
     @ApiModelProperty(value = "问题id", name = "questionId")
     private String questionId;
 
+//
     /**
-     * 问题库类别
+     //     * 问题库类别
+     //
      */
-    @ApiModelProperty(value = "不需要传值 后台赋值 问题库类别  bigQuestion(考题 练习)/ brainstormQuestion (头脑风暴题库) /" +
-            " surveyQuestion(问卷题库) / taskQuestion (任务题库)", name = "questionId")
-    private String libraryType;
-
+    @ApiModelProperty(value = "提问：TiWen  任务：RenWu", name ="questionType")
+    private String questionType;
     /**
      * 答案对错
      */
