@@ -1,5 +1,6 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
@@ -195,7 +196,9 @@ public class TeacherInteractController {
     public Mono<WebResult> findQuestionRecord(@RequestBody RecordReq recordReq) {
         MyAssert.isNull(recordReq.getCircleId(), DefineCode.ERR0010, "课堂信息id不为空");
         MyAssert.isNull(recordReq.getQuestionId(), DefineCode.ERR0010, "问题不为空");
-        MyAssert.isNull(recordReq.getInteractive(), DefineCode.ERR0010, "参与方式不为空");
+        if (StrUtil.isBlank(recordReq.getInteractive())){
+            recordReq.setInteractive("no");
+        }
         return recordService.findQuestionRecord(
                 recordReq.getCircleId(),
                 recordReq.getQuestionId(),
