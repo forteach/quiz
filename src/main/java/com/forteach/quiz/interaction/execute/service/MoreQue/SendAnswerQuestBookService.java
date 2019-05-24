@@ -55,7 +55,7 @@ public class SendAnswerQuestBookService {
      * @param answer 回答内容
      * @return
      */
-    public Mono<Boolean> sendAnswer(final String questionType,final String circleId,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList) {
+    public Mono<Boolean> sendAnswer(String interactive,final String questionType,final String circleId,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList) {
 
         return Mono.just(answer)
                 //验证当前回答的题目和参与回答的人员
@@ -90,7 +90,7 @@ public class SendAnswerQuestBookService {
                         }
                     )
                 //设置MONGO的题目回答值
-                .filterWhen(r->sendValue(circleId,questionType,examineeId,questId,answer,fileList,r.toString()));
+                .filterWhen(r->sendValue(interactive,circleId,questionType,examineeId,questId,answer,fileList,r.toString()));
                 //记录学生回答MONGO记录
 //               .filterWhen(right -> insertInteractRecordService.answer(circleId, questId, examineeId, answer, String.valueOf(right))
 //                       .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
@@ -157,14 +157,14 @@ public class SendAnswerQuestBookService {
      *
      * @return
      */
-    private Mono<Boolean> sendValue(final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight) {
+    private Mono<Boolean> sendValue(final String interactive, final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight) {
 
-       return findExists(circleId,questionType,examineeId,questId)
-               .flatMap(r->saveOrupdate(r.booleanValue(),circleId,questionType,examineeId,questId,answer,fileList,answerRight))
+       return findExists(interactive,circleId,questionType,examineeId,questId)
+               .flatMap(r->saveOrupdate(r.booleanValue(),interactive,circleId,questionType,examineeId,questId,answer,fileList,answerRight))
                .flatMap(r-> Mono.just(r));
     }
 
-    public Mono<Boolean> findExists(final String circleId,final String questionType,final String examineeId,final String questId){
+    public Mono<Boolean> findExists(final String interactive,final String circleId,final String questionType,final String examineeId,final String questId){
         Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
                         .and("examineeId").is(examineeId)
@@ -174,9 +174,9 @@ public class SendAnswerQuestBookService {
     }
 
     //添加题目回答信息
-    private Mono<Boolean> saveOrupdate(final boolean r,final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight){
+    private Mono<Boolean> saveOrupdate(final boolean r,final String interactive,final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight){
         if(!r){
-            return add(circleId,questionType,examineeId,questId,answer,fileList,answerRight);
+            return add(interactive,circleId,questionType,examineeId,questId,answer,fileList,answerRight);
         }else{
             System.out.println("***** circleId");
             final Query query = Query.query(
@@ -190,16 +190,17 @@ public class SendAnswerQuestBookService {
                     //删除记录成功后
                     .filter(r1->r1.wasAcknowledged())
                     //添加新的信息
-                    .flatMap(r1->add(circleId,questionType,examineeId,questId,answer,fileList,answerRight));
+                    .flatMap(r1->add(interactive,circleId,questionType,examineeId,questId,answer,fileList,answerRight));
         }
     }
 
     //修改Mongo题目信息
-    private Mono<Boolean> add(final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight){
+    private Mono<Boolean> add(final String interactive,final String circleId,final String questionType,final String examineeId,final String questId,final String answer,final List<DataDatumVo> fileList,final String answerRight){
 
         Query query = Query.query(
                 Criteria.where("circleId").is(circleId)
                         .and("examineeId").is(examineeId)
+                        .and("interactive").is(interactive)
                         //练习、任务
                         .and("questionType").is(questionType));
         Update update = new Update()

@@ -57,6 +57,12 @@ public class InteractAnswerVo {
     @ApiModelProperty(value = "切换提问类型过期标识  接收的该题cut", name = "cut")
     private String questionType;
 
+    /**
+     * 回答参与方式
+     */
+    @ApiModelProperty(value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote  没有参与方式：no : 投票", name = "questionType")
+    private String interactive="no";
+
     public InteractAnswerVo(String examineeId, String circleId, String questionId, String answer, String questionType,List<DataDatumVo> fileList) {
         this.examineeId = examineeId;
         this.circleId = circleId;

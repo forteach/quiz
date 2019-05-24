@@ -178,7 +178,9 @@ public class StudentInteractController {
     public Mono<WebResult> sendBookAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, ServerHttpRequest serverHttpRequest) {
 
         interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        return sendAnswerQuestBookService.sendAnswer(QuestionType.LianXi.name(),
+        return sendAnswerQuestBookService.sendAnswer(
+                interactAnswerVo.getInteractive(),
+                QuestionType.LianXi.name(),
                 interactAnswerVo.getCircleId(),
                 interactAnswerVo.getExamineeId(),
                 interactAnswerVo.getQuestionId(),
