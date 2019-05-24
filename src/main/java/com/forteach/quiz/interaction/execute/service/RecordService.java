@@ -43,7 +43,7 @@ public class RecordService {
      * @param questionsId
      * @return
      */
-    public Mono<InteractRecordResp> findQuestionRecord(final String circleId, final String questionsId, final String examineeId, final String questionType) {
+    public Mono<InteractRecordResp> findQuestionRecord(final String circleId, final String questionsId, final String examineeId, final String questionType, final String interactive) {
         Criteria criteria = Criteria.where("circleId").is(circleId);
         if (StrUtil.isNotBlank(questionsId)){
             criteria.and("questionId").is(questionsId);
@@ -53,6 +53,9 @@ public class RecordService {
         }
         if (StrUtil.isNotBlank(questionType)){
             criteria.and("questionType").is(questionType);
+        }
+        if (StrUtil.isNotBlank(interactive)){
+            criteria.and("interactive").is(interactive);
         }
 
         Query query = Query.query(criteria);

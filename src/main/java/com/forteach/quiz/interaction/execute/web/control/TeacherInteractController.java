@@ -189,16 +189,19 @@ public class TeacherInteractController {
             @ApiImplicitParam(value = "课堂/课程 id", name = "circleId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "问题id", name = "questionsId", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(value = "答题的学生id", name = "examineeId", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote  没有参与方式：no  : 投票", name = "interactive", dataType = "string", required = true),
             @ApiImplicitParam(value = " TiWen (提问) / FengBao(头脑风暴题库) /  RenWu (任务)　/ WenJuan (问卷) / LianXi (练习册)", name = "questionType", dataType = "string", paramType = "query")
     })
     public Mono<WebResult> findQuestionRecord(@RequestBody RecordReq recordReq) {
         MyAssert.isNull(recordReq.getCircleId(), DefineCode.ERR0010, "课堂信息id不为空");
         MyAssert.isNull(recordReq.getQuestionId(), DefineCode.ERR0010, "问题不为空");
+        MyAssert.isNull(recordReq.getInteractive(), DefineCode.ERR0010, "参与方式不为空");
         return recordService.findQuestionRecord(
                 recordReq.getCircleId(),
                 recordReq.getQuestionId(),
                 recordReq.getExamineeId(),
-                recordReq.getQuestionType())
+                recordReq.getQuestionType(),
+                recordReq.getInteractive())
                 .map(WebResult::okResult);
     }
 
