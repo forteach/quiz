@@ -7,7 +7,6 @@ import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -20,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
 import static com.forteach.quiz.common.Dic.*;
 
 /**
@@ -151,7 +151,7 @@ public class InsertInteractRecordService {
 
             return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
                 if (result.wasAcknowledged()) {
-                    return Mono.just(right);
+                    return Mono.just(true);
                 } else {
                     return Mono.error(new AskException("Mongo操作失败"));
                 }
