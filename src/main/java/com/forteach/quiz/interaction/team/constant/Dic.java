@@ -28,4 +28,9 @@ public class Dic {
      * 永久小组 课程小组
      */
     public final static String TEAM_FOREVER = "forever";
+
+    /**
+     * 班级学生信息前缀
+     */
+    public static final String CLASS_ROOM = "classRoom#";
 }

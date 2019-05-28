@@ -7,7 +7,6 @@ import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.team.domain.Team;
 import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
-import com.forteach.quiz.web.pojo.Students;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -18,8 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 
-import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_FOREVER;
-import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_TEMPORARILY;
+import static com.forteach.quiz.interaction.team.constant.Dic.*;
 
 /**
  * @Description:
@@ -70,17 +68,31 @@ public class TeamService {
                                 .flatMap(number -> teamRandomService.allotVerify(number, randomVo.getNumber()))
                                 .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0002, "分组时 至少需要条件达到每组两个人"));
                     } else if (TEAM_FOREVER.equals(randomVo.getExpType())) {
-                        return Mono.just(true);
+                        final String key = CLASS_ROOM.concat(random.getClassId());
+                        return stringRedisTemplate.opsForSet().size(key)
+                                .flatMap(number -> MyAssert.isNull(number, DefineCode.ERR0002, "不存在相关数据"))
+                                .flatMap(number -> teamRandomService.allotVerify(number, randomVo.getNumber()))
+                                .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0002, "班级人数不够分组每组两个人"));
                     } else {
                         return MyAssert.isNull(null, DefineCode.ERR0002, "有效期参数错误");
                     }
                 })
                 .flatMap(randomVo -> {
-                    // TODO 需要做查询对应的班级所有学生
-                    Mono<List<Students>> list = classRoomService.findInteractiveStudents(randomVo.getCircleId(), random.getTeacherId())
-                            .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
-                            .transform(teamRandomService::shuffle);
-                    return list.flatMap(l -> teamRandomService.groupTeam(l, randomVo));
+                    if (TEAM_FOREVER.equals(randomVo.getExpType())){
+                        //   永久小组/班级小组
+                        return classRoomService.findClassStudents(randomVo.getClassId())
+                                .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
+                                .transform(teamRandomService::shuffle)
+                                .flatMap(l -> teamRandomService.groupTeam(l, randomVo));
+                    }else if (TEAM_TEMPORARILY.equals(randomVo.getExpType())){
+                        //    临时小组/课堂小组
+                        return classRoomService.findClassStudents(randomVo.getClassId())
+                                .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
+                                .transform(teamRandomService::shuffle)
+                                .flatMap(l -> teamRandomService.groupTeam(l, randomVo));
+                    }else {
+                        return MyAssert.isNull(null, DefineCode.ERR0002, "有效期参数错误");
+                    }
                 })
                 .filterWhen(groupTeamResp -> teamRedisService.deleteTeams(random.getGroupKey()))
                 .filterWhen(groupTeamResp -> teamRedisService.saveRedisTeams(groupTeamResp.getTeamList(), random))

@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
-import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
@@ -13,8 +12,13 @@ import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
+
+import static com.forteach.quiz.interaction.team.constant.Dic.CLASS_ROOM;
+
 /**
  * @Description: 创建课堂
  * @author: liu zhenming
@@ -154,4 +158,15 @@ public class ClassRoomService {
         return stringRedisTemplate.opsForSet().size(ClassRoomKey.getInteractiveIdQra(circleId));
     }
 
+
+    /**
+     * 通过班级id查找对应的学生信息
+     * @param classId
+     * @return
+     */
+    public Mono<List<Students>> findClassStudents(final String classId){
+        return stringRedisTemplate.opsForSet().members(CLASS_ROOM.concat(classId)).collectList()
+                .filter(Objects::nonNull)
+                .flatMap(stringList -> studentsService.exchangeStudents(stringList));
+    }
 }
