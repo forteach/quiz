@@ -86,7 +86,7 @@ public class TeamService {
                                 .flatMap(l -> teamRandomService.groupTeam(l, randomVo));
                     }else if (TEAM_TEMPORARILY.equals(randomVo.getExpType())){
                         //    临时小组/课堂小组
-                        return classRoomService.findClassStudents(randomVo.getClassId())
+                        return classRoomService.findInteractiveStudents(randomVo.getCircleId(), randomVo.getTeacherId())
                                 .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
                                 .transform(teamRandomService::shuffle)
                                 .flatMap(l -> teamRandomService.groupTeam(l, randomVo));
