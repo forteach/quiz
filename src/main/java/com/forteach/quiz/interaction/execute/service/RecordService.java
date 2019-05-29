@@ -76,7 +76,7 @@ public class RecordService {
         Mono<String> portrait = studentsService.findStudentsPortrait(askAnswer.getExamineeId());
         return name.zipWith(portrait)
                 .flatMap(t -> {
-                    return Mono.just(new InteractAnswerRecordResp(askAnswer.getExamineeId(), t.getT1(), t.getT2(), askAnswer.getAnswer(), askAnswer.getRight(), askAnswer.getUDate()));
+                    return Mono.just(new InteractAnswerRecordResp(askAnswer.getExamineeId(), t.getT1(), t.getT2(), askAnswer.getAnswer(), askAnswer.getFileList(), askAnswer.getRight(), askAnswer.getUDate()));
                 });
     }
 

@@ -1,8 +1,11 @@
 package com.forteach.quiz.interaction.execute.web.resp;
 
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author: zhangyy
@@ -31,6 +34,9 @@ public class InteractAnswerRecordResp {
     @ApiModelProperty(name = "answer", value = "回答内容", dataType = "string")
     private String answer;
 
+    @ApiModelProperty(value = "附件列表", name = "fileList")
+    private List<DataDatumVo> fileList;
+
     @ApiModelProperty(name = "piGaiResult", value = "批改的答题结果", dataType = "boolean", notes = "true / false")
     private Boolean piGaiResult;
 
@@ -41,11 +47,13 @@ public class InteractAnswerRecordResp {
     }
 
     public InteractAnswerRecordResp(String studentId, String name, String portrait,
-                                    String answer, String piGaiResult, String updateTime) {
+                                    String answer, List<DataDatumVo> fileList,
+                                    String piGaiResult, String updateTime) {
         this.studentId = studentId;
         this.name = name;
         this.portrait = portrait;
         this.answer = answer;
+        this.fileList = fileList;
         if ("true".equals(piGaiResult)){
             this.piGaiResult = true;
         }else {
