@@ -146,6 +146,13 @@ public class TeamService {
                     if (!b) {
                         //不存在没有记录需要去mongodb查询并将查询的结果保存到redis
                         return teamMongoDBService.findTeamList(req)
+                                .filterWhen(baseTeam -> {
+                                    if (baseTeam.getTeamList() != null && baseTeam.getTeamList().size() > 0){
+                                        return Mono.just(true);
+                                    }else {
+                                        return MyAssert.isNull(null, DefineCode.OK, "您还没有分组");
+                                    }
+                                })
                                 .filterWhen(teamRedisService::saveRedisTeamList)
                                 .flatMap(baseTeam -> Mono.just(baseTeam.getTeamList()));
                     } else {

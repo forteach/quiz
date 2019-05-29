@@ -12,7 +12,6 @@ import com.forteach.quiz.interaction.team.web.req.*;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
-import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,12 +20,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.forteach.quiz.common.Dic.MONGDB_ID;
 import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_FOREVER;
 import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_TEMPORARILY;
 
@@ -289,10 +286,12 @@ public class TeamMongoDBService {
      * @return
      */
     Mono<? extends BaseTeam> findTeamList(final CircleIdReq req) {
-        if (StrUtil.isBlank(req.getClassId())){
-            return reactiveMongoTemplate.findOne(Query.query(Criteria.where("circleId").is(req.getCircleId())), TeamCircle.class);
+        if (StrUtil.isNotBlank(req.getClassId())){
+            return reactiveMongoTemplate.findOne(Query.query(Criteria.where("courseId").is(req.getCircleId()).and("classId").is(req.getClassId())), TeamCourse.class)
+                    .defaultIfEmpty(new TeamCourse());
         }else {
-            return reactiveMongoTemplate.findOne(Query.query(Criteria.where("courseId").is(req.getCircleId()).and("classId").is(req.getClassId())), TeamCourse.class);
+            return reactiveMongoTemplate.findOne(Query.query(Criteria.where("circleId").is(req.getCircleId())), TeamCircle.class)
+                    .defaultIfEmpty(new TeamCircle());
         }
     }
 }
