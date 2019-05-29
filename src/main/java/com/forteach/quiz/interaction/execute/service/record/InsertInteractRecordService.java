@@ -149,13 +149,8 @@ public class InsertInteractRecordService {
                     .set("fileList",fileList)
                     .set("uDate", DataUtil.format(new Date()));
 
-            return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
-                if (result.wasAcknowledged()) {
-                    return Mono.just(right);
-                } else {
-                    return Mono.error(new AskException("Mongo操作失败"));
-                }
-            });
+            return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> Mono.just(result.wasAcknowledged()));
+//);
 
     }
 
