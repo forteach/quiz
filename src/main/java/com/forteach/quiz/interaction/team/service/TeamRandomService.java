@@ -1,23 +1,19 @@
 package com.forteach.quiz.interaction.team.service;
 
 import cn.hutool.core.util.IdUtil;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.CustomException;
-import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.team.domain.Team;
 import com.forteach.quiz.interaction.team.web.req.ChangeTeamReq;
 import com.forteach.quiz.interaction.team.web.req.GroupRandomReq;
 import com.forteach.quiz.interaction.team.web.resp.GroupTeamResp;
-import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.redis.core.ReactiveHashOperations;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -33,37 +29,30 @@ import java.util.Objects;
 @Slf4j
 public class TeamRandomService {
 
-    private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final ReactiveRedisTemplate redisTemplate;
-    private final ClassRoomService classRoomService;
-    private final StudentsService studentsService;
     private final TeamRedisService teamRedisService;
 
-    public TeamRandomService(ReactiveStringRedisTemplate stringRedisTemplate,
-                             ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                             ReactiveMongoTemplate reactiveMongoTemplate,
-                             ReactiveRedisTemplate reactiveRedisTemplate,
-                             TeamRedisService teamRedisService,
-                             ClassRoomService classRoomService,
-                             StudentsService studentsService) {
-        this.stringRedisTemplate = stringRedisTemplate;
+    public TeamRandomService(ReactiveHashOperations<String, String, String> reactiveHashOperations,
+                             TeamRedisService teamRedisService) {
         this.reactiveHashOperations = reactiveHashOperations;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.redisTemplate = reactiveRedisTemplate;
-        this.classRoomService = classRoomService;
-        this.studentsService = studentsService;
         this.teamRedisService = teamRedisService;
+    }
+
+    Mono<GroupTeamResp> groupTeamBuild(final List<Students> list, final GroupRandomReq random) {
+        return Mono.just(list)
+                .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
+                .transform(this::shuffle)
+                .flatMap(l -> this.groupTeam(l, random));
     }
 
     /**
      * 随机分组 根据班级或课堂人数进行分组,从前到后排序多出部分依次从第一组到最后一组添加
+     *
      * @param list
      * @param randomVo
      * @return
      */
-    Mono<GroupTeamResp> groupTeam(final List<Students> list, final GroupRandomReq randomVo) {
+    private Mono<GroupTeamResp> groupTeam(final List<Students> list, final GroupRandomReq randomVo) {
         return Mono.just(list)
                 .map(students -> {
                     //总数 , 组数 , 每组个数 , 余数 ,余数累加值
@@ -95,6 +84,7 @@ public class TeamRandomService {
 
     /**
      * 从redis中查询小组信息转换为需要数据传给前台
+     *
      * @param teamId
      * @return
      */
@@ -131,10 +121,11 @@ public class TeamRandomService {
 
     /**
      * 打乱学生列表顺序
+     *
      * @param listMono
      * @return
      */
-    Mono<List<Students>> shuffle(final Mono<List<Students>> listMono) {
+    private Mono<List<Students>> shuffle(final Mono<List<Students>> listMono) {
         return listMono
                 .map(list -> {
                     Collections.shuffle(list);

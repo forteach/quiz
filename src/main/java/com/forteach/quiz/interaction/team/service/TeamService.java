@@ -72,7 +72,7 @@ public class TeamService {
                         return stringRedisTemplate.opsForSet().size(key)
                                 .flatMap(number -> MyAssert.isNull(number, DefineCode.ERR0002, "不存在相关数据"))
                                 .flatMap(number -> teamRandomService.allotVerify(number, randomVo.getNumber()))
-                                .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0002, "班级人数不够分组每组两个人"));
+                                .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0002, "班级人数不足,分组时最少需要每组两个人"));
                     } else {
                         return MyAssert.isNull(null, DefineCode.ERR0002, "有效期参数错误");
                     }
@@ -81,15 +81,11 @@ public class TeamService {
                     if (TEAM_FOREVER.equals(randomVo.getExpType())){
                         //   永久小组/班级小组
                         return classRoomService.findClassStudents(randomVo.getClassId())
-                                .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
-                                .transform(teamRandomService::shuffle)
-                                .flatMap(l -> teamRandomService.groupTeam(l, randomVo));
+                                .flatMap(l -> teamRandomService.groupTeamBuild(l, randomVo));
                     }else if (TEAM_TEMPORARILY.equals(randomVo.getExpType())){
                         //    临时小组/课堂小组
                         return classRoomService.findInteractiveStudents(randomVo.getCircleId(), randomVo.getTeacherId())
-                                .flatMap(studentsList -> MyAssert.isNull(studentsList, DefineCode.ERR0002, "不存在相关数据"))
-                                .transform(teamRandomService::shuffle)
-                                .flatMap(l -> teamRandomService.groupTeam(l, randomVo));
+                                .flatMap(l -> teamRandomService.groupTeamBuild(l, randomVo));
                     }else {
                         return MyAssert.isNull(null, DefineCode.ERR0002, "有效期参数错误");
                     }
