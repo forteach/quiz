@@ -1,47 +1,47 @@
 package com.forteach.quiz.interaction.execute.service.SingleQue;
 
 import com.alibaba.fastjson.JSON;
+import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
+import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.service.Key.AchieveAnswerKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
-import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
 import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-import static com.forteach.quiz.common.Dic.*;
 
 @Slf4j
 @Service
 public class SendAnswerService {
 
+    private final ReactiveMongoTemplate mongoTemplate;
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final CorrectService correctService;
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final InsertInteractRecordService insertInteractRecordService;
 
     public SendAnswerService(ReactiveStringRedisTemplate stringRedisTemplate,
+                             ReactiveMongoTemplate mongoTemplate,
                              ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                             CorrectService correctService,
-                             InsertInteractRecordService insertInteractRecordService,
-                             ReactiveMongoTemplate reactiveMongoTemplate) {
+                             CorrectService correctService) {
         this.stringRedisTemplate = stringRedisTemplate;
+        this.mongoTemplate = mongoTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
         this.correctService = correctService;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.insertInteractRecordService = insertInteractRecordService;
     }
 
 
@@ -102,7 +102,7 @@ public class SendAnswerService {
                                     .flatMap(ok->stringRedisTemplate.expire(AchieveAnswerKey.piGaiTypeQuestionsId(circleId,questId,questionType), Duration.ofSeconds(60*60*2)))
                     )
                 //记录学生回答MONGO记录
-               .filterWhen(right -> insertInteractRecordService.answer(circleId,questionType, questId, examineeId, answer,fileList, right)
+               .filterWhen(right -> answer(circleId,questionType, questId, examineeId, answer,fileList, right)
                        .flatMap(f -> MyAssert.isFalse(f, DefineCode.ERR0012, "保存mongodb记录失败")));
     }
 
@@ -195,6 +195,35 @@ public class SendAnswerService {
      */
     private Mono<Boolean> sendRaise(final String circleId,final String examineeId,final String questId,final String answer, final String questionType) {
        return Mono.just(circleId).flatMap(interactAnswerVo -> sendSelect(circleId,examineeId,questId,answer,questionType));
+
+    }
+
+    /**
+     * 学生回答问题时 加入记录
+     *
+     * @param circleId
+     * @param questionId
+     * @param studentId
+     * @param answer
+     * @param right
+     * @return
+     */
+    public Mono<Boolean> answer(final String circleId, final String type, final String questionId, final String studentId, final String answer, final List<DataDatumVo> fileList,final Boolean right) {
+
+        //查找学生需要回答的题目
+        Query query = Query.query(
+                Criteria.where("circleId").is(circleId)
+                        .and("questionId").is(questionId)
+                        .and("examineeId").is(studentId));
+        //更新题目答案
+        Update update = Update.update("answer", answer)
+                .set("questionType", type)
+                .set("right", String.valueOf(right))
+                .set("fileList",fileList)
+                .set("uDate", DataUtil.format(new Date()));
+
+        return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> Mono.just(result.wasAcknowledged()));
+//);
 
     }
 }

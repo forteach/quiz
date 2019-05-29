@@ -1,7 +1,6 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
 import com.forteach.quiz.common.DataUtil;
-import com.forteach.quiz.exceptions.AskException;
 import com.forteach.quiz.interaction.execute.domain.AskAnswer;
 import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
@@ -15,11 +14,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
 import static com.forteach.quiz.common.Dic.*;
 
 /**
@@ -33,70 +30,71 @@ import static com.forteach.quiz.common.Dic.*;
 @Service
 public class InsertInteractRecordService {
 
-    private final ReactiveMongoTemplate mongoTemplate;
+//    private final ReactiveMongoTemplate mongoTemplate;
 
-    private final InteractRecordExecuteService interactRecordExecuteService;
+//    private final InteractRecordExecuteService interactRecordExecuteService;
+//
+//    private final UpdateInteractRecordService updateInteractRecordService;
+//
+//    private final InteractRecordBrainstormService interactRecordBrainstormService;
+//
+//    private final InteractRecordSurveyService interactRecordSurveyService;
+//
+//    private final InteractRecordTaskService interactRecordTaskService;
+//
+//    private final InteractRecordQuestionsService interactRecordQuestionsService;
 
-    private final UpdateInteractRecordService updateInteractRecordService;
-
-    private final InteractRecordBrainstormService interactRecordBrainstormService;
-
-    private final InteractRecordSurveyService interactRecordSurveyService;
-
-    private final InteractRecordTaskService interactRecordTaskService;
-
-    private final InteractRecordQuestionsService interactRecordQuestionsService;
-
-    public InsertInteractRecordService(ReactiveMongoTemplate mongoTemplate,
-                                       InteractRecordExecuteService interactRecordExecuteService,
-                                       UpdateInteractRecordService updateInteractRecordService,
-                                       InteractRecordTaskService interactRecordTaskService,
-                                       InteractRecordSurveyService interactRecordSurveyService,
-                                       InteractRecordBrainstormService interactRecordBrainstormService,
-                                       InteractRecordQuestionsService interactRecordQuestionsService) {
-        this.mongoTemplate = mongoTemplate;
-        this.interactRecordExecuteService = interactRecordExecuteService;
-        this.updateInteractRecordService = updateInteractRecordService;
-        this.interactRecordBrainstormService = interactRecordBrainstormService;
-        this.interactRecordSurveyService = interactRecordSurveyService;
-        this.interactRecordTaskService = interactRecordTaskService;
-        this.interactRecordQuestionsService = interactRecordQuestionsService;
-    }
-
-    public Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
-        final Query query = Query.query(Criteria.where(MONGDB_ID).is(sheetVo.getCircleId())
-                .and(interactRecordType + ".questionsId").is(sheetVo.getAnsw().getQuestionId())
-                .and(interactRecordType + ".answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
-                .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
-        Update update = new Update();
-        update.push(interactRecordType + ".$.answerRecordList", new InteractAnswerRecord(sheetVo.getExamineeId(), sheetVo.getAnsw().getAnswer()));
-        return mongoTemplate.updateMulti(query, update, InteractRecord.class).thenReturn(true);
-    }
-
-    public Mono<Boolean> releaseInteractRecord(final String circleId, final String questionId, final String selectId, final String category, final String interactRecordType) {
-
-        Mono<Long> number = interactRecordExecuteService.questionNumber(circleId);
-
-        Mono<InteractRecord> recordMono = interactRecordExecuteService.findInteractInteractRecord(circleId, questionId, category, interactRecordType);
-
-        return Mono.zip(number, recordMono).flatMap(tuple2 -> {
-
-            if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0
-                    || tuple2.getT2().getSurveys() != null && tuple2.getT2().getSurveys().size() > 0
-                    || tuple2.getT2().getBrainstorms() != null && tuple2.getT2().getBrainstorms().size() > 0
-                    || tuple2.getT2().getInteracts() != null && tuple2.getT2().getInteracts().size() > 0) {
-                return updateInteractRecordService.upInteractInteractRecord(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactRecordType);
-            } else if (INTERACT_RECORD_SURVEYS.equals(interactRecordType)) {
-                return interactRecordSurveyService.pushInteractSurveys(selectId, circleId, questionId, tuple2.getT1(), category);
-            } else if (INTERACT_RECORD_INTERACTS.equals(interactRecordType)) {
-                return interactRecordTaskService.pushInteractTask(selectId, circleId, questionId, tuple2.getT1(), category);
-            } else if (INTERACT_RECORD_BRAINSTORMS.equals(interactRecordType)) {
-                return interactRecordBrainstormService.pushInteractBrainstorms(selectId, circleId, questionId, tuple2.getT1(), category);
-            } else {
-                return interactRecordQuestionsService.pushInteractQuestions(selectId, circleId, questionId, tuple2.getT1(), "", category);
-            }
-        }).map(Objects::nonNull);
-    }
+//    public InsertInteractRecordService(ReactiveMongoTemplate mongoTemplate
+//                                       InteractRecordExecuteService interactRecordExecuteService,
+//                                       UpdateInteractRecordService updateInteractRecordService,
+//                                       InteractRecordTaskService interactRecordTaskService,
+//                                       InteractRecordSurveyService interactRecordSurveyService,
+//                                       InteractRecordBrainstormService interactRecordBrainstormService,
+//                                       InteractRecordQuestionsService interactRecordQuestionsService
+//    ) {
+//        this.mongoTemplate = mongoTemplate;
+//        this.interactRecordExecuteService = interactRecordExecuteService;
+//        this.updateInteractRecordService = updateInteractRecordService;
+//        this.interactRecordBrainstormService = interactRecordBrainstormService;
+//        this.interactRecordSurveyService = interactRecordSurveyService;
+//        this.interactRecordTaskService = interactRecordTaskService;
+//        this.interactRecordQuestionsService = interactRecordQuestionsService;
+//    }
+//
+//    public Mono<Boolean> pushMongo(final InteractiveSheetVo sheetVo, final String interactRecordType){
+//        final Query query = Query.query(Criteria.where(MONGDB_ID).is(sheetVo.getCircleId())
+//                .and(interactRecordType + ".questionsId").is(sheetVo.getAnsw().getQuestionId())
+//                .and(interactRecordType + ".answerRecordList.examineeId").ne(sheetVo.getExamineeId()))
+//                .with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+//        Update update = new Update();
+//        update.push(interactRecordType + ".$.answerRecordList", new InteractAnswerRecord(sheetVo.getExamineeId(), sheetVo.getAnsw().getAnswer()));
+//        return mongoTemplate.updateMulti(query, update, InteractRecord.class).thenReturn(true);
+//    }
+//
+//    public Mono<Boolean> releaseInteractRecord(final String circleId, final String questionId, final String selectId, final String category, final String interactRecordType) {
+//
+//        Mono<Long> number = interactRecordExecuteService.questionNumber(circleId);
+//
+//        Mono<InteractRecord> recordMono = interactRecordExecuteService.findInteractInteractRecord(circleId, questionId, category, interactRecordType);
+//
+//        return Mono.zip(number, recordMono).flatMap(tuple2 -> {
+//
+//            if (tuple2.getT2().getQuestions() != null && tuple2.getT2().getQuestions().size() > 0
+//                    || tuple2.getT2().getSurveys() != null && tuple2.getT2().getSurveys().size() > 0
+//                    || tuple2.getT2().getBrainstorms() != null && tuple2.getT2().getBrainstorms().size() > 0
+//                    || tuple2.getT2().getInteracts() != null && tuple2.getT2().getInteracts().size() > 0) {
+//                return updateInteractRecordService.upInteractInteractRecord(selectId, tuple2.getT2().getQuestions().get(0).getSelectId(), circleId, questionId, category, interactRecordType);
+//            } else if (INTERACT_RECORD_SURVEYS.equals(interactRecordType)) {
+//                return interactRecordSurveyService.pushInteractSurveys(selectId, circleId, questionId, tuple2.getT1(), category);
+//            } else if (INTERACT_RECORD_INTERACTS.equals(interactRecordType)) {
+//                return interactRecordTaskService.pushInteractTask(selectId, circleId, questionId, tuple2.getT1(), category);
+//            } else if (INTERACT_RECORD_BRAINSTORMS.equals(interactRecordType)) {
+//                return interactRecordBrainstormService.pushInteractBrainstorms(selectId, circleId, questionId, tuple2.getT1(), category);
+//            } else {
+//                return interactRecordQuestionsService.pushInteractQuestions(selectId, circleId, questionId, tuple2.getT1(), "", category);
+//            }
+//        }).map(Objects::nonNull);
+//    }
 
 //    /**
 //     * 学生回答问题时 加入记录
@@ -125,39 +123,7 @@ public class InsertInteractRecordService {
 //
 //    }
 
-    /**
-     * 学生回答问题时 加入记录
-     *
-     * @param circleId
-     * @param questionId
-     * @param studentId
-     * @param answer
-     * @param right
-     * @return
-     */
-    public Mono<Boolean> answer(final String circleId, final String type, final String questionId, final String studentId, final String answer, final List<DataDatumVo> fileList,final Boolean right) {
 
-            //查找学生需要回答的题目
-            Query query = Query.query(
-                    Criteria.where("circleId").is(circleId)
-                            .and("questionId").is(questionId)
-                            .and("examineeId").is(studentId));
-            //更新题目答案
-            Update update = Update.update("answer", answer)
-                    .set("questionType", type)
-                    .set("right", String.valueOf(right))
-                    .set("fileList",fileList)
-                    .set("uDate", DataUtil.format(new Date()));
-
-            return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> {
-                if (result.wasAcknowledged()) {
-                    return Mono.just(true);
-                } else {
-                    return Mono.error(new AskException("Mongo操作失败"));
-                }
-            });
-
-    }
 
 
 }
