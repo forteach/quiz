@@ -1,28 +1,18 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
-import com.forteach.quiz.interaction.execute.repository.InteractRecordRepository;
-import com.forteach.quiz.interaction.execute.web.resp.InteractAnswerRecordResp;
-import com.forteach.quiz.interaction.execute.web.resp.InteractRecordResp;
-import com.forteach.quiz.service.StudentsService;
-import com.forteach.quiz.web.pojo.Students;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import java.util.List;
+
 import java.util.Objects;
+
 import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
-import static com.forteach.quiz.util.DateUtil.getEndTime;
-import static com.forteach.quiz.util.DateUtil.getStartTime;
 
 /**
  * @Description: 课堂交互日志记录记录数据相关
@@ -33,15 +23,19 @@ import static com.forteach.quiz.util.DateUtil.getStartTime;
 @Service
 public class InteractRecordExecuteService {
 
-    private final InteractRecordRepository repository;
-    private final ReactiveMongoTemplate mongoTemplate;
-    private final StudentsService studentsService;
+//    private final InteractRecordRepository repository;
 
-    public InteractRecordExecuteService(InteractRecordRepository repository, ReactiveMongoTemplate mongoTemplate,
-                                        StudentsService studentsService) {
-        this.repository = repository;
+    private final ReactiveMongoTemplate mongoTemplate;
+//    private final StudentsService studentsService;
+
+    public InteractRecordExecuteService(
+//            InteractRecordRepository repository,
+            ReactiveMongoTemplate mongoTemplate
+//                                        StudentsService studentsService
+    ) {
+//        this.repository = repository;
         this.mongoTemplate = mongoTemplate;
-        this.studentsService = studentsService;
+//        this.studentsService = studentsService;
     }
     /**
      * 学生加入互动课堂时存入记录
@@ -50,16 +44,16 @@ public class InteractRecordExecuteService {
      * @param student
      * @return
      */
-    public Mono<Boolean> join(final String circleId, final String student) {
-
-        final Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId).and("students").ne(student));
-
-        Update update = new Update();
-        update.addToSet("students", student);
-        update.inc("participate", 1);
-
-        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
-    }
+//    public Mono<Boolean> join(final String circleId, final String student) {
+//
+//        final Query query = Query.query(Criteria.where(MONGDB_ID).is(circleId).and("students").ne(student));
+//
+//        Update update = new Update();
+//        update.addToSet("students", student);
+//        update.inc("participate", 1);
+//
+//        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
+//    }
 
     /**
      * 学生举手时记录
@@ -82,39 +76,39 @@ public class InteractRecordExecuteService {
         return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
     }
 
-    public Mono<Boolean> init(final String circleId,final String teacherId,final String chapterId) {
-        //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
-        return Mono.just(teacherId)
-                //创建记录
-                .flatMap(id ->build(circleId,id,chapterId)
-                        .flatMap(item->MyAssert.isTrue(item==null, DefineCode.ERR0012, "创建互动课堂日志失败")));
-    }
+//    public Mono<Boolean> init(final String circleId,final String teacherId,final String chapterId) {
+//        //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息
+//        return Mono.just(teacherId)
+//                //创建记录
+//                .flatMap(id ->build(circleId,id,chapterId)
+//                        .flatMap(item->MyAssert.isTrue(item==null, DefineCode.ERR0012, "创建互动课堂日志失败")));
+//    }
 
     /**
      * 创建Mongo课堂信息
      * @param teacherId
      * @return
      */
-    private Mono<InteractRecord> build(final String circleId, final String teacherId,final String chapterId) {
-        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId,teacherId,number + 1L,chapterId)));
-    }
+//    private Mono<InteractRecord> build(final String circleId, final String teacherId,final String chapterId) {
+//        return todayNumber(teacherId).flatMap(number -> repository.save(new InteractRecord(circleId,teacherId,number + 1L,chapterId)));
+//    }
 
     /**
      * 获取今日上课次数
      * @return
      */
-    private Mono<Long> todayNumber(final String teacherId) {
-        return mongoTemplate.count(Query.query(nowRecord(teacherId)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
-    }
+//    private Mono<Long> todayNumber(final String teacherId) {
+//        return mongoTemplate.count(Query.query(nowRecord(teacherId)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
+//    }
 
     /**
      * 获取本次课堂发布问题次数
      *
      * @return
-     */
-    Mono<Long> questionNumber(final String circleId) {
-        return mongoTemplate.count(Query.query(Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
-    }
+//     */
+//    Mono<Long> questionNumber(final String circleId) {
+//        return mongoTemplate.count(Query.query(Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).ne("").ne(null)), InteractRecord.class).switchIfEmpty(Mono.just(0L));
+//    }
 
     /**
      * 获取今天最新的课堂记录
@@ -122,9 +116,9 @@ public class InteractRecordExecuteService {
      * @param teacherId
      * @return
      */
-    private Criteria nowRecord(final String teacherId) {
-        return Criteria.where("teacherId").is(teacherId).and("time").gte(getStartTime()).lte(getEndTime());
-    }
+//    private Criteria nowRecord(final String teacherId) {
+//        return Criteria.where("teacherId").is(teacherId).and("time").gte(getStartTime()).lte(getEndTime());
+//    }
 
     /**
      * 查询或者新建个记录对象
@@ -134,11 +128,11 @@ public class InteractRecordExecuteService {
      * @param interactRecordType
      * @return
      */
-    Mono<InteractRecord> findInteractInteractRecord(final String circleId, final String questionId, final String category, final String interactRecordType) {
-        return mongoTemplate
-                .findOne(buildLastInteractRecord(circleId, questionId, category, interactRecordType), InteractRecord.class)
-                .switchIfEmpty(Mono.just(new InteractRecord()));
-    }
+//    Mono<InteractRecord> findInteractInteractRecord(final String circleId, final String questionId, final String category, final String interactRecordType) {
+//        return mongoTemplate
+//                .findOne(buildLastInteractRecord(circleId, questionId, category, interactRecordType), InteractRecord.class)
+//                .switchIfEmpty(Mono.just(new InteractRecord()));
+//    }
 
     /**
      * 获取新的发布问题(指定问题id)
@@ -148,86 +142,86 @@ public class InteractRecordExecuteService {
      * @param category
      * @return
      */
-    Query buildLastInteractRecord(final String circleId, final String questionId, final String category, final String interactType) {
-        final Query query = Query.query(Criteria.where(MONGDB_ID)
-                .is(circleId).and(interactType + ".questionsId").is(questionId)
-                .and(interactType + ".category").is(category)
-        ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
-        query.fields().include(interactType);
-        return query;
-    }
+//    Query buildLastInteractRecord(final String circleId, final String questionId, final String category, final String interactType) {
+//        final Query query = Query.query(Criteria.where(MONGDB_ID)
+//                .is(circleId).and(interactType + ".questionsId").is(questionId)
+//                .and(interactType + ".category").is(category)
+//        ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+//        query.fields().include(interactType);
+//        return query;
+//    }
 
     /**
      * 构建答题记录详细对象
      * @param interactAnswerRecord
      * @return
      */
-    private Mono<InteractAnswerRecordResp> changInteractAnswerRecord(InteractAnswerRecord interactAnswerRecord){
-        return Mono.just(interactAnswerRecord)
-                .zipWith(studentsService.findStudentsBrief(interactAnswerRecord.getExamineeId()), (i, s) -> {
-                    InteractAnswerRecordResp interactAnswerRecordResp = new InteractAnswerRecordResp();
-                    interactAnswerRecordResp.setStudentId(s.getId());
-                    interactAnswerRecordResp.setName(s.getName());
-                    interactAnswerRecordResp.setPortrait(s.getPortrait());
-                    interactAnswerRecordResp.setUpdateTime(i.getTime());
-                    if (i.getAnswer() != null){
-                        interactAnswerRecordResp.setAnswer(i.getAnswer());
-                    }
-                    if (i.getRight() != null){
-                        interactAnswerRecordResp.setPiGaiResult("true".equals(i.getRight()));
-                    }
-                    return interactAnswerRecordResp;
-                });
-    }
+//    private Mono<InteractAnswerRecordResp> changInteractAnswerRecord(InteractAnswerRecord interactAnswerRecord){
+//        return Mono.just(interactAnswerRecord)
+//                .zipWith(studentsService.findStudentsBrief(interactAnswerRecord.getExamineeId()), (i, s) -> {
+//                    InteractAnswerRecordResp interactAnswerRecordResp = new InteractAnswerRecordResp();
+//                    interactAnswerRecordResp.setStudentId(s.getId());
+//                    interactAnswerRecordResp.setName(s.getName());
+//                    interactAnswerRecordResp.setPortrait(s.getPortrait());
+//                    interactAnswerRecordResp.setUpdateTime(i.getTime());
+//                    if (i.getAnswer() != null){
+//                        interactAnswerRecordResp.setAnswer(i.getAnswer());
+//                    }
+//                    if (i.getRight() != null){
+//                        interactAnswerRecordResp.setPiGaiResult("true".equals(i.getRight()));
+//                    }
+//                    return interactAnswerRecordResp;
+//                });
+//    }
 
-    Mono<InteractRecordResp> changeFindRecord(List<InteractAnswerRecord> answerRecordList, String interactive, String category){
-        return Mono.just(category)
-                .zipWith(changeFindRecord(answerRecordList), (c, list) -> {
-                    return InteractRecordResp.builder()
-//                            .interactive(interactive)
-//                            .category(c)
-                            .answerRecordList(list)
-                            .build();
-                });
-    }
+//    Mono<InteractRecordResp> changeFindRecord(List<InteractAnswerRecord> answerRecordList, String interactive, String category){
+//        return Mono.just(category)
+//                .zipWith(changeFindRecord(answerRecordList), (c, list) -> {
+//                    return InteractRecordResp.builder()
+////                            .interactive(interactive)
+////                            .category(c)
+//                            .answerRecordList(list)
+//                            .build();
+//                });
+//    }
     /**
      * 获取答题记录列表
      * @param answerRecordList
      * @return
-     */
-    private Mono<List<InteractAnswerRecordResp>> changeFindRecord(List<InteractAnswerRecord> answerRecordList){
-        return Mono.just(answerRecordList)
-                .flatMapMany(Flux::fromIterable)
-                .filter(Objects::nonNull)
-                .flatMap(this::changInteractAnswerRecord)
-                .collectList();
-    }
+//     */
+//    private Mono<List<InteractAnswerRecordResp>> changeFindRecord(List<InteractAnswerRecord> answerRecordList){
+//        return Mono.just(answerRecordList)
+//                .flatMapMany(Flux::fromIterable)
+//                .filter(Objects::nonNull)
+//                .flatMap(this::changInteractAnswerRecord)
+//                .collectList();
+//    }
 
-    Mono<InteractRecordResp> changeRecord(List<String> selectId, String interactive, String category){
-        return Mono.just(category)
-                .zipWith(changStudentList(selectId), (c, list) -> {
-                    return InteractRecordResp.builder()
-//                           .category(c)
-//                           .interactive(interactive)
-                           .answerRecordList(list)
-                           .build();
-                });
-    }
+//    Mono<InteractRecordResp> changeRecord(List<String> selectId, String interactive, String category){
+//        return Mono.just(category)
+//                .zipWith(changStudentList(selectId), (c, list) -> {
+//                    return InteractRecordResp.builder()
+////                           .category(c)
+////                           .interactive(interactive)
+//                           .answerRecordList(list)
+//                           .build();
+//                });
+//    }
 
-    private Mono<? extends List<InteractAnswerRecordResp>> changStudentList(List<String> selectId) {
-        return studentsService.exchangeStudents(selectId)
-                .flatMapMany(Flux::fromIterable)
-                .filter(Objects::nonNull)
-                .flatMap(this::changeStudent)
-                .collectList();
-    }
+//    private Mono<? extends List<InteractAnswerRecordResp>> changStudentList(List<String> selectId) {
+//        return studentsService.exchangeStudents(selectId)
+//                .flatMapMany(Flux::fromIterable)
+//                .filter(Objects::nonNull)
+//                .flatMap(this::changeStudent)
+//                .collectList();
+//    }
 
     /**
      * 从学生信息转换请求详细对象信息
      * @param students
      * @return
      */
-    private Mono<InteractAnswerRecordResp> changeStudent(Students students){
-        return Mono.just(new InteractAnswerRecordResp(students.getId(), students.getName(), students.getPortrait()));
-    }
+//    private Mono<InteractAnswerRecordResp> changeStudent(Students students){
+//        return Mono.just(new InteractAnswerRecordResp(students.getId(), students.getName(), students.getPortrait()));
+//    }
 }

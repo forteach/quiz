@@ -1,33 +1,14 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.service.TaskInteractService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordTaskService;
-import com.forteach.quiz.interaction.execute.web.req.RecordReq;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
-import com.forteach.quiz.service.TokenService;
-import io.swagger.annotations.*;
-import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-
 /**
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/16  22:24
  */
-@RestController
-@Api(value = "任务互动", tags = {"任务互动等互动"})
-@RequestMapping(value = "/TaskInteract", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//@RestController
+//@Api(value = "任务互动", tags = {"任务互动等互动"})
+//@RequestMapping(value = "/TaskInteract", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class TaskInteractController {
 //
 //    private final TaskInteractService interactService;

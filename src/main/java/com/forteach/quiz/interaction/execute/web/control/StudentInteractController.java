@@ -3,14 +3,9 @@ package com.forteach.quiz.interaction.execute.web.control;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.service.SingleQue.FabuQuestService;
 import com.forteach.quiz.interaction.execute.service.MoreQue.SendAnswerQuestBookService;
-import com.forteach.quiz.interaction.execute.service.MoreQue.SendQuestBookService;
 import com.forteach.quiz.interaction.execute.service.SingleQue.RaiseHandService;
 import com.forteach.quiz.interaction.execute.service.SingleQue.SendAnswerService;
-import com.forteach.quiz.interaction.execute.service.SingleQue.SendQuestService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
@@ -36,14 +31,15 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/stuInteract", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class StudentInteractController {
 
-    private final InteractRecordQuestionsService interactRecordQuestionsService;
-    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
+//    private final InteractRecordQuestionsService interactRecordQuestionsService;
+//    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
+
     private final TokenService tokenService;
 
     /**
      * 课堂发布问题
      */
-    private final SendQuestService sendQuestService;
+//    private final SendQuestService sendQuestService;
 
     /**
      * 课堂问题回答
@@ -58,36 +54,37 @@ public class StudentInteractController {
     /**
      * 当前课堂已发布的题目列表
      */
-    private final FabuQuestService fabuQuestService;
+//    private final FabuQuestService fabuQuestService;
 
     /**
      * 练习册提问
      */
-    private  final SendQuestBookService sendQuestBookService;
+//    private  final SendQuestBookService sendQuestBookService;
 
     /**
      * 练习册回答
      */
     private final SendAnswerQuestBookService sendAnswerQuestBookService;
 
-    public StudentInteractController(InteractRecordQuestionsService interactRecordQuestionsService,
-                                     InteractRecordExerciseBookService interactRecordExerciseBookService,
-                                     SendQuestService sendQuestService,
+    public StudentInteractController(
+//            InteractRecordQuestionsService interactRecordQuestionsService,
+//                                     InteractRecordExerciseBookService interactRecordExerciseBookService,
+//                                     SendQuestService sendQuestService,
                                      SendAnswerService sendAnswerService,
                                      RaiseHandService raiseHandService,
-                                     FabuQuestService fabuQuestService,
-                                     SendQuestBookService sendQuestBookService,
+//                                     FabuQuestService fabuQuestService,
+//                                     SendQuestBookService sendQuestBookService,
                                      SendAnswerQuestBookService sendAnswerQuestBookService,
                                      TokenService tokenService) {
-        this.interactRecordQuestionsService = interactRecordQuestionsService;
-        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+//        this.interactRecordQuestionsService = interactRecordQuestionsService;
+//        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.tokenService = tokenService;
-        this.sendQuestService = sendQuestService;
+//        this.sendQuestService = sendQuestService;
         this.sendAnswerService= sendAnswerService;
         this.raiseHandService=raiseHandService;
-        this.fabuQuestService=fabuQuestService;
+//        this.fabuQuestService=fabuQuestService;
         this.sendAnswerQuestBookService=sendAnswerQuestBookService;
-        this.sendQuestBookService=sendQuestBookService;
+//        this.sendQuestBookService=sendQuestBookService;
     }
 //******************教师端*************************************
 //    /**

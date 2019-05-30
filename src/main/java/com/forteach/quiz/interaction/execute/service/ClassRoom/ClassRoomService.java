@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.interaction.execute.service.Key.ClassRoomKey;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import com.forteach.quiz.service.StudentsService;
 import com.forteach.quiz.web.pojo.Students;
 import org.bson.types.ObjectId;
@@ -34,7 +33,8 @@ public class ClassRoomService {
 //    private final InteractRecordExecuteService interactRecordExecuteService;
 
     public ClassRoomService(StudentsService studentsService, ReactiveStringRedisTemplate stringRedisTemplate, ReactiveHashOperations<String, String, String> reactiveHashOperations
-            , InteractRecordExecuteService interactRecordExecuteService) {
+//            , InteractRecordExecuteService interactRecordExecuteService
+    ) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.studentsService = studentsService;
 //        this.interactRecordExecuteService = interactRecordExecuteService;

@@ -3,10 +3,12 @@ package com.forteach.quiz.interaction.execute.web.control;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
+import com.forteach.quiz.interaction.execute.service.GradePapersService;
 import com.forteach.quiz.interaction.execute.service.MoreQue.SendQuestBookService;
 import com.forteach.quiz.interaction.execute.service.RecordService;
 import com.forteach.quiz.interaction.execute.service.SingleQue.FabuQuestService;
 import com.forteach.quiz.interaction.execute.service.SingleQue.SendQuestService;
+import com.forteach.quiz.interaction.execute.web.req.GradePapersReq;
 import com.forteach.quiz.interaction.execute.web.req.RecordReq;
 import com.forteach.quiz.interaction.execute.web.resp.QuestFabuListResponse;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
@@ -58,12 +60,19 @@ public class TeacherInteractController {
      */
     private final RecordService recordService;
 
+    /**
+     * 批改作业
+     */
+    private final GradePapersService gradePapersService;
+
     public TeacherInteractController(SendQuestService sendQuestService,
                                      FabuQuestService fabuQuestService,
                                      SendQuestBookService sendQuestBookService,
+                                     GradePapersService gradePapersService,
                                      RecordService recordService,
                                      TokenService tokenService) {
         this.tokenService = tokenService;
+        this.gradePapersService = gradePapersService;
         this.sendQuestService = sendQuestService;
         this.fabuQuestService = fabuQuestService;
         this.sendQuestBookService = sendQuestBookService;
@@ -225,5 +234,25 @@ public class TeacherInteractController {
                 recordReq.getExamineeId(),
                 recordReq.getQuestionType())
                 .map(WebResult::okResult);
+    }
+
+
+    @ApiOperation(value = "老师批改主观题", notes = "老师批改主观题")
+    @PostMapping("/gradePapers")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "examineeId", value = "学生id", dataType = "string", required = true),
+            @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true),
+            @ApiImplicitParam(name = "circleId", value = "课堂id", dataType = "string"),
+            @ApiImplicitParam(name = "questionType", value = "提问：TiWen  任务：RenWu", dataType = "string"),
+            @ApiImplicitParam(name = "evaluate", value = "主观题 教师给出的答案评价", dataType = "string"),
+            @ApiImplicitParam(name = "score", value = "答案分数", dataType = "string"),
+            @ApiImplicitParam(name = "right", value = "答案回答对错 true  false  主观题则为空串", dataType = "string"),
+            @ApiImplicitParam(name = "interactive", value = "参与方式 race   : 抢答/raise  : 举手/select : 选择/vote  没有参与方式：no  : 投票", dataType = "string")
+    })
+    public Mono<WebResult> gradePapers(@RequestBody GradePapersReq gradePapersReq){
+        MyAssert.isNull(gradePapersReq.getExamineeId(), DefineCode.ERR0010, "学生id不为空");
+        MyAssert.isNull(gradePapersReq.getQuestionId(), DefineCode.ERR0010, "问题不为空");
+        MyAssert.isNull(gradePapersReq.getScore(), DefineCode.ERR0010, "答案分数不为空");
+        return gradePapersService.saveGradePapersService(gradePapersReq).map(WebResult::okResult);
     }
 }

@@ -4,7 +4,6 @@ import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.execute.service.Key.MoreQueKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExerciseBookService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +14,12 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -27,23 +30,23 @@ import java.util.*;
 public class SendQuestBookService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
-    private final ReactiveMongoTemplate mongoTemplate;
+//    private final ReactiveMongoTemplate mongoTemplate;
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
-    private final BigQuestionRepository bigQuestionRepository;
-    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
+//    private final BigQuestionRepository bigQuestionRepository;
+//    private final InteractRecordExerciseBookService interactRecordExerciseBookService;
     private final ClassRoomService classRoomService;
 
     public SendQuestBookService(ReactiveStringRedisTemplate stringRedisTemplate,
                                 ReactiveMongoTemplate mongoTemplate,
                                 ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                                InteractRecordExerciseBookService interactRecordExerciseBookService,
+//                                InteractRecordExerciseBookService interactRecordExerciseBookService,
                                 ClassRoomService classRoomService,
                                 BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;
-        this.mongoTemplate=mongoTemplate;
+//        this.mongoTemplate=mongoTemplate;
         this.reactiveHashOperations = reactiveHashOperations;
-        this.bigQuestionRepository=bigQuestionRepository;
-        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
+//        this.bigQuestionRepository=bigQuestionRepository;
+//        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.classRoomService= classRoomService;
     }
 

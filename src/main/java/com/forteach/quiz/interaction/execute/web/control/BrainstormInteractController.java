@@ -1,33 +1,14 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.service.BrainstormInteractService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordBrainstormService;
-import com.forteach.quiz.interaction.execute.web.req.RecordReq;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
-import com.forteach.quiz.service.TokenService;
-import io.swagger.annotations.*;
-import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-import javax.validation.Valid;
-
 /**
  * @Description:
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/16  22:25
  */
-@RestController
-@Api(value = "头脑风暴交互", tags = {"头脑风暴交互等互动"})
-@RequestMapping(value = "/brainstormInteract", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//@RestController
+//@Api(value = "头脑风暴交互", tags = {"头脑风暴交互等互动"})
+//@RequestMapping(value = "/brainstormInteract", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class BrainstormInteractController {
 //
 //    private final BrainstormInteractService interactService;

@@ -1,32 +1,14 @@
 package com.forteach.quiz.interaction.execute.web.control;
 
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.interaction.execute.service.SurveyInteractService;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordSurveyService;
-import com.forteach.quiz.interaction.execute.web.req.RecordReq;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
-import com.forteach.quiz.service.TokenService;
-import io.swagger.annotations.*;
-import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-
 /**
  * @Description: 问卷互动课堂
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/15  15:41
  */
-@RestController
-@Api(value = "问卷互动", tags = {"问卷互动等互动"})
-@RequestMapping(value = "/interactSurvey", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//@RestController
+//@Api(value = "问卷互动", tags = {"问卷互动等互动"})
+//@RequestMapping(value = "/interactSurvey", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class SurveyInteractController {
 //
 //    private final SurveyInteractService surveyService;

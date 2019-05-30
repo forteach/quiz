@@ -1,12 +1,7 @@
 package com.forteach.quiz.interaction.execute.repository;
 
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
-import com.forteach.quiz.interaction.execute.dto.*;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 /**
  * @Description: 记录课堂的交互情况 学生回答情况
  * @author: liu zhenming
@@ -22,7 +17,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param teacherId
      * @return
      */
-    Flux<InteractRecord> findByIdAndTeacherId(final String circleId, final String teacherId);
+//    Flux<InteractRecord> findByIdAndTeacherId(final String circleId, final String teacherId);
 
     /**
      * 通过课堂id查找记录
@@ -37,18 +32,18 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param id
      * @return
      */
-    @Transactional(readOnly = true)
-    @Query(value = "{'_id': ?0, 'exerciseBooks.questionsId' : ?1 }", fields = "{ '_id' : 0, 'exerciseBooks' : 1}")
-    Mono<ExerciseBooksDto> findExerciseBooksByIdAndQuestionsId(final String id, final String questionsId);
+//    @Transactional(readOnly = true)
+//    @Query(value = "{'_id': ?0, 'exerciseBooks.questionsId' : ?1 }", fields = "{ '_id' : 0, 'exerciseBooks' : 1}")
+//    Mono<ExerciseBooksDto> findExerciseBooksByIdAndQuestionsId(final String id, final String questionsId);
 
     /**
      * 查询记录不为空的信息
      * @param id
      * @return
      */
-    @Transactional(readOnly = true)
-    @Query(value = " { '_id': ?0, 'questions' : {$exists:true}}")
-    Mono<InteractRecord> findByIdAndQuestionsNotNull(final String id);
+//    @Transactional(readOnly = true)
+//    @Query(value = " { '_id': ?0, 'questions' : {$exists:true}}")
+//    Mono<InteractRecord> findByIdAndQuestionsNotNull(final String id);
 
     /**
      * 查询对应的记录存在不
@@ -57,9 +52,9 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @return
      * db.interactRecord.find({"_id" : "bd4a84e4a61943e6b07e02947ecc85f1"},{"students":1, _id: 0})
      */
-    @Transactional(readOnly = true)
-    @Query(value = "{'_id': ?0, ?1 : {$exists:true}}")
-    Mono<InteractRecord> findByIdAndRecord(final String id, final String recordName);
+//    @Transactional(readOnly = true)
+//    @Query(value = "{'_id': ?0, ?1 : {$exists:true}}")
+//    Mono<InteractRecord> findByIdAndRecord(final String id, final String recordName);
 
     /**
      * 查询答题信息
@@ -67,9 +62,9 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param questionsId 问题 id
      * @return
      */
-    @Transactional(readOnly = true)
-    @Query(value = "{'_id': ?0 , 'questions.questionsId' : ?1}", fields = "{ '_id' : 0, 'questions' : 1}")
-    Mono<QuestionsDto> findRecordByIdAndQuestionsId(final String objectId, final String questionsId);
+//    @Transactional(readOnly = true)
+//    @Query(value = "{'_id': ?0 , 'questions.questionsId' : ?1}", fields = "{ '_id' : 0, 'questions' : 1}")
+//    Mono<QuestionsDto> findRecordByIdAndQuestionsId(final String objectId, final String questionsId);
 
     /**
      * 查询问卷记录
@@ -77,9 +72,9 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param questionsId 问题 id
      * @return
      */
-    @Transactional(readOnly = true)
-    @Query(value = "{'_id': ?0, 'surveys.questionsId' : ?1 }", fields = "{ '_id' : 0, 'surveys' : 1}")
-    Mono<SurveysDto> findRecordSurveysByIdAndQuestionsId(final String id, final String questionsId);
+//    @Transactional(readOnly = true)
+//    @Query(value = "{'_id': ?0, 'surveys.questionsId' : ?1 }", fields = "{ '_id' : 0, 'surveys' : 1}")
+//    Mono<SurveysDto> findRecordSurveysByIdAndQuestionsId(final String id, final String questionsId);
 
     /**
      * 查询任务记录
@@ -87,9 +82,9 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param questionsId
      * @return
      */
-    @Transactional(readOnly = true)
-    @Query(value = "{'_id': ?0, 'interacts.questionsId' : ?1 }", fields = "{ '_id' : 0, 'interacts' : 1}")
-    Mono<TaskInteractDto> findRecordTaskByIdAndQuestionsId(final String id, final String questionsId);
+//    @Transactional(readOnly = true)
+//    @Query(value = "{'_id': ?0, 'interacts.questionsId' : ?1 }", fields = "{ '_id' : 0, 'interacts' : 1}")
+//    Mono<TaskInteractDto> findRecordTaskByIdAndQuestionsId(final String id, final String questionsId);
 
     /**
      * 查询头脑风暴记录
@@ -97,7 +92,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param questionsId
      * @return
      */
-    @Transactional(readOnly = true)
-    @Query(value = "{'_id' : ?0, 'brainstorms.questionsId' : ?1 }", fields = "{'_id' : 0, 'brainstorms' : 1}")
-    Mono<BrainstormDto> findBrainstormsByIdAndQuestionsId(final String id, final String questionsId);
+//    @Transactional(readOnly = true)
+//    @Query(value = "{'_id' : ?0, 'brainstorms.questionsId' : ?1 }", fields = "{'_id' : 0, 'brainstorms' : 1}")
+//    Mono<BrainstormDto> findBrainstormsByIdAndQuestionsId(final String id, final String questionsId);
 }

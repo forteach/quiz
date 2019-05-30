@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordQuestionsService;
 import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.questionlibrary.repository.TaskQuestionRepository;
@@ -16,6 +14,7 @@ import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class SendQuestService {
     public SendQuestService(ReactiveStringRedisTemplate stringRedisTemplate,
                             TaskQuestionRepository taskQuestionRepository,
                             ReactiveHashOperations<String, String, String> reactiveHashOperations,
-                            InteractRecordQuestionsService interactRecordQuestionsService,
+//                            InteractRecordQuestionsService interactRecordQuestionsService,
                             ClassRoomService classRoomService,
                             BigQuestionRepository bigQuestionRepository) {
         this.stringRedisTemplate = stringRedisTemplate;

@@ -71,7 +71,7 @@ public class AskAnswer extends BaseEntity {
     /**
      * 答案对错
      */
-    @ApiModelProperty(value = "答案回答对错 true  false  主观题则未空串", name = "right")
+    @ApiModelProperty(value = "答案回答对错 true  false  主观题则为空串", name = "right")
     private String right;
 
     /**

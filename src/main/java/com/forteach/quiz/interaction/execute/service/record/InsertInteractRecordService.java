@@ -1,24 +1,5 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
-import com.forteach.quiz.common.DataUtil;
-import com.forteach.quiz.interaction.execute.domain.AskAnswer;
-import com.forteach.quiz.interaction.execute.domain.record.InteractAnswerRecord;
-import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
-import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import static com.forteach.quiz.common.Dic.*;
-
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
@@ -26,8 +7,8 @@ import static com.forteach.quiz.common.Dic.*;
  * @version: 1.0
  * @description:
  */
-@Slf4j
-@Service
+//@Slf4j
+//@Service
 public class InsertInteractRecordService {
 
 //    private final ReactiveMongoTemplate mongoTemplate;
