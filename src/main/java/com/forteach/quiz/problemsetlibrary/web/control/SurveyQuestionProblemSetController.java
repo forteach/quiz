@@ -6,6 +6,7 @@ import com.forteach.quiz.problemsetlibrary.service.SurveyQuestionExerciseBookSer
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetService;
 import com.forteach.quiz.problemsetlibrary.web.control.base.BaseProblemSetController;
 import com.forteach.quiz.questionlibrary.domain.SurveyQuestion;
+import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SurveyQuestionProblemSetController extends BaseProblemSetController<SurveyQuestionProblemSet, SurveyQuestion, SurveyQuestionExerciseBook> {
 
     public SurveyQuestionProblemSetController(BaseProblemSetService<SurveyQuestionProblemSet, SurveyQuestion> service,
-                                              SurveyQuestionExerciseBookService exerciseBookService) {
-        super(service, exerciseBookService);
+                                              SurveyQuestionExerciseBookService exerciseBookService, TokenService tokenService) {
+        super(service, exerciseBookService, tokenService);
     }
 }

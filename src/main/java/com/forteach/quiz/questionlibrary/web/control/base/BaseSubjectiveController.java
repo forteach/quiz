@@ -5,6 +5,7 @@ import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.domain.question.Design;
 import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
+import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -23,8 +24,8 @@ import javax.validation.Valid;
  */
 public abstract class BaseSubjectiveController<T extends QuestionExamEntity> extends BaseQuestionController<T> {
 
-    public BaseSubjectiveController(BaseQuestionService<T> service, KeywordService<T> keywordService) {
-        super(service, keywordService);
+    public BaseSubjectiveController(BaseQuestionService<T> service, KeywordService<T> keywordService, TokenService tokenService) {
+        super(service, keywordService, tokenService);
     }
 
     /**
@@ -35,8 +36,8 @@ public abstract class BaseSubjectiveController<T extends QuestionExamEntity> ext
      */
     @PostMapping("/design/edit")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "relate", value = "此操作是否修改到快照", dataType = "string", required = true, defaultValue = "0"),
-            @ApiImplicitParam(name = "examChildren", value = "保存,修改的简答题对象", dataType = "json", required = true),
+            @ApiImplicitParam(name = "relate", value = "此操作是否修改到快照", dataType = "string", required = true, defaultValue = "0", paramType = "form"),
+            @ApiImplicitParam(name = "examChildren", value = "保存,修改的简答题对象", dataType = "json", required = true, paramType = "form"),
     })
     @ApiOperation(value = "编辑简答思考题", notes = "新增数据时 不添加id 修改时数据添加id")
     public Mono<WebResult> editDesign(@Valid @RequestBody @ApiParam(value = "简答思考题", required = true) T design) {

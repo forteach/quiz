@@ -1,5 +1,6 @@
 package com.forteach.quiz.problemsetlibrary.service.base;
 
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
@@ -76,7 +77,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
                 .zipWhen(list ->
                         findExerciseBook(problemSetVo.getChapterId(), problemSetVo.getCourseId()))
                 .flatMap(tuple2 -> {
-                    if (isNotEmpty(tuple2.getT2().getId())) {
+                    if (StrUtil.isNotBlank(tuple2.getT2().getId())) {
                         tuple2.getT2().setQuestionChildren(tuple2.getT1());
                         return repository.save(tuple2.getT2());
                     } else {
@@ -108,9 +109,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
     @Override
     public Mono<List<R>> findDetailedExerciseBook(final ExerciseBookReq sortVo) {
         return findExerciseBook(sortVo)
-                .flatMapMany(list ->
-                        Flux.fromStream(list.stream())
-                )
+                .flatMapMany(Flux::fromIterable)
                 .flatMap(que -> {
                     return questionRepository.findOneDetailed(que.getId()).map(det -> {
                         det.setIndex(que.getIndex());
@@ -147,8 +146,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
 
         update.pull("questionChildren", Query.query(Criteria.where(MONGDB_ID).is(delVo.getTargetId())));
 
-        return template
-                .updateMulti(Query.query(criteria), update, entityClass());
+        return template.updateMulti(Query.query(criteria), update, entityClass());
     }
 
     /**
@@ -162,10 +160,10 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
 
         Criteria criteria = new Criteria();
 
-        if (isNotEmpty(chapterId)) {
+        if (StrUtil.isNotBlank(chapterId)) {
             criteria.and("chapterId").in(chapterId);
         }
-        if (isNotEmpty(courseId)) {
+        if (StrUtil.isNotBlank(courseId)) {
             criteria.and("courseId").in(courseId);
         }
 

@@ -3,32 +3,23 @@ package com.forteach.quiz.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
-import com.alibaba.fastjson.TypeReference;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
-import com.forteach.quiz.domain.ExerciseBookSheet;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
-import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.interaction.execute.domain.Answ;
-import com.forteach.quiz.interaction.execute.domain.AnswChildren;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
-import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.question.ChoiceQst;
 import com.forteach.quiz.questionlibrary.domain.question.TrueOrFalse;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.repository.ProblemSetBackupRepository;
-import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import static com.forteach.quiz.common.Dic.*;
-import static java.util.stream.Collectors.toList;
 
 /**
  * @Description: 判断题目信息相关操作
@@ -37,7 +28,7 @@ import static java.util.stream.Collectors.toList;
  * @date: 2018/11/20  16:55
  */
 @Slf4j
-@Component
+@Service
 public class CorrectService {
 
     private final ProblemSetBackupRepository problemSetBackupRepository;

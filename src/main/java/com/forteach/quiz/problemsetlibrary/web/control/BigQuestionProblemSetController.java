@@ -7,10 +7,9 @@ import com.forteach.quiz.problemsetlibrary.service.BigQuestionExerciseBookServic
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetService;
 import com.forteach.quiz.problemsetlibrary.web.control.base.BaseProblemSetController;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,11 +35,10 @@ public class BigQuestionProblemSetController extends BaseProblemSetController<Bi
     private final BigQuestionExerciseBookService exerciseBookService;
 
     public BigQuestionProblemSetController(BaseProblemSetService<BigQuestionProblemSet, BigQuestion> service,
-                                           BigQuestionExerciseBookService exerciseBookService,
-                                           BigQuestionExerciseBookService exerciseBookService1) {
+                                           BigQuestionExerciseBookService exerciseBookService, TokenService tokenService) {
 
-        super(service, exerciseBookService);
-        this.exerciseBookService = exerciseBookService1;
+        super(service, exerciseBookService, tokenService);
+        this.exerciseBookService = exerciseBookService;
     }
 
     /**
@@ -50,6 +48,12 @@ public class BigQuestionProblemSetController extends BaseProblemSetController<Bi
      */
     @ApiOperation(value = "编辑练习册 预习类型", notes = "编辑练习册 预习类型")
     @PostMapping("/edit/preview")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", dataType = "string", example = "1", paramType = "form"),
+            @ApiImplicitParam(value = "章节id", name = "chapterId", example = "章节id", dataType = "string", paramType = "form"),
+            @ApiImplicitParam(value = "课程id", name = "courseId", example = "章节id", dataType = "string", paramType = "form"),
+            @ApiImplicitParam(value = "需要修改的题目id", name = "targetId", example = "需要修改的题目id ... ", paramType = "form")
+    })
     public Mono<WebResult> editPreview(@Valid @ApiParam(name = "delVo", value = "通过题目id与挂接信息进行编辑练习册", required = true) @RequestBody PreviewChangeVo changeVo) {
         return exerciseBookService.editPreview(changeVo).map(WebResult::okResult);
     }

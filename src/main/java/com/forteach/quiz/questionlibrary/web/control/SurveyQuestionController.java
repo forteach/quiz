@@ -4,6 +4,7 @@ import com.forteach.quiz.questionlibrary.domain.SurveyQuestion;
 import com.forteach.quiz.questionlibrary.service.KeywordService;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionService;
 import com.forteach.quiz.questionlibrary.web.control.base.BaseObjectiveController;
+import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/surveyQuestion", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class SurveyQuestionController extends BaseObjectiveController<SurveyQuestion> {
 
-    public SurveyQuestionController(BaseQuestionService<SurveyQuestion> service, KeywordService<SurveyQuestion> keywordService) {
-        super(service, keywordService);
+    public SurveyQuestionController(BaseQuestionService<SurveyQuestion> service, KeywordService<SurveyQuestion> keywordService, TokenService tokenService) {
+        super(service, keywordService, tokenService);
     }
 
 }

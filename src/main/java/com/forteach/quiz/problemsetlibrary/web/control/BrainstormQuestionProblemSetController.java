@@ -6,6 +6,7 @@ import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookService;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetService;
 import com.forteach.quiz.problemsetlibrary.web.control.base.BaseProblemSetController;
 import com.forteach.quiz.questionlibrary.domain.BrainstormQuestion;
+import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,8 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class BrainstormQuestionProblemSetController extends BaseProblemSetController<BrainstormQuestionProblemSet, BrainstormQuestion, BrainstormQuestionExerciseBook> {
 
     public BrainstormQuestionProblemSetController(BaseProblemSetService<BrainstormQuestionProblemSet, BrainstormQuestion> service,
-                                                  BaseExerciseBookService<BrainstormQuestionExerciseBook, BrainstormQuestion> exerciseBookService) {
-        super(service, exerciseBookService);
+                                                  BaseExerciseBookService<BrainstormQuestionExerciseBook, BrainstormQuestion> exerciseBookService, TokenService tokenService) {
+        super(service, exerciseBookService, tokenService);
     }
 
 }

@@ -9,7 +9,6 @@ import com.forteach.quiz.interaction.execute.service.Key.MoreQueKey;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetAnsw;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import com.forteach.quiz.service.CorrectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -20,11 +19,10 @@ import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.forteach.quiz.common.Dic.*;
 
 @Slf4j
 @Service
