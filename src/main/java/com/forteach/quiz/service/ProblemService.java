@@ -1,62 +1,38 @@
 package com.forteach.quiz.service;
 
-import com.alibaba.fastjson.JSON;
-import com.forteach.quiz.domain.ExerciseBookSheet;
-import com.forteach.quiz.domain.ProblemSetBackup;
-import com.forteach.quiz.exceptions.ProblemSetException;
-import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
-import com.forteach.quiz.questionlibrary.service.BigQuestionService;
-import com.forteach.quiz.repository.ExerciseBookRepository;
-import com.forteach.quiz.repository.ExerciseBookSheetRepository;
-import com.forteach.quiz.repository.ProblemSetBackupRepository;
-import com.forteach.quiz.web.vo.ExerciseBookQuestionVo;
-import com.forteach.quiz.web.vo.ExerciseBookSheetVo;
-import com.forteach.quiz.web.vo.ProblemSetBackupVo;
-import com.forteach.quiz.web.vo.RewriteVo;
-import com.mongodb.client.result.UpdateResult;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
-import static com.forteach.quiz.common.Dic.*;
-
 /**
  * @Description: 练习册相关
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2018/11/15  11:01
  */
-@Slf4j
-@Service
+//@Slf4j
+//@Service
 public class ProblemService {
 
-    private final BigQuestionService bigQuestionService;
-
-    private final ExerciseBookRepository exerciseBookRepository;
-
-    private final ProblemSetBackupRepository problemSetBackupRepository;
-
-    private final ExerciseBookSheetRepository exerciseBookSheetRepository;
-
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
-
-    private final CorrectService correctService;
-
-
-    public ProblemService(BigQuestionService bigQuestionService, ExerciseBookRepository exerciseBookRepository,
-                          ExerciseBookSheetRepository exerciseBookSheetRepository, ProblemSetBackupRepository problemSetBackupRepository,
-                          CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
-        this.bigQuestionService = bigQuestionService;
-        this.exerciseBookRepository = exerciseBookRepository;
-        this.problemSetBackupRepository = problemSetBackupRepository;
-        this.exerciseBookSheetRepository = exerciseBookSheetRepository;
-        this.correctService = correctService;
-        this.reactiveMongoTemplate = reactiveMongoTemplate;
-    }
+//    private final BigQuestionService bigQuestionService;
+//
+//    private final ExerciseBookRepository exerciseBookRepository;
+//
+//    private final ProblemSetBackupRepository problemSetBackupRepository;
+//
+//    private final ExerciseBookSheetRepository exerciseBookSheetRepository;
+//
+//    private final ReactiveMongoTemplate reactiveMongoTemplate;
+//
+//    private final CorrectService correctService;
+//
+//
+//    public ProblemService(BigQuestionService bigQuestionService, ExerciseBookRepository exerciseBookRepository,
+//                          ExerciseBookSheetRepository exerciseBookSheetRepository, ProblemSetBackupRepository problemSetBackupRepository,
+//                          CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate) {
+//        this.bigQuestionService = bigQuestionService;
+//        this.exerciseBookRepository = exerciseBookRepository;
+//        this.problemSetBackupRepository = problemSetBackupRepository;
+//        this.exerciseBookSheetRepository = exerciseBookSheetRepository;
+//        this.correctService = correctService;
+//        this.reactiveMongoTemplate = reactiveMongoTemplate;
+//    }
 
 
 //
