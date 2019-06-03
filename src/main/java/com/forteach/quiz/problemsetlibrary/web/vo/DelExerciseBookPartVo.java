@@ -1,4 +1,4 @@
-package com.forteach.quiz.problemsetlibrary.domain;
+package com.forteach.quiz.problemsetlibrary.web.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -1,6 +1,6 @@
 package com.forteach.quiz.practiser.repository;
 
-import com.forteach.quiz.practiser.domain.ExerciseBookAnswer;
+import com.forteach.quiz.practiser.domain.AskAnswerExerciseBook;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**
@@ -10,6 +10,6 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
  * @version: 1.0
  * @description:
  */
-public interface ExerciseBookAnswerRepository extends ReactiveMongoRepository<ExerciseBookAnswer, String> {
+public interface AskAnswerExerciseBookRepository extends ReactiveMongoRepository<AskAnswerExerciseBook, String> {
 
 }

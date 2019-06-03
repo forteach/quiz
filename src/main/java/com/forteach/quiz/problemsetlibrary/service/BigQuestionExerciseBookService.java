@@ -2,7 +2,7 @@ package com.forteach.quiz.problemsetlibrary.service;
 
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
-import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
+import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceImpl;
@@ -137,8 +137,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
                 .and("questionChildren." + MONGDB_ID).is(changeVo.getTargetId());
         Update update = Update.update("questionChildren.$.preview", changeVo.getPreview());
 
-        return template
-                .updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
+        return template.updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
     }
 
     /**

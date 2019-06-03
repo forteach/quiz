@@ -3,6 +3,7 @@ package com.forteach.quiz.practiser.domain.base;
 import com.forteach.quiz.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author: zhangyy
@@ -12,7 +13,8 @@ import lombok.Data;
  * @description:
  */
 @Data
-public abstract class AbstractAnsw extends BaseEntity {
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractAnswer extends BaseEntity {
 
     @ApiModelProperty(value = "练习册类型：1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
     protected int exeBookType;

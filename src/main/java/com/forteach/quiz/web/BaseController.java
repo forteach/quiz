@@ -6,5 +6,5 @@ package com.forteach.quiz.web;
  * @version: V1.0
  * @date: 2018/11/13  10:45
  */
-public class BaseController {
-}
+//public class BaseController {
+//}

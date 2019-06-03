@@ -1,10 +1,12 @@
-package com.forteach.quiz.problemsetlibrary.domain.record;
+package com.forteach.quiz.practiser.domain;
 
+import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description:
@@ -17,26 +19,44 @@ import java.io.Serializable;
 public class AnswChildren implements Serializable {
 
     /**
-     * 大题下子项id
+     * 习题id
      */
-    @ApiModelProperty(value = "大题下子项id", name = "questionId")
+    @ApiModelProperty(value = "习题id", name = "questionId")
     private String questionId;
+
+    /**
+     * 学生id
+     */
+    @ApiModelProperty(value = "学生id", name = "studentId", dataType = "string")
+    private String studentId;
 
     /**
      * 学生答案
      */
-    @ApiModelProperty(value = "大题下子项id", name = "questionId")
+    @ApiModelProperty(value = "回答内容", name = "answer")
     private String answer;
+
+    /**
+     * 答案附件
+     */
+    @ApiModelProperty(value = "附件列表", name = "fileList")
+    private List<DataDatumVo> fileList;
+
+    /**
+     * 答案图片列表
+     */
+    private List<String> answerImageList;
 
     /**
      * 答题得分
      */
-    private Double score;
+    @ApiModelProperty(name = "score", value = "得分", dataType = "string")
+    private String score;
 
     /**
      * 答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf
      */
-    @ApiModelProperty(value = "大题下子项id", name = "questionId")
+    @ApiModelProperty(value = "主观题 教师给出的答案评价", name = "evaluation", example = "答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf")
     private String evaluation;
 
     public AnswChildren() {

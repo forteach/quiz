@@ -1,5 +1,16 @@
 package com.forteach.quiz.practiser.domain;
 
+import com.forteach.quiz.practiser.domain.base.AbstractAnswer;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Set;
+
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
@@ -7,5 +18,18 @@ package com.forteach.quiz.practiser.domain;
  * @version: 1.0
  * @description:
  */
-public class AskAnswerStudents {
+@Data
+@Document(collection = "askAnswerStudents")
+@EqualsAndHashCode(callSuper = true)
+@Builder
+@AllArgsConstructor
+@ApiModel(value = "学生作业回答记录表", description = "学生作业回答记录表")
+public class AskAnswerStudents extends AbstractAnswer {
+
+    @ApiModelProperty(name = "studentId", value = "学生id", dataType = "string")
+    private String studentId;
+
+    @ApiModelProperty(name = "questions", value = "学生回答过的问题集合", dataType = "list")
+    private Set<String> questions;
+
 }

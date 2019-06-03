@@ -1,13 +1,23 @@
 package com.forteach.quiz.interaction.execute.service.SingleQue;
 
+import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.interaction.execute.service.Key.AchieveRaiseKey;
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
 import java.time.Duration;
+import java.util.Objects;
+
+import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
 @Slf4j
 @Service
@@ -15,16 +25,21 @@ public class RaiseHandService {
 
     private final ReactiveStringRedisTemplate stringRedisTemplate;
 
-    private final InteractRecordExecuteService interactRecordExecuteService;
+//    private final InteractRecordExecuteService interactRecordExecuteService;
 
     private final ClassRoomService classRoomService;
 
+    private final ReactiveMongoTemplate mongoTemplate;
+
     public RaiseHandService(ReactiveStringRedisTemplate stringRedisTemplate,
                             ClassRoomService classRoomService,
-                            InteractRecordExecuteService interactRecordExecuteService) {
+                            ReactiveMongoTemplate mongoTemplate
+//                            InteractRecordExecuteService interactRecordExecuteService
+    ) {
         this.stringRedisTemplate = stringRedisTemplate;
-        this.interactRecordExecuteService = interactRecordExecuteService;
+//        this.interactRecordExecuteService = interactRecordExecuteService;
         this.classRoomService= classRoomService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     /**
@@ -40,7 +55,28 @@ public class RaiseHandService {
         return set.filterWhen(r->time)
                 //设置当前课堂当前活动是提问
                 .filterWhen(r->setInteractionType(circleId,questionType))
-                .filterWhen(obj -> interactRecordExecuteService.raiseHand(circleId, examineeId, questId));
+                .filterWhen(obj -> this.raiseHand(circleId, examineeId, questId));
+    }
+
+    /**
+     * 学生举手时记录
+     *
+     * @param circleId
+     * @param student
+     * @param questionId
+     * @return
+     */
+    private Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
+
+        final Query query = Query.query(
+                Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".raiseHandsId")).ne(student).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId)
+        ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+
+        Update update = new Update();
+        update.addToSet(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsId"), student);
+        update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsNumber"), 1);
+
+        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
     }
 
     /**

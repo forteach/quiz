@@ -12,6 +12,7 @@ import com.forteach.quiz.web.vo.UpdateChildrenVo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -50,7 +51,8 @@ public class BigQuestionsController extends BaseAllController<BigQuestion> {
     @ApiImplicitParams({
             @ApiImplicitParam(dataTypeClass = BigQuestion.class, required = true, paramType = "form")
     })
-    public Mono<WebResult> editBigQuestion(@Valid @RequestBody @ApiParam(value = "编辑大题", required = true) BigQuestion bigQuestion) {
+    public Mono<WebResult> editBigQuestion(@Valid @RequestBody @ApiParam(value = "编辑大题", required = true) BigQuestion bigQuestion, ServerHttpRequest request) {
+        tokenService.getTeacherId(request).ifPresent(bigQuestion::setTeacherId);
         return bigQuestionService.editBigQuestion(bigQuestion).map(WebResult::okResult);
     }
 

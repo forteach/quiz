@@ -1,42 +1,28 @@
 package com.forteach.quiz.interaction.execute.service.record;
 
-import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
-import java.util.Objects;
-
-import static com.forteach.quiz.common.Dic.INTERACT_RECORD_QUESTIONS;
-import static com.forteach.quiz.common.Dic.MONGDB_ID;
-
 /**
  * @Description: 课堂交互日志记录记录数据相关
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/4  15:33
  */
-@Service
+//@Service
 public class InteractRecordExecuteService {
 
 //    private final InteractRecordRepository repository;
 
-    private final ReactiveMongoTemplate mongoTemplate;
+//    private final ReactiveMongoTemplate mongoTemplate;
 //    private final StudentsService studentsService;
 
-    public InteractRecordExecuteService(
+//    public InteractRecordExecuteService(
 //            InteractRecordRepository repository,
-            ReactiveMongoTemplate mongoTemplate
+//            ReactiveMongoTemplate mongoTemplate
 //                                        StudentsService studentsService
-    ) {
+//    ) {
 //        this.repository = repository;
-        this.mongoTemplate = mongoTemplate;
+//        this.mongoTemplate = mongoTemplate;
 //        this.studentsService = studentsService;
-    }
+//    }
     /**
      * 学生加入互动课堂时存入记录
      *
@@ -63,18 +49,18 @@ public class InteractRecordExecuteService {
      * @param questionId
      * @return
      */
-    public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
-
-        final Query query = Query.query(
-                Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".raiseHandsId")).ne(student).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId)
-        ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
-
-        Update update = new Update();
-        update.addToSet(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsId"), student);
-        update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsNumber"), 1);
-
-        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
-    }
+//    public Mono<Boolean> raiseHand(final String circleId, final String student, final String questionId) {
+//
+//        final Query query = Query.query(
+//                Criteria.where(MONGDB_ID).is(circleId).and(INTERACT_RECORD_QUESTIONS.concat(".raiseHandsId")).ne(student).and(INTERACT_RECORD_QUESTIONS.concat(".questionsId")).is(questionId)
+//        ).with(new Sort(Sort.Direction.DESC, "index")).limit(1);
+//
+//        Update update = new Update();
+//        update.addToSet(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsId"), student);
+//        update.inc(INTERACT_RECORD_QUESTIONS.concat(".$.raiseHandsNumber"), 1);
+//
+//        return mongoTemplate.findAndModify(query, update, InteractRecord.class).switchIfEmpty(Mono.just(new InteractRecord())).map(Objects::nonNull);
+//    }
 
 //    public Mono<Boolean> init(final String circleId,final String teacherId,final String chapterId) {
 //        //获得课堂的交互情况 学生回答情况，如果存在返回true，否则创建mongo的课堂信息

@@ -3,7 +3,7 @@ package com.forteach.quiz.problemsetlibrary.service.base;
 import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.CustomException;
-import com.forteach.quiz.problemsetlibrary.domain.DelExerciseBookPartVo;
+import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
