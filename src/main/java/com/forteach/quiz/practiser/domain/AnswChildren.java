@@ -56,7 +56,7 @@ public class AnswChildren implements Serializable {
     /**
      * 答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf
      */
-    @ApiModelProperty(value = "主观题 教师给出的答案评价", name = "evaluation", example = "答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf")
+    @ApiModelProperty(value = "主观题 教师给出的答案评价", name = "evaluation", example = "客观题: true  false  halfOf, 答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf")
     private String evaluation;
 
     public AnswChildren() {

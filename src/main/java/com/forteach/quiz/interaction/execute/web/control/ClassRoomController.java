@@ -5,7 +5,6 @@ import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.service.ClassRoom.ClassRoomService;
 import com.forteach.quiz.service.TokenService;
-import com.forteach.quiz.web.BaseController;
 import com.forteach.quiz.web.req.InteractiveStudentsReq;
 import com.forteach.quiz.web.vo.InteractiveRoomVo;
 import com.forteach.quiz.web.vo.JoinInteractiveRoomVo;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
 import java.util.Optional;
 
 /**
@@ -28,7 +28,7 @@ import java.util.Optional;
 @RestController
 @Api(value = "课堂", tags = {"课堂,上课相关处理"})
 @RequestMapping(path = "/classRoom", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class ClassRoomController extends BaseController {
+public class ClassRoomController{
 
     private final ClassRoomService classRoomService;
 

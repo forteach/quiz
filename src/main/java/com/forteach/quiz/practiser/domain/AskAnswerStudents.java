@@ -29,6 +29,9 @@ public class AskAnswerStudents extends AbstractAnswer {
     @ApiModelProperty(name = "studentId", value = "学生id", dataType = "string")
     private String studentId;
 
+    @ApiModelProperty(name = "isAnswerCompleted", value = "是否回答完 Y/N", dataType = "string")
+    private String isAnswerCompleted;
+
     @ApiModelProperty(name = "questions", value = "学生回答过的问题集合", dataType = "list")
     private Set<String> questions;
 

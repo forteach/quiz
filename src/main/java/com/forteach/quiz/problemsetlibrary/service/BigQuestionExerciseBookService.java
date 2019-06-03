@@ -2,11 +2,11 @@ package com.forteach.quiz.problemsetlibrary.service;
 
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
-import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceImpl;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
+import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
@@ -121,8 +122,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
 
         update.pull("questionChildren", Query.query(Criteria.where(MONGDB_ID).is(delVo.getTargetId())));
 
-        return template
-                .updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
+        return template.updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
     }
 
     /**
@@ -163,5 +163,33 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
         }
 
         return criteria;
+    }
+
+
+    /**
+     * 查找习题的答案
+     */
+    public Mono<String> checkAnswer(final String exeBookType, final String chapterId,
+                                    final String courseId, final String questionId, final String answer){
+        Mono<List<BigQuestion>> listMono = findExerciseBook(exeBookType, chapterId, courseId)
+                .filter(Objects::nonNull)
+                .map(BigQuestionExerciseBook::getQuestionChildren)
+                .filter(Objects::nonNull)
+                .flatMapMany(Flux::fromIterable)
+                .collectList();
+
+        listMono.flatMapMany(Flux::fromIterable)
+                .filter(Objects::nonNull)
+                .filter(bigQuestion -> bigQuestion.getId().equals(questionId))
+                .map(BigQuestion::getExamChildren);
+//                .filter(Objects::nonNull).filter(objects -> objects.get(""))
+//                .flatMapMany(Flux::fromIterable)
+//                .collectList();
+//                .filter(Objects::nonNull)
+//                .flatMaP
+//                .map(ChoiceQst::getId)
+
+
+        return Mono.just("");
     }
 }

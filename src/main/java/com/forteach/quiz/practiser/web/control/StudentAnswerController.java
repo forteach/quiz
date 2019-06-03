@@ -47,6 +47,7 @@ public class StudentAnswerController {
         MyAssert.isNull(answerReq.getChapterId(), DefineCode.ERR0010, "章节不为空");
         MyAssert.isNull(answerReq.getCourseId(), DefineCode.ERR0010, "课程不为空");
         MyAssert.isNull(answerReq.getExeBookType(), DefineCode.ERR0010, "练习册/习题册类型类型不为空");
+        MyAssert.isNull(answerReq.getQuestionId(), DefineCode.ERR0010, "题目id不为空");
         answerReq.setStudentId(tokenService.getStudentId(request));
         return exerciseBookAnswerService
                 .saveAnswer(answerReq)
