@@ -1,9 +1,11 @@
 package com.forteach.quiz.practiser.web.req;
 
 import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
+import com.forteach.quiz.practiser.web.req.base.AbstractReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,22 +19,11 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "回答记录")
-public class AnswerReq implements Serializable {
-
-    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
-    private String courseId;
-
-    @ApiModelProperty(name = "chapterId", value = "章节id", dataType = "string")
-    private String chapterId;
-
-    @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
-    private int exeBookType;
+@EqualsAndHashCode(callSuper = true)
+public class AnswerReq extends AbstractReq implements Serializable {
 
     @ApiModelProperty(name = "answer", value = "回答内容", dataType = "string", required = true)
     private String answer;
-
-    @ApiModelProperty(name = "questionId", value = "问题id", dataType = "string")
-    private String questionId;
 
     /**
      * 答案附件

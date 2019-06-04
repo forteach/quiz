@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author: zhangyy
@@ -33,6 +33,6 @@ public class AskAnswerStudents extends AbstractAnswer {
     private String isAnswerCompleted;
 
     @ApiModelProperty(name = "questions", value = "学生回答过的问题集合", dataType = "list")
-    private Set<String> questions;
+    private List<String> questions;
 
 }

@@ -29,7 +29,7 @@ public class AskAnswerGrade extends AbstractAnswer {
     @ApiModelProperty(name = "teacherId", value = "教师id", dataType = "string")
     private String teacherId;
 
-    @ApiModelProperty(name = "questionId", value = "习题id", dataType = "string")
-    private List<AnswerGrade> questionId;
+    @ApiModelProperty(name = "gradeList", value = "老师批改过的记录信息", dataType = "string")
+    private List<AnswerGrade> gradeList;
 
 }

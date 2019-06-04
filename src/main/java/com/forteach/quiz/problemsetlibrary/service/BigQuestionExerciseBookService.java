@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
@@ -163,33 +162,5 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
         }
 
         return criteria;
-    }
-
-
-    /**
-     * 查找习题的答案
-     */
-    public Mono<String> checkAnswer(final String exeBookType, final String chapterId,
-                                    final String courseId, final String questionId, final String answer){
-        Mono<List<BigQuestion>> listMono = findExerciseBook(exeBookType, chapterId, courseId)
-                .filter(Objects::nonNull)
-                .map(BigQuestionExerciseBook::getQuestionChildren)
-                .filter(Objects::nonNull)
-                .flatMapMany(Flux::fromIterable)
-                .collectList();
-
-        listMono.flatMapMany(Flux::fromIterable)
-                .filter(Objects::nonNull)
-                .filter(bigQuestion -> bigQuestion.getId().equals(questionId))
-                .map(BigQuestion::getExamChildren);
-//                .filter(Objects::nonNull).filter(objects -> objects.get(""))
-//                .flatMapMany(Flux::fromIterable)
-//                .collectList();
-//                .filter(Objects::nonNull)
-//                .flatMaP
-//                .map(ChoiceQst::getId)
-
-
-        return Mono.just("");
     }
 }

@@ -5,8 +5,11 @@ import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.practiser.service.ExerciseBookAnswerService;
 import com.forteach.quiz.practiser.web.req.AnswerReq;
+import com.forteach.quiz.practiser.web.req.verify.AnswerVerify;
 import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,21 +36,30 @@ public class StudentAnswerController {
 
     private final TokenService tokenService;
     private final ExerciseBookAnswerService exerciseBookAnswerService;
+    private final AnswerVerify answerVerify;
 
     @Autowired
-    public StudentAnswerController(ExerciseBookAnswerService exerciseBookAnswerService, TokenService tokenService) {
+    public StudentAnswerController(ExerciseBookAnswerService exerciseBookAnswerService, TokenService tokenService, AnswerVerify answerVerify) {
         this.exerciseBookAnswerService = exerciseBookAnswerService;
         this.tokenService = tokenService;
+        this.answerVerify = answerVerify;
     }
 
     @ApiOperation(value = "学生回答作业记录")
     @PostMapping("/saveAnswer")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "answer", value = "回答内容", dataType = "string", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "fileList", value = "附件列表", paramType = "form"),
+            @ApiImplicitParam(name = "answerImageList", value = "答案图片列表", paramType = "form"),
+    })
     public Mono<WebResult> saveAnswer(@RequestBody AnswerReq answerReq, ServerHttpRequest request){
+        answerVerify.verify(answerReq);
         MyAssert.isNull(answerReq.getAnswer(), DefineCode.ERR0010, "答案不为空");
-        MyAssert.isNull(answerReq.getChapterId(), DefineCode.ERR0010, "章节不为空");
-        MyAssert.isNull(answerReq.getCourseId(), DefineCode.ERR0010, "课程不为空");
-        MyAssert.isNull(answerReq.getExeBookType(), DefineCode.ERR0010, "练习册/习题册类型类型不为空");
-        MyAssert.isNull(answerReq.getQuestionId(), DefineCode.ERR0010, "题目id不为空");
         answerReq.setStudentId(tokenService.getStudentId(request));
         return exerciseBookAnswerService
                 .saveAnswer(answerReq)
