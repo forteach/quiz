@@ -5,18 +5,19 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.BaseEntity;
+import com.forteach.quiz.evaluate.Service.RewardService;
+import com.forteach.quiz.evaluate.domain.QuestionExerciseReward;
+import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.practiser.domain.AskAnswerExercise;
-import com.forteach.quiz.practiser.web.req.AnswerReq;
-import com.forteach.quiz.practiser.web.req.FindAnswerGradeReq;
-import com.forteach.quiz.practiser.web.req.FindAnswerStudentReq;
-import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
+import com.forteach.quiz.practiser.web.req.*;
 import com.forteach.quiz.practiser.web.resp.AnswerStudentResp;
 import com.forteach.quiz.problemsetlibrary.service.BigQuestionExerciseBookService;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.service.CorrectService;
 import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -48,16 +49,19 @@ public class ExerciseAnswerService {
     private final ReactiveRedisTemplate reactiveRedisTemplate;
     private final CorrectService correctService;
     private final StudentsService studentsService;
+    private final RewardService rewardService;
     private final BigQuestionExerciseBookService bigQuestionExerciseBookService;
 
     @Autowired
     public ExerciseAnswerService(ReactiveMongoTemplate reactiveMongoTemplate,
                                  BigQuestionExerciseBookService bigQuestionExerciseBookService,
                                  ReactiveRedisTemplate reactiveRedisTemplate,
+                                 RewardService rewardService,
                                  CorrectService correctService, StudentsService studentsService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.studentsService = studentsService;
         this.correctService = correctService;
+        this.rewardService = rewardService;
         this.reactiveRedisTemplate = reactiveRedisTemplate;
         this.bigQuestionExerciseBookService = bigQuestionExerciseBookService;
     }
@@ -395,4 +399,47 @@ public class ExerciseAnswerService {
                 .collectList();
     }
 
+    /**
+     * 添加奖励(小红花)
+     * @param addRewardReq
+     * @return
+     */
+    public Mono<String> addReward(final AddRewardReq addRewardReq) {
+        Criteria criteria = new Criteria();
+
+        if (StrUtil.isNotBlank(addRewardReq.getExeBookType())) {
+            criteria.and("exeBookType").is(addRewardReq.getExeBookType());
+        }
+        if (StrUtil.isNotBlank(addRewardReq.getChapterId())) {
+            criteria.and("chapterId").is(addRewardReq.getChapterId());
+        }
+        if (StrUtil.isNotBlank(addRewardReq.getCourseId())) {
+            criteria.and("courseId").is(addRewardReq.getCourseId());
+        }
+        if (StrUtil.isNotBlank(addRewardReq.getPreview())) {
+            criteria.and("preview").is(addRewardReq.getPreview());
+        }
+        if (StrUtil.isNotBlank(addRewardReq.getStudentId())){
+            criteria.and("studentId").is(addRewardReq.getStudentId());
+        }
+        return reactiveMongoTemplate.findOne(Query.query(criteria), QuestionExerciseReward.class)
+                .flatMap(questionExerciseReward -> MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了"))
+                .flatMap(o -> saveReward(addRewardReq));
+
+    }
+
+    /**
+     * 记录奖励
+     * @param addRewardReq
+     * @return
+     */
+    private Mono<String> saveReward(final AddRewardReq addRewardReq){
+        QuestionExerciseReward questionExerciseReward = new QuestionExerciseReward();
+        BeanUtils.copyProperties(addRewardReq, questionExerciseReward);
+        return rewardService.cumulativeResMono(addRewardReq.getQuestionId(), addRewardReq.getStudentId(), Integer.valueOf(addRewardReq.getNum()))
+                .map(CumulativeRes::getCount)
+                .filterWhen(c -> reactiveMongoTemplate.insert(questionExerciseReward)
+                        .map(Objects::nonNull)
+                        .flatMap(q -> MyAssert.isNull(q, DefineCode.ERR0010, "记录失败")));
+    }
 }
