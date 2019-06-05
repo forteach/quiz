@@ -3,16 +3,13 @@ package com.forteach.quiz.practiser.web.control;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.practiser.service.ExerciseBookAnswerService;
+import com.forteach.quiz.practiser.service.ExerciseAnswerService;
 import com.forteach.quiz.practiser.web.req.FindAnswerGradeReq;
 import com.forteach.quiz.practiser.web.req.FindAnswerStudentReq;
 import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
 import com.forteach.quiz.practiser.web.req.verify.AnswerVerify;
 import com.forteach.quiz.service.TokenService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -38,21 +35,21 @@ public class TeacherAnswerController {
 
     private final TokenService tokenService;
     private final AnswerVerify answerVerify;
-    private final ExerciseBookAnswerService exerciseBookAnswerService;
+    private final ExerciseAnswerService exerciseAnswerService;
 
     @Autowired
-    public TeacherAnswerController(ExerciseBookAnswerService exerciseBookAnswerService, AnswerVerify answerVerify, TokenService tokenService) {
-        this.exerciseBookAnswerService = exerciseBookAnswerService;
+    public TeacherAnswerController(ExerciseAnswerService exerciseAnswerService, AnswerVerify answerVerify, TokenService tokenService) {
+        this.exerciseAnswerService = exerciseAnswerService;
         this.tokenService = tokenService;
         this.answerVerify = answerVerify;
     }
 
-    @ApiOperation(value = "老师批改答题", notes = "老师批改学生的主观题并给出相应的评价　习题、提问册、练习册、作业册")
+    @ApiOperation(value = "老师批改作业、习题、练习册", notes = "老师批改学生的主观题并给出相应的评价　习题、提问册、练习册、作业册")
     @PostMapping("/gradeAnswer")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "form"),
-            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", dataType = "string", example = "3", required = true, paramType = "form"),
             @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "form"),
             @ApiImplicitParam(name = "studentId", value = "学生id", dataType = "string", required = true, paramType = "form"),
@@ -64,40 +61,41 @@ public class TeacherAnswerController {
         MyAssert.isNull(gradeAnswerReq.getStudentId(), DefineCode.ERR0010, "要批改的学生id不为空");
         MyAssert.isNull(gradeAnswerReq.getEvaluation(), DefineCode.ERR0010, "老师评价不为空");
         tokenService.getTeacherId(request).ifPresent(gradeAnswerReq::setTeacherId);
-        return exerciseBookAnswerService.gradeAnswer(gradeAnswerReq).map(WebResult::okResult);
+        return exerciseAnswerService.gradeAnswer(gradeAnswerReq).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "查询回答的学生记录", notes = "教师端查询学生习题回答情况")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", dataType = "String", example = "3", required = true, paramType = "query"),
             @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "query"),
             @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "classId", value = "班级id", required = true, paramType = "query"),
             @ApiImplicitParam(name = "studentId", value = "学生id", dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "isAnswerCompleted", value = "是否回答完 Y/N", dataType = "string", paramType = "query")
+            @ApiImplicitParam(name = "isAnswerCompleted", value = "是否提交过答案的 Y/N", dataType = "string", paramType = "query")
     })
     @PostMapping("/findAnswerStudent")
     public Mono<WebResult> findAnswerStudent(@RequestBody FindAnswerStudentReq findAnswerStudentReq){
         answerVerify.verify(findAnswerStudentReq);
-        return exerciseBookAnswerService.findAnswerStudent(findAnswerStudentReq).map(WebResult::okResult);
+        return exerciseAnswerService.findAnswerStudent(findAnswerStudentReq).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "查询教师的批改记录", notes = "教师端查询自己批改的习题记录")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", dataType = "string", example = "3", required = true, paramType = "query"),
             @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "studentId", value = "学生id", dataType = "string", paramType = "query")
-//            @ApiImplicitParam(name = "isAnswerCompleted", value = "是否回答完 Y/N", dataType = "string", paramType = "query")
+            @ApiImplicitParam(name = "studentId", value = "学生id", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "classId", value = "班级id", required = true, paramType = "query")
     })
     @PostMapping("/findAnswerGrade")
     public Mono<WebResult> findAnswerGrade(@RequestBody FindAnswerGradeReq findAnswerGradeReq, ServerHttpRequest serverHttpRequest){
         answerVerify.verify(findAnswerGradeReq);
         tokenService.getTeacherId(serverHttpRequest).ifPresent(findAnswerGradeReq::setTeacherId);
-        return exerciseBookAnswerService.findAnswerGradeList(findAnswerGradeReq).map(WebResult::okResult);
+        return exerciseAnswerService.findAnswerGradeList(findAnswerGradeReq).map(WebResult::okResult);
     }
 
 }

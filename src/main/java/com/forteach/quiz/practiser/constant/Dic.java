@@ -17,4 +17,9 @@ public class Dic {
      * 是否回答完题目信息　否
      */
     public final static String IS_ANSWER_COMPLETED_N = "N";
+
+    /**
+     * 班级学生信息前缀
+     */
+    public static final String CLASS_ROOM = "classRoom#";
 }
