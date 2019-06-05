@@ -1,6 +1,7 @@
 package com.forteach.quiz.problemsetlibrary.web.req;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date: 2018/12/18  10:24
  */
 @Data
+@Builder
 public class ExerciseBookReq {
 
 

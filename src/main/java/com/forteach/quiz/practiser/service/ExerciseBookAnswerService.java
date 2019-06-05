@@ -16,7 +16,10 @@ import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
 import com.forteach.quiz.practiser.web.resp.AnswerGradeListResp;
 import com.forteach.quiz.practiser.web.resp.AnswerGradeResp;
 import com.forteach.quiz.practiser.web.resp.AnswerStudentResp;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
 import com.forteach.quiz.problemsetlibrary.service.BigQuestionExerciseBookService;
+import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.service.CorrectService;
 import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
@@ -44,19 +47,24 @@ import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_Y;
  * @description:
  */
 @Service
-public class ExerciseBookAnswerService {
+public class ExerciseBookAnswerService<T extends ProblemSet, R extends QuestionExamEntity, E extends ExerciseBook> {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final CorrectService correctService;
     private final StudentsService studentsService;
+//    private final BaseExerciseBookService<E, R> exerciseBookService;
     private final BigQuestionExerciseBookService bigQuestionExerciseBookService;
 
     @Autowired
-    public ExerciseBookAnswerService(ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionExerciseBookService bigQuestionExerciseBookService, CorrectService correctService, StudentsService studentsService) {
+    public ExerciseBookAnswerService(ReactiveMongoTemplate reactiveMongoTemplate,
+                                     BigQuestionExerciseBookService bigQuestionExerciseBookService,
+//                                     BaseExerciseBookService<E, R> exerciseBookService,
+                                     CorrectService correctService, StudentsService studentsService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionExerciseBookService = bigQuestionExerciseBookService;
         this.studentsService = studentsService;
         this.correctService = correctService;
+//        this.exerciseBookService = exerciseBookService;
     }
 
     /**
@@ -234,6 +242,11 @@ public class ExerciseBookAnswerService {
         return reactiveMongoTemplate.updateMulti(query, update, AskAnswerGrade.class).map(UpdateResult::wasAcknowledged);
     }
 
+    /**
+     * 查询学生的答题记录
+     * @param findAnswerStudentReq
+     * @return
+     */
     public Mono<List<AnswerStudentResp>> findAnswerStudent(final FindAnswerStudentReq findAnswerStudentReq) {
         Criteria criteria = buildExerciseBook(findAnswerStudentReq.getExeBookType(), findAnswerStudentReq.getChapterId(), findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getPreview());
         if (StrUtil.isNotBlank(findAnswerStudentReq.getStudentId())) {
@@ -252,7 +265,7 @@ public class ExerciseBookAnswerService {
                             return changeFindAnswer(answerStudentsList);
                         case IS_ANSWER_COMPLETED_N:
                             //没有回答的
-                            return changeFindAnswer(answerStudentsList);
+                            return findNoReplyAnswer(answerStudentsList, findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getChapterId());
                         default:
                             MyAssert.isNull(null, DefineCode.ERR0010, "是否答题完毕参数错误");
                             return Mono.error(new Throwable("是否回答完毕, 参数错误"));
@@ -260,11 +273,33 @@ public class ExerciseBookAnswerService {
                 });
     }
 
+    /**
+     * 查询已经回答过的
+     * @param answerStudentsList
+     * @return
+     */
     private Mono<List<AnswerStudentResp>> changeFindAnswer(final List<AskAnswerStudents> answerStudentsList) {
         return Mono.just(answerStudentsList)
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(this::answerStudentResp)
                 .collectList();
+    }
+
+    /**
+     * 学生没有回答的
+     * @param answerStudentsList
+     * @param courseId
+     * @param chapterId
+     * @return
+     */
+    private Mono<List<AnswerStudentResp>> findNoReplyAnswer(final List<AskAnswerStudents> answerStudentsList,
+                                                              final String courseId, final String chapterId){
+//        exerciseBookService.findExerciseBook(ExerciseBookReq.builder().chapterId(chapterId).courseId(courseId).build())
+//                .filter(Objects::nonNull)
+//                .flatMapMany(Flux::fromIterable)
+//                .map(BaseEntity::getId)
+//                .collectList();
+        return Mono.just(null);
     }
 
     private Mono<AnswerStudentResp> answerStudentResp(final AskAnswerStudents askAnswerStudents) {
@@ -276,7 +311,6 @@ public class ExerciseBookAnswerService {
     }
 
     public Mono<List<AnswerGradeListResp>>  findAnswerGradeList(final FindAnswerGradeReq findAnswerGradeReq) {
-//    public Mono<List<AnswerGradeResp>>  findAnswerGradeList(final FindAnswerGradeReq findAnswerGradeReq) {
         Criteria criteria = buildExerciseBook(findAnswerGradeReq.getExeBookType(), findAnswerGradeReq.getChapterId(), findAnswerGradeReq.getCourseId(), findAnswerGradeReq.getPreview());
 
         if (StrUtil.isNotBlank(findAnswerGradeReq.getTeacherId())) {
@@ -290,8 +324,6 @@ public class ExerciseBookAnswerService {
                         .flatMapMany(Flux::fromIterable)
                         .filter(Objects::nonNull)
                         .flatMap(this::findAnswerGrade)
-//                        .map(ArrayList::new)
-//                        .collectList();
                         .map(AnswerGradeListResp::new)
                         .collectList();
     }
