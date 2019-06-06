@@ -1,4 +1,4 @@
-package com.forteach.quiz.evaluate.Service;
+package com.forteach.quiz.evaluate.service;
 
 import cn.hutool.core.util.NumberUtil;
 import com.forteach.quiz.evaluate.config.RewardKey;

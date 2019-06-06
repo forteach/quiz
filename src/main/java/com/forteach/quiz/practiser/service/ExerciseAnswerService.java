@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.BaseEntity;
-import com.forteach.quiz.evaluate.Service.RewardService;
+import com.forteach.quiz.evaluate.service.RewardService;
 import com.forteach.quiz.evaluate.domain.QuestionExerciseReward;
 import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
@@ -168,7 +168,7 @@ public class ExerciseAnswerService {
                 .flatMap(r -> {
                     update.set("right", r);
                     return reactiveMongoTemplate
-                            .updateMulti(query, update, AskAnswerExercise.class)
+                            .upsert(query, update, AskAnswerExercise.class)
                             .map(UpdateResult::wasAcknowledged);
                 })
                 .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0010, "保存失败"));

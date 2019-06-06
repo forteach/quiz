@@ -1,7 +1,7 @@
 package com.forteach.quiz.evaluate.web.control;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.evaluate.Service.RewardService;
+import com.forteach.quiz.evaluate.service.RewardService;
 import com.forteach.quiz.evaluate.web.control.req.CumulativeReq;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
