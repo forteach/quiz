@@ -6,10 +6,10 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 /**
  * @author: zhangyy
  * @email: zhang10092009@hotmail.com
- * @date: 19-6-5 10:36
+ * @date: 19-6-9 16:59
  * @version: 1.0
- * @description:　学生回答详情记录表(包含老师评价)
+ * @description: 学生回答记录信息表
  */
-public interface AskAnswerExerciseRepository extends ReactiveMongoRepository<AskAnswerExercise, String> {
+public interface AnswerListsRepository extends ReactiveMongoRepository<AskAnswerExercise, String> {
 
 }

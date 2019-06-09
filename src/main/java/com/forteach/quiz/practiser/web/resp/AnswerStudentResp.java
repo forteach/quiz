@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author: zhangyy
@@ -22,6 +23,9 @@ public class AnswerStudentResp extends Students implements Serializable {
     @ApiModelProperty(name = "questionId", value = "问题id")
     private String questionId;
 
+    @ApiModelProperty(name = "questionIds", value = "回答/没有回答 的问题id")
+    private List<String> questionIds;
+
     @ApiModelProperty(name = "isAnswerCompleted", value = "是否答完题 Y/N")
     private String isAnswerCompleted;
 
@@ -31,6 +35,11 @@ public class AnswerStudentResp extends Students implements Serializable {
         this.isAnswerCompleted = isAnswerCompleted;
     }
 
+    public AnswerStudentResp(String id, String name, String portrait, List<String> questionIds, String isAnswerCompleted) {
+        super(id, name, portrait);
+        this.questionIds = questionIds;
+        this.isAnswerCompleted = isAnswerCompleted;
+    }
     public AnswerStudentResp(String id, String name, String portrait, String questionId, String isAnswerCompleted) {
         super(id, name, portrait);
         this.questionId = questionId;

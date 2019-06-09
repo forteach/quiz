@@ -1,16 +1,16 @@
 package com.forteach.quiz.practiser.domain;
 
-import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
+import com.forteach.quiz.practiser.domain.base.AbstractAnswer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,36 +18,16 @@ import java.util.List;
  * @email: zhang10092009@hotmail.com
  * @date: 19-6-5 10:32
  * @version: 1.0
- * @description: 练习记录
+ * @description: 学生回答详情记录表(包含老师评价)
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Document(collection = "askAnswerExercise")
 @Builder
 @AllArgsConstructor
 @ApiModel(value = "学生作业回答详情信息", description = "学生作业回答详情信息")
-public class AskAnswerExercise extends BaseEntity implements Serializable {
+public class AskAnswerExercise extends AbstractAnswer {
 
-
-    @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
-    @Indexed
-    private String exeBookType;
-
-    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
-    @Indexed
-    private String courseId;
-
-    @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")
-    @Indexed
-    protected String chapterId;
-    
-    @ApiModelProperty(name = "classId", value = "班级id", dataType = "string")
-    private String classId;
-    /**
-     * 课堂练习：before/预习 now/课堂 before,now/全部
-     */
-    @ApiModelProperty(value = "习题类型  before/预习 now/课堂 after/课后练习", name = "preview", dataType = "string", example = "before")
-    @Indexed
-    private String preview;
     /**
      * 习题id
      */
@@ -55,12 +35,7 @@ public class AskAnswerExercise extends BaseEntity implements Serializable {
     @Indexed
     private String questionId;
 
-    /**
-     * 学生id
-     */
-    @Indexed
-    @ApiModelProperty(value = "学生id", name = "studentId", dataType = "string")
-    private String studentId;
+
 
     /**
      * 学生答案

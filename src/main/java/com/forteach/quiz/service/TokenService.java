@@ -1,6 +1,5 @@
 package com.forteach.quiz.service;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -24,8 +23,7 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.forteach.quiz.common.Dic.TOKEN_TEACHER;
-import static com.forteach.quiz.common.Dic.USER_PREFIX;
+import static com.forteach.quiz.common.Dic.*;
 
 /**
  * @Auther: zhangyy
@@ -44,6 +42,17 @@ public class TokenService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    private String getToken(ServerHttpRequest request){
+        return request.getHeaders().getFirst("token");
+    }
+
+    private String getValue(String token, int index){
+        return JWT.decode(token).getAudience().get(index);
+    }
+
+    private String getKey(String userId){
+        return USER_PREFIX.concat(userId);
+    }
 
     private JWTVerifier verifier(String openId) {
         return JWT.require(Algorithm.HMAC256(salt.concat(openId))).build();
@@ -56,7 +65,6 @@ public class TokenService {
      */
     private String getOpenId(ServerHttpRequest request) {
         String token = request.getHeaders().getFirst("token");
-//        String token = getToken1(request);
         Assert.notNull(token, "token is null");
         MyAssert.blank(token, DefineCode.ERR0004, "token is null");
         return JWT.decode(token).getAudience().get(0);
@@ -82,13 +90,27 @@ public class TokenService {
      */
     public Optional<String> getTeacherId(ServerHttpRequest request){
         String token = request.getHeaders().getFirst("token");
-//        String token = getToken1(request);
         if (TOKEN_TEACHER.equals(JWT.decode(token).getAudience().get(1))){
             return Optional.of(JWT.decode(token).getAudience().get(0));
         }
         MyAssert.isNull(null, DefineCode.ERR0010, "token 非法");
         return Optional.empty();
     }
+
+    /**
+     * 查询学生对应的班级id
+     * @param request
+     * @return
+     */
+    public String getClassId(ServerHttpRequest request) {
+        String token = getToken(request);
+        if (TOKEN_STUDENT.equals(getValue(token, 1))){
+            return String.valueOf(stringRedisTemplate.opsForHash().get(getKey(getValue(token, 0)), "classId"));
+        }
+        return null;
+    }
+
+
 
     /**
      * 校验token 是否有效

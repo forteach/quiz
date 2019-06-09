@@ -65,6 +65,7 @@ public class TeacherAnswerController {
         return exerciseAnswerService.gradeAnswer(gradeAnswerReq).map(WebResult::okResult);
     }
 
+    // todo 查询学生全部回答过的题并且没有批改过的
     @ApiOperation(value = "查询回答的学生记录", notes = "教师端查询学生习题回答情况")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", dataType = "String", example = "3", required = true, paramType = "query"),
@@ -81,6 +82,25 @@ public class TeacherAnswerController {
         answerVerify.verify(findAnswerStudentReq);
         return exerciseAnswerService.findAnswerStudent(findAnswerStudentReq).map(WebResult::okResult);
     }
+
+    @ApiOperation(value = "查找学生的答题记录", notes = "查询学生回答情况")
+    @PostMapping(path = "/findAnswer")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", dataType = "String", example = "3", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "classId", value = "班级id", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "studentId", value = "学生id", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "isAnswerCompleted", value = "是否提交过答案的 Y/N", dataType = "string", paramType = "query")
+    })
+    public Mono<WebResult> findAnswer(@RequestBody FindAnswerStudentReq findAnswerStudentReq){
+        answerVerify.verify(findAnswerStudentReq);
+        return exerciseAnswerService.findAnswer(findAnswerStudentReq).map(WebResult::okResult);
+    }
+
+
 
     @ApiOperation(value = "查询教师的批改记录", notes = "教师端查询自己批改的习题记录")
     @ApiImplicitParams({
