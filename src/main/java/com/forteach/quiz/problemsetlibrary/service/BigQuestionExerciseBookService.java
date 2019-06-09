@@ -97,7 +97,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
     /**
      * 查找需要挂接的课堂链接册
      */
-    private Mono<BigQuestionExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId) {
+    public Mono<BigQuestionExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId) {
 
         final Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId);
 

@@ -5,8 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.BaseEntity;
-import com.forteach.quiz.evaluate.service.RewardService;
 import com.forteach.quiz.evaluate.domain.QuestionExerciseReward;
+import com.forteach.quiz.evaluate.service.RewardService;
 import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.practiser.domain.AskAnswerExercise;
@@ -355,12 +355,21 @@ public class ExerciseAnswerService {
      * @return
      */
     private Mono<List<String>> findAllQuestionIds(final String exeBookType, final String courseId, final String chapterId) {
+////        Set<String> stringSet = new HashSet<>();
         return bigQuestionExerciseBookService
                 .findExerciseBook(ExerciseBookReq.builder().exeBookType(exeBookType).chapterId(chapterId).courseId(courseId).build())
+                .filter(Objects::nonNull)
+//                .log("id =====>> ")
                 .flatMapMany(Flux::fromIterable)
                 .filter(Objects::nonNull)
                 .map(BaseEntity::getId)
                 .collectList();
+//        return bigQuestionExerciseBookService.findExerciseBook(exeBookType, chapterId, courseId)
+//                .map(BigQuestionExerciseBook::getQuestionChildren)
+//                .flatMapMany(Flux::fromIterable)
+//                .filter(Objects::nonNull)
+//                .map(BaseEntity::getId)
+//                .collectList();
     }
 
     /**
@@ -401,6 +410,7 @@ public class ExerciseAnswerService {
 
     /**
      * 添加奖励(小红花)
+     *
      * @param addRewardReq
      * @return
      */
@@ -419,26 +429,32 @@ public class ExerciseAnswerService {
         if (StrUtil.isNotBlank(addRewardReq.getPreview())) {
             criteria.and("preview").is(addRewardReq.getPreview());
         }
-        if (StrUtil.isNotBlank(addRewardReq.getStudentId())){
+        if (StrUtil.isNotBlank(addRewardReq.getStudentId())) {
             criteria.and("studentId").is(addRewardReq.getStudentId());
         }
         return reactiveMongoTemplate.findOne(Query.query(criteria), QuestionExerciseReward.class)
-                .flatMap(questionExerciseReward -> MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了"))
-                .flatMap(o -> saveReward(addRewardReq));
+                .switchIfEmpty(Mono.just(new QuestionExerciseReward()))
+                .flatMap(questionExerciseReward -> {
+                    if (StrUtil.isNotEmpty(questionExerciseReward.getNum())) {
+                        MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了");
+                    }
+                    return saveReward(addRewardReq);
+                });
 
     }
 
     /**
      * 记录奖励
+     *
      * @param addRewardReq
      * @return
      */
-    private Mono<String> saveReward(final AddRewardReq addRewardReq){
+    private Mono<String> saveReward(final AddRewardReq addRewardReq) {
         QuestionExerciseReward questionExerciseReward = new QuestionExerciseReward();
         BeanUtils.copyProperties(addRewardReq, questionExerciseReward);
         return rewardService.cumulativeResMono(addRewardReq.getQuestionId(), addRewardReq.getStudentId(), Integer.valueOf(addRewardReq.getNum()))
                 .map(CumulativeRes::getCount)
-                .filterWhen(c -> reactiveMongoTemplate.insert(questionExerciseReward)
+                .filterWhen(c -> reactiveMongoTemplate.save(questionExerciseReward)
                         .map(Objects::nonNull)
                         .flatMap(q -> MyAssert.isNull(q, DefineCode.ERR0010, "记录失败")));
     }
