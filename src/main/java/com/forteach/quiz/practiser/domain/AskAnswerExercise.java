@@ -49,6 +49,9 @@ public class AskAnswerExercise extends AbstractAnswer {
     @ApiModelProperty(value = "附件列表", name = "fileList")
     private List<DataDatumVo> fileList;
 
+    @ApiModelProperty(name = "right", value = "回答正确与错误", dataType = "string")
+    private String right;
+
     /**
      * 答案图片列表
      */
