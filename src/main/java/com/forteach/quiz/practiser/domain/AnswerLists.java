@@ -31,4 +31,10 @@ public class AnswerLists extends AbstractAnswer {
 
     @ApiModelProperty(name = "questions", value = "已经回答过的问题信息", dataType = "list")
     private List<String> questions;
+
+    @ApiModelProperty(name = "isCorrectCompleted", value = "是否批改完　Y/N", dataType = "list")
+    private String isCorrectCompleted;
+
+    @ApiModelProperty(name = "correctQuestionIds", value = "批改的集合列表", dataType = "list")
+    private List<String> correctQuestionIds;
 }
