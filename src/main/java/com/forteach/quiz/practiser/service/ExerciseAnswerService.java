@@ -21,6 +21,7 @@ import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.service.CorrectService;
 import com.forteach.quiz.service.StudentsService;
+import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_N;
-import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_Y;
+import static com.forteach.quiz.common.Dic.BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN;
+import static com.forteach.quiz.common.Dic.QUESTION_CHOICE_OPTIONS_SINGLE;
+import static com.forteach.quiz.practiser.constant.Dic.*;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author: zhangyy
@@ -220,11 +223,82 @@ public class ExerciseAnswerService {
                     return isCompletedSuccess(tuple2.getT1(), tuple2.getT2())
                             .flatMap(s -> {
                                 return reactiveMongoTemplate.upsert(query, Update.update("isAnswerCompleted", s), AnswerLists.class)
-                                        .map(UpdateResult::wasAcknowledged);
+                                        .map(UpdateResult::wasAcknowledged)
+                                        .filterWhen(b -> {
+                                            if (b) {
+                                                return setIsCorrectCompleted(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(),
+                                                        answerReq.getPreview(), answerReq.getClassId(), answerReq.getStudentId(), answerReq.getQuestionId());
+                                            } else {
+                                                return Mono.just(false);
+                                            }
+                                        });
                             });
                 });
     }
 
+    private Mono<Boolean> setIsCorrectCompleted(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
+        Criteria criteria = new Criteria();
+
+        if (isNotEmpty(exeBookType)) {
+            criteria.and("exeBookType").in(Integer.parseInt(exeBookType));
+        }
+        if (isNotEmpty(chapterId)) {
+            criteria.and("chapterId").in(chapterId);
+        }
+        if (isNotEmpty(courseId)) {
+            criteria.and("courseId").in(courseId);
+        }
+
+        Query query = new Query(criteria);
+        Mono<List<BigQuestionVo>> questionExamEntitylist = reactiveMongoTemplate
+                .findOne(query, BigQuestionExerciseBook.class).defaultIfEmpty(new BigQuestionExerciseBook())
+                .map(ExerciseBook::getQuestionChildren);
+
+//        Mono<List<QuestionExamEntity>> examType =
+        questionExamEntitylist
+                .flatMapMany(Flux::fromIterable)
+                .filter(Objects::nonNull)
+                .filter(BigQuestionVo -> questionId.equals(BigQuestionVo.getId()))
+                .map(BigQuestionVo::getExamChildren)
+                .collect(toList());
+
+        //todo 查询小题对应的类型
+        Mono<String> examType = Mono.just(QUESTION_CHOICE_OPTIONS_SINGLE);
+
+        return examType.flatMap(type -> {
+            if (BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN.equals(type)) {
+                return Mono.just(true);
+            } else {
+                return addCorrect(exeBookType, chapterId, courseId, preview, classId, studentId, questionId);
+            }
+        });
+    }
+
+//    private Mono<String> getExamType(final QuestionExamEntity questionExamEntity, final String questionId) {
+//        return Mono.just(questionExamEntity)
+//                .filter(q -> questionId.equals(q.getId()))
+//                .map(QuestionExamEntity::getExamChildren)
+//                .flatMapMany();
+//
+//    }
+
+    private Mono<Boolean> isCorrectCompleted(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId) {
+
+        Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId, preview, classId, studentId);
+
+        Query query = Query.query(criteria);
+        Mono<List<String>> answerQuestionIds = reactiveMongoTemplate.findOne(query, AnswerLists.class).map(AnswerLists::getCorrectQuestionIds);
+        //查询全部题目信息
+        Mono<List<String>> allQuestionIds = findAllQuestionIds(exeBookType, courseId, chapterId);
+        return Mono.zip(answerQuestionIds, allQuestionIds)
+                .flatMap(tuple2 -> {
+                    return isCompletedSuccess(tuple2.getT1(), tuple2.getT2())
+                            .flatMap(s -> {
+                                return reactiveMongoTemplate.upsert(query, Update.update("isCorrectCompleted", s), AnswerLists.class)
+                                        .map(UpdateResult::wasAcknowledged);
+                            });
+                });
+    }
 
     /**
      * 老师批改学生回答的题
@@ -254,126 +328,34 @@ public class ExerciseAnswerService {
         return reactiveMongoTemplate
                 .updateMulti(query, update, AskAnswerExercise.class)
                 .map(UpdateResult::wasAcknowledged)
+                .filterWhen(b -> {
+                    if (b) {
+                        return addCorrect(gradeAnswerReq.getExeBookType(), gradeAnswerReq.getChapterId(), gradeAnswerReq.getCourseId(),
+                                gradeAnswerReq.getPreview(), gradeAnswerReq.getClassId(), gradeAnswerReq.getStudentId(), gradeAnswerReq.getQuestionId());
+                    } else {
+                        return Mono.just(false);
+                    }
+                })
                 .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0010, "保存失败"));
     }
 
-    /**
-     * 查询学生的答题记录
-     *
-     * @param findAnswerStudentReq
-     * @return
-     */
-//    public Mono<List<AnswerStudentResp>> findAnswerStudent(final FindAnswerStudentReq findAnswerStudentReq) {
-//        Criteria criteria = buildExerciseBook(findAnswerStudentReq.getExeBookType(), findAnswerStudentReq.getChapterId(), findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getPreview(), findAnswerStudentReq.getClassId(), findAnswerStudentReq.getStudentId());
-//
-//        if (StrUtil.isNotBlank(findAnswerStudentReq.getQuestionId())) {
-//            criteria.and("questionId").is(findAnswerStudentReq.getQuestionId());
-//        }
-//
-//        Query query = Query.query(criteria);
-//
-//        return reactiveMongoTemplate.find(query, AskAnswerExercise.class).collectList()
-//                .flatMap(askAnswerExercises -> {
-//                    switch (findAnswerStudentReq.getIsAnswerCompleted()) {
-//                        case IS_ANSWER_COMPLETED_Y:
-//                            //是查询回答过的
-//                            return changeFindAnswer(askAnswerExercises, findAnswerStudentReq.getExeBookType(), findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getChapterId());
-//                        case IS_ANSWER_COMPLETED_N:
-//                            //没有回答的
-//                            return findNoReplyAnswer(askAnswerExercises, findAnswerStudentReq.getExeBookType(), findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getChapterId(), findAnswerStudentReq.getClassId());
-//                        default:
-//                            MyAssert.isNull(null, DefineCode.ERR0010, "是否答题完毕参数错误");
-//                            return Mono.error(new Throwable("是否回答完毕, 参数错误"));
-//                    }
-//                });
-//    }
+    private Mono<Boolean> addCorrect(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
+        //设置查询条件
+        Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId, preview, classId, studentId);
 
-//    /**
-//     * 查询已经回答过的
-//     *
-//     * @param askAnswerExercises
-//     * @return
-//     */
-//    private Mono<List<AnswerStudentResp>> changeFindAnswer(final List<AskAnswerExercise> askAnswerExercises, final String exeBookType, final String courseId, final String chapterId) {
-//        //查询回答过的题目id
-//        Mono<List<String>> answerQuestionIds = findAnswerQuestionIds(askAnswerExercises);
-//        //查询全部题目信息
-//        Mono<List<String>> allQuestionIds = findAllQuestionIds(exeBookType, courseId, chapterId);
-//
-//        return Mono.zip(answerQuestionIds, allQuestionIds)
-//                .flatMap(tuple2 -> {
-//                    //判断是否回答完毕
-//                    return isCompletedSuccess(tuple2.getT1(), tuple2.getT2())
-//                            .flatMap(b -> {
-//                                return Mono.just(askAnswerExercises)
-//                                        .flatMapMany(Flux::fromIterable)
-//                                        .flatMap(askAnswerExercise -> answerStudentResp(askAnswerExercise.getStudentId(), askAnswerExercise.getQuestionId(), b))
-//                                        .collectList();
-//                            });
-//                });
-//    }
+        Query query = Query.query(criteria);
 
-    /**
-     * 学生没有回答的
-     *
-     * @param askAnswerExercises
-//     * @param courseId
-//     * @param chapterId
-     * @return
-     */
-//    private Mono<List<AnswerStudentResp>> findNoReplyAnswer(final List<AskAnswerExercise> askAnswerExercises, final String exeBookType,
-//                                                            final String courseId, final String chapterId, final String classId) {
-//        //查询回答过的题目id
-//        Mono<List<String>> answerQuestionIds = findAnswerQuestionIds(askAnswerExercises);
-//        //查询全部题目信息
-//        Mono<List<String>> allQuestionIds = findAllQuestionIds(exeBookType, courseId, chapterId);
-//        //查询所有题id
-//
-//        return Mono.zip(answerQuestionIds, allQuestionIds)
-//                .flatMap(tuple2 -> {
-//                    return Mono.just(tuple2.getT1()
-//                            .stream()
-//                            .filter(i -> !tuple2.getT2().contains(i))
-//                            .collect(toList()));
-//                })
-//                .flatMap(stringList -> {
-//                    return findAnswerStudentIds(askAnswerExercises).flatMap(strings -> {
-//                        return findNoAnswerStudentIds(classId, strings)
-//                                .flatMap(q -> findNoAnswerQuestionId(stringList, q));
-//                    });
-//                });
-//    }
-
-//    private Mono<List<AnswerStudentResp>> findNoAnswerQuestionId(final List<String> studentIds, final List<String> questionIds) {
-//        return Mono.just(studentIds)
-//                .flatMapMany(Flux::fromIterable)
-//                .flatMap(s -> {
-//                    return Mono.just(questionIds)
-//                            .flatMapMany(Flux::fromIterable)
-//                            .flatMap(q -> answerStudentResp(s, q, IS_ANSWER_COMPLETED_N));
-//                })
-//                .collectList();
-//    }
-
-//    private Mono<List<String>> findAnswerStudentIds(final List<AskAnswerExercise> askAnswerExercises) {
-//        return Mono.just(askAnswerExercises)
-//                .flatMapMany(Flux::fromIterable)
-//                .map(AskAnswerExercise::getStudentId)
-//                .collectList();
-//    }
-
-//    private Mono<List<String>> findNoAnswerStudentIds(final String classId, final List<String> studentIds) {
-//        Mono<List<String>> listMono = reactiveRedisTemplate
-//                .opsForHash()
-//                .keys(CLASS_ROOM.concat(classId))
-//                .collectList()
-//                .switchIfEmpty(MyAssert.isNull(null, DefineCode.ERR0010, "不存在对应的班级学生"));
-//        return listMono
-//                .filter(Objects::nonNull)
-//                .flatMap(s -> {
-//                    return Mono.just(studentIds.stream().filter(i -> !s.contains(i)).collect(toList()));
-//                });
-//    }
+        // 修改答题记录
+        Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
+        //保存回答记录
+        if (StrUtil.isNotBlank(questionId)) {
+            update.addToSet("correctQuestionIds", questionId);
+        }
+        return reactiveMongoTemplate
+                .upsert(query, update, AnswerLists.class)
+                .map(UpdateResult::wasAcknowledged)
+                .filterWhen(b -> isCorrectCompleted(exeBookType, chapterId, courseId, preview, classId, studentId));
+    }
 
 
     /**
@@ -393,43 +375,6 @@ public class ExerciseAnswerService {
             return Mono.just("Y");
         }
     }
-
-
-    /**
-     * 回答的题目信息id
-     *
-//     * @param askAnswerExercises
-//     * @return
-     */
-//    private Mono<List<String>> findAnswerQuestionIds(final List<AskAnswerExercise> askAnswerExercises) {
-//        return Mono.just(askAnswerExercises)
-//                .flatMapMany(Flux::fromIterable)
-//                .filter(Objects::nonNull)
-//                .map(AskAnswerExercise::getQuestionId)
-//                .collectList();
-//    }
-
-//    private Mono<AnswerStudentResp> answerStudentResp(final String studentId, final String questionId, final String isAnswerCompleted) {
-//        return studentsService.findStudentsBrief(studentId)
-//                .map(students -> {
-//                    return new AnswerStudentResp(students.getId(), students.getName(), students.getPortrait(),
-//                            questionId, isAnswerCompleted);
-//                });
-//    }
-
-
-//    public Mono<List<AskAnswerExercise>> findAnswerGradeList(final FindAnswerGradeReq findAnswerGradeReq) {
-//        Criteria criteria = queryCriteria(findAnswerGradeReq.getExeBookType(), findAnswerGradeReq.getChapterId(), findAnswerGradeReq.getCourseId(), findAnswerGradeReq.getPreview(), findAnswerGradeReq.getStudentId(), findAnswerGradeReq.getQuestionId(), findAnswerGradeReq.getClassId());
-//
-//        if (StrUtil.isNotBlank(findAnswerGradeReq.getTeacherId())) {
-//            criteria.and("teacherId").is(findAnswerGradeReq.getTeacherId());
-//        }
-//
-//        Query query = Query.query(criteria);
-//
-//        return reactiveMongoTemplate.find(query, AskAnswerExercise.class)
-//                .collectList();
-//    }
 
     /**
      * 添加奖励(小红花)
@@ -498,7 +443,7 @@ public class ExerciseAnswerService {
                     .filter(Objects::nonNull)
                     .flatMap(this::findAnswerNoReply);
         } else if (IS_ANSWER_COMPLETED_Y.equals(findAnswerStudentReq.getIsAnswerCompleted())) {
-            if (StrUtil.isNotBlank(findAnswerStudentReq.getIsCorrectCompleted())){
+            if (StrUtil.isNotBlank(findAnswerStudentReq.getIsCorrectCompleted())) {
                 criteria.and("isCorrectCompleted").is(findAnswerStudentReq.getIsCorrectCompleted());
             }
             Query query = Query.query(criteria);
@@ -518,26 +463,35 @@ public class ExerciseAnswerService {
 
         Mono<List<String>> answerQuestionIds = Mono.just(answerLists.getQuestions());
         //查询所有题的集合
-        Mono<List<String>> allQuestionIds = findAllQuestionIds(findAnswerStudentReq.getExeBookType(), findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getChapterId());
-        //
-//        return Mono.zip(answerQuestionIds, allQuestionIds)
-//                .map(tuple2 -> tuple2.getT1())
-//                allQuestionIds.map(answerLists::getQuestions
-//                allQuestionId -> {
-//            return answerQuestionIds.stream().filter(i -> !allQuestionId.contains(i))
-//                    .collect(toList());
-//        ).flatMap(questionIds -> {
-//            return studentsService.findStudentsBrief(answerLists.getStudentId())
-//                    .flatMap(students -> {
-//                        return Mono.just(new AnswerStudentResp(students.getId(), students.getName(), students.getPortrait(), questionIds, findAnswerStudentReq.getIsAnswerCompleted()));
-//                    });
-//        });
-        return Mono.zip(answerQuestionIds, allQuestionIds)
-                .flatMap(tuple2 -> {
-                    return studentsService.findStudentsBrief(answerLists.getStudentId())
-                            .flatMap(students -> {
-                        return Mono.just(new AnswerStudentResp(students.getId(), students.getName(), students.getPortrait(), tuple2.getT1(), findAnswerStudentReq.getIsAnswerCompleted()));
+        if (IS_CORRECT_COMPLETED_N.equals(findAnswerStudentReq.getIsCorrectCompleted())) {
+            Mono<List<String>> allQuestionIds = Mono.just(answerLists.getQuestions());
+            Mono<List<String>> correctList = Mono.just(answerLists.getCorrectQuestionIds());
+            return Mono.zip(correctList, allQuestionIds)
+                    .flatMap(tuple2 -> {
+                        return Mono.just(tuple2.getT2().stream().filter(i -> !tuple2.getT1().contains(i)).collect(toList()));
+                    })
+                    .flatMap(questionIds -> {
+                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted());
                     });
+        } else if (IS_CORRECT_COMPLETED_Y.equals(findAnswerStudentReq.getIsCorrectCompleted())) {
+            Mono<List<String>> correctList = Mono.just(answerLists.getCorrectQuestionIds());
+            return correctList
+                    .flatMap(questionIds -> {
+                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted());
+                    });
+        } else {
+            return answerQuestionIds
+                    .flatMap(questionIds -> {
+                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted());
+                    });
+        }
+    }
+
+    private Mono<AnswerStudentResp> findAnswerStudentResp(final List<String> answerList, final String studentId, final String isAnswerCompleted, final String isCorrectCompleted) {
+        return studentsService.findStudentsBrief(studentId)
+                .flatMap(students -> {
+                    return Mono.just(new AnswerStudentResp(students.getId(), students.getName(), students.getPortrait(),
+                            answerList, isAnswerCompleted, isCorrectCompleted));
                 });
     }
 

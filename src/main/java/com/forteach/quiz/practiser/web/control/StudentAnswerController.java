@@ -74,9 +74,9 @@ public class StudentAnswerController {
             @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "form"),
-            @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "form"),
             @ApiImplicitParam(name = "classId", value = "班级id", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", paramType = "form"),
     })
     public Mono<WebResult> findAnswer(@RequestBody AnswerReq answerReq, ServerHttpRequest request){
         answerVerify.verify(answerReq);
