@@ -11,8 +11,12 @@ import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
 import com.forteach.quiz.interaction.execute.service.Key.SingleQueKey;
 import com.forteach.quiz.practiser.domain.AnswerLists;
 import com.forteach.quiz.practiser.domain.AskAnswerExercise;
-import com.forteach.quiz.practiser.web.req.*;
+import com.forteach.quiz.practiser.web.req.AddRewardReq;
+import com.forteach.quiz.practiser.web.req.AnswerReq;
+import com.forteach.quiz.practiser.web.req.FindAnswerStudentReq;
+import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
 import com.forteach.quiz.practiser.web.resp.AnswerStudentResp;
+import com.forteach.quiz.practiser.web.resp.AskAnswerExerciseResp;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.service.CorrectService;
@@ -588,5 +592,18 @@ public class ExerciseAnswerService {
                 .flatMapMany(Flux::fromIterable)
                 .map(BaseEntity::getId)
                 .collectList();
+    }
+
+    public Mono<List<AskAnswerExerciseResp>> findAnswerStudent(final AnswerReq answerReq) {
+        Criteria criteria = queryCriteria(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(),
+                answerReq.getPreview(), answerReq.getStudentId(), answerReq.getQuestionId(), answerReq.getClassId());
+
+        Query query = Query.query(criteria);
+        return reactiveMongoTemplate.find(query, AskAnswerExercise.class)
+                .collectList()
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(askAnswerExercise -> {
+                    return Mono.just(new AskAnswerExerciseResp(askAnswerExercise.getQuestionId(), askAnswerExercise.getAnswer(), askAnswerExercise.getFileList(), answerReq.getAnswerImageList()));
+                }).collectList();
     }
 }
