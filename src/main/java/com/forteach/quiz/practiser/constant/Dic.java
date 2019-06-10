@@ -28,6 +28,16 @@ public class Dic {
     public final static String IS_CORRECT_COMPLETED_N = "N";
 
     /**
+     * 是否奖励　是
+     */
+    public final static String IS_REWARD_Y = "Y";
+
+    /**
+     * 是否奖励否
+     */
+    public final static String IS_REWARD_N = "N";
+
+    /**
      * 班级学生信息前缀
      */
     public static final String CLASS_ROOM = "classRoom#";

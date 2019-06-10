@@ -3,10 +3,7 @@ package com.forteach.quiz.practiser.domain;
 import com.forteach.quiz.practiser.domain.base.AbstractAnswer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -22,6 +19,7 @@ import java.util.List;
 @Data
 @Document(collection = "answerLists")
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(value = "学生回答记录表", description = "学生作业回答信息记录表")
 public class AnswerLists extends AbstractAnswer {
@@ -37,4 +35,7 @@ public class AnswerLists extends AbstractAnswer {
 
     @ApiModelProperty(name = "correctQuestionIds", value = "批改的集合列表", dataType = "list")
     private List<String> correctQuestionIds;
+
+    @ApiModelProperty(name = "isReward", value = "是否奖励", dataType = "string")
+    private String isReward;
 }

@@ -29,4 +29,7 @@ public class FindAnswerStudentReq extends AbstractReq implements Serializable {
     @ApiModelProperty(name = "isCorrectCompleted", value = "是否批改完作业　Y/N", dataType = "string", required = true)
     private String isCorrectCompleted;
 
+    @ApiModelProperty(name = "isReward", value = "是否奖励", dataType = "string")
+    private String isReward;
+
 }
