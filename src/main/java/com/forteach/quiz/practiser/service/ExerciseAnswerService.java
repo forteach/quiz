@@ -174,23 +174,23 @@ public class ExerciseAnswerService {
 
         //判断答案是否正确
         return isReward.flatMap(is -> {
-            if (is){
+            if (is) {
                 return correctService.correcting(SingleQueKey.questionsNow(answerReq.getQuestionId()), answerReq.getQuestionId(), answerReq.getAnswer())
-                .flatMap(r -> {
-                    update.set("right", r);
-                    return reactiveMongoTemplate
-                            .upsert(query, update, AskAnswerExercise.class)
-                            .map(UpdateResult::wasAcknowledged)
-                            .filterWhen(b -> {
-                                if (!b) {
-                                    return Mono.just(false);
-                                } else {
-                                    //保存答题记录信息习题id
-                                    return updateAnswerLists(answerReq);
-                                }
-                            });
-                })
-                .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0010, "保存失败"));
+                        .flatMap(r -> {
+                            update.set("right", r);
+                            return reactiveMongoTemplate
+                                    .upsert(query, update, AskAnswerExercise.class)
+                                    .map(UpdateResult::wasAcknowledged)
+                                    .filterWhen(b -> {
+                                        if (!b) {
+                                            return Mono.just(false);
+                                        } else {
+                                            //保存答题记录信息习题id
+                                            return updateAnswerLists(answerReq);
+                                        }
+                                    });
+                        })
+                        .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0010, "保存失败"));
             }
             return MyAssert.isNull(null, DefineCode.ERR0010, "老师已经批改过不能回答了");
         });
@@ -203,9 +203,9 @@ public class ExerciseAnswerService {
                 .switchIfEmpty(Mono.just(new AnswerLists()))
                 .filter(Objects::nonNull)
                 .flatMap(AnswerLists -> {
-                    if (StrUtil.isBlank(AnswerLists.getIsReward())){
+                    if (StrUtil.isBlank(AnswerLists.getIsReward())) {
                         return Mono.just(true);
-                    }else if (IS_REWARD_Y.equals(AnswerLists.getIsReward())){
+                    } else if (IS_REWARD_Y.equals(AnswerLists.getIsReward())) {
                         return Mono.just(false);
                     }
                     return Mono.just(true);
@@ -471,13 +471,11 @@ public class ExerciseAnswerService {
 
 
     public Mono<List<AnswerStudentResp>> findAnswer(final FindAnswerStudentReq findAnswerStudentReq) {
+
         Criteria criteria = buildExerciseBook(findAnswerStudentReq.getExeBookType(), findAnswerStudentReq.getChapterId(), findAnswerStudentReq.getCourseId(), findAnswerStudentReq.getPreview(), findAnswerStudentReq.getClassId(), findAnswerStudentReq.getStudentId());
 
         if (StrUtil.isNotBlank(findAnswerStudentReq.getIsAnswerCompleted())) {
             criteria.and("isAnswerCompleted").is(findAnswerStudentReq.getIsAnswerCompleted());
-        }
-        if (StrUtil.isNotBlank(findAnswerStudentReq.getIsReward())){
-            criteria.and("isReward").is(findAnswerStudentReq.getIsReward());
         }
 
         if (IS_ANSWER_COMPLETED_N.equals(findAnswerStudentReq.getIsAnswerCompleted())) {
@@ -491,6 +489,11 @@ public class ExerciseAnswerService {
             if (StrUtil.isNotBlank(findAnswerStudentReq.getIsCorrectCompleted())) {
                 criteria.and("isCorrectCompleted").is(findAnswerStudentReq.getIsCorrectCompleted());
             }
+
+            if (StrUtil.isNotBlank(findAnswerStudentReq.getIsReward())) {
+                criteria.and("isReward").is(findAnswerStudentReq.getIsReward());
+            }
+
             Query query = Query.query(criteria);
             //查询回答完的记录
             return reactiveMongoTemplate.find(query, AnswerLists.class)
@@ -516,27 +519,44 @@ public class ExerciseAnswerService {
                         return Mono.just(tuple2.getT2().stream().filter(i -> !tuple2.getT1().contains(i)).collect(toList()));
                     })
                     .flatMap(questionIds -> {
-                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted());
+                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted(), answerLists.getIsReward());
                     });
         } else if (IS_CORRECT_COMPLETED_Y.equals(findAnswerStudentReq.getIsCorrectCompleted())) {
             Mono<List<String>> correctList = Mono.just(answerLists.getCorrectQuestionIds());
             return correctList
                     .flatMap(questionIds -> {
-                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted());
+                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted(), answerLists.getIsReward());
                     });
         } else {
-            return answerQuestionIds
-                    .flatMap(questionIds -> {
-                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted());
-                    });
+//            return answerQuestionIds
+//                    .flatMap(questionIds -> {
+//                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted(), answerLists.getIsReward());
+//                    });
+            return buildAnswerStudentResp(answerLists);
         }
     }
 
-    private Mono<AnswerStudentResp> findAnswerStudentResp(final List<String> answerList, final String studentId, final String isAnswerCompleted, final String isCorrectCompleted) {
+    private Mono<AnswerStudentResp> buildAnswerStudentResp(final AnswerLists answerLists){
+        return Mono.just(answerLists.getQuestions())
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(s -> {
+                    Criteria criteria = queryCriteria(answerLists.getExeBookType(), answerLists.getChapterId(), answerLists.getCourseId(), answerLists.getPreview(), answerLists.getStudentId(), s, answerLists.getClassId());
+                    return reactiveMongoTemplate.findOne(Query.query(criteria), AskAnswerExercise.class);
+                }).collectList()
+                .flatMap(askAnswerExercises -> {
+                    return studentsService.findStudentsBrief(answerLists.getStudentId())
+                            .flatMap(students -> {
+                                return Mono.just(new AnswerStudentResp(askAnswerExercises, answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted(), answerLists.getIsReward(),
+                                        students.getId(), students.getName(), students.getPortrait()));
+                            });
+                });
+    }
+
+    private Mono<AnswerStudentResp> findAnswerStudentResp(final List<String> answerList, final String studentId, final String isAnswerCompleted, final String isCorrectCompleted, final String isReward) {
         return studentsService.findStudentsBrief(studentId)
                 .flatMap(students -> {
                     return Mono.just(new AnswerStudentResp(students.getId(), students.getName(), students.getPortrait(),
-                            answerList, isAnswerCompleted, isCorrectCompleted));
+                            answerList, isAnswerCompleted, isCorrectCompleted, isReward));
                 });
     }
 
@@ -553,7 +573,8 @@ public class ExerciseAnswerService {
                     return studentsService.findStudentsBrief(answerList.getStudentId())
                             .flatMap(students -> {
                                 return Mono.just(new AnswerStudentResp(students.getId(), students.getName(), students.getPortrait(),
-                                        answerList.getQuestions(), answerList.getIsAnswerCompleted()));
+                                                answerList.getQuestions(), answerList.getIsAnswerCompleted(), answerList.getIsCorrectCompleted(), answerList.getIsReward())
+                                );
                             });
                 })
                 .collectList();

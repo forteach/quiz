@@ -1,5 +1,6 @@
 package com.forteach.quiz.practiser.domain.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.forteach.quiz.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -41,6 +42,7 @@ public abstract class AbstractAnswer extends BaseEntity {
      * 学生id
      */
     @Indexed
+    @JsonIgnore
     @ApiModelProperty(value = "学生id", name = "studentId", dataType = "string")
     private String studentId;
 }
