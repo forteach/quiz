@@ -19,6 +19,9 @@ public abstract class AbstractReq {
     @ApiModelProperty(name = "chapterId", value = "章节id", dataType = "string", required = true)
     private String chapterId;
 
+    @ApiModelProperty(name = "chapterName", value = "章节名称", dataType = "string")
+    private String chapterName;
+
     @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
     private String exeBookType;
 

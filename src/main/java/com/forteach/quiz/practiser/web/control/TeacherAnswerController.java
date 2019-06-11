@@ -32,7 +32,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @RestController
-@Api(value = "学生提交答案")
+@Api(value = "学生提交答案", tags = {"学生提交答案"}, description = "教师端查询、批改、奖励学生")
 @RequestMapping(path = "/teacherAnswer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class TeacherAnswerController {
 

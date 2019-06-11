@@ -29,6 +29,9 @@ public abstract class AbstractAnswer extends BaseEntity {
     @Indexed
     protected String chapterId;
 
+    @ApiModelProperty(name = "chapterName", value = "章节名称", dataType = "string")
+    private String chapterName;
+
     @ApiModelProperty(name = "classId", value = "班级id", dataType = "string")
     private String classId;
     /**

@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @RestController
-@Api(value = "学生提交答案")
+@Api(value = "学生提交答案", description = "学生回答提交作业练习答案接口", tags = {"学生提交答案"})
 @RequestMapping(path = "/studentAnswer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class StudentAnswerController {
 
@@ -50,6 +50,7 @@ public class StudentAnswerController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "chapterId", value = "章节id", dataType = "string", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "chapterName", value = "章节名称", dataType = "string", paramType = "chapterName"),
             @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "form"),
             @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "form"),
@@ -69,6 +70,7 @@ public class StudentAnswerController {
     }
 
 
+    @ApiOperation(value = "学生端查询自己回答")
     @PostMapping(path = "/findAnswer")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "courseId", value = "课程id", dataType = "string", required = true, paramType = "form"),

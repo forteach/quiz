@@ -117,7 +117,7 @@ public class ExerciseAnswerService {
         return criteria;
     }
 
-    private Update updateQuery(final String exeBookType, final String chapterId, final String courseId, final String preview, final String studentId, final String classId) {
+    private Update updateQuery(final String exeBookType, final String chapterId, final String courseId, final String preview, final String studentId, final String classId, final String chapterName) {
         // 修改答题记录
         Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
         if (StrUtil.isNotBlank(exeBookType)) {
@@ -137,6 +137,9 @@ public class ExerciseAnswerService {
         }
         if (StrUtil.isNotBlank(studentId)) {
             update.set("studentId", studentId);
+        }
+        if (StrUtil.isNotBlank(chapterName)){
+            update.set("chapterName", chapterName);
         }
         return update;
     }
@@ -159,7 +162,7 @@ public class ExerciseAnswerService {
 
         // 修改答题记录
         Update update = updateQuery(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(),
-                answerReq.getPreview(), answerReq.getStudentId(), answerReq.getClassId());
+                answerReq.getPreview(), answerReq.getStudentId(), answerReq.getClassId(), answerReq.getChapterName());
 
         if (StrUtil.isNotBlank(answerReq.getQuestionId())) {
             update.set("questionId", answerReq.getQuestionId());
@@ -223,7 +226,8 @@ public class ExerciseAnswerService {
         Query query = Query.query(criteria);
 
         // 修改答题记录
-        Update update = updateQuery(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(), answerReq.getPreview(), answerReq.getStudentId(), answerReq.getClassId());
+        Update update = updateQuery(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(),
+                answerReq.getPreview(), answerReq.getStudentId(), answerReq.getClassId(), answerReq.getChapterName());
 
         //保存回答记录
         if (StrUtil.isNotBlank(answerReq.getQuestionId())) {
@@ -518,7 +522,7 @@ public class ExerciseAnswerService {
                 .filter(Objects::nonNull)
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(s -> {
-                    Criteria criteria = queryCriteria(answerLists.getExeBookType(), answerLists.getChapterId(), answerLists.getCourseId(), answerLists.getPreview(), answerLists.getStudentId(), s, answerLists.getClassId());
+                    final Criteria criteria = queryCriteria(answerLists.getExeBookType(), answerLists.getChapterId(), answerLists.getCourseId(), answerLists.getPreview(), answerLists.getStudentId(), s, answerLists.getClassId());
                     return reactiveMongoTemplate.findOne(Query.query(criteria), AskAnswerExercise.class);
                 }).collectList()
                 .filter(Objects::nonNull)
