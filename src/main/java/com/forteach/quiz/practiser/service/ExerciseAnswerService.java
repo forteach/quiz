@@ -2,6 +2,9 @@ package com.forteach.quiz.practiser.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.BaseEntity;
@@ -19,16 +22,17 @@ import com.forteach.quiz.practiser.web.resp.AnswerStudentResp;
 import com.forteach.quiz.practiser.web.resp.AskAnswerExerciseResp;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
+import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.service.CorrectService;
 import com.forteach.quiz.service.StudentsService;
 import com.mongodb.client.result.UpdateResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.forteach.quiz.common.Dic.*;
+import static com.forteach.quiz.common.Dic.BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN;
 import static com.forteach.quiz.practiser.constant.Dic.*;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 import static java.util.stream.Collectors.toList;
@@ -49,25 +53,25 @@ import static java.util.stream.Collectors.toList;
  * @version: 1.0
  * @description:
  */
+@Slf4j
 @Service
 public class ExerciseAnswerService {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final ReactiveRedisTemplate reactiveRedisTemplate;
     private final CorrectService correctService;
     private final StudentsService studentsService;
     private final RewardService rewardService;
+    private final BigQuestionRepository bigQuestionRepository;
 
     @Autowired
     public ExerciseAnswerService(ReactiveMongoTemplate reactiveMongoTemplate,
-                                 ReactiveRedisTemplate reactiveRedisTemplate,
-                                 RewardService rewardService,
+                                 RewardService rewardService, BigQuestionRepository bigQuestionRepository,
                                  CorrectService correctService, StudentsService studentsService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.studentsService = studentsService;
         this.correctService = correctService;
         this.rewardService = rewardService;
-        this.reactiveRedisTemplate = reactiveRedisTemplate;
+        this.bigQuestionRepository = bigQuestionRepository;
     }
 
     /**
@@ -260,11 +264,7 @@ public class ExerciseAnswerService {
     }
 
     private Mono<Boolean> setIsCorrectCompleted(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
-
-        //todo 查询小题对应的类型
-        Mono<String> examType = Mono.just(QUESTION_CHOICE_OPTIONS_SINGLE);
-
-        return examType.flatMap(type -> {
+        return findExamType(questionId).flatMap(type -> {
             if (BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN.equals(type)) {
                 return Mono.just(true);
             } else {
@@ -273,42 +273,19 @@ public class ExerciseAnswerService {
         });
     }
 
-//    private Mono<String> getExamType(final String exeBookType, final String chapterId, final String courseId, final String questionId) {
-//        Criteria criteria = new Criteria();
-//
-//        if (isNotEmpty(exeBookType)) {
-//            criteria.and("exeBookType").in(Integer.parseInt(exeBookType));
-//        }
-//        if (isNotEmpty(chapterId)) {
-//            criteria.and("chapterId").in(chapterId);
-//        }
-//        if (isNotEmpty(courseId)) {
-//            criteria.and("courseId").in(courseId);
-//        }
-//        if (StrUtil.isNotBlank(questionId)){
-//            criteria.and("questionChildren._id").is(questionId);
-//        }
-//
-//        Query query = new Query(criteria);
-//        Mono<List<BigQuestion>> questionExamEntitylist = reactiveMongoTemplate
-//                .findOne(query, BigQuestionExerciseBook.class)
-//                .filter(Objects::nonNull)
-//                .map(BigQuestionExerciseBook::getQuestionChildren);
-//
-//        Mono<List<QuestionExamEntity>> examType =
-//        questionExamEntitylist
-//                .flatMapMany(Flux::fromIterable)
-//                .filter(Objects::nonNull)
-//                .filter(BigQuestion -> questionId.equals(BigQuestion.getId()))
-//                .map(BigQuestion::getExamChildren)
-//                .collect(toList());
-//
-//        return Mono.just(questionExamEntity)
-//                .filter(q -> questionId.equals(q.getId()))
-//                .map(QuestionExamEntity::getExamChildren)
-//                .flatMapMany();
-//
-//    }
+    /**
+     * 查找习题类型
+     * @param questionId
+     * @return
+     */
+    private Mono<String> findExamType(final String questionId){
+        return bigQuestionRepository.findById(questionId)
+                .flatMap(bigQuestion -> {
+                    final JSONObject json = JSON.parseObject(JSON.toJSONString(bigQuestion));
+                    log.debug("查找题类型 : questionId : [], bigQuestion : []", questionId, bigQuestion);
+                    return Mono.just(String.valueOf(JSONPath.eval(json, "$.examChildren[0].examType")));
+                });
+    }
 
     private Mono<Boolean> isCorrectCompleted(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId) {
 
@@ -509,7 +486,7 @@ public class ExerciseAnswerService {
 
     private Mono<AnswerStudentResp> findAnswerReply(final AnswerLists answerLists, final FindAnswerStudentReq findAnswerStudentReq) {
 
-        Mono<List<String>> answerQuestionIds = Mono.just(answerLists.getQuestions());
+//        Mono<List<String>> answerQuestionIds = Mono.just(answerLists.getQuestions());
         //查询所有题的集合
         if (IS_CORRECT_COMPLETED_N.equals(findAnswerStudentReq.getIsCorrectCompleted())) {
             Mono<List<String>> allQuestionIds = Mono.just(answerLists.getQuestions());
@@ -538,11 +515,13 @@ public class ExerciseAnswerService {
 
     private Mono<AnswerStudentResp> buildAnswerStudentResp(final AnswerLists answerLists){
         return Mono.just(answerLists.getQuestions())
+                .filter(Objects::nonNull)
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(s -> {
                     Criteria criteria = queryCriteria(answerLists.getExeBookType(), answerLists.getChapterId(), answerLists.getCourseId(), answerLists.getPreview(), answerLists.getStudentId(), s, answerLists.getClassId());
                     return reactiveMongoTemplate.findOne(Query.query(criteria), AskAnswerExercise.class);
                 }).collectList()
+                .filter(Objects::nonNull)
                 .flatMap(askAnswerExercises -> {
                     return studentsService.findStudentsBrief(answerLists.getStudentId())
                             .flatMap(students -> {
