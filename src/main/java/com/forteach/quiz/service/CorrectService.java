@@ -115,7 +115,7 @@ public class CorrectService {
      * @return
      */
     private boolean trueOrFalse(final TrueOrFalse trueOrFalse, final String answer) {
-        if (trueOrFalse.getTrueOrFalseAnsw().equals(Boolean.valueOf(answer))) {
+        if (trueOrFalse.getTrueOrFalseAnsw().equals("Y".equals(answer) ? true : false)) {
             return true;
         } else {
             return false;
