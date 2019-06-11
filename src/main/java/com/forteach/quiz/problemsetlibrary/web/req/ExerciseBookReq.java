@@ -1,8 +1,12 @@
 package com.forteach.quiz.problemsetlibrary.web.req;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * @Description:
@@ -12,7 +16,9 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class ExerciseBookReq {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExerciseBookReq implements Serializable {
 
 
     /**
