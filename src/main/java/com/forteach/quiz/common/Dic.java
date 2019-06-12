@@ -61,6 +61,10 @@ public class Dic {
 
     public static final String QUESTION_ACCURACY_HALFOF = "halfOf";
 
+    public static final String QUESTION_TRUE_OR_FALSE_Y = "Y";
+
+    public static final String QUESTION_TRUE_OR_FALSE_N = "N";
+
     public static final int COVER_QUESTION_BANK = 1;
 
     public static final int UN_COVER_QUESTION_BANK = 0;

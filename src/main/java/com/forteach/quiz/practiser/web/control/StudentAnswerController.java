@@ -4,14 +4,17 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.practiser.service.ExerciseAnswerService;
+import com.forteach.quiz.practiser.service.ExerciseBookSnapshotService;
 import com.forteach.quiz.practiser.web.req.AnswerReq;
 import com.forteach.quiz.practiser.web.req.verify.AnswerVerify;
+import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -37,12 +40,16 @@ public class StudentAnswerController {
     private final TokenService tokenService;
     private final AnswerVerify answerVerify;
     private final ExerciseAnswerService exerciseAnswerService;
+    private final ExerciseBookSnapshotService exerciseBookSnapshotService;
 
     @Autowired
-    public StudentAnswerController(ExerciseAnswerService exerciseAnswerService, TokenService tokenService, AnswerVerify answerVerify) {
+    public StudentAnswerController(ExerciseAnswerService exerciseAnswerService,
+                                   ExerciseBookSnapshotService exerciseBookSnapshotService,
+                                   TokenService tokenService, AnswerVerify answerVerify) {
         this.tokenService = tokenService;
         this.answerVerify = answerVerify;
         this.exerciseAnswerService = exerciseAnswerService;
+        this.exerciseBookSnapshotService = exerciseBookSnapshotService;
     }
 
     @ApiOperation(value = "学生回答作业", notes = "学生端学生提交答案")
@@ -64,8 +71,11 @@ public class StudentAnswerController {
         MyAssert.isNull(answerReq.getQuestionId(), DefineCode.ERR0010, "题目id不为空");
         MyAssert.isNull(answerReq.getAnswer(), DefineCode.ERR0010, "答案不为空");
         answerReq.setStudentId(tokenService.getStudentId(request));
-        return exerciseAnswerService
-                .saveAnswer(answerReq)
+//        return exerciseAnswerService
+//                .saveAnswer(answerReq)
+        AnswerVo answerVo = new AnswerVo();
+        BeanUtils.copyProperties(answerReq, answerVo);
+        return exerciseBookSnapshotService.saveSnapshot(answerVo, answerReq)
                 .map(WebResult::okResult);
     }
 

@@ -220,7 +220,7 @@ public class ExerciseAnswerService {
     }
 
 
-    private Mono<Boolean> updateAnswerLists(final AnswerReq answerReq) {
+    Mono<Boolean> updateAnswerLists(final AnswerReq answerReq) {
         Criteria criteria = buildExerciseBook(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(), answerReq.getPreview(), answerReq.getClassId(), answerReq.getStudentId());
 
         Query query = Query.query(criteria);
@@ -267,7 +267,7 @@ public class ExerciseAnswerService {
                 });
     }
 
-    private Mono<Boolean> setIsCorrectCompleted(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
+    Mono<Boolean> setIsCorrectCompleted(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
         return findExamType(questionId).flatMap(type -> {
             if (BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN.equals(type)) {
                 return Mono.just(true);
@@ -348,7 +348,7 @@ public class ExerciseAnswerService {
                 .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0010, "保存失败"));
     }
 
-    private Mono<Boolean> addCorrect(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
+    Mono<Boolean> addCorrect(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId, final String questionId) {
         //设置查询条件
         Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId, preview, classId, studentId);
 
@@ -509,10 +509,6 @@ public class ExerciseAnswerService {
                         return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted(), answerLists.getIsReward());
                     });
         } else {
-//            return answerQuestionIds
-//                    .flatMap(questionIds -> {
-//                        return findAnswerStudentResp(questionIds, answerLists.getStudentId(), answerLists.getIsAnswerCompleted(), answerLists.getIsCorrectCompleted(), answerLists.getIsReward());
-//                    });
             return buildAnswerStudentResp(answerLists);
         }
     }

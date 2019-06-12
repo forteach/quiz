@@ -4,8 +4,10 @@ import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
 import com.forteach.quiz.practiser.web.req.base.AbstractReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
  * @description:
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel(value = "回答记录")
 @EqualsAndHashCode(callSuper = true)
 public class AnswerReq extends AbstractReq implements Serializable {

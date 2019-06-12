@@ -2,6 +2,7 @@ package com.forteach.quiz.practiser.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
@@ -23,66 +24,63 @@ public class BaseExerciseAnswerService {
     /**
      * 设置查询条件
      *
-     * @param exeBookType
-     * @param chapterId
-     * @param courseId
      * @return
      */
-     Criteria buildExerciseBook(final String exeBookType, final String chapterId, final String courseId, final String preview, final String classId, final String studentId) {
+     Criteria buildExerciseBook(final AnswerVo answerVo) {
 
         Criteria criteria = new Criteria();
 
-        if (StrUtil.isNotBlank(exeBookType)) {
-            criteria.and("exeBookType").is(exeBookType);
+        if (StrUtil.isNotBlank(answerVo.getExeBookType())) {
+            criteria.and("exeBookType").in(answerVo.getExeBookType());
         }
-        if (StrUtil.isNotBlank(chapterId)) {
-            criteria.and("chapterId").is(chapterId);
+        if (StrUtil.isNotBlank(answerVo.getChapterId())) {
+            criteria.and("chapterId").in(answerVo.getChapterId());
         }
-        if (StrUtil.isNotBlank(courseId)) {
-            criteria.and("courseId").is(courseId);
+        if (StrUtil.isNotBlank(answerVo.getCourseId())) {
+            criteria.and("courseId").in(answerVo.getCourseId());
         }
-        if (StrUtil.isNotBlank(preview)) {
-            criteria.and("preview").is(preview);
+        if (StrUtil.isNotBlank(answerVo.getPreview())) {
+            criteria.and("preview").in(answerVo.getPreview());
         }
-        if (StrUtil.isNotBlank(classId)) {
-            criteria.and("classId").is(classId);
+        if (StrUtil.isNotBlank(answerVo.getClassId())) {
+            criteria.and("classId").in(answerVo.getClassId());
         }
-        if (StrUtil.isNotBlank(studentId)) {
-            criteria.and("studentId").is(studentId);
+        if (StrUtil.isNotBlank(answerVo.getStudentId())) {
+            criteria.and("studentId").in(answerVo.getStudentId());
         }
         return criteria;
     }
 
-     Criteria queryCriteria(final String exeBookType, final String chapterId, final String courseId, final String preview, final String studentId, final String questionId, final String classId) {
+     Criteria queryCriteria(final AnswerVo answerVo, final String questionId) {
         //设置查询条件
-        Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId, preview, classId, studentId);
+        Criteria criteria = buildExerciseBook(answerVo);
 
         if (StrUtil.isNotBlank(questionId)) {
-            criteria.and("questionId").is(questionId);
+            criteria.and("questionId").in(questionId);
         }
         return criteria;
     }
 
-     Update updateQuery(final String exeBookType, final String chapterId, final String courseId, final String preview, final String studentId, final String classId) {
+     Update updateQuery(final AnswerVo answerVo) {
         // 修改答题记录
         Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
-        if (StrUtil.isNotBlank(exeBookType)) {
-            update.set("exeBookType", exeBookType);
+        if (StrUtil.isNotBlank(answerVo.getExeBookType())) {
+            update.set("exeBookType", answerVo.getExeBookType());
         }
-        if (StrUtil.isNotBlank(chapterId)) {
-            update.set("chapterId", chapterId);
+        if (StrUtil.isNotBlank(answerVo.getChapterId())) {
+            update.set("chapterId", answerVo.getChapterId());
         }
-        if (StrUtil.isNotBlank(courseId)) {
-            update.set("courseId", courseId);
+        if (StrUtil.isNotBlank(answerVo.getCourseId())) {
+            update.set("courseId", answerVo.getCourseId());
         }
-        if (StrUtil.isNotBlank(preview)) {
-            update.set("preview", preview);
+        if (StrUtil.isNotBlank(answerVo.getPreview())) {
+            update.set("preview", answerVo.getPreview());
         }
-        if (StrUtil.isNotBlank(classId)) {
-            update.set("classId", classId);
+        if (StrUtil.isNotBlank(answerVo.getClassId())) {
+            update.set("classId", answerVo.getClassId());
         }
-        if (StrUtil.isNotBlank(studentId)) {
-            update.set("studentId", studentId);
+        if (StrUtil.isNotBlank(answerVo.getStudentId())) {
+            update.set("studentId", answerVo.getStudentId());
         }
         return update;
     }
