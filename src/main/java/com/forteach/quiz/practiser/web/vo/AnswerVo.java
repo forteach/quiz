@@ -18,5 +18,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AnswerVo {
 
-    private String exeBookType, chapterId, courseId, preview, classId, studentId;
+    private String exeBookType, chapterId, chapterName, courseId, preview, classId, studentId;
 }

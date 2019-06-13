@@ -3,6 +3,7 @@ package com.forteach.quiz.practiser.service;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.practiser.web.vo.AnswerVo;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
 /**
  * @author: zhangyy
@@ -31,22 +34,22 @@ public class BaseExerciseAnswerService {
         Criteria criteria = new Criteria();
 
         if (StrUtil.isNotBlank(answerVo.getExeBookType())) {
-            criteria.and("exeBookType").in(answerVo.getExeBookType());
+            criteria.and("exeBookType").is(answerVo.getExeBookType());
         }
         if (StrUtil.isNotBlank(answerVo.getChapterId())) {
-            criteria.and("chapterId").in(answerVo.getChapterId());
+            criteria.and("chapterId").is(answerVo.getChapterId());
         }
         if (StrUtil.isNotBlank(answerVo.getCourseId())) {
-            criteria.and("courseId").in(answerVo.getCourseId());
+            criteria.and("courseId").is(answerVo.getCourseId());
         }
         if (StrUtil.isNotBlank(answerVo.getPreview())) {
-            criteria.and("preview").in(answerVo.getPreview());
+            criteria.and("preview").is(answerVo.getPreview());
         }
         if (StrUtil.isNotBlank(answerVo.getClassId())) {
-            criteria.and("classId").in(answerVo.getClassId());
+            criteria.and("classId").is(answerVo.getClassId());
         }
         if (StrUtil.isNotBlank(answerVo.getStudentId())) {
-            criteria.and("studentId").in(answerVo.getStudentId());
+            criteria.and("studentId").is(answerVo.getStudentId());
         }
         return criteria;
     }
@@ -56,7 +59,7 @@ public class BaseExerciseAnswerService {
         Criteria criteria = buildExerciseBook(answerVo);
 
         if (StrUtil.isNotBlank(questionId)) {
-            criteria.and("questionId").in(questionId);
+            criteria.and("bigQuestionExerciseBook.questionChildren.".concat(MONGDB_ID)).is(new ObjectId(questionId));
         }
         return criteria;
     }

@@ -4,16 +4,19 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.practiser.service.ExerciseAnswerService;
+import com.forteach.quiz.practiser.service.ExerciseBookSnapshotService;
 import com.forteach.quiz.practiser.web.req.AddRewardReq;
 import com.forteach.quiz.practiser.web.req.FindAnswerStudentReq;
 import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
 import com.forteach.quiz.practiser.web.req.verify.AnswerVerify;
+import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import com.forteach.quiz.service.TokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -39,12 +42,16 @@ public class TeacherAnswerController {
     private final TokenService tokenService;
     private final AnswerVerify answerVerify;
     private final ExerciseAnswerService exerciseAnswerService;
+    private final ExerciseBookSnapshotService exerciseBookSnapshotService;
 
     @Autowired
-    public TeacherAnswerController(ExerciseAnswerService exerciseAnswerService, AnswerVerify answerVerify, TokenService tokenService) {
+    public TeacherAnswerController(ExerciseAnswerService exerciseAnswerService,
+                                   ExerciseBookSnapshotService exerciseBookSnapshotService,
+                                   AnswerVerify answerVerify, TokenService tokenService) {
         this.exerciseAnswerService = exerciseAnswerService;
         this.tokenService = tokenService;
         this.answerVerify = answerVerify;
+        this.exerciseBookSnapshotService = exerciseBookSnapshotService;
     }
 
     @ApiOperation(value = "老师批改作业、习题、练习册", notes = "老师批改学生的主观题并给出相应的评价　习题、提问册、练习册、作业册")
@@ -64,7 +71,11 @@ public class TeacherAnswerController {
         MyAssert.isNull(gradeAnswerReq.getStudentId(), DefineCode.ERR0010, "要批改的学生id不为空");
         MyAssert.isNull(gradeAnswerReq.getEvaluation(), DefineCode.ERR0010, "老师评价不为空");
         tokenService.getTeacherId(request).ifPresent(gradeAnswerReq::setTeacherId);
-        return exerciseAnswerService.gradeAnswer(gradeAnswerReq).map(WebResult::okResult);
+        AnswerVo answerVo = new AnswerVo();
+        BeanUtils.copyProperties(gradeAnswerReq, answerVo);
+//        return exerciseAnswerService.gradeAnswer(gradeAnswerReq)
+        return exerciseBookSnapshotService.gradeAnswer(gradeAnswerReq, answerVo)
+                .map(WebResult::okResult);
     }
 
 
@@ -84,7 +95,9 @@ public class TeacherAnswerController {
     public Mono<WebResult> findAnswer(@RequestBody FindAnswerStudentReq findAnswerStudentReq){
         answerVerify.verify(findAnswerStudentReq);
         MyAssert.isNull(findAnswerStudentReq.getIsAnswerCompleted(), DefineCode.ERR0010, "是否回答完作业不为空");
-        return exerciseAnswerService.findAnswer(findAnswerStudentReq).map(WebResult::okResult);
+//        return exerciseAnswerService.findAnswer(findAnswerStudentReq)
+        return exerciseBookSnapshotService.findAnswer(findAnswerStudentReq)
+                .map(WebResult::okResult);
     }
 
 
