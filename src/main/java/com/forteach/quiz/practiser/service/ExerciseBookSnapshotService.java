@@ -76,12 +76,14 @@ public class ExerciseBookSnapshotService {
     }
 
     /**
-     * 作业练习回答记录步骤 1、查询是否保存有快照 exerciseAnswerQuestionBook
-     *                      1> 有快照直接查询出对应的习题、作业信息
-     *                      2> 没有保存快照，直接拉取快照保存后， 将拉取的信息返回 bigQuestionexerciseBook
-     * 　　　　　　　　　　 2、比对回答信息，客观题直接进行批改，主观题只记录回答情况，等候教师批改
-     * 　　　　　　　　　　 3、将客观题批改过的记录下 questions
-     *                   4、判断是否批改完成　并修改对应的字段值 isAnswerCompleted Y/N
+     * 作业练习回答记录步骤
+     * 1、查询是否保存有快照 exerciseAnswerQuestionBook
+     * 1) 有快照直接查询出对应的习题、作业信息
+     * 2) 没有保存快照，直接拉取快照保存后， 将拉取的信息返回 bigQuestionexerciseBook
+     * 2、比对回答信息，客观题直接进行批改，主观题只记录回答情况，等候教师批改
+     * 3、将客观题批改过的记录下 questions
+     * 4、判断是否批改完成　并修改对应的字段值 isAnswerCompleted Y/N
+     *
      * @param answerVo
      * @param answerReq
      * @return
@@ -130,11 +132,11 @@ public class ExerciseBookSnapshotService {
                             }
                         });
             }
-            return MyAssert.isNull(null, DefineCode.ERR0010, "老师已经批改过不能回答了");
+            return MyAssert.isNull(null, DefineCode.ERR0011, "老师已经批改过不能回答了");
         });
     }
 
-    private Mono<Boolean> saveAnswer(final AnswerVo answerVo, final AnswerReq answerReq, final Query query, Update update){
+    private Mono<Boolean> saveAnswer(final AnswerVo answerVo, final AnswerReq answerReq, final Query query, Update update) {
         return judgedResult(answerVo, answerReq.getQuestionId(), answerReq.getAnswer())
                 .flatMap(r -> {
                     update.set("bigQuestionExerciseBook.questionChildren.$.examChildren.0.right", r);
@@ -162,7 +164,7 @@ public class ExerciseBookSnapshotService {
         Criteria criteria = baseExerciseAnswerService.buildExerciseBook(answerVo);
 
         // 查找题目类型
-        Mono<List<QuestionExamEntity>> bigQuestionVos  = reactiveMongoTemplate.findOne(Query.query(criteria), ExerciseAnswerQuestionBook.class)
+        Mono<List<QuestionExamEntity>> bigQuestionVos = reactiveMongoTemplate.findOne(Query.query(criteria), ExerciseAnswerQuestionBook.class)
                 .filter(Objects::nonNull)
                 .map(ExerciseAnswerQuestionBook::getBigQuestionExerciseBook)
                 .map(BigQuestionExerciseBook::getQuestionChildren);
@@ -177,23 +179,12 @@ public class ExerciseBookSnapshotService {
                 });
     }
 
-
-//    Mono<Boolean> setCorrectCompleted(final String exeBookType, final String chapterId, final String courseId,
-//                                      final String preview,
-//                                      final String classId, final String studentId, final String questionId, final String examType) {
-//        return Mono.just(examType).flatMap(type -> {
-//            if (BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN.equals(type)) {
-//                return Mono.just(true);
-//            } else {
-//                return exerciseAnswerService.addCorrect(exeBookType, chapterId, courseId, preview, classId, studentId, questionId);
-//            }
-//        });
-//    }
-
     /**
-     * 批改步骤 1、将批改内容添加进答题批改记录表快照 exerciseAnswerQuestionBook
-     *         2、将批改记录保存到记录表 answerLists correctQuestionIds
-     *         3、判断批改完成，修改批改完成字段 isCorrectCompleted　'N' 改为　'Y'
+     * 批改步骤
+     * 1、将批改内容添加进答题批改记录表快照 exerciseAnswerQuestionBook
+     * 2、将批改记录保存到记录表 answerLists correctQuestionIds
+     * 3、判断批改完成，修改批改完成字段 isCorrectCompleted　'N' 改为　'Y'
+     *
      * @param gradeAnswerReq
      * @param answerVo
      * @return
@@ -259,6 +250,7 @@ public class ExerciseBookSnapshotService {
             }
 
             Query query = Query.query(criteria);
+
             //查询回答完的记录
             return reactiveMongoTemplate.find(query, AnswerLists.class)
                     .collectList()
@@ -273,7 +265,7 @@ public class ExerciseBookSnapshotService {
         }
     }
 
-    private Mono<List<AnswerResp>> findAnswerRespList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks){
+    private Mono<List<AnswerResp>> findAnswerRespList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
         Set<String> studentIds = new HashSet<>();
         exerciseAnswerQuestionBooks.parallelStream()
                 .forEach(exerciseAnswerQuestionBook -> studentIds.add(exerciseAnswerQuestionBook.getStudentId()));
@@ -284,7 +276,7 @@ public class ExerciseBookSnapshotService {
                     AnswerResp answerResp = new AnswerResp();
                     List<ExerciseAnswerQuestionBook> list = new ArrayList<>();
                     BeanUtils.copyProperties(exerciseAnswerQuestionBook, answerResp);
-                    if (answerResp.getStudentId().equals(exerciseAnswerQuestionBook.getStudentId())){
+                    if (answerResp.getStudentId().equals(exerciseAnswerQuestionBook.getStudentId())) {
                         return studentsService.findStudentsBrief(exerciseAnswerQuestionBook.getStudentId())
                                 .flatMap(students -> {
                                     answerResp.setPortrait(students.getPortrait());
@@ -300,7 +292,7 @@ public class ExerciseBookSnapshotService {
     }
 
 
-    private Mono<ExerciseAnswerQuestionBook> findExerciseAnswerQuestionBook(final AnswerLists answerLists){
+    private Mono<ExerciseAnswerQuestionBook> findExerciseAnswerQuestionBook(final AnswerLists answerLists) {
 
         final Criteria criteria = exerciseAnswerService.buildExerciseBook(answerLists.getExeBookType(),
                 answerLists.getChapterId(), answerLists.getCourseId(),
