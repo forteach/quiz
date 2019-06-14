@@ -73,7 +73,6 @@ public class TeacherAnswerController {
         tokenService.getTeacherId(request).ifPresent(gradeAnswerReq::setTeacherId);
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(gradeAnswerReq, answerVo);
-//        return exerciseAnswerService.gradeAnswer(gradeAnswerReq)
         return exerciseBookSnapshotService.gradeAnswer(gradeAnswerReq, answerVo)
                 .map(WebResult::okResult);
     }
@@ -95,7 +94,6 @@ public class TeacherAnswerController {
     public Mono<WebResult> findAnswer(@RequestBody FindAnswerStudentReq findAnswerStudentReq){
         answerVerify.verify(findAnswerStudentReq);
         MyAssert.isNull(findAnswerStudentReq.getIsAnswerCompleted(), DefineCode.ERR0010, "是否回答完作业不为空");
-//        return exerciseAnswerService.findAnswer(findAnswerStudentReq)
         return exerciseBookSnapshotService.findAnswer(findAnswerStudentReq)
                 .map(WebResult::okResult);
     }

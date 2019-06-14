@@ -71,8 +71,6 @@ public class StudentAnswerController {
         MyAssert.isNull(answerReq.getQuestionId(), DefineCode.ERR0010, "题目id不为空");
         MyAssert.isNull(answerReq.getAnswer(), DefineCode.ERR0010, "答案不为空");
         answerReq.setStudentId(tokenService.getStudentId(request));
-//        return exerciseAnswerService
-//                .saveAnswer(answerReq)
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerReq, answerVo);
         return exerciseBookSnapshotService.saveSnapshot(answerVo, answerReq)

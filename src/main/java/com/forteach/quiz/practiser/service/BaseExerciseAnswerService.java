@@ -7,10 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.Date;
-import java.util.List;
 
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
 
@@ -86,23 +84,5 @@ public class BaseExerciseAnswerService {
             update.set("studentId", answerVo.getStudentId());
         }
         return update;
-    }
-
-    /**
-     * 判断是否回答完成
-     *
-     * @return
-     */
-     Mono<String> isCompletedSuccess(final List<String> answerQuestionIds, final List<String> questionIds) {
-        if (answerQuestionIds.size() != questionIds.size()) {
-            return Mono.just("N");
-        } else {
-            for (String questionId : questionIds) {
-                if (!answerQuestionIds.contains(questionId)) {
-                    return Mono.just("N");
-                }
-            }
-            return Mono.just("Y");
-        }
     }
 }
