@@ -12,10 +12,9 @@ import com.forteach.quiz.evaluate.domain.QuestionExerciseReward;
 import com.forteach.quiz.evaluate.service.RewardService;
 import com.forteach.quiz.evaluate.web.control.res.CumulativeRes;
 import com.forteach.quiz.practiser.domain.AnswerLists;
-import com.forteach.quiz.practiser.domain.AskAnswerExercise;
+import com.forteach.quiz.practiser.domain.ExerciseAnswerQuestionBook;
 import com.forteach.quiz.practiser.web.req.AddRewardReq;
 import com.forteach.quiz.practiser.web.req.AnswerReq;
-import com.forteach.quiz.practiser.web.resp.AskAnswerExerciseResp;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
@@ -395,16 +394,17 @@ public class ExerciseAnswerService {
                 .collectList();
     }
 
-    public Mono<List<AskAnswerExerciseResp>> findAnswerStudent(final AnswerReq answerReq) {
-        Criteria criteria = queryCriteria(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(),
-                answerReq.getPreview(), answerReq.getStudentId(), answerReq.getQuestionId(), answerReq.getClassId());
+    public Mono<BigQuestionExerciseBook> findAnswerStudent(final AnswerReq answerReq) {
+        Criteria criteria = buildExerciseBook(answerReq.getExeBookType(), answerReq.getChapterId(), answerReq.getCourseId(),
+                answerReq.getPreview(), answerReq.getClassId(), answerReq.getStudentId());
 
-        return reactiveMongoTemplate.find(Query.query(criteria), AskAnswerExercise.class)
-                .collectList()
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(askAnswerExercise -> {
-                    return Mono.just(new AskAnswerExerciseResp(askAnswerExercise.getQuestionId(),
-                            askAnswerExercise.getAnswer(), askAnswerExercise.getFileList(), answerReq.getAnswerImageList()));
-                }).collectList();
+
+        Query query = Query.query(criteria);
+        // todo 返回的有答题与否和答案需要过滤
+        query.fields().include("bigQuestionExerciseBook");
+
+        return reactiveMongoTemplate.findOne(query, ExerciseAnswerQuestionBook.class)
+                .switchIfEmpty(Mono.just(new ExerciseAnswerQuestionBook()))
+                .map(ExerciseAnswerQuestionBook::getBigQuestionExerciseBook);
     }
 }
