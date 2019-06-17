@@ -17,6 +17,7 @@ import com.forteach.quiz.practiser.web.req.AddRewardReq;
 import com.forteach.quiz.practiser.web.req.AnswerReq;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
+import com.forteach.quiz.problemsetlibrary.service.BigQuestionExerciseBookService;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
@@ -53,13 +54,16 @@ public class ExerciseAnswerService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final RewardService rewardService;
     private final BigQuestionRepository bigQuestionRepository;
+    private final BigQuestionExerciseBookService bigQuestionExerciseBookService;
 
     @Autowired
     public ExerciseAnswerService(ReactiveMongoTemplate reactiveMongoTemplate,
+                                 BigQuestionExerciseBookService bigQuestionExerciseBookService,
                                  RewardService rewardService, BigQuestionRepository bigQuestionRepository) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.rewardService = rewardService;
         this.bigQuestionRepository = bigQuestionRepository;
+        this.bigQuestionExerciseBookService = bigQuestionExerciseBookService;
     }
 
     /**
@@ -405,6 +409,13 @@ public class ExerciseAnswerService {
 
         return reactiveMongoTemplate.findOne(query, ExerciseAnswerQuestionBook.class)
                 .switchIfEmpty(Mono.just(new ExerciseAnswerQuestionBook()))
-                .map(ExerciseAnswerQuestionBook::getBigQuestionExerciseBook);
+                .flatMap(exerciseAnswerQuestionBook -> {
+                    if (exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null){
+                        return bigQuestionExerciseBookService.findExerciseBook(answerReq.getChapterId(), answerReq.getCourseId());
+                    }else {
+                        return Mono.just(exerciseAnswerQuestionBook.getBigQuestionExerciseBook());
+                    }
+                });
+
     }
 }

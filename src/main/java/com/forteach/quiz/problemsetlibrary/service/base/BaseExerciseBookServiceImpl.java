@@ -122,7 +122,7 @@ public abstract class BaseExerciseBookServiceImpl<T extends ExerciseBook, R exte
     /**
      * 查找需要挂接的课堂链接册
      */
-    private Mono<T> findExerciseBook(final String chapterId, final String courseId) {
+    public Mono<T> findExerciseBook(final String chapterId, final String courseId) {
 
         final Criteria criteria = buildExerciseBook(chapterId, courseId);
 
