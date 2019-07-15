@@ -316,19 +316,19 @@ public class ExerciseAnswerService {
      * @param addRewardReq
      * @return
      */
-    public Mono<String> addReward(final AddRewardReq addRewardReq) {
-        Criteria criteria = buildExerciseBook(addRewardReq.getExeBookType(), addRewardReq.getChapterId(),
-                addRewardReq.getCourseId(), addRewardReq.getPreview(), addRewardReq.getClassId(), addRewardReq.getStudentId());
-        return reactiveMongoTemplate.findOne(Query.query(criteria), QuestionExerciseReward.class)
-                .switchIfEmpty(Mono.just(new QuestionExerciseReward()))
-                .flatMap(questionExerciseReward -> {
-                    if (StrUtil.isNotEmpty(questionExerciseReward.getNum())) {
-                        MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了");
-                    }
-                    return saveReward(addRewardReq);
-                });
-
-    }
+//    public Mono<String> addReward(final AddRewardReq addRewardReq) {
+//        Criteria criteria = buildExerciseBook(addRewardReq.getExeBookType(), addRewardReq.getChapterId(),
+//                addRewardReq.getCourseId(), addRewardReq.getPreview(), addRewardReq.getClassId(), addRewardReq.getStudentId());
+//        return reactiveMongoTemplate.findOne(Query.query(criteria), QuestionExerciseReward.class)
+//                .switchIfEmpty(Mono.just(new QuestionExerciseReward()))
+//                .flatMap(questionExerciseReward -> {
+//                    if (StrUtil.isNotEmpty(questionExerciseReward.getNum())) {
+//                        MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了");
+//                    }
+//                    return saveReward(addRewardReq);
+//                });
+//
+//    }
 
     /**
      * 记录奖励
@@ -336,7 +336,7 @@ public class ExerciseAnswerService {
      * @param addRewardReq
      * @return
      */
-    private Mono<String> saveReward(final AddRewardReq addRewardReq) {
+    public Mono<String> saveReward(final AddRewardReq addRewardReq) {
         QuestionExerciseReward questionExerciseReward = new QuestionExerciseReward();
         BeanUtils.copyProperties(addRewardReq, questionExerciseReward);
         return rewardService.cumulativeResMono(addRewardReq.getQuestionId(), addRewardReq.getStudentId(), Integer.valueOf(addRewardReq.getNum()))

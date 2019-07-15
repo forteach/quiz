@@ -115,7 +115,7 @@ public class TeacherAnswerController {
         answerVerify.verify(addRewardReq);
         MyAssert.isNull(addRewardReq.getNum(), DefineCode.ERR0010, "奖励数量不为空");
         tokenService.getTeacherId(serverHttpRequest).ifPresent(addRewardReq::setTeacherId);
-        return exerciseAnswerService.addReward(addRewardReq).map(WebResult::okResult);
+        return exerciseAnswerService.saveReward(addRewardReq).map(WebResult::okResult);
     }
 
 }
