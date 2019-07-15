@@ -1,5 +1,7 @@
 package com.forteach.quiz.domain;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -20,6 +22,6 @@ public abstract class BaseEntity implements Serializable {
     protected String id;
 
     @ApiModelProperty(value = "更新时间", name = "uDate", example = "1543950907881", notes = "时间戳")
-    protected String uDate;
+    protected String uDate = StrUtil.isBlank(this.getUDate()) ? DateUtil.now() : this.getUDate();
 
 }

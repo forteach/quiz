@@ -1,5 +1,8 @@
 package com.forteach.quiz.problemsetlibrary.service;
 
+import cn.hutool.core.date.DateUtil;
+import com.forteach.quiz.common.DefineCode;
+import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
@@ -13,6 +16,7 @@ import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -130,13 +134,15 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
      * @param changeVo
      * @return
      */
-    public Mono<UpdateResult> editPreview(final PreviewChangeVo changeVo) {
+    public Mono<Boolean> editPreview(final PreviewChangeVo changeVo) {
 
         final Criteria criteria = buildExerciseBook(EXE_BOOKTYPE_PREVIEW, changeVo.getChapterId(), changeVo.getCourseId())
-                .and("questionChildren." + MONGDB_ID).is(changeVo.getTargetId());
+                .and("questionChildren." + MONGDB_ID).is(new ObjectId(changeVo.getTargetId()));
         Update update = Update.update("questionChildren.$.preview", changeVo.getPreview());
+        update.set("uDate", DateUtil.now());
 
-        return template.updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class);
+        return template.updateMulti(Query.query(criteria), update, BigQuestionExerciseBook.class)
+                .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0013, "修改失败"));
     }
 
     /**
