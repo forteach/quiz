@@ -57,7 +57,6 @@ public class RewardService {
         .inc("amount", addNum);
 
         //没有记录小红花明细
-
         return add
                 .flatMap(num->Mono.just(new CumulativeRes(circleId,sutdentId,num,RewardKey.REWARD_FLOWER_KEY)))
                .filterWhen(num->reactiveMongoTemplate.upsert(query, update, Reward.class).flatMap(r->Mono.just(r.wasAcknowledged())));
@@ -91,12 +90,12 @@ public class RewardService {
      */
     private Mono<String> redisFlowerAdd(final  String circleId,final String sutdentId, final int amount){
         //当前课堂的奖励MAP
-        String  key=RewardKey.rewardAddKey(circleId,RewardKey.REWARD_FLOWER_KEY);
+        final String key=RewardKey.rewardAddKey(circleId,RewardKey.REWARD_FLOWER_KEY);
         return reactiveHashOperations.hasKey(key,sutdentId).flatMap(r-> {
             if(r) {
-                return stringRedisTemplate.opsForValue().get(key)
-                        .flatMap(num->Mono.just(String.valueOf(Integer.parseInt(num)+amount)))
-                        .filterWhen(num->reactiveHashOperations.put(key,sutdentId, String.valueOf(Integer.parseInt(num)+amount)));
+                return reactiveHashOperations.get(key, sutdentId)
+                        .map(num -> String.valueOf(Integer.parseInt(num)+amount))
+                        .flatMap(num -> reactiveHashOperations.put(key, sutdentId, num).flatMap(b -> Mono.just(num)));
             }else{
                 return Mono.just(String.valueOf(amount))
                 .filterWhen(num->reactiveHashOperations.put(key,sutdentId, num))
@@ -104,8 +103,6 @@ public class RewardService {
             }
                 }
         );
-
-
     }
 
 }
