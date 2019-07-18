@@ -12,12 +12,14 @@ import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceI
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
+import com.forteach.quiz.problemsetlibrary.web.vo.UnwindedBigQuestionexerciseBook;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
 import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -26,10 +28,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.EXE_BOOKTYPE_PREVIEW;
@@ -115,10 +114,16 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
                 unwind("questionChildren"),
                 match(criteria)
         );
-        return template.aggregate(agg, "bigQuestionexerciseBook", BigQuestionExerciseBook.class)
-                .log(">>>>>>>>>>>>> ")
-                .last()
-                .log("##########")
+        return template.aggregate(agg, "bigQuestionexerciseBook", UnwindedBigQuestionexerciseBook.class)
+                .next()
+                .flatMap(unwindedBigQuestionexerciseBook -> {
+                    BigQuestionExerciseBook bigQuestionExerciseBook = new BigQuestionExerciseBook();
+                    BeanUtils.copyProperties(unwindedBigQuestionexerciseBook, bigQuestionExerciseBook);
+                    List list = new ArrayList();
+                    list.add(unwindedBigQuestionexerciseBook.getQuestionChildren());
+                    bigQuestionExerciseBook.setQuestionChildren(list);
+                    return Mono.just(bigQuestionExerciseBook);
+                })
                 .defaultIfEmpty(new BigQuestionExerciseBook());
     }
 
