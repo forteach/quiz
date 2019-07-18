@@ -22,9 +22,9 @@ public class ExerciseBookReq implements Serializable {
 
 
     /**
-     * 挂接的课堂练习题：1、预习练习册 2、课堂练习册3、课后作业册
+     * 挂接的课堂练习题：1、提问册 2、练习册3、作业册
      */
-    @ApiModelProperty(value = "题集类型", name = "exeBookType", example = "1、预习练习册 2、课堂练习册3、课后作业册")
+    @ApiModelProperty(value = "题集类型", name = "exeBookType", example = "1、提问册 2、练习册3、作业册")
     private String exeBookType;
 
     /**
@@ -38,5 +38,11 @@ public class ExerciseBookReq implements Serializable {
      */
     @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
     private String courseId;
+
+    /**
+     * 课堂练习：before/预习 now/课堂 before,now/全部
+     */
+    @ApiModelProperty(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", dataType = "string", example = "before")
+    private String preview;
 
 }

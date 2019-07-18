@@ -1,6 +1,7 @@
 package com.forteach.quiz.problemsetlibrary.service;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.QuestionIds;
@@ -92,11 +93,26 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
     @Override
     public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
 
-        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId())
+        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId(), sortVo.getPreview())
                 .filter(Objects::nonNull)
                 .map(ExerciseBook::getQuestionChildren);
     }
 
+
+    /**
+     * 查找需要挂接的课堂链接册
+     */
+    public Mono<BigQuestionExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId, final String preview) {
+
+        Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId);
+        if (StrUtil.isNotBlank(preview)){
+            criteria.and("questionChildren.preview").is(preview);
+        }
+
+        Query query = new Query(criteria);
+
+        return template.findOne(query, BigQuestionExerciseBook.class).defaultIfEmpty(new BigQuestionExerciseBook());
+    }
 
     /**
      * 查找需要挂接的课堂链接册

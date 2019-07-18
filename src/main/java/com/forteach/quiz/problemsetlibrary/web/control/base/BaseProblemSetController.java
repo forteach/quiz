@@ -143,8 +143,10 @@ public abstract class BaseProblemSetController<T extends ProblemSet, R extends Q
     @ApiOperation(value = "查找挂接的课堂练习题", notes = "查找挂接的课堂练习题")
     @PostMapping("/findExerciseBook")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "章节id", name = "chapterId", example = "章节id", dataType = "string", paramType = "form"),
-            @ApiImplicitParam(value = "课程id", name = "courseId", example = "章节id", dataType = "string", paramType = "form")
+            @ApiImplicitParam(value = "章节id", name = "chapterId", example = "章节id", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(value = "课程id", name = "courseId", example = "章节id", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(value = "题集类型", name = "exeBookType", example = "1、提问册 2、练习册3、作业册", paramType = "query"),
+            @ApiImplicitParam(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", dataType = "string", paramType = "query")
     })
     public Mono<WebResult> findExerciseBook(@ApiParam(name = "ExerciseBookReq", value = "查找挂接的课堂练习题", required = true) @RequestBody ExerciseBookReq bookReq) {
         return exerciseBookService.findExerciseBook(bookReq).map(WebResult::okResult);
