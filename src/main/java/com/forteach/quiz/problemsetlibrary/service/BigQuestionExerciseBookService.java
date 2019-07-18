@@ -19,6 +19,7 @@ import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.forteach.quiz.common.Dic.EXE_BOOKTYPE_PREVIEW;
 import static com.forteach.quiz.common.Dic.MONGDB_ID;
 import static com.forteach.quiz.util.StringUtil.isNotEmpty;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * @Description:
@@ -109,9 +111,15 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
             criteria.and("questionChildren.preview").is(preview);
         }
 
-        Query query = new Query(criteria);
-
-        return template.findOne(query, BigQuestionExerciseBook.class).defaultIfEmpty(new BigQuestionExerciseBook());
+        Aggregation agg = newAggregation(
+                unwind("questionChildren"),
+                match(criteria)
+        );
+        return template.aggregate(agg, "bigQuestionexerciseBook", BigQuestionExerciseBook.class)
+                .log(">>>>>>>>>>>>> ")
+                .last()
+                .log("##########")
+                .defaultIfEmpty(new BigQuestionExerciseBook());
     }
 
     /**
@@ -174,13 +182,13 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
         Criteria criteria = new Criteria();
 
         if (isNotEmpty(exeBookType)) {
-            criteria.and("exeBookType").in(Integer.parseInt(exeBookType));
+            criteria.and("exeBookType").is(Integer.parseInt(exeBookType));
         }
         if (isNotEmpty(chapterId)) {
-            criteria.and("chapterId").in(chapterId);
+            criteria.and("chapterId").is(chapterId);
         }
         if (isNotEmpty(courseId)) {
-            criteria.and("courseId").in(courseId);
+            criteria.and("courseId").is(courseId);
         }
 
         return criteria;
