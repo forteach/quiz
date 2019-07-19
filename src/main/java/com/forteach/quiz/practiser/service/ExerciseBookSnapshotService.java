@@ -12,10 +12,11 @@ import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
 import com.forteach.quiz.practiser.web.req.findExerciseBookReq;
 import com.forteach.quiz.practiser.web.resp.AnswerResp;
 import com.forteach.quiz.practiser.web.vo.AnswerVo;
+import com.forteach.quiz.practiser.web.vo.UnwindedExerciseAnswerQuestionBook;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
-import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.service.BigQuestionExerciseBookService;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
+import com.forteach.quiz.problemsetlibrary.web.vo.UnwindedBigQuestionexerciseBook;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.service.CorrectService;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -39,6 +41,7 @@ import java.util.Objects;
 
 import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_N;
 import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_Y;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * @author: zhangyy
@@ -110,7 +113,7 @@ public class ExerciseBookSnapshotService {
             update.set("chapterName", answerReq.getChapterName());
         }
         if (StrUtil.isNotBlank(answerReq.getAnswer())) {
-            update.set("bigQuestionExerciseBook.questionChildren.$.examChildren.0.answer", answerReq.getAnswer());
+            update.set("bigQuestionExerciseBook.questionChildren.$.examChildren.0.stuAnswer", answerReq.getAnswer());
         }
 
         if (answerReq.getAnswerImageList() != null && !answerReq.getAnswerImageList().isEmpty()) {
@@ -329,11 +332,22 @@ public class ExerciseBookSnapshotService {
                     if(exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null){
                         return bigQuestionExerciseBookService.findExerciseBook(new ExerciseBookReq(req.getExeBookType(), req.getChapterId(), req.getCourseId(), req.getPreview()));
                     }else {
-                        return Mono.just(exerciseAnswerQuestionBook.getBigQuestionExerciseBook())
-                                .map(ExerciseBook::getQuestionChildren)
-                                .flatMapMany(Flux::fromIterable)
-                                .collectList();
+                        return findQuestion(criteria, req.getPreview());
                     }
                 });
+    }
+    private Mono<List<BigQuestion>> findQuestion(Criteria criteria, String preview){
+        if (StrUtil.isNotBlank(preview)){
+            criteria.and("bigQuestionExerciseBook.questionChildren.preview").is(preview);
+        }
+
+        Aggregation agg = newAggregation(
+                unwind("bigQuestionExerciseBook.questionChildren"),
+                match(criteria)
+        );
+        return reactiveMongoTemplate.aggregate(agg, "exerciseAnswerQuestionBook", UnwindedExerciseAnswerQuestionBook.class)
+                .map(UnwindedExerciseAnswerQuestionBook::getBigQuestionExerciseBook)
+                .map(UnwindedBigQuestionexerciseBook::getQuestionChildren)
+                .collectList();
     }
 }
