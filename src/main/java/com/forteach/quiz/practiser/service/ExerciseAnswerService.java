@@ -38,7 +38,6 @@ import java.util.Objects;
 import static com.forteach.quiz.common.Dic.BIG_QUESTION_EXAM_CHILDREN_TYPE_DESIGN;
 import static com.forteach.quiz.practiser.constant.Dic.IS_REWARD_N;
 import static com.forteach.quiz.practiser.constant.Dic.IS_REWARD_Y;
-import static com.forteach.quiz.util.StringUtil.isNotEmpty;
 
 /**
  * @author: zhangyy
@@ -316,19 +315,19 @@ public class ExerciseAnswerService {
      * @param addRewardReq
      * @return
      */
-//    public Mono<String> addReward(final AddRewardReq addRewardReq) {
-//        Criteria criteria = buildExerciseBook(addRewardReq.getExeBookType(), addRewardReq.getChapterId(),
-//                addRewardReq.getCourseId(), addRewardReq.getPreview(), addRewardReq.getClassId(), addRewardReq.getStudentId());
-//        return reactiveMongoTemplate.findOne(Query.query(criteria), QuestionExerciseReward.class)
-//                .switchIfEmpty(Mono.just(new QuestionExerciseReward()))
-//                .flatMap(questionExerciseReward -> {
-//                    if (StrUtil.isNotEmpty(questionExerciseReward.getNum())) {
-//                        MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了");
-//                    }
-//                    return saveReward(addRewardReq);
-//                });
-//
-//    }
+    public Mono<String> addReward(final AddRewardReq addRewardReq) {
+        Criteria criteria = buildExerciseBook(addRewardReq.getExeBookType(), addRewardReq.getChapterId(),
+                addRewardReq.getCourseId(), addRewardReq.getPreview(), addRewardReq.getClassId(), addRewardReq.getStudentId());
+        return reactiveMongoTemplate.findOne(Query.query(criteria), QuestionExerciseReward.class)
+                .switchIfEmpty(Mono.just(new QuestionExerciseReward()))
+                .flatMap(questionExerciseReward -> {
+                    if (StrUtil.isNotEmpty(questionExerciseReward.getNum())) {
+                        MyAssert.notNull(questionExerciseReward, DefineCode.ERR0010, "您已经添加过奖励了");
+                    }
+                    return saveReward(addRewardReq);
+                });
+
+    }
 
     /**
      * 记录奖励
@@ -336,7 +335,7 @@ public class ExerciseAnswerService {
      * @param addRewardReq
      * @return
      */
-    public Mono<String> saveReward(final AddRewardReq addRewardReq) {
+    private Mono<String> saveReward(final AddRewardReq addRewardReq) {
         QuestionExerciseReward questionExerciseReward = new QuestionExerciseReward();
         BeanUtils.copyProperties(addRewardReq, questionExerciseReward);
         return rewardService.cumulativeResMono(addRewardReq.getQuestionId(), addRewardReq.getStudentId(), Integer.valueOf(addRewardReq.getNum()))
@@ -377,13 +376,13 @@ public class ExerciseAnswerService {
 
         Criteria criteria = new Criteria();
 
-        if (isNotEmpty(exeBookType)) {
+        if (StrUtil.isNotBlank(exeBookType)) {
             criteria.and("exeBookType").in(Integer.parseInt(exeBookType));
         }
-        if (isNotEmpty(chapterId)) {
+        if (StrUtil.isNotBlank(chapterId)) {
             criteria.and("chapterId").in(chapterId);
         }
-        if (isNotEmpty(courseId)) {
+        if (StrUtil.isNotBlank(courseId)) {
             criteria.and("courseId").in(courseId);
         }
 

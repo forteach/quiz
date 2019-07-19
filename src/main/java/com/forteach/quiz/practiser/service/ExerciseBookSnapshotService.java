@@ -332,10 +332,6 @@ public class ExerciseBookSnapshotService {
                     if(exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null){
                         return bigQuestionExerciseBookService.findExerciseBook(new ExerciseBookReq(req.getExeBookType(), req.getChapterId(), req.getCourseId(), req.getPreview()));
                     }else {
-//                        return Mono.just(exerciseAnswerQuestionBook.getBigQuestionExerciseBook())
-//                                .map(ExerciseBook::getQuestionChildren)
-//                                .flatMapMany(Flux::fromIterable)
-//                                .collectList();
                         return findQuestion(criteria, req.getPreview());
                     }
                 });
