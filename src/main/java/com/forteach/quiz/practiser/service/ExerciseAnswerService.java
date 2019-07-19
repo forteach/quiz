@@ -404,7 +404,6 @@ public class ExerciseAnswerService {
 
 
         Query query = Query.query(criteria);
-        // todo 返回的有答题与否和答案需要过滤
         query.fields().include("bigQuestionExerciseBook");
 
         return reactiveMongoTemplate.findOne(query, ExerciseAnswerQuestionBook.class)

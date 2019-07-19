@@ -3,12 +3,16 @@ package com.forteach.quiz.practiser.domain;
 import com.forteach.quiz.practiser.domain.base.AbstractAnswer;
 import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
+import com.forteach.quiz.web.vo.BigQuestionVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author: zhangyy
@@ -36,12 +40,12 @@ public class ExerciseAnswerQuestionBook extends AbstractAnswer {
 
 
     public ExerciseAnswerQuestionBook(BigQuestionExerciseBook bigQuestionExerciseBook, final AnswerVo answerVo) {
-//        List<BigQuestionVo> vos = bigQuestionExerciseBook.getQuestionChildren();
-//        for (BigQuestionVo vo : vos) {
-////            JSON.toJSONString(vo.getExamChildren().get(0));
-//            Map map = (Map)vo.getExamChildren().get(0);
-//            map.remove("answer");
-//        }
+        //移除查询到的答题答案
+        List<BigQuestionVo> vos = bigQuestionExerciseBook.getQuestionChildren();
+        vos.stream().forEach(bigQuestionVo -> {
+            Map map = (Map)bigQuestionVo.getExamChildren().get(0);
+            map.remove("answer");
+        });
         BeanUtils.copyProperties(answerVo, this);
         this.bigQuestionExerciseBook = bigQuestionExerciseBook;
     }

@@ -283,9 +283,6 @@ public class ExerciseBookSnapshotService {
     }
 
     private Mono<List<AnswerResp>> findAnswerRespList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
-//        Set<String> studentIds = new HashSet<>();
-//        exerciseAnswerQuestionBooks.parallelStream()
-//                .forEach(exerciseAnswerQuestionBook -> studentIds.add(exerciseAnswerQuestionBook.getStudentId()));
         return Mono.just(exerciseAnswerQuestionBooks)
                 .flatMapMany(Flux::fromIterable)
                 .filter(Objects::nonNull)
