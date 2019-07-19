@@ -6,7 +6,6 @@ import com.forteach.quiz.common.DefineCode;
 import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
-import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.repository.base.ExerciseBookMongoRepository;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookServiceImpl;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
@@ -19,7 +18,6 @@ import com.forteach.quiz.web.vo.BigQuestionVo;
 import com.forteach.quiz.web.vo.PreviewChangeVo;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -28,7 +26,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.EXE_BOOKTYPE_PREVIEW;
@@ -93,21 +93,9 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
      */
     @Override
     public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
-
-        return findExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId(), sortVo.getPreview())
-                .filter(Objects::nonNull)
-                .map(ExerciseBook::getQuestionChildren);
-    }
-
-
-    /**
-     * 查找需要挂接的课堂链接册
-     */
-    public Mono<BigQuestionExerciseBook> findExerciseBook(final String exeBookType, final String chapterId, final String courseId, final String preview) {
-
-        Criteria criteria = buildExerciseBook(exeBookType, chapterId, courseId);
-        if (StrUtil.isNotBlank(preview)){
-            criteria.and("questionChildren.preview").is(preview);
+        Criteria criteria = buildExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId());
+        if (StrUtil.isNotBlank(sortVo.getPreview())){
+            criteria.and("questionChildren.preview").is(sortVo.getPreview());
         }
 
         Aggregation agg = newAggregation(
@@ -115,16 +103,8 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
                 match(criteria)
         );
         return template.aggregate(agg, "bigQuestionexerciseBook", UnwindedBigQuestionexerciseBook.class)
-                .next()
-                .flatMap(unwindedBigQuestionexerciseBook -> {
-                    BigQuestionExerciseBook bigQuestionExerciseBook = new BigQuestionExerciseBook();
-                    BeanUtils.copyProperties(unwindedBigQuestionexerciseBook, bigQuestionExerciseBook);
-                    List list = new ArrayList();
-                    list.add(unwindedBigQuestionexerciseBook.getQuestionChildren());
-                    bigQuestionExerciseBook.setQuestionChildren(list);
-                    return Mono.just(bigQuestionExerciseBook);
-                })
-                .defaultIfEmpty(new BigQuestionExerciseBook());
+                .map(UnwindedBigQuestionexerciseBook::getQuestionChildren)
+                .collectList();
     }
 
     /**
