@@ -9,10 +9,13 @@ import com.forteach.quiz.practiser.domain.ExerciseAnswerQuestionBook;
 import com.forteach.quiz.practiser.web.req.AnswerReq;
 import com.forteach.quiz.practiser.web.req.FindAnswerStudentReq;
 import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
+import com.forteach.quiz.practiser.web.req.findExerciseBookReq;
 import com.forteach.quiz.practiser.web.resp.AnswerResp;
 import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
+import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.service.BigQuestionExerciseBookService;
+import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.service.CorrectService;
@@ -29,7 +32,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_N;
 import static com.forteach.quiz.practiser.constant.Dic.IS_ANSWER_COMPLETED_Y;
@@ -315,5 +321,22 @@ public class ExerciseBookSnapshotService {
                 answerLists.getPreview(), answerLists.getClassId(), answerLists.getStudentId());
         return reactiveMongoTemplate.findOne(Query.query(criteria), ExerciseAnswerQuestionBook.class)
                 .switchIfEmpty(Mono.empty());
+    }
+
+    public Mono<List<BigQuestion>> findExerciseBook(final findExerciseBookReq req) {
+        Criteria criteria = baseExerciseAnswerService
+                .buildExerciseBook(new AnswerVo(req.getExeBookType(), req.getChapterId(), req.getCourseId(), req.getPreview(), req.getStudentId()));
+        return reactiveMongoTemplate.findOne(Query.query(criteria), ExerciseAnswerQuestionBook.class)
+                .defaultIfEmpty(new ExerciseAnswerQuestionBook())
+                .flatMap(exerciseAnswerQuestionBook -> {
+                    if(exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null){
+                        return bigQuestionExerciseBookService.findExerciseBook(new ExerciseBookReq(req.getExeBookType(), req.getChapterId(), req.getCourseId(), req.getPreview()));
+                    }else {
+                        return Mono.just(exerciseAnswerQuestionBook.getBigQuestionExerciseBook())
+                                .map(ExerciseBook::getQuestionChildren)
+                                .flatMapMany(Flux::fromIterable)
+                                .collectList();
+                    }
+                });
     }
 }

@@ -6,6 +6,7 @@ import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.practiser.service.ExerciseAnswerService;
 import com.forteach.quiz.practiser.service.ExerciseBookSnapshotService;
 import com.forteach.quiz.practiser.web.req.AnswerReq;
+import com.forteach.quiz.practiser.web.req.findExerciseBookReq;
 import com.forteach.quiz.practiser.web.req.verify.AnswerVerify;
 import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import com.forteach.quiz.service.TokenService;
@@ -96,4 +97,22 @@ public class StudentAnswerController {
                 .map(WebResult::okResult);
     }
 
+    /**
+     * 学生端查询习题集,如果学生没有答题查询最新的题集,答过返回题库的快照
+     * @param req
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "学生端查询习题", notes = "学生查询习题集,学生答题后是快照,没有答题返回最新的答题的题库")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "章节id", name = "chapterId", example = "章节id", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(value = "课程id", name = "courseId", example = "章节id", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(value = "题集类型", name = "exeBookType", example = "1、提问册 2、练习册3、作业册", paramType = "query"),
+            @ApiImplicitParam(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", dataType = "string", paramType = "query")
+    })
+    @PostMapping("/findExerciseBook")
+    public Mono<WebResult> findExerciseBook(@RequestBody findExerciseBookReq req, ServerHttpRequest request) {
+        req.setStudentId(tokenService.getStudentId(request));
+        return exerciseBookSnapshotService.findExerciseBook(req).map(WebResult::okResult);
+    }
 }

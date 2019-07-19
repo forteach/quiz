@@ -36,7 +36,7 @@ public class ExerciseBookReq implements Serializable {
     /**
      * 课程id
      */
-    @ApiModelProperty(value = "课程id", name = "courseId", example = "章节id")
+    @ApiModelProperty(value = "课程id", name = "courseId", example = "课程id")
     private String courseId;
 
     /**

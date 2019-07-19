@@ -19,4 +19,12 @@ import lombok.NoArgsConstructor;
 public class AnswerVo {
 
     private String exeBookType, chapterId, chapterName, courseId, preview, classId, studentId;
+
+    public AnswerVo(String exeBookType, String chapterId, String courseId, String preview, String studentId) {
+        this.exeBookType = exeBookType;
+        this.chapterId = chapterId;
+        this.courseId = courseId;
+        this.preview = preview;
+        this.studentId = studentId;
+    }
 }
