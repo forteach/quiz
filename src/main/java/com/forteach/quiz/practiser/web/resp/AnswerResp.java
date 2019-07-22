@@ -1,6 +1,5 @@
 package com.forteach.quiz.practiser.web.resp;
 
-import com.forteach.quiz.practiser.domain.ExerciseAnswerQuestionBook;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -26,15 +25,15 @@ public class AnswerResp implements Serializable {
     @ApiModelProperty(value = "学生头像", name = "portrait", dataType = "string")
     private String portrait;
 
-    @ApiModelProperty(name = "exerciseAnswerQuestionBooks", value = "学生答题记录")
-    private List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks;
+    @ApiModelProperty(name = "bigQuestionExerciseBooks", value = "习题快照和答题内容")
+    private List<BigQuestionExerciseBookResp> bigQuestionExerciseBooks;
 
     public AnswerResp() {
     }
 
-    public AnswerResp(String studentName, String portrait, List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
+    public AnswerResp(String studentId, String studentName, String portrait) {
+        this.studentId = studentId;
         this.studentName = studentName;
         this.portrait = portrait;
-        this.exerciseAnswerQuestionBooks = exerciseAnswerQuestionBooks;
     }
 }

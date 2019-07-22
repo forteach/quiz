@@ -1,5 +1,7 @@
 package com.forteach.quiz.practiser.service;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.common.DefineCode;
@@ -11,6 +13,7 @@ import com.forteach.quiz.practiser.web.req.FindAnswerStudentReq;
 import com.forteach.quiz.practiser.web.req.GradeAnswerReq;
 import com.forteach.quiz.practiser.web.req.findExerciseBookReq;
 import com.forteach.quiz.practiser.web.resp.AnswerResp;
+import com.forteach.quiz.practiser.web.resp.BigQuestionExerciseBookResp;
 import com.forteach.quiz.practiser.web.vo.AnswerVo;
 import com.forteach.quiz.practiser.web.vo.UnwindedExerciseAnswerQuestionBook;
 import com.forteach.quiz.problemsetlibrary.domain.BigQuestionExerciseBook;
@@ -149,6 +152,7 @@ public class ExerciseBookSnapshotService {
 
     /**
      * 保存学生提交的作业答案并计算客观题的答题结果
+     *
      * @param answerVo
      * @param answerReq
      * @param query
@@ -271,10 +275,11 @@ public class ExerciseBookSnapshotService {
 
     /**
      * 通过查询记录表信息转化查询结果集
+     *
      * @param query
      * @return
      */
-    private Mono<List<AnswerResp>> findAnswerListByAnswerLists(final Query query){
+    private Mono<List<AnswerResp>> findAnswerListByAnswerLists(final Query query) {
         return reactiveMongoTemplate.find(query, AnswerLists.class)
                 .collectList()
                 .filter(Objects::nonNull)
@@ -286,24 +291,36 @@ public class ExerciseBookSnapshotService {
     }
 
     private Mono<List<AnswerResp>> findAnswerRespList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
-        return Mono.just(exerciseAnswerQuestionBooks)
+        Mono<List<AnswerResp>> reqs = Mono.just(exerciseAnswerQuestionBooks)
                 .flatMapMany(Flux::fromIterable)
-                .filter(Objects::nonNull)
-                .flatMap(exerciseAnswerQuestionBook -> {
-                    AnswerResp answerResp = new AnswerResp();
-                    List<ExerciseAnswerQuestionBook> list = new ArrayList<>();
-                    BeanUtils.copyProperties(exerciseAnswerQuestionBook, answerResp);
-                    if (answerResp.getStudentId().equals(exerciseAnswerQuestionBook.getStudentId())) {
-                        return studentsService.findStudentsBrief(exerciseAnswerQuestionBook.getStudentId())
-                                .flatMap(students -> {
-                                    answerResp.setPortrait(students.getPortrait());
-                                    answerResp.setStudentId(students.getId());
-                                    answerResp.setStudentName(students.getName());
-                                    list.add(exerciseAnswerQuestionBook);
-                                    answerResp.setExerciseAnswerQuestionBooks(list);
-                                    return Mono.just(answerResp);
-                                });
-                    }
+                .map(ExerciseAnswerQuestionBook::getStudentId)
+                .distinct()
+                .collectList()
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(s -> {
+                    return studentsService.findStudentsBrief(s)
+                            .flatMap(students -> {
+                                return Mono.just(new AnswerResp(students.getId(), students.getName(), students.getPortrait()));
+                            });
+                })
+                .collectList();
+
+        return reqs.flatMapMany(Flux::fromIterable)
+                .flatMap(answerResp -> {
+                    exerciseAnswerQuestionBooks.forEach(exerciseAnswerQuestionBook -> {
+                        if (answerResp.getStudentId().equals(exerciseAnswerQuestionBook.getStudentId())) {
+                            BigQuestionExerciseBookResp bigQuestionExerciseBookResp = new BigQuestionExerciseBookResp();
+                            BeanUtil.copyProperties(exerciseAnswerQuestionBook.getBigQuestionExerciseBook(), bigQuestionExerciseBookResp);
+                            bigQuestionExerciseBookResp.setChapterName(exerciseAnswerQuestionBook.getChapterName());
+                            bigQuestionExerciseBookResp.setPreview(exerciseAnswerQuestionBook.getPreview());
+                            if (answerResp.getBigQuestionExerciseBooks() != null) {
+                                answerResp.getBigQuestionExerciseBooks().add(bigQuestionExerciseBookResp);
+                            } else {
+                                ArrayList<BigQuestionExerciseBookResp> list = CollUtil.newArrayList(bigQuestionExerciseBookResp);
+                                answerResp.setBigQuestionExerciseBooks(list);
+                            }
+                        }
+                    });
                     return Mono.just(answerResp);
                 }).collectList();
     }
@@ -311,6 +328,7 @@ public class ExerciseBookSnapshotService {
 
     /**
      * 查询学生答题时生成的快照作业或试卷
+     *
      * @param answerLists
      * @return
      */
@@ -329,15 +347,16 @@ public class ExerciseBookSnapshotService {
         return reactiveMongoTemplate.findOne(Query.query(criteria), ExerciseAnswerQuestionBook.class)
                 .defaultIfEmpty(new ExerciseAnswerQuestionBook())
                 .flatMap(exerciseAnswerQuestionBook -> {
-                    if(exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null){
+                    if (exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null) {
                         return bigQuestionExerciseBookService.findExerciseBook(new ExerciseBookReq(req.getExeBookType(), req.getChapterId(), req.getCourseId(), req.getPreview()));
-                    }else {
+                    } else {
                         return findQuestion(criteria, req.getPreview());
                     }
                 });
     }
-    private Mono<List<BigQuestion>> findQuestion(Criteria criteria, String preview){
-        if (StrUtil.isNotBlank(preview)){
+
+    private Mono<List<BigQuestion>> findQuestion(Criteria criteria, String preview) {
+        if (StrUtil.isNotBlank(preview)) {
             criteria.and("bigQuestionExerciseBook.questionChildren.preview").is(preview);
         }
 
