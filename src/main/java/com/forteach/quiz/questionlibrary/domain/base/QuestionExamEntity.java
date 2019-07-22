@@ -97,4 +97,10 @@ public class QuestionExamEntity<T> extends BaseEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(value = "下标", name = "index", example = "")
     protected String index;
+
+    /**
+     * 课堂练习  before/预习 now/课堂 before,now/全部
+     */
+    @ApiModelProperty(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", example = "1")
+    private String preview;
 }

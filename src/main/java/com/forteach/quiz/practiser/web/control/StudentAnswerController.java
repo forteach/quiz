@@ -61,7 +61,7 @@ public class StudentAnswerController {
             @ApiImplicitParam(name = "chapterName", value = "章节名称", dataType = "string", paramType = "chapterName"),
             @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", example = "3", required = true, paramType = "form"),
             @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", required = true, paramType = "form"),
-            @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "form"),
+            @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "answer", value = "回答内容", dataType = "string", required = true, paramType = "form"),
             @ApiImplicitParam(name = "classId", value = "班级id", required = true, paramType = "query"),
             @ApiImplicitParam(name = "fileList", value = "附件列表", paramType = "form"),
