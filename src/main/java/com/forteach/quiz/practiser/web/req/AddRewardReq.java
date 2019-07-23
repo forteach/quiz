@@ -21,9 +21,6 @@ public class AddRewardReq extends AbstractReq implements Serializable {
     @ApiModelProperty(name = "num", value = "奖励数量", dataType = "string", required = true)
     private String num;
 
-    @ApiModelProperty(name = "questionId", value = "习题id", dataType = "string")
-    private String questionId;
-
     @ApiModelProperty(name = "studentId", value = "学生id", dataType = "string")
     private String studentId;
 

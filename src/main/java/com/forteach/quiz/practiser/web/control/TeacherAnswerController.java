@@ -109,10 +109,13 @@ public class TeacherAnswerController {
             @ApiImplicitParam(name = "exeBookType", value = "练习册类型: 1、提问册 2、练习册3、作业册", dataType = "string", example = "3", required = true, paramType = "form"),
             @ApiImplicitParam(name = "preview", value = "习题类型  before/预习 now/课堂 after/课后练习", required = true, paramType = "form"),
             @ApiImplicitParam(name = "studentId", value = "学生id", dataType = "string", paramType = "form"),
-            @ApiImplicitParam(name = "num", value = "奖励", dataType = "string", paramType = "form")
+            @ApiImplicitParam(name = "num", value = "奖励", dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "classId", value = "班级id", dataType = "string", paramType = "form")
     })
     public Mono<WebResult> addReward(@RequestBody AddRewardReq addRewardReq, ServerHttpRequest serverHttpRequest){
         answerVerify.verify(addRewardReq);
+        MyAssert.isNull(addRewardReq.getChapterId(), DefineCode.ERR0010, "章节不为空");
+        MyAssert.isNull(addRewardReq.getStudentId(), DefineCode.ERR0010, "学生id不为空");
         MyAssert.isNull(addRewardReq.getNum(), DefineCode.ERR0010, "奖励数量不为空");
         tokenService.getTeacherId(serverHttpRequest).ifPresent(addRewardReq::setTeacherId);
         return exerciseAnswerService.addReward(addRewardReq).map(WebResult::okResult);
