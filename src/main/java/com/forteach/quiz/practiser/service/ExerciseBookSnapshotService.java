@@ -256,7 +256,7 @@ public class ExerciseBookSnapshotService {
         if (IS_ANSWER_COMPLETED_N.equals(findAnswerStudentReq.getIsAnswerCompleted())) {
 
             //查询没有回答完的记录
-            return findAnswerListByAnswerLists(Query.query(criteria));
+            return findAnswerListByAnswerLists(Query.query(criteria), findAnswerStudentReq.getStudentId());
         } else if (IS_ANSWER_COMPLETED_Y.equals(findAnswerStudentReq.getIsAnswerCompleted())) {
             if (StrUtil.isNotBlank(findAnswerStudentReq.getIsCorrectCompleted())) {
                 criteria.and("isCorrectCompleted").is(findAnswerStudentReq.getIsCorrectCompleted());
@@ -267,7 +267,7 @@ public class ExerciseBookSnapshotService {
             }
 
             //查询回答完的记录
-            return findAnswerListByAnswerLists(Query.query(criteria));
+            return findAnswerListByAnswerLists(Query.query(criteria), findAnswerStudentReq.getStudentId());
         } else {
             return MyAssert.isNull(null, DefineCode.ERR0010, "是否回答完参数不正确");
         }
@@ -279,7 +279,7 @@ public class ExerciseBookSnapshotService {
      * @param query
      * @return
      */
-    private Mono<List<AnswerResp>> findAnswerListByAnswerLists(final Query query) {
+    private Mono<List<AnswerResp>> findAnswerListByAnswerLists(final Query query, final String studentId) {
         return reactiveMongoTemplate.find(query, AnswerLists.class)
                 .collectList()
                 .filter(Objects::nonNull)
@@ -287,11 +287,17 @@ public class ExerciseBookSnapshotService {
                 .flatMap(this::findExerciseAnswerQuestionBook)
                 .filter(Objects::nonNull)
                 .collectList()
-                .flatMap(this::findAnswerRespList);
+                .flatMap(list -> {
+                    if (StrUtil.isNotBlank(studentId)) {
+                        return findAnswerRespList(list);
+                    }else {
+                        return findAnswerStudentsList(list);
+                    }
+                });
     }
 
-    private Mono<List<AnswerResp>> findAnswerRespList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
-        Mono<List<AnswerResp>> reqs = Mono.just(exerciseAnswerQuestionBooks)
+    private Mono<List<AnswerResp>> findAnswerStudentsList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks){
+        return Mono.just(exerciseAnswerQuestionBooks)
                 .flatMapMany(Flux::fromIterable)
                 .map(ExerciseAnswerQuestionBook::getStudentId)
                 .distinct()
@@ -304,7 +310,10 @@ public class ExerciseBookSnapshotService {
                             });
                 })
                 .collectList();
+    }
 
+    private Mono<List<AnswerResp>> findAnswerRespList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
+        Mono<List<AnswerResp>> reqs = findAnswerStudentsList(exerciseAnswerQuestionBooks);
         return reqs.flatMapMany(Flux::fromIterable)
                 .flatMap(answerResp -> {
                     exerciseAnswerQuestionBooks.forEach(exerciseAnswerQuestionBook -> {
@@ -333,7 +342,6 @@ public class ExerciseBookSnapshotService {
      * @return
      */
     private Mono<ExerciseAnswerQuestionBook> findExerciseAnswerQuestionBook(final AnswerLists answerLists) {
-
         final Criteria criteria = exerciseAnswerService.buildExerciseBook(answerLists.getExeBookType(),
                 answerLists.getChapterId(), answerLists.getCourseId(),
                 answerLists.getPreview(), answerLists.getClassId(), answerLists.getStudentId());
@@ -341,9 +349,14 @@ public class ExerciseBookSnapshotService {
                 .switchIfEmpty(Mono.empty());
     }
 
+    /**
+     * 查询习题记录
+     * @param req
+     * @return
+     */
     public Mono<List<BigQuestion>> findExerciseBook(final findExerciseBookReq req) {
-        Criteria criteria = baseExerciseAnswerService
-                .buildExerciseBook(new AnswerVo(req.getExeBookType(), req.getChapterId(), req.getCourseId(), req.getPreview(), req.getStudentId()));
+        Criteria criteria = baseExerciseAnswerService.buildExerciseBook(new AnswerVo(req.getExeBookType(),
+                req.getChapterId(), req.getCourseId(), req.getPreview(), req.getStudentId()));
         return reactiveMongoTemplate.findOne(Query.query(criteria), ExerciseAnswerQuestionBook.class)
                 .defaultIfEmpty(new ExerciseAnswerQuestionBook())
                 .flatMap(exerciseAnswerQuestionBook -> {
