@@ -163,15 +163,13 @@ public class SendAnswerService {
                 .filterWhen(r->cleanAnswerHasJoinStu(circleId,examineeId,questId,questionType));
     }
 
+    @SuppressWarnings("all")
     private Mono<Boolean> cleanAnswerHasJoinStu(final String circleId,final String examineeId,final String questId,final String questionType){
        String key= AchieveAnswerKey.cleanAnswerHasJoin(circleId,questId,questionType);
        //从已经回答推送的列表移除
        String[] strarrays = new String[]{examineeId};
        return stringRedisTemplate.opsForSet().remove(key,strarrays)
-               .flatMap(r->
-//                   System.out.println("r-----------" + r);
-                    Mono.just(true)
-               );
+               .flatMap(r-> Mono.just(true));
     }
 
 
@@ -223,7 +221,5 @@ public class SendAnswerService {
                 .set("uDate", DataUtil.format(new Date()));
 
         return mongoTemplate.upsert(query, update, AskAnswer.class).flatMap(result -> Mono.just(result.wasAcknowledged()));
-//);
-
     }
 }

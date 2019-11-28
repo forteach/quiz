@@ -262,7 +262,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
         if (isNotEmpty(sortVo.getQuestionType())) {
             criteria.and("examChildren.examType").is(sortVo.getQuestionType());
         }
-        if (sortVo.getKeyword() != null && sortVo.getKeyword().length > 0) {
+        if ( null != sortVo.getKeyword() && sortVo.getKeyword().length > 0) {
             criteria.and("keyword").all(sortVo.getKeyword());
         }
 
