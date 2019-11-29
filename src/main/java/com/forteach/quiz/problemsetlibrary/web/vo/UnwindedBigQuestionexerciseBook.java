@@ -2,8 +2,10 @@ package com.forteach.quiz.problemsetlibrary.web.vo;
 
 import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @Auther: zhangyy
@@ -13,6 +15,8 @@ import lombok.EqualsAndHashCode;
  * @Description:
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UnwindedBigQuestionexerciseBook extends BaseEntity {
 
@@ -21,5 +25,4 @@ public class UnwindedBigQuestionexerciseBook extends BaseEntity {
     private String chapterId;
     private String courseId;
     private int exeBookType;
-
 }

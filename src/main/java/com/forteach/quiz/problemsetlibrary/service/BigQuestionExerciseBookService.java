@@ -24,11 +24,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.forteach.quiz.common.Dic.EXE_BOOKTYPE_PREVIEW;
@@ -104,6 +106,9 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
                 match(criteria)
         );
         return template.aggregate(agg, "bigQuestionexerciseBook", UnwindedBigQuestionexerciseBook.class)
+                .switchIfEmpty(Flux.just(new UnwindedBigQuestionexerciseBook()))
+                .filter(Objects::nonNull)
+                .filter(o -> null != o.getQuestionChildren())
                 .map(UnwindedBigQuestionexerciseBook::getQuestionChildren)
                 .collectList();
     }
