@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -96,7 +97,7 @@ public class TeacherInteractController {
                     name = "interactive", allowableValues = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
                     required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
+    public Mono<WebResult> sendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
         MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
@@ -134,7 +135,7 @@ public class TeacherInteractController {
                     name = "interactive", allowableValues = "race   : 抢答/raise  : 举手/select : 选择/vote   : 投票",
                     required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> raiseSendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
+    public Mono<WebResult> raiseSendQuestion(@ApiParam(value = "发布问题", required = true) @RequestBody BigQuestionGiveVo giveVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
         giveVo.setTeacherId(tokenService.getTeacherId(serverHttpRequest).get());
         MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
         MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010,"课堂问题发布不能为空");
@@ -161,7 +162,7 @@ public class TeacherInteractController {
     @PostMapping("/fabu/questList")
     @ApiOperation(value = "获得当前已发布题目的题目列表", notes = "已发布题目列表、当前题目、以显示题目答案的列表")
     @ApiImplicitParam(name = "circleId", value = "课堂id", required = true, dataType = "string", paramType = "query")
-    public Mono<WebResult> questFabuList(@RequestBody QuestFabuListVo questFabuListVo, ServerHttpRequest serverHttpRequest) {
+    public Mono<WebResult> questFabuList(@RequestBody QuestFabuListVo questFabuListVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
         MyAssert.blank(questFabuListVo.getCircleId(), DefineCode.ERR0010, "课堂id不为空");
         return fabuQuestService.getFaBuQuestNow(questFabuListVo.getCircleId())
                 .flatMap(list->Mono.just(new QuestFabuListResponse(questFabuListVo.getCircleId(),(List<String>)list.get(0),list.get(1).toString())))
@@ -180,7 +181,7 @@ public class TeacherInteractController {
     @ApiOperation(value = "发布互动练习册", notes = "传入练习册内题目的id 发布互动练习册题目")
     @PostMapping("/send/book")
     @ApiImplicitParam(value = "问题id,多个id逗号分隔", name = "questionIds", required = true, dataType = "string", paramType = "from")
-    public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo, ServerHttpRequest serverHttpRequest) {
+    public Mono<WebResult> sendInteractiveBook(@ApiParam(value = "发布问题", required = true) @RequestBody MoreGiveVo giveVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
         MyAssert.blank(giveVo.getCircleId(), DefineCode.ERR0010, "课堂编号不能为空");
         MyAssert.blank(giveVo.getQuestionId(), DefineCode.ERR0010, "题目信息不能为空");
         MyAssert.blank(giveVo.getTeacherId(), DefineCode.ERR0010, "课堂问题发布教师不能为空");

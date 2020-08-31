@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author: zhangyy
@@ -67,7 +68,7 @@ public class StudentAnswerController {
             @ApiImplicitParam(name = "fileList", value = "附件列表", paramType = "form"),
             @ApiImplicitParam(name = "answerImageList", value = "答案图片列表", paramType = "form"),
     })
-    public Mono<WebResult> saveAnswer(@RequestBody AnswerReq answerReq, ServerHttpRequest request){
+    public Mono<WebResult> saveAnswer(@RequestBody AnswerReq answerReq, @ApiIgnore ServerHttpRequest request){
         answerVerify.verify(answerReq);
         MyAssert.isNull(answerReq.getQuestionId(), DefineCode.ERR0010, "题目id不为空");
         MyAssert.isNull(answerReq.getAnswer(), DefineCode.ERR0010, "答案不为空");
@@ -89,7 +90,7 @@ public class StudentAnswerController {
             @ApiImplicitParam(name = "classId", value = "班级id", required = true, paramType = "query"),
             @ApiImplicitParam(name = "questionId", value = "问题id", dataType = "string", paramType = "form"),
     })
-    public Mono<WebResult> findAnswer(@RequestBody AnswerReq answerReq, ServerHttpRequest request){
+    public Mono<WebResult> findAnswer(@RequestBody AnswerReq answerReq, @ApiIgnore ServerHttpRequest request){
         answerVerify.verify(answerReq);
         answerReq.setStudentId(tokenService.getStudentId(request));
         return exerciseAnswerService
@@ -111,7 +112,7 @@ public class StudentAnswerController {
             @ApiImplicitParam(value = "课堂练习  before/预习 now/课堂 before,now/全部", name = "preview", dataType = "string", paramType = "query")
     })
     @PostMapping("/findExerciseBook")
-    public Mono<WebResult> findExerciseBook(@RequestBody findExerciseBookReq req, ServerHttpRequest request) {
+    public Mono<WebResult> findExerciseBook(@RequestBody findExerciseBookReq req, @ApiIgnore ServerHttpRequest request) {
         req.setStudentId(tokenService.getStudentId(request));
         return exerciseBookSnapshotService.findExerciseBook(req).map(WebResult::okResult);
     }

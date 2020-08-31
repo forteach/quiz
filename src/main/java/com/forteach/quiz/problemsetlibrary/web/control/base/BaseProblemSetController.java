@@ -2,13 +2,13 @@ package com.forteach.quiz.problemsetlibrary.web.control.base;
 
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.domain.QuestionIds;
-import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.domain.base.ExerciseBook;
 import com.forteach.quiz.problemsetlibrary.domain.base.ProblemSet;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseExerciseBookService;
 import com.forteach.quiz.problemsetlibrary.service.base.BaseProblemSetService;
 import com.forteach.quiz.problemsetlibrary.web.req.ExerciseBookReq;
 import com.forteach.quiz.problemsetlibrary.web.req.ProblemSetReq;
+import com.forteach.quiz.problemsetlibrary.web.vo.DelExerciseBookPartVo;
 import com.forteach.quiz.problemsetlibrary.web.vo.ProblemSetVo;
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
 import com.forteach.quiz.questionlibrary.web.req.QuestionProblemSetReq;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -59,7 +60,7 @@ public abstract class BaseProblemSetController<T extends ProblemSet, R extends Q
             @ApiImplicitParam(value = "难易度id", name = "levelId", example = "0", dataType = "string", paramType = "form")
     })
     @ApiOperation(value = "编辑题集", notes = "修改或增加题集")
-    public Mono<WebResult> buildExerciseBook(@Valid @RequestBody T problemSet, ServerHttpRequest request) {
+    public Mono<WebResult> buildExerciseBook(@Valid @RequestBody T problemSet, @ApiIgnore ServerHttpRequest request) {
         tokenService.getTeacherId(request).ifPresent(problemSet::setTeacherId);
         return service.buildExerciseBook(problemSet).map(WebResult::okResult);
     }

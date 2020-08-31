@@ -1,9 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
-import com.forteach.quiz.interaction.execute.service.record.InteractRecordExecuteService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -18,8 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class InteractRecordExecuteServiceTest {
 
-    @Autowired
-    private InteractRecordExecuteService interactRecordExecuteService;
+//    @Autowired
+//    private InteractRecordExecuteService interactRecordExecuteService;
     @Test
     public void getRecord() {
 //        interactRecordExecuteService.getRecord("0cf3feef4ba84ae99d5e24c4d3c8270f");

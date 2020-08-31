@@ -17,6 +17,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -77,7 +78,7 @@ public abstract class BaseAllController <T extends QuestionExamEntity> extends B
             @ApiImplicitParam(name = "examChildren", value = "保存,修改的简答题对象", dataType = "json", required = true),
     })
     @ApiOperation(value = "编辑简答思考题", notes = "新增数据时 不添加id 修改时数据添加id")
-    public Mono<WebResult> editDesign(@Valid @RequestBody @ApiParam(value = "简答思考题", required = true) T design, ServerHttpRequest request) {
+    public Mono<WebResult> editDesign(@Valid @RequestBody @ApiParam(value = "简答思考题", required = true) T design, @ApiIgnore ServerHttpRequest request) {
         tokenService.getTeacherId(request).ifPresent(design::setTeacherId);
         return service.editQuestion(design, Design.class).map(WebResult::okResult);
     }

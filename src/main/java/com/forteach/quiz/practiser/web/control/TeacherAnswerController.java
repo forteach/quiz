@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author: zhangyy
@@ -66,7 +67,7 @@ public class TeacherAnswerController {
             @ApiImplicitParam(name = "evaluation", value = "主观题 教师给出的答案评价", required = true, example = "客观题: true  false  halfOf, 答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf"),
             @ApiImplicitParam(name = "score", value = "得分", dataType = "string", paramType = "form")
     })
-    public Mono<WebResult> gradeAnswer(@RequestBody GradeAnswerReq gradeAnswerReq, ServerHttpRequest request){
+    public Mono<WebResult> gradeAnswer(@RequestBody GradeAnswerReq gradeAnswerReq, @ApiIgnore ServerHttpRequest request){
         answerVerify.verify(gradeAnswerReq);
         MyAssert.isNull(gradeAnswerReq.getStudentId(), DefineCode.ERR0010, "要批改的学生id不为空");
         MyAssert.isNull(gradeAnswerReq.getEvaluation(), DefineCode.ERR0010, "老师评价不为空");
@@ -112,7 +113,7 @@ public class TeacherAnswerController {
             @ApiImplicitParam(name = "num", value = "奖励", dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "classId", value = "班级id", dataType = "string", paramType = "form")
     })
-    public Mono<WebResult> addReward(@RequestBody AddRewardReq addRewardReq, ServerHttpRequest serverHttpRequest){
+    public Mono<WebResult> addReward(@RequestBody AddRewardReq addRewardReq, @ApiIgnore ServerHttpRequest serverHttpRequest){
         answerVerify.verify(addRewardReq);
         MyAssert.isNull(addRewardReq.getChapterId(), DefineCode.ERR0010, "章节不为空");
         MyAssert.isNull(addRewardReq.getStudentId(), DefineCode.ERR0010, "学生id不为空");

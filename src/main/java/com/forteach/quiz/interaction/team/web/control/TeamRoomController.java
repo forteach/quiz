@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import static com.forteach.quiz.interaction.team.constant.Dic.TEAM_FOREVER;
 
@@ -47,7 +48,7 @@ public class TeamRoomController {
             @ApiImplicitParam(name = "classId", value = "班级id", dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "expType", value = "分组的有效期 forever : 永久, temporarily : 临时", required = true, dataType = "string", paramType = "form")
     })
-    public Mono<WebResult> groupRandom(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody GroupRandomReq random, ServerHttpRequest request) {
+    public Mono<WebResult> groupRandom(@ApiParam(value = "填入分组个数,随机分组", required = true) @RequestBody GroupRandomReq random, @ApiIgnore ServerHttpRequest request) {
         MyAssert.isNull(random.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
         MyAssert.isNull(random.getNumber(), DefineCode.ERR0010, "分组数量不为空");
         MyAssert.isNull(random.getExpType(), DefineCode.ERR0010, "分组有效期不为空");

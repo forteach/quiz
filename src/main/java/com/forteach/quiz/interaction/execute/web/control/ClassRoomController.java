@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class ClassRoomController{
             @ApiImplicitParam(value = "教室ID", name = "teacherId", dataType = "string", paramType = "from"),
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> createInteractiveRoom(@RequestBody InteractiveRoomVo roomVo, ServerHttpRequest request) {
+    public Mono<WebResult> createInteractiveRoom(@RequestBody InteractiveRoomVo roomVo, @ApiIgnore ServerHttpRequest request) {
         MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
         Optional<String> teacherId = tokenService.getTeacherId(request);
         teacherId.ifPresent(roomVo::setTeacherId);
@@ -60,7 +61,7 @@ public class ClassRoomController{
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂Id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
-    public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, ServerHttpRequest request) {
+    public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, @ApiIgnore ServerHttpRequest request) {
 //        //验证请求参数
         MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
         joinVo.setExamineeId(tokenService.getStudentId(request));

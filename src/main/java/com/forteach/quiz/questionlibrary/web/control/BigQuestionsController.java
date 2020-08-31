@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -51,7 +52,7 @@ public class BigQuestionsController extends BaseAllController<BigQuestion> {
     @ApiImplicitParams({
             @ApiImplicitParam(dataTypeClass = BigQuestion.class, required = true, paramType = "form")
     })
-    public Mono<WebResult> editBigQuestion(@Valid @RequestBody @ApiParam(value = "编辑大题", required = true) BigQuestion bigQuestion, ServerHttpRequest request) {
+    public Mono<WebResult> editBigQuestion(@Valid @RequestBody @ApiParam(value = "编辑大题", required = true) BigQuestion bigQuestion, @ApiIgnore ServerHttpRequest request) {
         tokenService.getTeacherId(request).ifPresent(bigQuestion::setTeacherId);
         return bigQuestionService.editBigQuestion(bigQuestion).map(WebResult::okResult);
     }
