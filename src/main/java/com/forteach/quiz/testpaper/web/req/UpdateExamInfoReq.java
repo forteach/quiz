@@ -1,9 +1,11 @@
 package com.forteach.quiz.testpaper.web.req;
 
+import cn.hutool.core.date.DateUtil;
+import com.forteach.quiz.testpaper.web.vo.ClassVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,7 +17,6 @@ import java.util.List;
  * @Modified：保存考试记录信息
  * @Description:
  */
-@Data
 @ApiModel(value = "保存试卷信息")
 public class UpdateExamInfoReq implements Serializable {
 
@@ -52,6 +53,127 @@ public class UpdateExamInfoReq implements Serializable {
     /**
      * 需要考试的班级集合
      */
-    @ApiModelProperty(name = "classList", value = "需要考试的班级Id集合", dataType = "list", required = true)
-    private List<String> classList;
+    @ApiModelProperty(name = "classList", value = "需要考试的班级集合包含班级Id和名称", dataType = "list", required = true)
+    private List<ClassVo> classList;
+
+    @ApiModelProperty(name = "testPaperId", value = "试卷id", dataType = "string", required = true)
+    private String testPaperId;
+
+    @ApiModelProperty(name = "testPaperName", value = "试卷名称", dataType = "string", required = true)
+    private String testPaperName;
+
+    /**
+     * 课程id
+     */
+    @NotBlank(message = "课程id 不为空")
+    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string", required = true)
+    private String courseId;
+    /**
+     * 课程名称
+     */
+    @NotBlank(message = "课程名不为空")
+    @ApiModelProperty(name = "courseName", value = "课程名称", dataType = "string", required = true)
+    private String courseName;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        if (null == year){
+            year = DateUtil.thisYear();
+        }
+        this.year = year;
+    }
+
+    public Integer getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Integer semester) {
+        if (null == semester){
+            semester = com.forteach.quiz.util.DateUtil.getSemesterByNow();
+        }
+        this.semester = semester;
+    }
+
+    public String getTeacherId() {
+        return teacherId;
+    }
+
+    public void setTeacherId(String teacherId) {
+        this.teacherId = teacherId;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    public String getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(String startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public String getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(String endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
+    public List<ClassVo> getClassList() {
+        return classList;
+    }
+
+    public void setClassList(List<ClassVo> classList) {
+        this.classList = classList;
+    }
+
+    public String getTestPaperId() {
+        return testPaperId;
+    }
+
+    public void setTestPaperId(String testPaperId) {
+        this.testPaperId = testPaperId;
+    }
+
+    public String getTestPaperName() {
+        return testPaperName;
+    }
+
+    public void setTestPaperName(String testPaperName) {
+        this.testPaperName = testPaperName;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
 }

@@ -32,7 +32,7 @@ public class ExamInfoServiceTest {
     public void saveUpdate() {
         ExamInfo examInfo = new ExamInfo();
         examInfo.setId(IdUtil.objectId());
-        examInfo.setClassList(CollUtil.toList("12","32","2323"));
+        examInfo.setClassList(CollUtil.toList());
         examInfo.setStartDateTime(DateUtil.offsetHour(new Date(), 1).toString());
         examInfo.setEndDateTime(DateUtil.offsetHour(new Date(), 3).toString());
         examInfo.setSemester(2);

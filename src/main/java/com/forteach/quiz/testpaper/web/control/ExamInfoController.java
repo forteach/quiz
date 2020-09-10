@@ -8,6 +8,7 @@ import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.testpaper.domain.ExamInfo;
 import com.forteach.quiz.testpaper.service.ExamInfoService;
 import com.forteach.quiz.testpaper.web.req.FindExamInfoReq;
+import com.forteach.quiz.testpaper.web.req.FindMyExamInfoReq;
 import com.forteach.quiz.testpaper.web.req.UpdateExamInfoReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,12 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * @Author: zhangyy
@@ -62,5 +62,21 @@ public class ExamInfoController {
         String teacherId = tokenService.getTeacherId(request).get();
         req.setTeacherId(teacherId);
         return examInfoService.findAll(req).collectList().map(WebResult::okResult);
+    }
+
+
+    @ApiOperation(value = "学生查询自己的考试信息")
+    @PostMapping(path = "/myExamInfo")
+    public Mono<WebResult> findMyExamInfo(@RequestBody FindMyExamInfoReq req, @ApiIgnore ServerHttpRequest request){
+        String classId = tokenService.getClassId(request);
+        req.setClassId(classId);
+        return examInfoService.findMyExamInfo(req).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "学生查询试卷判断是否到考试时间")
+    @PostMapping(path = "/{testPaperId}")
+    public Mono<WebResult> decide(@PathVariable @Validated @NotBlank(message = "试卷编号不能为空") String testPaperId, @ApiIgnore ServerHttpRequest request){
+        String classId = tokenService.getClassId(request);
+        return examInfoService.decide(classId, testPaperId).map(WebResult::okResult);
     }
 }

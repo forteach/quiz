@@ -3,12 +3,14 @@ package com.forteach.quiz.testpaper.domain;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.domain.BaseEntity;
+import com.forteach.quiz.testpaper.web.vo.ClassVo;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,17 +50,33 @@ public class ExamInfo extends BaseEntity {
     /**
      * 开始日期
      */
-//    @JsonIgnore
     private LocalDateTime startDateTime;
     /**
      * 结束日期
      */
-//    @JsonIgnore
     private LocalDateTime endDateTime;
     /**
      * 需要考试的班级集合
      */
-    private List<String> classList;
+    private List<ClassVo> classList;
+    /**
+     * 课程id
+     */
+    private String courseId;
+    /**
+     * 课程名称
+     */
+    private String courseName;
+    /**
+     * 试卷id
+     * @return
+     */
+    private String testPaperId;
+
+    /**
+     * 试卷名称
+     */
+    private String testPaperName;
 
     public Integer getYear() {
         return year;
@@ -94,52 +112,67 @@ public class ExamInfo extends BaseEntity {
 
     public String getStartDateTime() {
         if (null != startDateTime){
-            return startDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return startDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         }
         return "";
     }
 
     public void setStartDateTime(String startDateTime) {
         if (StrUtil.isNotBlank(startDateTime)) {
-            this.startDateTime = LocalDateTime.parse(startDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            this.startDateTime = LocalDateTime.parse(startDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         }
     }
 
     public String getEndDateTime() {
         if (null != endDateTime) {
-            return endDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return endDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         }
         return "";
     }
 
     public void setEndDateTime(String endDateTime) {
         if (StrUtil.isNotBlank(endDateTime)) {
-            this.endDateTime = LocalDateTime.parse(endDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            this.endDateTime = LocalDateTime.parse(endDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         }
     }
 
-
-//    public Date getStartDateTime() {
-//        return startDateTime;
-//    }
-//
-//    public void setStartDateTime(Date startDateTime) {
-//        this.startDateTime = startDateTime;
-//    }
-//
-//    public Date getEndDateTime() {
-//        return endDateTime;
-//    }
-//
-//    public void setEndDateTime(Date endDateTime) {
-//        this.endDateTime = endDateTime;
-//    }
-
-    public List<String> getClassList() {
+    public List<ClassVo> getClassList() {
         return classList;
     }
 
-    public void setClassList(List<String> classList) {
+    public void setClassList(List<ClassVo> classList) {
         this.classList = classList;
+    }
+
+    public String getTestPaperId(){
+        return testPaperId;
+    }
+
+    public void setTestPaperId(String testPaperId){
+        this.testPaperId = testPaperId;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public String getTestPaperName() {
+        return testPaperName;
+    }
+
+    public void setTestPaperName(String testPaperName) {
+        this.testPaperName = testPaperName;
     }
 }
