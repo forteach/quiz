@@ -41,8 +41,8 @@ public class TestPaperResult extends BaseEntity {
     /**
      * 考试分数
      */
-    @ApiModelProperty(name = "testScore", value = "考试试卷分数", dataType = "number")
-    private Number testScore;
+    @ApiModelProperty(name = "testScore", value = "考试试卷分数", dataType = "int")
+    private int testScore;
     /**
      * 课程id
      */
@@ -97,20 +97,9 @@ public class TestPaperResult extends BaseEntity {
     @ApiModelProperty(name = "className", value = "班级名称", dataType = "string")
     private String className;
 
-    //答题结果
     /**
-     * 单选
+     * 答题结果
      */
-    @ApiModelProperty(name = "singleListResult", value = "单选回答结果", dataType = "list")
-    private List<ResultVo> singleListResult;
-    /**
-     * 多选
-     */
-    @ApiModelProperty(name = "multipleListResult", value = "多选回答结果", dataType = "list")
-    private List<ResultVo> multipleListResult;
-    /**
-     * 判断
-     */
-    @ApiModelProperty(name = "trueOrFalseResult", value = "判断回答结果", dataType = "list")
-    private List<ResultVo> trueOrFalseListResult;
+    @ApiModelProperty(name = "resultList", value = "回答结果", dataType = "list")
+    private List<ResultVo> resultList;
 }

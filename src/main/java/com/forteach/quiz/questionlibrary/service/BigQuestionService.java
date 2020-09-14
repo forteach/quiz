@@ -2,6 +2,7 @@ package com.forteach.quiz.questionlibrary.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.problemsetlibrary.repository.BigQuestionProblemSetRepository;
 import com.forteach.quiz.questionlibrary.domain.BigQuestion;
@@ -83,7 +84,7 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
      * @param bigQuestion
      * @return
      */
-    private BigQuestion setBigQuestionUUID(final BigQuestion bigQuestion) {
+    public BigQuestion setBigQuestionUUID(final BigQuestion bigQuestion) {
         bigQuestion.setExamChildren((List) bigQuestion.getExamChildren()
                 .stream()
                 .map(obj -> {
@@ -263,4 +264,7 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
         });
     }
 
+    public Mono<BigQuestion> findById(final String questionId){
+        return bigQuestionRepository.findById(questionId).switchIfEmpty(Mono.error(new CustomException("没有找到试卷")));
+    }
 }

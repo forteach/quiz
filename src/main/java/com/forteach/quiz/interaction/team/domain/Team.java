@@ -3,7 +3,6 @@ package com.forteach.quiz.interaction.team.domain;
 import com.forteach.quiz.web.pojo.Students;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 

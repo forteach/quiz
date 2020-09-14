@@ -1,10 +1,9 @@
 package com.forteach.quiz.interaction.execute.web.vo;
 
-import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 /**
  * @Description:

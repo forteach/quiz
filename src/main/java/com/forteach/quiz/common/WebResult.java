@@ -1,6 +1,5 @@
 package com.forteach.quiz.common;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.forteach.quiz.util.PropertiesUtil;
 import com.forteach.quiz.web.vo.BigQuestionView;

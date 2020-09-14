@@ -1,28 +1,7 @@
 package com.forteach.quiz.interaction.execute.service;
 
-import com.forteach.quiz.common.DataUtil;
-import com.forteach.quiz.exceptions.AskException;
-import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
-import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
-import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.redis.core.ReactiveHashOperations;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import static com.forteach.quiz.common.Dic.INTERACT_RECORD_EXERCISEBOOKS;
 //import static com.forteach.quiz.interaction.execute.config.BigQueKey.CLASSROOM_ASK_QUESTIONS_ID;
 /**
  * @Description: 提问交互

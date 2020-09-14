@@ -1,26 +1,8 @@
 package com.forteach.quiz.interaction.execute.service;
 
-import com.forteach.quiz.common.DataUtil;
-import com.forteach.quiz.exceptions.AskException;
-//import com.forteach.quiz.interaction.execute.config.BigQueKey;
-import com.forteach.quiz.interaction.execute.domain.ActivityAskAnswer;
-import com.forteach.quiz.interaction.execute.service.record.InsertInteractRecordService;
-import com.forteach.quiz.interaction.execute.web.vo.InteractiveSheetVo;
-import com.forteach.quiz.interaction.execute.web.vo.MoreGiveVo;
-import com.forteach.quiz.questionlibrary.domain.QuestionType;
-import com.mongodb.client.result.UpdateResult;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.redis.core.ReactiveHashOperations;
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import java.time.Duration;
-import java.util.*;
-import static com.forteach.quiz.common.Dic.INTERACT_RECORD_SURVEYS;
+
+//import com.forteach.quiz.interaction.execute.config.BigQueKey;
 /**
  * @Description: 问卷
  * @author: liu zhenming

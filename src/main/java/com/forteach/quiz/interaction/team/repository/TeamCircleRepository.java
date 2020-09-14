@@ -1,7 +1,6 @@
 package com.forteach.quiz.interaction.team.repository;
 
 import com.forteach.quiz.interaction.team.domain.TeamCircle;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**

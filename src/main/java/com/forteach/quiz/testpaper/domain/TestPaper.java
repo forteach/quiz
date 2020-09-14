@@ -27,12 +27,16 @@ import java.util.List;
 public class TestPaper extends BaseEntity {
     @ApiModelProperty(name = "testPaperName", value = "试卷名称", dataType = "string")
     private String testPaperName;
+
     @ApiModelProperty(name = "courseId", value = "课程Id", dataType = "string")
     private String courseId;
+
     @ApiModelProperty(name = "courseName", value = "课程名称", dataType = "string")
     private String courseName;
+
     @ApiModelProperty(name = "teacherId", value = "教师", dataType = "string")
     private String teacherId;
+
     @ApiModelProperty(name = "teacherName", value = "教师名称", dataType = "string")
     private String teacherName;
 
@@ -47,6 +51,7 @@ public class TestPaper extends BaseEntity {
 
     @ApiModelProperty(name = "totalScore", value = "总成绩分数", dataType = "int")
     private Integer totalScore;
+
     @ApiModelProperty(name = "passingScore", value = "及格分数", dataType = "int")
     private Integer passingScore;
     /**

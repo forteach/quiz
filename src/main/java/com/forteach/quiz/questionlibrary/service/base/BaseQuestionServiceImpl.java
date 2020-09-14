@@ -2,8 +2,6 @@ package com.forteach.quiz.questionlibrary.service.base;
 
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
-import com.forteach.quiz.common.DefineCode;
-import com.forteach.quiz.common.MyAssert;
 import com.forteach.quiz.exceptions.CustomException;
 import com.forteach.quiz.exceptions.ExamQuestionsException;
 import com.forteach.quiz.exceptions.ProblemSetException;
@@ -23,7 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;

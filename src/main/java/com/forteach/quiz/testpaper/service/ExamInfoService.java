@@ -1,10 +1,7 @@
 package com.forteach.quiz.testpaper.service;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.forteach.quiz.testpaper.domain.ExamInfo;
 import com.forteach.quiz.testpaper.repository.ExamInfoRepository;
 import com.forteach.quiz.testpaper.web.req.FindExamInfoReq;
@@ -21,7 +18,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.List;
 
 /**

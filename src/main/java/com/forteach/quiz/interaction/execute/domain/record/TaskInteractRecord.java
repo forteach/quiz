@@ -2,6 +2,7 @@ package com.forteach.quiz.interaction.execute.domain.record;
 
 import com.forteach.quiz.common.DataUtil;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

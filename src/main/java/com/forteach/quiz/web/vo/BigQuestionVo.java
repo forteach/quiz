@@ -1,7 +1,6 @@
 package com.forteach.quiz.web.vo;
 
 import com.forteach.quiz.questionlibrary.domain.base.QuestionExamEntity;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;

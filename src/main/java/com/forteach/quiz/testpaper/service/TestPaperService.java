@@ -47,4 +47,8 @@ public class TestPaperService {
             return testPaperRepository.findAll(sort);
         }
     }
+
+    public Mono<TestPaper> findById(String id){
+        return testPaperRepository.findById(id);
+    }
 }

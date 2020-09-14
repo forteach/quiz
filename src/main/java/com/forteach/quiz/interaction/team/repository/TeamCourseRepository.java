@@ -1,12 +1,7 @@
 package com.forteach.quiz.interaction.team.repository;
 
 import com.forteach.quiz.interaction.team.domain.TeamCourse;
-import com.mongodb.client.result.UpdateResult;
-import org.springframework.data.mongodb.core.ReactiveMongoOperations;
-import org.springframework.data.mongodb.repository.DeleteQuery;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import reactor.core.publisher.Mono;
 
 /**
  * @author: zhangyy

@@ -22,10 +22,13 @@ public class ResultVo implements Serializable {
      */
     @ApiModelProperty(name = "questionId", value = "习题编号", dataType = "string", required = true)
     private String questionId;
+
+    @ApiModelProperty(name = "questionType", value = "习题类型", dataType = "string", required = true)
+    private String questionType;
     /**
      * 回答结果
      */
-    @ApiModelProperty(name = "answer", value = "回答结果", dataType = "string")
+    @ApiModelProperty(name = "answer", value = "回答结果", dataType = "string", required = true)
     private String answer;
     /**
      * 评价
@@ -35,11 +38,30 @@ public class ResultVo implements Serializable {
     /**
      * 结果对错
      */
-    @ApiModelProperty(name = "result", value = "回答结果正确与否", dataType = "boolean")
+    @ApiModelProperty(name = "result", value = "回答结果正确与否", dataType = "boolean", required = true)
     private Boolean result;
     /**
      * 评分
      */
-    @ApiModelProperty(name = "score", value = "评分", dataType = "number")
-    private Number score;
+    @ApiModelProperty(name = "score", value = "评分", dataType = "int", required = true)
+    private int score;
+
+    public ResultVo() {
+    }
+
+//    public ResultVo(String questionId, String answer, Boolean result, Number score, String questionType) {
+//        this.questionId = questionId;
+//        this.answer = answer;
+//        this.result = result;
+//        this.score = score;
+//        this.questionType = questionType;
+//    }
+//
+//    public ResultVo(String questionId, String answer, String assess, Boolean result, Number score) {
+//        this.questionId = questionId;
+//        this.answer = answer;
+//        this.assess = assess;
+//        this.result = result;
+//        this.score = score;
+//    }
 }

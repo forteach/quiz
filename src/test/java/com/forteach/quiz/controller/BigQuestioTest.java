@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.WebResult;
 import com.forteach.quiz.interaction.execute.web.vo.BigQuestionGiveVo;
 import com.forteach.quiz.interaction.execute.web.vo.DataDatumVo;
-import com.forteach.quiz.interaction.execute.web.vo.DelSelectStuVo;
 import com.forteach.quiz.web.vo.InteractAnswerVo;
 import com.forteach.quiz.web.vo.RaisehandVo;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+
 import javax.annotation.Resource;
 import java.util.Arrays;
 
