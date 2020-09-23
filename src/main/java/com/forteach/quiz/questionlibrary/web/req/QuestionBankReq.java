@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -15,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel(value = "题库条件查询", description = "题库条件查询")
-public class QuestionBankReq extends SortVo {
+public class QuestionBankReq extends SortVo implements Serializable {
 
     /**
      * 章节id

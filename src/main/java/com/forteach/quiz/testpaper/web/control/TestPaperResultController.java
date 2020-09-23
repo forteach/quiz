@@ -1,10 +1,10 @@
 package com.forteach.quiz.testpaper.web.control;
 
 import com.forteach.quiz.common.WebResult;
-import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.service.TokenService;
 import com.forteach.quiz.testpaper.service.TestPaperResultService;
 import com.forteach.quiz.testpaper.web.req.AddResultReq;
+import com.forteach.quiz.testpaper.web.req.TestPaperPageReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -30,30 +30,27 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @Api(value = "试卷回答记录", tags = {"试卷回答信息"}, description = "试卷回答信息")
 @RequestMapping(path = "/testPaperResult", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class TestPaperResultController<T extends BigQuestion> {
+public class TestPaperResultController {
 
     private final TokenService tokenService;
 
-//    private final ExamInfoService examInfoService;
-
     private final TestPaperResultService testPaperResultService;
 
-    public TestPaperResultController(TokenService tokenService,// ExamInfoService examInfoService,
+    public TestPaperResultController(TokenService tokenService,
                                      TestPaperResultService testPaperResultService) {
         this.tokenService = tokenService;
-//        this.examInfoService = examInfoService;
         this.testPaperResultService = testPaperResultService;
     }
 
     @PostMapping(path = "/addResult")
     @ApiOperation(value = "学生回答")
-    public Mono<WebResult> addResult(@RequestBody @Validated AddResultReq resultReq, @ApiIgnore ServerHttpRequest request){
-//        String classId = tokenService.getClassId(request);
-//        String classId = resultReq.getClassId();
-//        Mono<Boolean> decide = examInfoService.decide(classId, resultReq.getTestPaperId());
-//        MyAssert.isFalse(decide., DefineCode.ERR0013, "您没有对应的权限");
-//        resultReq.setClassId(classId);
-
+    public Mono<WebResult> addResult(@RequestBody @Validated AddResultReq resultReq, @ApiIgnore ServerHttpRequest request) {
         return testPaperResultService.addResult(resultReq).map(WebResult::okResult);
+    }
+
+    @PostMapping(path = "/findAllPage")
+    @ApiOperation(value = "查询成绩")
+    public Mono<WebResult> findAllPage(@RequestBody @Validated TestPaperPageReq req){
+        return testPaperResultService.findAllPage(req).map(WebResult::okResult);
     }
 }

@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @Author: zhangyy
@@ -48,11 +49,6 @@ public class ExamInfoService {
         if (StrUtil.isNotBlank(req.getClassId())) {
             criteria.andOperator(new Criteria().and("classList.classId").in(req.getClassId()));
         }
-//        if (StrUtil.isNotBlank(req.getCourseName())){
-        // 模糊匹配
-//            Pattern pattern = Pattern.compile("^.*+" + req.getCourseName() + "+.*$", Pattern.CASE_INSENSITIVE);
-//            Criteria.where("courseName").regex(pattern);
-//        }
         if (StrUtil.isNotBlank(req.getCourseId())) {
             criteria.and("courseId").is(req.getCourseId());
         }
@@ -76,7 +72,13 @@ public class ExamInfoService {
         if (StrUtil.isNotBlank(req.getTestPaperId())) {
             criteria.and("testPaperId").is(req.getTestPaperId());
         }
-        return reactiveMongoTemplate.find(Query.query(criteria), ExamInfo.class);
+        if (StrUtil.isNotBlank(req.getCourseName())){
+        // 模糊匹配
+            Pattern pattern = Pattern.compile("^.*" + req.getCourseName() + ".*$", Pattern.CASE_INSENSITIVE);
+            criteria.and("courseName").regex(pattern);
+        }
+        Query query = new Query().addCriteria(criteria);
+        return reactiveMongoTemplate.find(query, ExamInfo.class);
 
 
 //        final Sort sort = new Sort(Sort.Direction.DESC, "uDate");

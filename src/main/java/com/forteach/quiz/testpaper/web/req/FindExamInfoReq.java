@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @Author: zhangyy
  * @Email: zhang10092009@hotmail.com
@@ -19,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(value = "查询考试信息")
-public class FindExamInfoReq extends SortVo {
+public class FindExamInfoReq extends SortVo implements Serializable {
 
     @ApiModelProperty(name = "classId", value = "班级id", dataType = "string")
     private String classId;
@@ -48,6 +50,9 @@ public class FindExamInfoReq extends SortVo {
 
     @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
     private String courseId;
+
+    @ApiModelProperty(name = "courseName", value = "课程名称", dataType = "string")
+    private String courseName;
 
     public String getClassId() {
         return classId;
@@ -117,5 +122,13 @@ public class FindExamInfoReq extends SortVo {
 
     public void setCourseId(String courseId) {
         this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 }

@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -13,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ProblemSetReq extends SortVo {
+public class ProblemSetReq extends SortVo implements Serializable {
 
     /**
      * 题集类型：1、预习练习册 2、课堂练习册3、课后作业册
