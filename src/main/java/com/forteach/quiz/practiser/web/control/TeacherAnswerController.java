@@ -67,7 +67,7 @@ public class TeacherAnswerController {
             @ApiImplicitParam(name = "evaluation", value = "主观题 教师给出的答案评价", required = true, example = "客观题: true  false  halfOf, 答案评价  主观题: {人工输入:优.良.中.差}    客观题: true  false  halfOf"),
             @ApiImplicitParam(name = "score", value = "得分", dataType = "string", paramType = "form")
     })
-    public Mono<WebResult> gradeAnswer(@RequestBody GradeAnswerReq gradeAnswerReq, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> gradeAnswer(@RequestBody GradeAnswerReq gradeAnswerReq, @ApiIgnore ServerHttpRequest request) {
         answerVerify.verify(gradeAnswerReq);
         MyAssert.isNull(gradeAnswerReq.getStudentId(), DefineCode.ERR0010, "要批改的学生id不为空");
         MyAssert.isNull(gradeAnswerReq.getEvaluation(), DefineCode.ERR0010, "老师评价不为空");
@@ -92,14 +92,12 @@ public class TeacherAnswerController {
             @ApiImplicitParam(name = "isAnswerCompleted", value = "是否回答完作业/习题 Y/N", dataType = "string", required = true, paramType = "query"),
             @ApiImplicitParam(name = "isCorrectCompleted", value = "是否批改完作业/习题 Y/N", example = "只有回答完的才传值", dataType = "string", paramType = "query")
     })
-    public Mono<WebResult> findAnswer(@RequestBody FindAnswerStudentReq findAnswerStudentReq){
+    public Mono<WebResult> findAnswer(@RequestBody FindAnswerStudentReq findAnswerStudentReq) {
         answerVerify.verify(findAnswerStudentReq);
         MyAssert.isNull(findAnswerStudentReq.getIsAnswerCompleted(), DefineCode.ERR0010, "是否回答完作业不为空");
         return exerciseBookSnapshotService.findAnswer(findAnswerStudentReq)
                 .map(WebResult::okResult);
     }
-
-
 
 
     @ApiOperation(value = "老师给予学生奖励", notes = "教师给予学生小红花等奖励")
@@ -113,7 +111,7 @@ public class TeacherAnswerController {
             @ApiImplicitParam(name = "num", value = "奖励", dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "classId", value = "班级id", dataType = "string", paramType = "form")
     })
-    public Mono<WebResult> addReward(@RequestBody AddRewardReq addRewardReq, @ApiIgnore ServerHttpRequest serverHttpRequest){
+    public Mono<WebResult> addReward(@RequestBody AddRewardReq addRewardReq, @ApiIgnore ServerHttpRequest serverHttpRequest) {
         answerVerify.verify(addRewardReq);
         MyAssert.isNull(addRewardReq.getChapterId(), DefineCode.ERR0010, "章节不为空");
         MyAssert.isNull(addRewardReq.getStudentId(), DefineCode.ERR0010, "学生id不为空");

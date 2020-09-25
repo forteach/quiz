@@ -26,7 +26,4 @@ public class KeyStorage {
     public static final String ANSW_HAND_STUDENT_DISTINCT = "distinctAnswHand";
 
 
-
-
-
 }

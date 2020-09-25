@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "teamCourse")
 @NoArgsConstructor
-public class TeamCourse extends BaseTeam{
+public class TeamCourse extends BaseTeam {
     /**
      * 课程id
      */

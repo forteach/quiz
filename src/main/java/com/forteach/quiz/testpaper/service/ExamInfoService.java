@@ -72,8 +72,8 @@ public class ExamInfoService {
         if (StrUtil.isNotBlank(req.getTestPaperId())) {
             criteria.and("testPaperId").is(req.getTestPaperId());
         }
-        if (StrUtil.isNotBlank(req.getCourseName())){
-        // 模糊匹配
+        if (StrUtil.isNotBlank(req.getCourseName())) {
+            // 模糊匹配
             Pattern pattern = Pattern.compile("^.*" + req.getCourseName() + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("courseName").regex(pattern);
         }
@@ -126,6 +126,7 @@ public class ExamInfoService {
 
     /**
      * 判断班级学生现在是否在考试时间
+     *
      * @param classId
      * @param testPaperId
      * @return

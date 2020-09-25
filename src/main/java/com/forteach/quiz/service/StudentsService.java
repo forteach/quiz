@@ -33,10 +33,11 @@ public class StudentsService {
 
     /**
      * 根据学生id转换为用户学生信息
+     *
      * @param strings
      * @return
      */
-    public Mono<List<Students>> exchangeStudents(List<String> strings){
+    public Mono<List<Students>> exchangeStudents(List<String> strings) {
         return Flux.fromIterable(strings)
                 .filter(StrUtil::isNotBlank)
                 .flatMap(this::findStudentsBrief)
@@ -45,6 +46,7 @@ public class StudentsService {
 
     /**
      * 从redis 查询学生信息并返回相关对象
+     *
      * @param id 加入课堂的学生id
      * @return 学生 Mono
      */
@@ -60,7 +62,8 @@ public class StudentsService {
 
     /**
      * 从redis 查找学生名称
-     * @param id　学生对应的id
+     *
+     * @param id 　学生对应的id
      * @return 学生名字
      */
     public Mono<String> findStudentsName(final String id) {
@@ -69,7 +72,8 @@ public class StudentsService {
 
     /**
      * 从redis 查找学生头像
-     * @param id　学生对应的id
+     *
+     * @param id 　学生对应的id
      * @return 学生头像对应的url
      */
     public Mono<String> findStudentsPortrait(final String id) {

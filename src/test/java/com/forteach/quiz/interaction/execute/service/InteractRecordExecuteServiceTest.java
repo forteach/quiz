@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class InteractRecordExecuteServiceTest {
 
-//    @Autowired
+    //    @Autowired
 //    private InteractRecordExecuteService interactRecordExecuteService;
     @Test
     public void getRecord() {

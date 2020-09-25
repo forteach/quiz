@@ -42,10 +42,6 @@ public class GroupRandomReq implements Serializable {
     @ApiModelProperty(hidden = true)
     private String teacherId;
 
-    public String getGroupKey() {
-        return circleId.concat(ASK_GROUP).concat(classId);
-    }
-
     public GroupRandomReq() {
     }
 
@@ -54,5 +50,9 @@ public class GroupRandomReq implements Serializable {
         this.classId = classId;
         this.expType = expType;
         this.teacherId = teacherId;
+    }
+
+    public String getGroupKey() {
+        return circleId.concat(ASK_GROUP).concat(classId);
     }
 }

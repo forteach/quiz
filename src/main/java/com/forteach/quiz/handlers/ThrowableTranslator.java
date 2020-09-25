@@ -21,6 +21,10 @@ class ThrowableTranslator {
         this.message = throwable.getMessage();
     }
 
+    static <T extends Throwable> Mono<ThrowableTranslator> translate(final Mono<T> throwable) {
+        return throwable.flatMap(error -> Mono.just(new ThrowableTranslator(error)));
+    }
+
     /**
      * 根据不同的错误 给予不同的错误码
      *
@@ -43,9 +47,5 @@ class ThrowableTranslator {
 
     String getMessage() {
         return message;
-    }
-
-    static <T extends Throwable> Mono<ThrowableTranslator> translate(final Mono<T> throwable) {
-        return throwable.flatMap(error -> Mono.just(new ThrowableTranslator(error)));
     }
 }

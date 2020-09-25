@@ -63,10 +63,10 @@ public class AskAnswer extends BaseEntity {
 
 //
     /**
-     //     * 问题库类别
-     //
+     * //     * 问题库类别
+     * //
      */
-    @ApiModelProperty(value = "提问：TiWen  任务：RenWu", name ="questionType")
+    @ApiModelProperty(value = "提问：TiWen  任务：RenWu", name = "questionType")
     private String questionType;
     /**
      * 答案对错

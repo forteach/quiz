@@ -39,6 +39,7 @@ public class SingleQueKey {
     public static String questionsNow(String questionId) {
         return questionId.concat(CLASSROOM_ASK_NOW);
     }
+
     /**
      * 发布课堂互动题目
      *
@@ -53,8 +54,8 @@ public class SingleQueKey {
      *
      * @return 上一次的问题前缀+课堂+问题类型+回答方式=ForValu
      */
-    public static String askTypeQuestionsIdPrve(final String questType,final String circleId,final String interactive) {
-        return askTypeQuestionsId(questType,circleId,interactive).concat(CLASSROOM_ASK_PRVE);
+    public static String askTypeQuestionsIdPrve(final String questType, final String circleId, final String interactive) {
+        return askTypeQuestionsId(questType, circleId, interactive).concat(CLASSROOM_ASK_PRVE);
     }
 
     /**
@@ -63,7 +64,7 @@ public class SingleQueKey {
      * @return 当前问题前缀+课堂+问题类型+回答方式=ForValue
      */
     public static String askTypeQuestionsIdNow(final String questionType, String circleId, String interactive) {
-        return  askTypeQuestionsId(questionType, circleId, interactive).concat(CLASSROOM_ASK_NOW);
+        return askTypeQuestionsId(questionType, circleId, interactive).concat(CLASSROOM_ASK_NOW);
     }
 
     /**
@@ -71,7 +72,7 @@ public class SingleQueKey {
      *
      * @return 问题前缀+课堂+问题类型  题目列表set
      */
-    public static String askTypeQuestionsId(final String questType,final String circleId) {
+    public static String askTypeQuestionsId(final String questType, final String circleId) {
         return circleId.concat(CLASSROOM_ASK_QUESTIONS_ID).concat(questType);
     }
 
@@ -84,8 +85,8 @@ public class SingleQueKey {
         return circleId.concat(SingleQueKey.CLASSROOM_ASK_QUESTIONS_ID).concat(questionType.concat(interactive));
     }
 
-    public static String cleanTuiSong(String circleId,String questionId,String interactive,String pushType,String questionType){
-         return circleId.concat(questionId).concat(interactive).concat(ROOM_JOIN_SINGLE_TS).concat(questionType).concat(pushType);
+    public static String cleanTuiSong(String circleId, String questionId, String interactive, String pushType, String questionType) {
+        return circleId.concat(questionId).concat(interactive).concat(ROOM_JOIN_SINGLE_TS).concat(questionType).concat(pushType);
     }
 
 }

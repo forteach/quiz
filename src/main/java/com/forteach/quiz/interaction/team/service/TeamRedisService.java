@@ -35,9 +35,10 @@ public class TeamRedisService {
     private final ReactiveHashOperations<String, String, String> reactiveHashOperations;
     private final ReactiveStringRedisTemplate stringRedisTemplate;
     private final StudentsService studentsService;
+
     public TeamRedisService(ReactiveHashOperations<String, String, String> reactiveHashOperations,
                             StudentsService studentsService,
-                            ReactiveStringRedisTemplate stringRedisTemplate){
+                            ReactiveStringRedisTemplate stringRedisTemplate) {
         this.reactiveHashOperations = reactiveHashOperations;
         this.stringRedisTemplate = stringRedisTemplate;
         this.studentsService = studentsService;
@@ -45,68 +46,75 @@ public class TeamRedisService {
 
     /**
      * 根据 key 获取 分组的学生id ‘,’分割
+     *
      * @param key
      * @return
      */
-    Mono<String> getRedisStudents(final String key){
+    Mono<String> getRedisStudents(final String key) {
         return reactiveHashOperations.get(key, "students")
                 .flatMap(s -> MyAssert.isNull(s, DefineCode.ERR0002, "不存在相关记录"));
     }
 
     /**
      * 判断是否存redis 在相关信息
+     *
      * @param key
      * @return
      */
-    Mono<Boolean> redisHasKey(final String key){
+    Mono<Boolean> redisHasKey(final String key) {
         return stringRedisTemplate.hasKey(key)
                 .filterWhen(b -> MyAssert.isFalse(b, DefineCode.ERR0002, "不存在相关记录"));
     }
 
     /**
      * 获取课程/课堂id信息
+     *
      * @param key
      * @return
      */
-    Mono<String> findCircleId(final String key){
+    Mono<String> findCircleId(final String key) {
         return reactiveHashOperations.get(key, "circleId")
                 .flatMap(c -> MyAssert.isNull(c, DefineCode.ERR0002, "课程(课堂)信息不存在"));
     }
 
     /**
      * 获取班级信息
+     *
      * @param key
      * @return
      */
-    Mono<String> findClassId(final String key){
+    Mono<String> findClassId(final String key) {
         return reactiveHashOperations.get(key, "classId")
                 .flatMap(c -> MyAssert.isNull(c, DefineCode.ERR0002, "班级信息不存在"));
     }
 
     /**
      * 修改加入课堂的学生id信息
+     *
      * @param key
      * @param students
      * @return
      */
-    Mono<Boolean> putRedisStudents(final String key, final List<String> students){
+    Mono<Boolean> putRedisStudents(final String key, final List<String> students) {
         return reactiveHashOperations.put(key, "students", this.studentsListToStr(students))
                 .flatMap(b -> MyAssert.isFalse(!b, DefineCode.ERR0013, "redis修改失败"));
     }
 
     /**
      * 获取redis hash 中对应的值
+     *
      * @param key
      * @param value
      * @return
      */
-    Mono<String> findHashString(final String key, final String value){
+    Mono<String> findHashString(final String key, final String value) {
         return reactiveHashOperations.get(key, value)
                 .flatMap(s -> MyAssert.isNull(s, DefineCode.ERR0012, "要查询的值在redis 不存在"));
     }
 
     /**
      * 删除redis 记录的学生信息
+     *
      * @param key
      * @return
      */
@@ -124,8 +132,10 @@ public class TeamRedisService {
                 })
                 .flatMap(f -> Mono.just(true));
     }
+
     /**
      * redis 保存小组的详细信息
+     *
      * @param teamId
      * @param teamName
      * @param expType
@@ -148,6 +158,7 @@ public class TeamRedisService {
 
     /**
      * 保存学生信息到redis
+     *
      * @param teamResp
      * @param expType
      * @param circleId
@@ -164,6 +175,7 @@ public class TeamRedisService {
 
     /**
      * 添加小组信息到redis列表
+     *
      * @param teamList
      * @param randomVo
      * @return
@@ -197,10 +209,10 @@ public class TeamRedisService {
         return Mono.just(key).flatMap(k -> {
             if (TEAM_TEMPORARILY.equals(expType)) {
                 return stringRedisTemplate.expire(key, Duration.ofHours(4))
-                        .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
+                        .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0013, "设置redis有效期失败"));
             } else if (TEAM_FOREVER.equals(expType)) {
                 return stringRedisTemplate.expire(key, Duration.ofDays(5))
-                        .flatMap(b -> MyAssert.isFalse(b,DefineCode.ERR0013, "设置redis有效期失败"));
+                        .flatMap(b -> MyAssert.isFalse(b, DefineCode.ERR0013, "设置redis有效期失败"));
             } else {
                 return Mono.error(new Exception("分组的有效期不正确"));
             }
@@ -218,22 +230,24 @@ public class TeamRedisService {
         return String.join(",", students.toArray(new String[students.size()]));
     }
 
-    List<String> findListString(final String string){
+    List<String> findListString(final String string) {
         return Arrays.asList(string.split(","));
     }
 
     /**
      * 123,1234, ==> List<Students> listStudents
+     *
      * @param students
      * @return
      */
-    Mono<List<Students>> findStudentsListByStr(final String students){
+    Mono<List<Students>> findStudentsListByStr(final String students) {
         return studentsService.exchangeStudents(Arrays.asList(students.split(",")));
     }
 
 
     /**
      * 将学生列表信息转换为学生字符串信息
+     *
      * @param studentsList
      * @return
      */
@@ -247,6 +261,7 @@ public class TeamRedisService {
 
     /**
      * 将从mongodb中查询道德小组信息保存到redis
+     *
      * @param baseTeam
      * @return
      */
@@ -255,7 +270,7 @@ public class TeamRedisService {
             return saveRedisTeams(baseTeam.getTeamList(),
                     new GroupRandomReq(((TeamCircle) baseTeam).getCircleId(),
                             baseTeam.getClassId(), baseTeam.getExpType(), baseTeam.getTeacherId()));
-        }else if (baseTeam instanceof TeamCourse){
+        } else if (baseTeam instanceof TeamCourse) {
             return saveRedisTeams(baseTeam.getTeamList(),
                     new GroupRandomReq(((TeamCourse) baseTeam).getCourseId(),
                             baseTeam.getClassId(), baseTeam.getExpType(), baseTeam.getTeacherId()));

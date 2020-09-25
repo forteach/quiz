@@ -54,7 +54,7 @@ public class Team {
     public Team() {
     }
 
-    public String getTeamsGroupKey(final String teamId){
+    public String getTeamsGroupKey(final String teamId) {
         return teamId.concat(ASK_GROUP);
     }
 }

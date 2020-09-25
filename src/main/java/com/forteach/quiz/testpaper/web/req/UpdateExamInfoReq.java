@@ -88,7 +88,7 @@ public class UpdateExamInfoReq implements Serializable {
     }
 
     public void setYear(Integer year) {
-        if (null == year){
+        if (null == year) {
             year = DateUtil.thisYear();
         }
         this.year = year;
@@ -99,7 +99,7 @@ public class UpdateExamInfoReq implements Serializable {
     }
 
     public void setSemester(Integer semester) {
-        if (null == semester){
+        if (null == semester) {
             semester = com.forteach.quiz.util.DateUtil.getSemesterByNow();
         }
         this.semester = semester;

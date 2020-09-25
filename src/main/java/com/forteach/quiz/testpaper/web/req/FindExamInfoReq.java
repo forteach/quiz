@@ -75,7 +75,7 @@ public class FindExamInfoReq extends SortVo implements Serializable {
     }
 
     public void setYear(String year) {
-        if (StrUtil.isBlank(year)){
+        if (StrUtil.isBlank(year)) {
             year = String.valueOf(cn.hutool.core.date.DateUtil.thisYear());
         }
         this.year = year;
@@ -86,7 +86,7 @@ public class FindExamInfoReq extends SortVo implements Serializable {
     }
 
     public void setSemester(String semester) {
-        if (StrUtil.isBlank(semester)){
+        if (StrUtil.isBlank(semester)) {
             semester = String.valueOf(DateUtil.getSemesterByNow());
         }
         this.semester = semester;

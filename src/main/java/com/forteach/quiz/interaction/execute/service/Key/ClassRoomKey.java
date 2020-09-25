@@ -11,7 +11,7 @@ public class ClassRoomKey {
     /**
      * 当前课堂当前互动名称
      */
-    public static final String CLASSROOM_NOW_INTERACT= "NowInteract";
+    public static final String CLASSROOM_NOW_INTERACT = "NowInteract";
 
     /**
      * 课堂相关信息ID-Redis的编码前缀
@@ -50,29 +50,32 @@ public class ClassRoomKey {
 
     /**
      * 课堂所有学生
+     *
      * @param circleId
      * @return
      */
-    public static String getInteractiveIdQra(String circleId){
+    public static String getInteractiveIdQra(String circleId) {
         return circleId.concat(ClassRoomKey.CLASS_ROOM_QR_CODE_PREFIX);
     }
 
 
     /**
      * 课堂的上课教师
+     *
      * @param circleId
      * @return
      */
-    public static String getRoomTeacherKey(String circleId){
+    public static String getRoomTeacherKey(String circleId) {
         return circleId.concat(ClassRoomKey.CLASSROOM_TEACHER);
     }
 
     /**
      * 课堂的授课章节
+     *
      * @param circleId
      * @return
      */
-    public static String getRoomChapterKey(String circleId){
+    public static String getRoomChapterKey(String circleId) {
         return circleId.concat(ClassRoomKey.CLASSROOM_CHAPTER);
     }
 

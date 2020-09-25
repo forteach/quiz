@@ -28,16 +28,16 @@ public class Cumulative extends BaseEntity {
 //    @ApiModelProperty(value = "被累加的学生id", name = "studentId")
     private String studentId;
 
-//    @ApiModelProperty(value = "题目Id", name = "questionId")
+    //    @ApiModelProperty(value = "题目Id", name = "questionId")
     private String questionId;
 
-//    @ApiModelProperty(value = "题目互动活动 提问、任务", name = "questionType")
+    //    @ApiModelProperty(value = "题目互动活动 提问、任务", name = "questionType")
     private String questionType;
 
-//    @ApiModelProperty(value = "修改前", name = "preValue")
+    //    @ApiModelProperty(value = "修改前", name = "preValue")
     private String preValue;
 
-//    @ApiModelProperty(value = "修改后", name = "nextValue")
+    //    @ApiModelProperty(value = "修改后", name = "nextValue")
     private String nextValue;
 
     /**

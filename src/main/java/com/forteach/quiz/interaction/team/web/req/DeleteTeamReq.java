@@ -21,7 +21,7 @@ public class DeleteTeamReq implements Serializable {
     @ApiModelProperty(value = "小组id", notes = "小组id", name = "teamId", dataType = "string", required = true)
     private String teamId;
 
-    public String getTeamKey(){
+    public String getTeamKey() {
         return teamId.concat(ASK_GROUP);
     }
 }

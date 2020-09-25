@@ -57,7 +57,7 @@ public class FindMyExamInfoReq implements Serializable {
     }
 
     public void setSemester(String semester) {
-        if (StrUtil.isBlank(semester)){
+        if (StrUtil.isBlank(semester)) {
             semester = String.valueOf(com.forteach.quiz.util.DateUtil.getSemesterByNow());
         }
         this.semester = semester;
@@ -68,7 +68,7 @@ public class FindMyExamInfoReq implements Serializable {
     }
 
     public void setYear(String year) {
-        if (StrUtil.isBlank(year)){
+        if (StrUtil.isBlank(year)) {
             year = String.valueOf(DateUtil.thisYear());
         }
         this.year = year;
@@ -79,7 +79,7 @@ public class FindMyExamInfoReq implements Serializable {
     }
 
     public void setStartDateTime(String startDateTime) {
-        if (StrUtil.isBlank(startDateTime)){
+        if (StrUtil.isBlank(startDateTime)) {
             startDateTime = DateUtil.offsetDay(new Date(), -90).toString();
         }
         this.startDateTime = startDateTime;
@@ -90,7 +90,7 @@ public class FindMyExamInfoReq implements Serializable {
     }
 
     public void setEndDateTime(String endDateTime) {
-        if (StrUtil.isBlank(endDateTime)){
+        if (StrUtil.isBlank(endDateTime)) {
             endDateTime = DateUtil.offsetDay(new Date(), 90).toString();
         }
         this.endDateTime = endDateTime;

@@ -35,9 +35,9 @@ import javax.validation.Valid;
  */
 public abstract class BaseProblemSetController<T extends ProblemSet, R extends QuestionExamEntity, E extends ExerciseBook> {
 
+    public final TokenService tokenService;
     private final BaseExerciseBookService<E, R> exerciseBookService;
     private final BaseProblemSetService<T, R> service;
-    public final TokenService tokenService;
 
     public BaseProblemSetController(BaseProblemSetService<T, R> service,
                                     BaseExerciseBookService<E, R> exerciseBookService, TokenService tokenService) {

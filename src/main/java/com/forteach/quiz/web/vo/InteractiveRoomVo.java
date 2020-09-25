@@ -3,6 +3,7 @@ package com.forteach.quiz.web.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 /**
  * @Description: 创建临时课堂
  * @author: liu zhenming
@@ -42,7 +43,7 @@ public class InteractiveRoomVo {
         this.chapterId = chapterId;
     }
 
-    public InteractiveRoomVo(){
+    public InteractiveRoomVo() {
 
     }
 }

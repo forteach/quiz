@@ -13,5 +13,4 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 public interface TeamCircleRepository extends ReactiveMongoRepository<TeamCircle, String> {
 
 
-
 }

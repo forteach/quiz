@@ -159,7 +159,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static <T> Mono<T> isNull(final T value, int errcode, String format,
-                                  Object... args) {
+                                     Object... args) {
         if (null == value) {
             fail(errcode, String.format(format, args));
         }
@@ -204,7 +204,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static <T> Mono<T> notNull(final T value, int errcode, String format,
-                                   Object... args) {
+                                      Object... args) {
 
         if (null != value) {
             fail(errcode, String.format(format, args));
@@ -248,7 +248,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<String> notBlank(String value, int errcode, final String format,
-                                Object... args) {
+                                        Object... args) {
 
         if (StringUtils.isEmpty(value)) {
             fail(errcode, String.format(format, args));
@@ -303,7 +303,7 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<Integer> eq(int value, int expect, int errcode) {
-       return  eq(value, expect, errcode, null);
+        return eq(value, expect, errcode, null);
     }
 
     /**
@@ -315,7 +315,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> eq(int value, int expect, int errcode,
-                          final String message) {
+                                   final String message) {
         if (expect == value) {
             fail(errcode, message);
         }
@@ -330,7 +330,7 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<String> eq(String value, String expect, int errcode) {
-       return  eq(value, expect, errcode, null);
+        return eq(value, expect, errcode, null);
     }
 
     /**
@@ -344,7 +344,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static <T> Mono<String> eq(String value, String expect, int errcode,
-                              String format, Object... args) {
+                                      String format, Object... args) {
         if (args.length == 0) {
             eq(value, expect, errcode, format);
         } else {
@@ -362,7 +362,7 @@ public final class MyAssert {
      * @param message 消息
      */
     private static Mono<String> eq(String value, String expect, int errcode,
-                           final String message) {
+                                   final String message) {
 
         if (value.equals(expect)) {
             fail(errcode, message);
@@ -378,7 +378,7 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<String> notEq(String value, String expect, int errcode) {
-       return notEq(value, expect, errcode, null);
+        return notEq(value, expect, errcode, null);
     }
 
     /**
@@ -389,7 +389,7 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<Integer> notEq(int value, int expect, int errcode) {
-       return notEq(value, expect, errcode, null);
+        return notEq(value, expect, errcode, null);
     }
 
     /**
@@ -401,7 +401,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> notEq(int value, int expect, int errcode,
-                             final String message) {
+                                      final String message) {
         if (expect != value) {
             fail(errcode, message);
         }
@@ -417,7 +417,7 @@ public final class MyAssert {
      * @param message 消息
      */
     public static Mono<String> notEq(String value, String expect, int errcode,
-                             final String message) {
+                                     final String message) {
 
         if (!value.equals(expect)) {
             fail(errcode, message);
@@ -446,7 +446,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<String> ne(String value, String expect, int errcode,
-                          String format, Object... args) {
+                                  String format, Object... args) {
         ne(value, expect, errcode, String.format(format, args));
         return Mono.just(value);
     }
@@ -460,7 +460,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<String> ne(String value, String expect, int errcode,
-                          final String message) {
+                                  final String message) {
 
         if (value.equalsIgnoreCase(expect)) {
             fail(errcode, message);
@@ -489,7 +489,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> ne(int value, int expect, int errcode, String format,
-                          Object... args) {
+                                   Object... args) {
 
         if (expect == value) {
             fail(errcode, String.format(format, args));
@@ -506,7 +506,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> ne(int value, int expect, int errcode,
-                          final String message) {
+                                   final String message) {
 
         if (expect == value) {
             fail(errcode, message);
@@ -535,7 +535,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> gt(int value, int expect, int errcode, String format,
-                          Object... args) {
+                                   Object... args) {
         if (value < expect) {
             fail(errcode, String.format(format, args));
         }
@@ -551,7 +551,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> gt(int value, int expect, int errcode,
-                          final String message) {
+                                   final String message) {
         if (value < expect) {
             fail(errcode, message);
         }
@@ -566,7 +566,7 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<Integer> egt(int value, int expect, int errcode) {
-      return   egt(value, expect, errcode, null);
+        return egt(value, expect, errcode, null);
     }
 
     /**
@@ -579,7 +579,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> egt(int value, int expect, int errcode, String format,
-                           Object... args) {
+                                    Object... args) {
         if (value <= expect) {
             fail(errcode, String.format(format, args));
         }
@@ -595,7 +595,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> egt(int value, int expect, int errcode,
-                           final String message) {
+                                    final String message) {
         if (value <= expect) {
             fail(errcode, message);
         }
@@ -623,7 +623,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> lt(int value, int expect, int errcode, String format,
-                          Object... args) {
+                                   Object... args) {
         if (value > expect) {
             fail(errcode, String.format(format, args));
         }
@@ -639,7 +639,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Long> lt(long value, long expect, int errcode,
-                          final String message) {
+                                final String message) {
         if (value > expect) {
             fail(errcode, message);
         }
@@ -667,7 +667,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Long> lt(long value, long expect, int errcode, String format,
-                          Object... args) {
+                                Object... args) {
         if (value >= expect) {
             fail(errcode, String.format(format, args));
         }
@@ -683,7 +683,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> lt(int value, int expect, int errcode,
-                          final String message) {
+                                   final String message) {
         if (value > expect) {
             fail(errcode, message);
         }
@@ -711,7 +711,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> elt(int value, int expect, int errcode, String format,
-                           Object... args) {
+                                    Object... args) {
         if (value >= expect) {
             fail(errcode, String.format(format, args));
         }
@@ -727,7 +727,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> elt(int value, int expect, int errcode,
-                           final String message) {
+                                    final String message) {
         if (value >= expect) {
             fail(errcode, message);
         }
@@ -755,7 +755,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Long> elt(long value, long expect, int errcode, String format,
-                           Object... args) {
+                                 Object... args) {
         if (value >= expect) {
             fail(errcode, String.format(format, args));
         }
@@ -771,7 +771,7 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Long> elt(long value, long expect, int errcode,
-                           final String message) {
+                                 final String message) {
         if (value >= expect) {
             fail(errcode, message);
         }
@@ -787,7 +787,7 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<Integer> between(int value, int start, int end, int errcode) {
-       return  between(value, start, end, errcode, null);
+        return between(value, start, end, errcode, null);
     }
 
     /**
@@ -801,7 +801,7 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> between(int value, int start, int end, int errcode,
-                               String format, Object... args) {
+                                        String format, Object... args) {
         if (((value >= start) && (value <= end))) {
             fail(errcode, String.format(format, args));
         }
@@ -818,12 +818,13 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> between(int value, int start, int end, int errcode,
-                               final String message) {
+                                        final String message) {
         if (((value >= start) && (value <= end))) {
             fail(errcode, message);
         }
         return Mono.just(value);
     }
+
     /**
      * 断言value < start || value > end (左右都为开区间)，则抛出异常.
      *
@@ -833,8 +834,9 @@ public final class MyAssert {
      * @param errcode 异常错误码
      */
     public static Mono<Integer> isExcept(int value, int start, int end, int errcode) {
-        return  isExcept(value, start, end, errcode, null);
+        return isExcept(value, start, end, errcode, null);
     }
+
     /**
      * 断言value < start || value > end (左右都为开区间)，则抛出异常.
      *
@@ -845,8 +847,8 @@ public final class MyAssert {
      * @param message 异常错误消息
      */
     public static Mono<Integer> isExcept(int value, int start, int end, int errcode,
-                                         final String message){
-        if (((value < start) || (value > end))){
+                                         final String message) {
+        if (((value < start) || (value > end))) {
             fail(errcode, message);
         }
         return Mono.just(value);
@@ -863,8 +865,8 @@ public final class MyAssert {
      * @param args    格式化字符串的参数
      */
     public static Mono<Integer> isExcept(int value, int start, int end, int errcode,
-                                        String format, Object... args) {
-        if (((value < start) || (value > end))){
+                                         String format, Object... args) {
+        if (((value < start) || (value > end))) {
             fail(errcode, String.format(format, args));
         }
         return Mono.just(value);
@@ -892,7 +894,7 @@ public final class MyAssert {
      * @param message    异常错误消息
      */
     public static <T> Mono<T> in(T value, Collection<T> collection, int errcode,
-                              final String message) {
+                                 final String message) {
         isNull(collection, errcode, message);
         if (collection.contains(value)) {
             fail(errcode, message);
@@ -923,7 +925,7 @@ public final class MyAssert {
      * @param message    异常错误消息
      */
     public static <T> Mono<T> notIn(T value, Collection<T> collection,
-                                 int errcode, final String message) {
+                                    int errcode, final String message) {
         isNull(collection, errcode, message);
         if (collection.contains(value)) {
             fail(errcode, message);

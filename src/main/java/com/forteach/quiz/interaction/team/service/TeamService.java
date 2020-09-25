@@ -56,6 +56,7 @@ public class TeamService {
     /**
      * 随机分组
      * TODO 需要修改根据班级和课程进行分组
+     *
      * @return
      */
     public Mono<GroupTeamResp> groupRandom(final GroupRandomReq random) {
@@ -78,15 +79,15 @@ public class TeamService {
                     }
                 })
                 .flatMap(randomVo -> {
-                    if (TEAM_FOREVER.equals(randomVo.getExpType())){
+                    if (TEAM_FOREVER.equals(randomVo.getExpType())) {
                         //   永久小组/班级小组
                         return classRoomService.findClassStudents(randomVo.getClassId())
                                 .flatMap(l -> teamRandomService.groupTeamBuild(l, randomVo));
-                    }else if (TEAM_TEMPORARILY.equals(randomVo.getExpType())){
+                    } else if (TEAM_TEMPORARILY.equals(randomVo.getExpType())) {
                         //    临时小组/课堂小组
                         return classRoomService.findInteractiveStudents(randomVo.getCircleId(), randomVo.getTeacherId())
                                 .flatMap(l -> teamRandomService.groupTeamBuild(l, randomVo));
-                    }else {
+                    } else {
                         return MyAssert.isNull(null, DefineCode.ERR0002, "有效期参数错误");
                     }
                 })
@@ -97,6 +98,7 @@ public class TeamService {
 
     /**
      * 修改移动小组信息
+     *
      * @param changeVo
      * @return
      */
@@ -115,7 +117,7 @@ public class TeamService {
                                 return teamChangeService.moreJoinTeamStudentStr(changeVo.getStudents(), a)
                                         .flatMap(students -> teamRedisService.putRedisStudents(changeVo.getTeamKey(changeVo.getAddTeamId()), students));
                             })
-                    .filterWhen(a -> teamMongoDBService.teamChange(changeVo));
+                            .filterWhen(a -> teamMongoDBService.teamChange(changeVo));
                 }).map(Objects::nonNull);
     }
 
@@ -147,9 +149,9 @@ public class TeamService {
                         //不存在没有记录需要去mongodb查询并将查询的结果保存到redis
                         return teamMongoDBService.findTeamList(req)
                                 .filterWhen(baseTeam -> {
-                                    if (baseTeam.getTeamList() != null && baseTeam.getTeamList().size() > 0){
+                                    if (baseTeam.getTeamList() != null && baseTeam.getTeamList().size() > 0) {
                                         return Mono.just(true);
-                                    }else {
+                                    } else {
                                         return MyAssert.isNull(null, DefineCode.OK, "您还没有分组");
                                     }
                                 })

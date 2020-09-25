@@ -32,13 +32,13 @@ public class GradePapersService {
         //查询要批改的题
         Criteria criteria = Criteria.where("examineeId").is(gradePapersReq.getExamineeId())
                 .and("questionId").is(gradePapersReq.getQuestionId());
-        if (StrUtil.isNotBlank(gradePapersReq.getQuestionType())){
+        if (StrUtil.isNotBlank(gradePapersReq.getQuestionType())) {
             criteria.and("questionType").is(gradePapersReq.getQuestionType());
         }
-        if (StrUtil.isNotBlank(gradePapersReq.getInteractive())){
+        if (StrUtil.isNotBlank(gradePapersReq.getInteractive())) {
             criteria.and("interactive").is(gradePapersReq.getInteractive());
         }
-        if (StrUtil.isNotBlank(gradePapersReq.getCircleId())){
+        if (StrUtil.isNotBlank(gradePapersReq.getCircleId())) {
             criteria.and("circleId").is(gradePapersReq.getCircleId());
         }
 
@@ -47,10 +47,10 @@ public class GradePapersService {
         //修改题批的题
         Update update = Update.update("score", gradePapersReq.getScore());
 
-        if (StrUtil.isNotBlank(gradePapersReq.getRight())){
+        if (StrUtil.isNotBlank(gradePapersReq.getRight())) {
             update.set("right", gradePapersReq.getRight());
         }
-        if (StrUtil.isNotBlank(gradePapersReq.getEvaluate())){
+        if (StrUtil.isNotBlank(gradePapersReq.getEvaluate())) {
             update.set("evaluate", gradePapersReq.getEvaluate());
         }
 

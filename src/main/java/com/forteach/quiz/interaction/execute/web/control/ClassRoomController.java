@@ -29,7 +29,7 @@ import java.util.Optional;
 @RestController
 @Api(value = "课堂", tags = {"课堂,上课相关处理"})
 @RequestMapping(path = "/classRoom", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class ClassRoomController{
+public class ClassRoomController {
 
     private final ClassRoomService classRoomService;
 
@@ -48,24 +48,24 @@ public class ClassRoomController{
             @ApiImplicitParam(value = "章节id", name = "chapterId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> createInteractiveRoom(@RequestBody InteractiveRoomVo roomVo, @ApiIgnore ServerHttpRequest request) {
-        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010 ,"章节编号不能为空");
+        MyAssert.blank(roomVo.getChapterId(), DefineCode.ERR0010, "章节编号不能为空");
         Optional<String> teacherId = tokenService.getTeacherId(request);
         teacherId.ifPresent(roomVo::setTeacherId);
-        MyAssert.blank(teacherId.get(), DefineCode.ERR0010 ,"教室编号不能为空");
-        return classRoomService.createInteractiveRoom(roomVo.getCircleId(),roomVo.getTeacherId(),roomVo.getChapterId()).map(WebResult::okResult);
+        MyAssert.blank(teacherId.get(), DefineCode.ERR0010, "教室编号不能为空");
+        return classRoomService.createInteractiveRoom(roomVo.getCircleId(), roomVo.getTeacherId(), roomVo.getChapterId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "学生加入互动课堂", notes = "学生加入互动课堂")
     @PostMapping(value = "/join/interactiveRoom")
-    
+
     @ApiImplicitParams({
             @ApiImplicitParam(value = "课堂Id", name = "circleId", required = true, dataType = "string", paramType = "from")
     })
     public Mono<WebResult> joinInteractiveRoom(@ApiParam(value = "学生加入互动课堂", required = true) @RequestBody JoinInteractiveRoomVo joinVo, @ApiIgnore ServerHttpRequest request) {
 //        //验证请求参数
-        MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010 ,"课堂编号不存在");
+        MyAssert.blank(joinVo.getCircleId(), DefineCode.ERR0010, "课堂编号不存在");
         joinVo.setExamineeId(tokenService.getStudentId(request));
-        return classRoomService.joinInteractiveRoom(joinVo.getCircleId(),joinVo.getExamineeId()).map(WebResult::okResult);
+        return classRoomService.joinInteractiveRoom(joinVo.getCircleId(), joinVo.getExamineeId()).map(WebResult::okResult);
     }
 
     @ApiOperation(value = "查找加入过的学生", notes = "查找加入过的学生")
@@ -76,7 +76,7 @@ public class ClassRoomController{
     })
     public Mono<WebResult> findInteractiveStudents(@ApiParam(value = "查找加入课堂的学生", required = true) @RequestBody InteractiveStudentsReq interactiveReq) {
         MyAssert.blank(interactiveReq.getCircleId(), DefineCode.ERR0010, "课堂圈子id不能为空");
-        return classRoomService.findInteractiveStudents(interactiveReq.getCircleId(),interactiveReq.getTeacherId()).map(WebResult::okResult);
+        return classRoomService.findInteractiveStudents(interactiveReq.getCircleId(), interactiveReq.getTeacherId()).map(WebResult::okResult);
     }
 
 }

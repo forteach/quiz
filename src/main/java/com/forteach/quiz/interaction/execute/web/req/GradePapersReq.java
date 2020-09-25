@@ -53,7 +53,7 @@ public class GradePapersReq implements Serializable {
     @ApiModelProperty(value = "课堂id", name = "circleId", dataType = "string")
     private String circleId;
 
-    @ApiModelProperty(value = "提问：TiWen  任务：RenWu", name ="questionType", dataType = "string")
+    @ApiModelProperty(value = "提问：TiWen  任务：RenWu", name = "questionType", dataType = "string")
     private String questionType;
 
 }

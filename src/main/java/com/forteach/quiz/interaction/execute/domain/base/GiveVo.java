@@ -46,6 +46,4 @@ public class GiveVo {
     private String cut;
 
 
-
-
 }

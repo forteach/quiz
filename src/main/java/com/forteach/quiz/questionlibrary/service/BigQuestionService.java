@@ -13,6 +13,7 @@ import com.forteach.quiz.questionlibrary.reflect.QuestionReflect;
 import com.forteach.quiz.questionlibrary.repository.BigQuestionRepository;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
 import com.forteach.quiz.questionlibrary.service.base.BaseQuestionServiceImpl;
+import com.forteach.quiz.questionlibrary.web.vo.QuestionNumVo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import static com.forteach.quiz.common.Dic.*;
 import static com.forteach.quiz.util.StringUtil.getRandomUUID;
 import static com.forteach.quiz.util.StringUtil.isEmpty;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * @Description:
@@ -59,6 +61,7 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
 
     /**
      * 批量保存修改
+     *
      * @param questionList
      * @return
      */
@@ -68,6 +71,7 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
 
     /**
      * 更改问题 (根据需要是否修改至练习册)
+     *
      * @param relate
      * @param questionList
      * @return
@@ -81,6 +85,7 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
 
     /**
      * 设置大题的id及属性
+     *
      * @param bigQuestion
      * @return
      */
@@ -264,7 +269,20 @@ public class BigQuestionService extends BaseQuestionServiceImpl<BigQuestion> {
         });
     }
 
-    public Mono<BigQuestion> findById(final String questionId){
+    public Mono<BigQuestion> findById(final String questionId) {
         return bigQuestionRepository.findById(questionId).switchIfEmpty(Mono.error(new CustomException("没有找到试卷")));
+    }
+
+
+    /**
+     * 根据课程分组统计题库数量
+     *
+     * @return
+     */
+    public Mono<List<QuestionNumVo>> findBigQuestionGroupByCourseId() {
+        return reactiveMongoTemplate.aggregate(newAggregation(
+                group("courseId").count().as("questionNum"),
+                project("questionNum").and("_id").as("courseId")
+        ), "bigQuestion", QuestionNumVo.class).collectList();
     }
 }

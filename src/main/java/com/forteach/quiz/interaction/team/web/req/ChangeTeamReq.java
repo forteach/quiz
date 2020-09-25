@@ -28,15 +28,15 @@ public class ChangeTeamReq implements Serializable {
     @ApiModelProperty(value = "被 新增或移除 小组的 学生id, 逗号分割", name = "students", dataType = "string", required = true)
     private String students;
 
-    public String getTeamKey(final String teamId){
-        return teamId.concat(ASK_GROUP);
-    }
-
-    public static String concatTeamKey(final String teamId){
+    public static String concatTeamKey(final String teamId) {
         return teamId.concat(ASK_GROUP);
     }
 
     public static String getGroupKey(final String circleId, final String classId) {
         return circleId.concat(ASK_GROUP).concat(classId);
+    }
+
+    public String getTeamKey(final String teamId) {
+        return teamId.concat(ASK_GROUP);
     }
 }

@@ -50,8 +50,9 @@ public class PartnerServerHttpRequestDecorator extends ServerHttpRequestDecorato
             body = flux;
         }
     }
+
     @Override
-    public Flux<DataBuffer> getBody(){
+    public Flux<DataBuffer> getBody() {
         return body;
     }
 }

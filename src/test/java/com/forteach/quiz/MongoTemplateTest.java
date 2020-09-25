@@ -53,11 +53,11 @@ public class MongoTemplateTest {
     }
 
     @Test
-    public void init(){
+    public void init() {
         StepVerifier.create(template.dropCollection(Design.class)).verifyComplete();
         Flux<BigQuestion> insertAll = template
-                .insertAll(Flux.just(new BigQuestion("q01",  Arrays.asList("测试题目1")), //
-                        new BigQuestion("q02",  Arrays.asList("测试题目2"))).collectList());
+                .insertAll(Flux.just(new BigQuestion("q01", Arrays.asList("测试题目1")), //
+                        new BigQuestion("q02", Arrays.asList("测试题目2"))).collectList());
 
 //        Flux<Design> insertAll = template
 //                .insertAll(Flux.just(new Design("1+1= ?", "2", "幼儿园难度1", 1.1), //

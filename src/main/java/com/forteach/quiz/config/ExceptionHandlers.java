@@ -31,11 +31,11 @@ public class ExceptionHandlers {
     @ExceptionHandler(AssertErrorException.class)
     @ResponseBody
     public Mono<WebResult> serverExceptionHandler(AssertErrorException ex) {
-        WebResult wr=WebResult.failResult(ex.getErrorCode(), ex.getMessage());
-        if (log.isDebugEnabled()){
+        WebResult wr = WebResult.failResult(ex.getErrorCode(), ex.getMessage());
+        if (log.isDebugEnabled()) {
             log.debug("MyAssert : [{}]", JSON.toJSONString(wr));
         }
-        return  Mono.just(wr);
+        return Mono.just(wr);
     }
 
     @ExceptionHandler(Exception.class)

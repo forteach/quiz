@@ -23,7 +23,7 @@ import javax.validation.Valid;
  * @version: V1.0
  * @date: 2019/1/14  16:28
  */
-public abstract class BaseObjectiveController <T extends QuestionExamEntity> extends BaseQuestionController<T>{
+public abstract class BaseObjectiveController<T extends QuestionExamEntity> extends BaseQuestionController<T> {
 
     public BaseObjectiveController(BaseQuestionService<T> service, KeywordService<T> keywordService, TokenService tokenService) {
         super(service, keywordService, tokenService);

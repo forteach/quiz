@@ -14,7 +14,8 @@ import com.forteach.quiz.testpaper.web.req.AddResultReq;
 import com.forteach.quiz.testpaper.web.req.TestPaperPageReq;
 import com.forteach.quiz.testpaper.web.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -132,36 +133,42 @@ public class TestPaperResultService {
     }
 
 
-    public Mono<List<TestPaperResult>> findAllPage(final TestPaperPageReq req){
+    public Mono<List<TestPaperResult>> findAllPage(final TestPaperPageReq req) {
         Query query = new Query();
         Criteria criteria = new Criteria();
-        if (StrUtil.isNotBlank(req.getClassName())){
-            Pattern pattern = Pattern.compile("^.*"+req.getClassName()+".*$", Pattern.CASE_INSENSITIVE);
+        if (StrUtil.isNotBlank(req.getTestPaperId())) {
+            criteria.and("testPaperId").is(req.getTestPaperId());
+        }
+        if (StrUtil.isNotBlank(req.getStudentId())) {
+            criteria.and("studentId").and(req.getStudentId());
+        }
+        if (StrUtil.isNotBlank(req.getClassName())) {
+            Pattern pattern = Pattern.compile("^.*" + req.getClassName() + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("className").regex(pattern);
         }
-        if (StrUtil.isNotBlank(req.getStudentName())){
+        if (StrUtil.isNotBlank(req.getStudentName())) {
             Pattern pattern = Pattern.compile("^.*" + req.getStudentName() + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("studentName").regex(pattern);
         }
-        if (StrUtil.isNotBlank(req.getCourseName())){
+        if (StrUtil.isNotBlank(req.getCourseName())) {
             Pattern pattern = Pattern.compile("^.*" + req.getCourseName() + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("courseName").regex(pattern);
         }
-        if (StrUtil.isNotBlank(req.getTestPaperName())){
+        if (StrUtil.isNotBlank(req.getTestPaperName())) {
             Pattern pattern = Pattern.compile("^.*" + req.getTestPaperName() + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("testPaperName").regex(pattern);
         }
-        if (StrUtil.isNotBlank(String.valueOf(req.getYear()))){
+        if (StrUtil.isNotBlank(String.valueOf(req.getYear()))) {
             criteria.and("year").is(req.getYear());
         }
-        if (StrUtil.isNotBlank(String.valueOf(req.getSemester()))){
+        if (StrUtil.isNotBlank(String.valueOf(req.getSemester()))) {
             criteria.and("semester").is(req.getSemester());
         }
         //设置分页和排序方式
         Sort sort;
-        if (0 == req.getSort()){
+        if (0 == req.getSort()) {
             sort = new Sort(Sort.Direction.ASC, "uDate");
-        }else {
+        } else {
             sort = new Sort(Sort.Direction.DESC, "uDate");
         }
         query.addCriteria(criteria).with(PageRequest.of(req.getPage(), req.getSize(), sort));

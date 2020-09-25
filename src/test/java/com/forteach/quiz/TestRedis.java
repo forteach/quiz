@@ -27,7 +27,7 @@ public class TestRedis {
     private ReactiveHashOperations<String, String, String> reactiveHashOperations;
 
     @Test
-    public void deleteRedis(){
+    public void deleteRedis() {
         reactiveHashOperations.delete("5cba928afdc65e508182aa9caskGroup")
                 .log(" delete ")
                 .subscribe();

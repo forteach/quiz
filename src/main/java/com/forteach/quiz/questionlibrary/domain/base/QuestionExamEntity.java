@@ -61,41 +61,6 @@ public class QuestionExamEntity<T> extends BaseEntity {
     @JsonView(BigQuestionView.Summary.class)
     @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")
     protected String chapterId;
-
-    /**
-     * 课程id
-     */
-    @JsonView(BigQuestionView.Summary.class)
-    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
-    private String courseId;
-
-    /**
-     * 是否修改应用到所有的练习册
-     * 1 : 应用到所有练习册    0  :  只修改本题
-     */
-    @Transient
-    @ApiModelProperty(value = "是否修改应用到所有的练习册", name = "relate", example = "0")
-    private int relate;
-
-    /**
-     * 难易度id
-     */
-    @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
-    private String levelId;
-
-    /**
-     * 知识点id
-     */
-    @ApiModelProperty(value = "知识点id", name = "knowledgeId", example = "0")
-    private String knowledgeId;
-
-    /**
-     * 关键词
-     */
-    @ApiModelProperty(value = "关键词", name = "keyword", example = "")
-    @Indexed
-    private List<String> keyword;
-
     /**
      * 下标
      * 不保存数据库
@@ -104,7 +69,35 @@ public class QuestionExamEntity<T> extends BaseEntity {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(value = "下标", name = "index", example = "")
     protected String index;
-
+    /**
+     * 课程id
+     */
+    @JsonView(BigQuestionView.Summary.class)
+    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
+    private String courseId;
+    /**
+     * 是否修改应用到所有的练习册
+     * 1 : 应用到所有练习册    0  :  只修改本题
+     */
+    @Transient
+    @ApiModelProperty(value = "是否修改应用到所有的练习册", name = "relate", example = "0")
+    private int relate;
+    /**
+     * 难易度id
+     */
+    @ApiModelProperty(value = "难易度id", name = "levelId", example = "0")
+    private String levelId;
+    /**
+     * 知识点id
+     */
+    @ApiModelProperty(value = "知识点id", name = "knowledgeId", example = "0")
+    private String knowledgeId;
+    /**
+     * 关键词
+     */
+    @ApiModelProperty(value = "关键词", name = "keyword", example = "")
+    @Indexed
+    private List<String> keyword;
     /**
      * 课堂练习  before/预习 now/课堂 before,now/全部
      */

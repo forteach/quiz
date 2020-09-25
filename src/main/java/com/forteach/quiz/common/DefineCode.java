@@ -7,7 +7,7 @@ public final class DefineCode {
 
     // 0-100通用错误码常量**********************
     /**
-     *("成功")
+     * ("成功")
      */
     public static final int OK = 0;
 
@@ -42,7 +42,7 @@ public final class DefineCode {
     public static final int ERR0009 = 9;
 
     /**
-     *("参数不能为空")
+     * ("参数不能为空")
      */
     public static final int ERR0010 = 10;
 

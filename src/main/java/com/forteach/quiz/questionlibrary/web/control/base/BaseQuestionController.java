@@ -31,10 +31,8 @@ import javax.validation.Valid;
 public abstract class BaseQuestionController<T extends QuestionExamEntity> {
 
     public final BaseQuestionService<T> service;
-
-    private final KeywordService<T> keywordService;
-
     public final TokenService tokenService;
+    private final KeywordService<T> keywordService;
 
     public BaseQuestionController(BaseQuestionService<T> service, KeywordService<T> keywordService, TokenService tokenService) {
         this.service = service;

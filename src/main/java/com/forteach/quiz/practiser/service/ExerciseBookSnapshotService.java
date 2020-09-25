@@ -290,13 +290,13 @@ public class ExerciseBookSnapshotService {
                 .flatMap(list -> {
                     if (StrUtil.isNotBlank(studentId)) {
                         return findAnswerRespList(list);
-                    }else {
+                    } else {
                         return findAnswerStudentsList(list);
                     }
                 });
     }
 
-    private Mono<List<AnswerResp>> findAnswerStudentsList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks){
+    private Mono<List<AnswerResp>> findAnswerStudentsList(final List<ExerciseAnswerQuestionBook> exerciseAnswerQuestionBooks) {
         return Mono.just(exerciseAnswerQuestionBooks)
                 .flatMapMany(Flux::fromIterable)
                 .map(ExerciseAnswerQuestionBook::getStudentId)
@@ -351,6 +351,7 @@ public class ExerciseBookSnapshotService {
 
     /**
      * 查询习题记录
+     *
      * @param req
      * @return
      */

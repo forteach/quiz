@@ -38,23 +38,24 @@ public class RaiseHandService {
     ) {
         this.stringRedisTemplate = stringRedisTemplate;
 //        this.interactRecordExecuteService = interactRecordExecuteService;
-        this.classRoomService= classRoomService;
+        this.classRoomService = classRoomService;
         this.mongoTemplate = mongoTemplate;
     }
 
     /**
      * 学生进行举手
      * 最后记录
+     *
      * @return
      */
-    public Mono<Long> raiseHand(final String circleId,final String examineeId,final String questId,final String questionType) {
+    public Mono<Long> raiseHand(final String circleId, final String examineeId, final String questId, final String questionType) {
         //创建题目提问举手的KEY=学生ID
-        Mono<Long> set = stringRedisTemplate.opsForSet().add(AchieveRaiseKey.askTypeQuestionsId(questionType,circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId), examineeId);
+        Mono<Long> set = stringRedisTemplate.opsForSet().add(AchieveRaiseKey.askTypeQuestionsId(questionType, circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE, questId), examineeId);
         //设置举手过期时间30分钟
-        Mono<Boolean> time = stringRedisTemplate.expire(AchieveRaiseKey.askTypeQuestionsId(questionType,circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId), Duration.ofSeconds(60 * 30 ));
-        return set.filterWhen(r->time)
+        Mono<Boolean> time = stringRedisTemplate.expire(AchieveRaiseKey.askTypeQuestionsId(questionType, circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE, questId), Duration.ofSeconds(60 * 30));
+        return set.filterWhen(r -> time)
                 //设置当前课堂当前活动是提问
-                .filterWhen(r->setInteractionType(circleId,questionType))
+                .filterWhen(r -> setInteractionType(circleId, questionType))
                 .filterWhen(obj -> this.raiseHand(circleId, examineeId, questId));
     }
 
@@ -85,20 +86,21 @@ public class RaiseHandService {
      *
      * @return
      */
-    public Mono<Long> launchRaise(final String circleId,final String examineeId,final String questId,final String questionType) {
+    public Mono<Long> launchRaise(final String circleId, final String examineeId, final String questId, final String questionType) {
         //清空上次举手题目的信息
-        return stringRedisTemplate.delete(AchieveRaiseKey.askTypeQuestionsId(questionType,circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE,questId))
+        return stringRedisTemplate.delete(AchieveRaiseKey.askTypeQuestionsId(questionType, circleId, AchieveRaiseKey.CLASSROOM_CLEAR_TAG_RAISE, questId))
                 //重新创建举手信息
-                .flatMap(r->raiseHand(circleId,examineeId,questId,questionType));
+                .flatMap(r -> raiseHand(circleId, examineeId, questId, questionType));
     }
 
     /**
      * 设置当前课堂当前活动主题为：提问
+     *
      * @param circleId
      */
-    private Mono<Boolean> setInteractionType(String circleId,final String questionType){
+    private Mono<Boolean> setInteractionType(String circleId, final String questionType) {
 
-        return classRoomService.setInteractionType(circleId,questionType);
+        return classRoomService.setInteractionType(circleId, questionType);
     }
 
 }

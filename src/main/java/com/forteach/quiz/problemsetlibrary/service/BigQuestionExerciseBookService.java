@@ -96,7 +96,7 @@ public class BigQuestionExerciseBookService extends BaseExerciseBookServiceImpl<
     @Override
     public Mono<List<BigQuestion>> findExerciseBook(final ExerciseBookReq sortVo) {
         Criteria criteria = buildExerciseBook(sortVo.getExeBookType(), sortVo.getChapterId(), sortVo.getCourseId());
-        if (StrUtil.isNotBlank(sortVo.getPreview())){
+        if (StrUtil.isNotBlank(sortVo.getPreview())) {
             //只要包含对应参数就可以 now, nowberofe, berforenow,
             criteria.and("questionChildren.preview").regex(sortVo.getPreview());
         }

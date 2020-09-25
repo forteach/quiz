@@ -44,7 +44,7 @@ public class InteractRecordQuestionsService {
     /**
      * 根据条件查询对应的questions 任务记录
      * @param circleId 课堂id
-     * @return Flux<List<InteractQuestionsRecord>>
+     * @return Flux<List < InteractQuestionsRecord>>
      */
 //    private Mono<InteractQuestionsRecord> findQuestionsRecord(final String circleId, final String questionsId) {
 //        return repository.findRecordByIdAndQuestionsId(circleId, questionsId)

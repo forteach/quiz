@@ -1,5 +1,6 @@
 package com.forteach.quiz.problemsetlibrary.service.base;
 
+import cn.hutool.core.util.StrUtil;
 import com.forteach.quiz.domain.BaseEntity;
 import com.forteach.quiz.domain.QuestionIds;
 import com.forteach.quiz.exceptions.CustomException;
@@ -132,9 +133,13 @@ public abstract class BaseProblemSetServiceImpl<T extends ProblemSet, R extends 
      */
     private Flux<T> findPratProblemSet(final ProblemSetReq sortVo) {
 
-        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+        Criteria criteria = new Criteria();
 
         Query query = new Query(criteria);
+
+        if (StrUtil.isNotBlank(sortVo.getOperatorId())) {
+            criteria.and("teacherId").is(sortVo.getOperatorId());
+        }
 
         if (isNotEmpty(sortVo.getExeBookType())) {
             criteria.and("exeBookType").in(Integer.parseInt(sortVo.getExeBookType()));

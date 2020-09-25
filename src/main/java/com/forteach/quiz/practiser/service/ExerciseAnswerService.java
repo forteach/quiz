@@ -152,6 +152,7 @@ public class ExerciseAnswerService {
 
     /**
      * 设置是否给予奖励并修改对应的字段
+     *
      * @param answerReq
      * @return
      */
@@ -175,6 +176,7 @@ public class ExerciseAnswerService {
 
     /**
      * 判断是否进行完毕　答题、批改
+     *
      * @param answerReq
      * @return
      */
@@ -408,9 +410,9 @@ public class ExerciseAnswerService {
         return reactiveMongoTemplate.findOne(query, ExerciseAnswerQuestionBook.class)
                 .switchIfEmpty(Mono.just(new ExerciseAnswerQuestionBook()))
                 .flatMap(exerciseAnswerQuestionBook -> {
-                    if (exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null){
+                    if (exerciseAnswerQuestionBook.getBigQuestionExerciseBook() == null) {
                         return bigQuestionExerciseBookService.findExerciseBook(answerReq.getChapterId(), answerReq.getCourseId());
-                    }else {
+                    } else {
                         return Mono.just(exerciseAnswerQuestionBook.getBigQuestionExerciseBook());
                     }
                 });

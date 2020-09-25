@@ -54,9 +54,9 @@ public class InteractAnswerRecordResp {
         this.portrait = portrait;
         this.answer = answer;
         this.fileList = fileList;
-        if ("true".equals(piGaiResult)){
+        if ("true".equals(piGaiResult)) {
             this.piGaiResult = true;
-        }else {
+        } else {
             this.piGaiResult = false;
         }
         this.updateTime = updateTime;

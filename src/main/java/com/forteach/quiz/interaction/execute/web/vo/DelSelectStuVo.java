@@ -18,7 +18,7 @@ public class DelSelectStuVo implements Serializable {
     @ApiModelProperty(value = "课堂id", name = "circleId", required = true, dataType = "string")
     protected String circleId;
 
-    @ApiModelProperty(value="学生id", name = "stuId", required = true, dataType = "string")
+    @ApiModelProperty(value = "学生id", name = "stuId", required = true, dataType = "string")
     private String stuId;
 
 }

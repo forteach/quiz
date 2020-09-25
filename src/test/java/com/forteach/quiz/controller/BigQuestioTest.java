@@ -25,7 +25,7 @@ public class BigQuestioTest {
     private WebTestClient webTestClient;
 
     @Test
-    public void sendQuestion(){
+    public void sendQuestion() {
         /**
          * 互动方式
          * <p>
@@ -34,19 +34,19 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        BigQuestionGiveVo vo=new BigQuestionGiveVo("5c73676306a38f000101b7b6","select");
+        BigQuestionGiveVo vo = new BigQuestionGiveVo("5c73676306a38f000101b7b6", "select");
         vo.setCircleId("5cd3d58f5157212350577a58");
         vo.setTeacherId("we123");
         vo.setCategory("people");
         vo.setQuestionType("TiWen");
         vo.setSelected("1301331992031827761");
         vo.setCut("0");
-        System.out.println("json------"+ JSON.toJSONString(vo));
+        System.out.println("json------" + JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/interact/send/question")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),BigQuestionGiveVo.class) // 3
+                .body(Mono.just(vo), BigQuestionGiveVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -57,7 +57,7 @@ public class BigQuestioTest {
     }
 
     @Test
-    public void sendAnswer(){
+    public void sendAnswer() {
         /**
          * 互动方式
          * <p>
@@ -67,13 +67,13 @@ public class BigQuestioTest {
          * vote   : 投票
          */
 
-        DataDatumVo file=new DataDatumVo();
+        DataDatumVo file = new DataDatumVo();
         file.setFileId("f01");
         file.setFileName("testName");
         file.setFileUrl("url");
 
 
-        InteractAnswerVo vo=new InteractAnswerVo(
+        InteractAnswerVo vo = new InteractAnswerVo(
                 "1301331992031827761",
                 "5cd3d58f5157212350577a58",
                 "5c73676306a38f000101b7b6",
@@ -82,12 +82,12 @@ public class BigQuestioTest {
                 Arrays.asList(file)
         );
 
-        System.out.println("json------"+ JSON.toJSONString(vo));
+        System.out.println("json------" + JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/stuInteract/send/answer")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),InteractAnswerVo.class) // 3
+                .body(Mono.just(vo), InteractAnswerVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -98,7 +98,7 @@ public class BigQuestioTest {
     }
 
     @Test
-    public void sendBookAnswer(){
+    public void sendBookAnswer() {
         /**
          * 互动方式
          * <p>
@@ -107,14 +107,14 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo("1301331992031827761","5cd3d58f5157212350577a58","5c73676306a38f000101b7b6","C","TiWen");
+        InteractAnswerVo vo = new InteractAnswerVo("1301331992031827761", "5cd3d58f5157212350577a58", "5c73676306a38f000101b7b6", "C", "TiWen");
 
-        System.out.println("json------"+ JSON.toJSONString(vo));
+        System.out.println("json------" + JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/interact/sendBook/answer")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),InteractAnswerVo.class) // 3
+                .body(Mono.just(vo), InteractAnswerVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -125,7 +125,7 @@ public class BigQuestioTest {
     }
 
     @Test
-    public void raiseHand(){
+    public void raiseHand() {
         /**
          * 互动方式
          * <p>
@@ -134,14 +134,14 @@ public class BigQuestioTest {
          * select : 选则
          * vote   : 投票
          */
-        RaisehandVo vo=new RaisehandVo("1301331992031827761","5cd3d58f5157212350577a58","5c73676306a38f000101b7b6","TiWen");
+        RaisehandVo vo = new RaisehandVo("1301331992031827761", "5cd3d58f5157212350577a58", "5c73676306a38f000101b7b6", "TiWen");
 
-        System.out.println("json------"+ JSON.toJSONString(vo));
+        System.out.println("json------" + JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/interact/raise")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),RaisehandVo.class) // 3
+                .body(Mono.just(vo), RaisehandVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()

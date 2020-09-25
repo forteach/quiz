@@ -96,4 +96,9 @@ public class BigQuestionsController extends BaseAllController<BigQuestion> {
         return bigQuestionService.addChildren(addChildrenVo.getQuestionId(), addChildrenVo.getJson(), addChildrenVo.getTeacherId()).map(WebResult::okResult);
     }
 
+    @ApiOperation(value = "课程分组统计习题数据")
+    @PostMapping(path = "/groupByCourseId")
+    public Mono<WebResult> findQuestionGroupByCourseId() {
+        return bigQuestionService.findBigQuestionGroupByCourseId().map(WebResult::okResult);
+    }
 }

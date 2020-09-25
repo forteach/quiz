@@ -14,7 +14,8 @@ public enum QuestionType {
     //BigQuestion,
     TiWen,
 
-    /**uiDa
+    /**
+     * uiDa
      * 头脑风暴题库
      */
     //BrainstormQuestion,

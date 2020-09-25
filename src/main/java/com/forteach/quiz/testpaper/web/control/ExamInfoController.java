@@ -45,9 +45,9 @@ public class ExamInfoController {
 
     @PostMapping("/update")
     @ApiOperation(value = "保存更新试卷信息")
-    public Mono<WebResult> update(@RequestBody @Validated UpdateExamInfoReq req, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> update(@RequestBody @Validated UpdateExamInfoReq req, @ApiIgnore ServerHttpRequest request) {
         ExamInfo examInfo = new ExamInfo();
-        if (StrUtil.isBlank(req.getId())){
+        if (StrUtil.isBlank(req.getId())) {
             examInfo.setId(IdUtil.objectId());
         }
         BeanUtil.copyProperties(req, examInfo, "startDateTime", "endDateTime");
@@ -58,7 +58,7 @@ public class ExamInfoController {
 
     @ApiOperation(value = "查询考试信息")
     @PostMapping(path = "/findAll")
-    public Mono<WebResult> findAll(@RequestBody @Validated FindExamInfoReq req, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> findAll(@RequestBody @Validated FindExamInfoReq req, @ApiIgnore ServerHttpRequest request) {
         String teacherId = tokenService.getTeacherId(request).get();
         req.setTeacherId(teacherId);
         return examInfoService.findAll(req).collectList().map(WebResult::okResult);
@@ -67,7 +67,7 @@ public class ExamInfoController {
 
     @ApiOperation(value = "学生查询自己的考试信息")
     @PostMapping(path = "/myExamInfo")
-    public Mono<WebResult> findMyExamInfo(@RequestBody FindMyExamInfoReq req, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> findMyExamInfo(@RequestBody FindMyExamInfoReq req, @ApiIgnore ServerHttpRequest request) {
         String classId = tokenService.getClassId(request);
         req.setClassId(classId);
         return examInfoService.findMyExamInfo(req).map(WebResult::okResult);
@@ -75,7 +75,7 @@ public class ExamInfoController {
 
     @ApiOperation(value = "学生查询试卷判断是否到考试时间")
     @PostMapping(path = "/{testPaperId}")
-    public Mono<WebResult> decide(@PathVariable @Validated @NotBlank(message = "试卷编号不能为空") String testPaperId, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> decide(@PathVariable @Validated @NotBlank(message = "试卷编号不能为空") String testPaperId, @ApiIgnore ServerHttpRequest request) {
         String classId = tokenService.getClassId(request);
         return examInfoService.decide(classId, testPaperId).map(WebResult::okResult);
     }

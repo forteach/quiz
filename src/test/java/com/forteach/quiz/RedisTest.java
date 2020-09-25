@@ -56,13 +56,13 @@ public class RedisTest {
 
     @Test
     public void testL() {
-        stringRedisTemplate.opsForList().leftPush("tlist","1");
-        stringRedisTemplate.opsForList().leftPush("tlist","2");
-        stringRedisTemplate.opsForList().leftPush("tlist","3");
-        stringRedisTemplate.opsForList().index("list",1).subscribe(System.out::println);
+        stringRedisTemplate.opsForList().leftPush("tlist", "1");
+        stringRedisTemplate.opsForList().leftPush("tlist", "2");
+        stringRedisTemplate.opsForList().leftPush("tlist", "3");
+        stringRedisTemplate.opsForList().index("list", 1).subscribe(System.out::println);
         System.out.println("----------------------------------------");
-        stringRedisTemplate.opsForList().range("list",0,-1)
-        .subscribe(System.out::println);
+        stringRedisTemplate.opsForList().range("list", 0, -1)
+                .subscribe(System.out::println);
 
     }
 
@@ -92,7 +92,7 @@ public class RedisTest {
     }
 
     @Test
-    public void deleteRedis(){
+    public void deleteRedis() {
         reactiveHashOperations.delete("*askGroup")
                 .subscribe();
     }

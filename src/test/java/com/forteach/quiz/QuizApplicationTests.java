@@ -14,9 +14,9 @@ public class QuizApplicationTests {
 
     @Test
     public void contextLoads() {
-        String str=Arrays.stream("1,2,3".split(",")).
-                filter(id->!id.equals("2"))
-                .map(str1->",".concat(str1)
+        String str = Arrays.stream("1,2,3".split(",")).
+                filter(id -> !id.equals("2"))
+                .map(str1 -> ",".concat(str1)
                 ).collect(joining())
                 .substring(1);
         System.out.println(str);

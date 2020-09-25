@@ -24,6 +24,9 @@ import java.io.Serializable;
 @ApiModel(value = "查询我的课程信息")
 public class TestPaperPageReq extends SortVo implements Serializable {
 
+    @ApiModelProperty(name = "testPaperId", value = "试卷id", dataType = "string")
+    private String testPaperId;
+
     @ApiModelProperty(name = "testPaperName", value = "试卷名称", dataType = "string")
     private String testPaperName;
 
@@ -32,6 +35,9 @@ public class TestPaperPageReq extends SortVo implements Serializable {
 
     @ApiModelProperty(name = "studentName", value = "学生名称", dataType = "string")
     private String studentName;
+
+    @ApiModelProperty(name = "studentId", value = "学生名称", dataType = "string")
+    private String studentId;
 
     @ApiModelProperty(name = "className", value = "班级名称", dataType = "string")
     private String className;

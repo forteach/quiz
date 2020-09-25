@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @Description: 头脑风暴题对象
- *               说明：只有主观题  所有的题目类型 全部由大题外部封装   由examChildren展示具体的题目信息
+ * 说明：只有主观题  所有的题目类型 全部由大题外部封装   由examChildren展示具体的题目信息
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/10  11:25

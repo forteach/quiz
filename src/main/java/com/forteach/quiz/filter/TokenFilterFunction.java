@@ -21,13 +21,14 @@ public class TokenFilterFunction implements HandlerFilterFunction<ServerResponse
     private final JwtHandler jwtHandler;
     private final ErrorHandler errorHandler;
 
-    private TokenFilterFunction (JwtHandler jwtHandler, ErrorHandler errorHandler){
+    private TokenFilterFunction(JwtHandler jwtHandler, ErrorHandler errorHandler) {
         this.jwtHandler = jwtHandler;
         this.errorHandler = errorHandler;
     }
 
     /**
      * 对用户的token 进行过滤和验证
+     *
      * @param request
      * @param next
      * @return
@@ -37,7 +38,7 @@ public class TokenFilterFunction implements HandlerFilterFunction<ServerResponse
         return jwtHandler.verify(request).flatMap(f -> {
             if (f) {
                 return next.handle(request);
-            }else {
+            } else {
                 return ServerResponse.badRequest()
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .body(Mono.just("token 无效"), String.class);

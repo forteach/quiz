@@ -156,7 +156,9 @@ public class Dic {
      */
     public static final String ASK_GROUP_CHANGE_LESS = "2";
 
-    /**----------微信登录token设置----------*/
+    /**
+     * ----------微信登录token设置----------
+     */
     public final static String USER_PREFIX = "userToken$";
 
     public final static Long TOKEN_VALIDITY_TIME = 3600L * 24 * 7;
@@ -169,16 +171,16 @@ public class Dic {
     /**
      * 微信端学生类型
      */
-    public final static String TOKEN_STUDENT ="student";
+    public final static String TOKEN_STUDENT = "student";
     /**
      * 登录认证的教师类型
      */
-    public final static String TOKEN_TEACHER ="teacher";
+    public final static String TOKEN_TEACHER = "teacher";
 
     /*-------  记录的字段名字  -------*/
 
     /**
-     *  问题　大题
+     * 问题　大题
      */
     public final static String INTERACT_RECORD_QUESTIONS = "questions";
     /**

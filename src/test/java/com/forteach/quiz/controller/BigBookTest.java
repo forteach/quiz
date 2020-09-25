@@ -25,7 +25,7 @@ public class BigBookTest {
     private WebTestClient webTestClient;
 
     @Test
-    public void sendInteractiveBook(){
+    public void sendInteractiveBook() {
         /**
          * 互动方式
          * <p>
@@ -34,19 +34,19 @@ public class BigBookTest {
          * select : 选则
          * vote   : 投票
          */
-        MoreGiveVo vo=new MoreGiveVo();
+        MoreGiveVo vo = new MoreGiveVo();
         vo.setCircleId("5cd3d58f5157212350577a58");
         vo.setQuestionId("5c73676306a38f000101b7b6,5c73679106a38f000101b7b7");
         vo.setTeacherId("we123");
         vo.setCategory("people");
         vo.setSelected("1301331992031827761,1301331992031827761");
 
-        System.out.println("json------"+ JSON.toJSONString(vo));
+        System.out.println("json------" + JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/interact/send/book")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),MoreGiveVo.class) // 3
+                .body(Mono.just(vo), MoreGiveVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -57,7 +57,7 @@ public class BigBookTest {
     }
 
     @Test
-    public void sendBookAnswer(){
+    public void sendBookAnswer() {
         /**
          * 互动方式
          * <p>
@@ -66,19 +66,19 @@ public class BigBookTest {
          * select : 选则
          * vote   : 投票
          */
-        InteractAnswerVo vo=new InteractAnswerVo(
+        InteractAnswerVo vo = new InteractAnswerVo(
                 "1301331992031827761",
                 "5cd3d58f5157212350577a58",
                 "5c73676306a38f000101b7b6",
                 "C",
                 "LianXi");
 
-        System.out.println("json------"+ JSON.toJSONString(vo));
+        System.out.println("json------" + JSON.toJSONString(vo));
         webTestClient
                 .post().uri("/interact/sendBook/answer")  //创建2小时内同一课堂
                 // .post().uri("/classRoom/create/cover")//创建不同的课堂
                 .contentType(MediaType.APPLICATION_JSON) // 2
-                .body(Mono.just(vo),InteractAnswerVo.class) // 3
+                .body(Mono.just(vo), InteractAnswerVo.class) // 3
                 .exchange()
                 .expectStatus()
                 .isOk()

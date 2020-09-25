@@ -25,7 +25,7 @@ public class ChangeTeamNameReq implements Serializable {
     @ApiModelProperty(value = "小组名称", name = "teamName", dataType = "string", required = true)
     private String teamName;
 
-    public String getTeamKey(){
+    public String getTeamKey() {
         return teamId.concat(ASK_GROUP);
     }
 }

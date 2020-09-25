@@ -42,15 +42,15 @@ public class TokenService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    private String getToken(ServerHttpRequest request){
+    private String getToken(ServerHttpRequest request) {
         return request.getHeaders().getFirst("token");
     }
 
-    private String getValue(String token, int index){
+    private String getValue(String token, int index) {
         return JWT.decode(token).getAudience().get(index);
     }
 
-    private String getKey(String userId){
+    private String getKey(String userId) {
         return USER_PREFIX.concat(userId);
     }
 
@@ -60,6 +60,7 @@ public class TokenService {
 
     /**
      * 通过token 获取openId
+     *
      * @param request
      * @return
      */
@@ -72,11 +73,12 @@ public class TokenService {
 
     /**
      * 根据token 查找对应的学生信息
+     *
      * @param request
      * @return
      */
-    public String getStudentId(ServerHttpRequest request){
-        if (!stringRedisTemplate.opsForHash().hasKey(USER_PREFIX.concat(getOpenId(request)), "studentId")){
+    public String getStudentId(ServerHttpRequest request) {
+        if (!stringRedisTemplate.opsForHash().hasKey(USER_PREFIX.concat(getOpenId(request)), "studentId")) {
             MyAssert.isNull(null, DefineCode.ERR0004, "token 已经失效");
         }
         return String.valueOf(stringRedisTemplate.opsForHash().get(USER_PREFIX.concat(getOpenId(request)), "studentId"));
@@ -85,12 +87,13 @@ public class TokenService {
 
     /**
      * 通过token 类型判断转换为教师id
+     *
      * @param request
      * @return Optional<String>
      */
-    public Optional<String> getTeacherId(ServerHttpRequest request){
+    public Optional<String> getTeacherId(ServerHttpRequest request) {
         String token = request.getHeaders().getFirst("token");
-        if (TOKEN_TEACHER.equals(JWT.decode(token).getAudience().get(1))){
+        if (TOKEN_TEACHER.equals(JWT.decode(token).getAudience().get(1))) {
             return Optional.of(JWT.decode(token).getAudience().get(0));
         }
         MyAssert.isNull(null, DefineCode.ERR0010, "token 非法");
@@ -99,25 +102,26 @@ public class TokenService {
 
     /**
      * 查询学生对应的班级id
+     *
      * @param request
      * @return
      */
     public String getClassId(ServerHttpRequest request) {
         String token = getToken(request);
-        if (TOKEN_STUDENT.equals(getValue(token, 1))){
+        if (TOKEN_STUDENT.equals(getValue(token, 1))) {
             return String.valueOf(stringRedisTemplate.opsForHash().get(getKey(getValue(token, 0)), "classId"));
         }
         return null;
     }
 
 
-
     /**
      * 校验token 是否有效
+     *
      * @param request
      * @return
      */
-    public Mono<Boolean> check(ServerRequest request){
+    public Mono<Boolean> check(ServerRequest request) {
         String token = getToken(request);
         MyAssert.blank(token, DefineCode.ERR0004, "token is null");
         try {
@@ -132,12 +136,13 @@ public class TokenService {
 
     /**
      * 获取token
+     *
      * @param request
      * @return
      */
-    private String getToken(ServerRequest request){
+    private String getToken(ServerRequest request) {
         AtomicReference<String> token = new AtomicReference<>(request.exchange().getRequest().getHeaders().getFirst("token"));
-        if (StringUtil.isEmpty(token.get())){
+        if (StringUtil.isEmpty(token.get())) {
             Mono.zip(request.bodyToMono(String.class),
                     Mono.just(request.remoteAddress()
                             .map(InetSocketAddress::getHostString)

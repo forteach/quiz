@@ -52,7 +52,7 @@ public class TeamRoomController {
         MyAssert.isNull(random.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
         MyAssert.isNull(random.getNumber(), DefineCode.ERR0010, "分组数量不为空");
         MyAssert.isNull(random.getExpType(), DefineCode.ERR0010, "分组有效期不为空");
-        if (TEAM_FOREVER.equals(random.getExpType())){
+        if (TEAM_FOREVER.equals(random.getExpType())) {
             MyAssert.isNull(random.getClassId(), DefineCode.ERR0010, "班级id不为空");
         }
         random.setTeacherId(tokenService.getTeacherId(request).get());
@@ -65,7 +65,7 @@ public class TeamRoomController {
             @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "teamName", value = "小组名字", required = true, dataType = "string", paramType = "form")
     })
-    public Mono<WebResult> changeTeamName(@RequestBody ChangeTeamNameReq req){
+    public Mono<WebResult> changeTeamName(@RequestBody ChangeTeamNameReq req) {
         MyAssert.isNull(req.getTeamId(), DefineCode.ERR0010, "小组id不为空");
         MyAssert.isNull(req.getTeamName(), DefineCode.ERR0010, "小组名称不为空");
         return teamService.updateTeamName(req).map(WebResult::okResult);
@@ -74,7 +74,7 @@ public class TeamRoomController {
     @ApiOperation(value = "需要删除小组", notes = "删除不需要的小组成员")
     @ApiImplicitParam(name = "teamId", value = "小组id", required = true, dataType = "string", paramType = "form")
     @PostMapping("/delete")
-    public Mono<WebResult> deleteTeam(@RequestBody DeleteTeamReq deleteTeamReq){
+    public Mono<WebResult> deleteTeam(@RequestBody DeleteTeamReq deleteTeamReq) {
         MyAssert.isNull(deleteTeamReq.getTeamId(), DefineCode.ERR0010, "小组id不为空");
         return teamService.deleteTeam(deleteTeamReq).map(WebResult::okResult);
     }
@@ -87,7 +87,7 @@ public class TeamRoomController {
             @ApiImplicitParam(name = "students", value = "学生id(用逗号分割)", example = "1234,1235", dataType = "string", required = true, paramType = "form")
     })
     @PostMapping("/addTeam")
-    public Mono<WebResult> addTeam(@RequestBody AddTeamReq req){
+    public Mono<WebResult> addTeam(@RequestBody AddTeamReq req) {
         MyAssert.isNull(req.getCircleId(), DefineCode.ERR0010, "课堂id或课程id不为空");
         MyAssert.isNull(req.getExpType(), DefineCode.ERR0010, "分组有效期不为空");
         MyAssert.isNull(req.getClassId(), DefineCode.ERR0010, "班级id不为空");

@@ -24,7 +24,7 @@ public class ErrorHandler {
         return Mono.just(error).transform(this::getResponse);
     }
 
-    private  <T extends Throwable> Mono<ServerResponse> getResponse(final Mono<T> monoError) {
+    private <T extends Throwable> Mono<ServerResponse> getResponse(final Mono<T> monoError) {
         return monoError.transform(ThrowableTranslator::translate)
                 .flatMap(translation -> ServerResponse
                         .status(translation.getHttpStatus())

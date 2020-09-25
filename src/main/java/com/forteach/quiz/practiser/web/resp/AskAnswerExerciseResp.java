@@ -25,7 +25,6 @@ public class AskAnswerExerciseResp implements Serializable {
     private String questionId;
 
 
-
     /**
      * 学生答案
      */

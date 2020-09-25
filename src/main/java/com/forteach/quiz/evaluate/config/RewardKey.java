@@ -13,13 +13,14 @@ public class RewardKey {
     public static final String REWARD_FLOWER_KEY = "Flower";
 
 
-        /**
+    /**
      * 获得小红花的学生。
+     *
      * @param circleId
-     * @param rewardType  奖励类型
+     * @param rewardType 奖励类型
      * @return
      */
-    public static String rewardAddKey(final  String circleId,final String rewardType) {
+    public static String rewardAddKey(final String circleId, final String rewardType) {
         return circleId.concat(REWARD_KEY.concat(rewardType));
     }
 }

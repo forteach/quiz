@@ -247,15 +247,18 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
     @SuppressWarnings(value = "all")
     private Query buildFindQuestion(final QuestionBankReq sortVo) {
 
-        Criteria criteria = Criteria.where("teacherId").is(sortVo.getOperatorId());
+        Criteria criteria = new Criteria();
 
+        if (StrUtil.isNotBlank(sortVo.getOperatorId())) {
+            criteria.and("teacherId").is(sortVo.getOperatorId());
+        }
         if (isNotEmpty(sortVo.getLevelId())) {
             criteria.and("levelId").is(sortVo.getLevelId());
         }
         if (isNotEmpty(sortVo.getChapterId())) {
             criteria.and("chapterId").is(sortVo.getChapterId());
         }
-        if (StrUtil.isNotBlank(sortVo.getCourseId())){
+        if (StrUtil.isNotBlank(sortVo.getCourseId())) {
             criteria.and("courseId").is(sortVo.getCourseId());
         }
         if (isNotEmpty(sortVo.getKnowledgeId())) {
@@ -264,7 +267,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
         if (isNotEmpty(sortVo.getQuestionType())) {
             criteria.and("examChildren.examType").is(sortVo.getQuestionType());
         }
-        if ( null != sortVo.getKeyword() && sortVo.getKeyword().length > 0) {
+        if (null != sortVo.getKeyword() && sortVo.getKeyword().length > 0) {
             criteria.and("keyword").all(sortVo.getKeyword());
         }
 

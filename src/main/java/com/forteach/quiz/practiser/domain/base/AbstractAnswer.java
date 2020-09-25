@@ -17,18 +17,15 @@ import org.springframework.data.mongodb.core.index.Indexed;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public abstract class AbstractAnswer extends BaseEntity {
-    @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
-    @Indexed
-    private String exeBookType;
-
-    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
-    @Indexed
-    private String courseId;
-
     @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")
     @Indexed
     protected String chapterId;
-
+    @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
+    @Indexed
+    private String exeBookType;
+    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
+    @Indexed
+    private String courseId;
     @ApiModelProperty(name = "chapterName", value = "章节名称", dataType = "string")
     private String chapterName;
 

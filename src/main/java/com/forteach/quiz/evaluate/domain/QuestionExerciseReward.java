@@ -25,18 +25,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ApiModel(value = "作业奖励记录", description = "作业的奖励记录表")
 public class QuestionExerciseReward extends BaseEntity {
 
-    @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
-    @Indexed
-    private String exeBookType;
-
-    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
-    @Indexed
-    private String courseId;
-
     @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")
     @Indexed
     protected String chapterId;
-
+    @ApiModelProperty(value = "练习册类型: 1、提问册 2、练习册3、作业册", name = "exeBookType", example = "3")
+    @Indexed
+    private String exeBookType;
+    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
+    @Indexed
+    private String courseId;
     @ApiModelProperty(name = "classId", value = "班级id", dataType = "string")
     private String classId;
     /**

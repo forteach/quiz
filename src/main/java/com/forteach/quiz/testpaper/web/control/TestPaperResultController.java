@@ -50,7 +50,7 @@ public class TestPaperResultController {
 
     @PostMapping(path = "/findAllPage")
     @ApiOperation(value = "查询成绩")
-    public Mono<WebResult> findAllPage(@RequestBody @Validated TestPaperPageReq req){
+    public Mono<WebResult> findAllPage(@RequestBody @Validated TestPaperPageReq req) {
         return testPaperResultService.findAllPage(req).map(WebResult::okResult);
     }
 }

@@ -9,7 +9,7 @@ package com.forteach.quiz.interaction.execute.service.Key;
 public class ClassStudentKey {
 
     //刷新清除场景命名加入学生场景
-    public static final String CLASSROOM_CLEAR_TAG_JION="join";
+    public static final String CLASSROOM_CLEAR_TAG_JION = "join";
 
     /**
      * 学生信息前缀

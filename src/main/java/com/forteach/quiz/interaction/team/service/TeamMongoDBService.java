@@ -51,6 +51,7 @@ public class TeamMongoDBService {
 
     /**
      * 将随机的小组信息覆盖原来生成的小组信息
+     *
      * @param groupTeamResp
      * @param random
      * @return
@@ -113,6 +114,7 @@ public class TeamMongoDBService {
 
     /**
      * 修改临时小组mongodb数据
+     *
      * @param circleId
      * @param classId
      * @param removeTeamId
@@ -122,7 +124,7 @@ public class TeamMongoDBService {
      */
     private Mono<Boolean> updateChangeTeamCircle(final String circleId, final String classId,
                                                  final String removeTeamId, final String addTeamId,
-                                                 final String students){
+                                                 final String students) {
 
         Query query1 = Query.query(Criteria.where("circleId").is(circleId)
                 .and("classId").is(classId).and("teamList.teamId").is(removeTeamId));
@@ -153,18 +155,19 @@ public class TeamMongoDBService {
 
     /**
      * 操作mongodb　更新记录
+     *
      * @param query
      * @param update
      * @param entityClass
      * @return
      */
-    Mono<Boolean> updateResultMono(Query query, Update update, Class<?> entityClass){
+    Mono<Boolean> updateResultMono(Query query, Update update, Class<?> entityClass) {
         return reactiveMongoTemplate.updateMulti(query, update, entityClass)
                 .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "修改失败"));
     }
 
     private Mono<Boolean> updateChangeTeamCourse(final String circleId, final String classId,
-                                                 final String removeTeamId, final String addTeamId, final String students){
+                                                 final String removeTeamId, final String addTeamId, final String students) {
 
         Query query1 = Query.query(Criteria.where("courseId").is(circleId)
                 .and("classId").is(classId).and("teamList.teamId").is(removeTeamId));
@@ -196,6 +199,7 @@ public class TeamMongoDBService {
 
     /**
      * 修改分组信息的组名
+     *
      * @param req
      * @return
      */
@@ -226,21 +230,22 @@ public class TeamMongoDBService {
 
     /**
      * 在mongdo 中添加一个新的分组信息
+     *
      * @param teamId
      * @param req
      * @return
      */
     Mono<Boolean> addTeam(final String teamId, final AddTeamReq req) {
         Mono<List<Students>> students = teamRedisService.findStudentsListByStr(req.getStudents());
-        if (TEAM_TEMPORARILY.equals(req.getExpType())){
+        if (TEAM_TEMPORARILY.equals(req.getExpType())) {
             return students.flatMap(studentsList -> {
-                    Query query = Query.query(Criteria.where("circleId").is(req.getCircleId()).and("classId").is(req.getClassId()));
-                    Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
-                    update.addToSet("teamList", new Team(teamId, req.getTeamName(), studentsList));
-                    return reactiveMongoTemplate.upsert(query, update, TeamCircle.class)
-                            .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "添加失败"));
-                    });
-        }else if (TEAM_FOREVER.equals(req.getExpType())){
+                Query query = Query.query(Criteria.where("circleId").is(req.getCircleId()).and("classId").is(req.getClassId()));
+                Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
+                update.addToSet("teamList", new Team(teamId, req.getTeamName(), studentsList));
+                return reactiveMongoTemplate.upsert(query, update, TeamCircle.class)
+                        .flatMap(updateResult -> MyAssert.isFalse(updateResult.wasAcknowledged(), DefineCode.ERR0012, "添加失败"));
+            });
+        } else if (TEAM_FOREVER.equals(req.getExpType())) {
             return students.flatMap(studentsList -> {
                 Query query = Query.query(Criteria.where("courseId").is(req.getCircleId()).and("classId").is(req.getClassId()));
                 Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
@@ -254,6 +259,7 @@ public class TeamMongoDBService {
 
     /**
      * 删除mongobd 中的分组信息
+     *
      * @param key
      * @param teamId
      * @param circleId
@@ -263,13 +269,13 @@ public class TeamMongoDBService {
     Mono<Boolean> deleteTeam(final String key, final String teamId, final String circleId, final String classId) {
         return teamRedisService.findHashString(key, "expType")
                 .flatMap(e -> {
-                    if (TEAM_TEMPORARILY.equals(e)){
+                    if (TEAM_TEMPORARILY.equals(e)) {
                         Query query = Query.query(Criteria.where("circleId").is(circleId).and("classId").is(classId));
                         Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
                         update.pull("teamList", Query.query(Criteria.where("teamId").is(teamId)));
                         return reactiveMongoTemplate.updateMulti(query, update, TeamCircle.class)
                                 .flatMap(teamCircle -> MyAssert.isNull(teamCircle, DefineCode.ERR0012, "mongodb不为空"));
-                    }else if (TEAM_FOREVER.equals(e)){
+                    } else if (TEAM_FOREVER.equals(e)) {
                         Query query = Query.query(Criteria.where("courseId").is(circleId).and("classId").is(classId));
                         Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
                         update.pull("teamList", Query.query(Criteria.where("teamId").is(teamId)));
@@ -282,14 +288,15 @@ public class TeamMongoDBService {
 
     /**
      * 从mongodb中查询分组信息
+     *
      * @param req
      * @return
      */
     Mono<? extends BaseTeam> findTeamList(final CircleIdReq req) {
-        if (StrUtil.isNotBlank(req.getClassId())){
+        if (StrUtil.isNotBlank(req.getClassId())) {
             return reactiveMongoTemplate.findOne(Query.query(Criteria.where("courseId").is(req.getCircleId()).and("classId").is(req.getClassId())), TeamCourse.class)
                     .defaultIfEmpty(new TeamCourse());
-        }else {
+        } else {
             return reactiveMongoTemplate.findOne(Query.query(Criteria.where("circleId").is(req.getCircleId())), TeamCircle.class)
                     .defaultIfEmpty(new TeamCircle());
         }

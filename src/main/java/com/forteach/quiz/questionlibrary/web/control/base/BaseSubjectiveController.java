@@ -45,12 +45,4 @@ public abstract class BaseSubjectiveController<T extends QuestionExamEntity> ext
     }
 
 
-
-
-
-
-
-
-
-
 }

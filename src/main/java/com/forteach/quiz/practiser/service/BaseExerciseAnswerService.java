@@ -27,7 +27,7 @@ public class BaseExerciseAnswerService {
      *
      * @return
      */
-     Criteria buildExerciseBook(final AnswerVo answerVo) {
+    Criteria buildExerciseBook(final AnswerVo answerVo) {
 
         Criteria criteria = new Criteria();
 
@@ -52,7 +52,7 @@ public class BaseExerciseAnswerService {
         return criteria;
     }
 
-     Criteria queryCriteria(final AnswerVo answerVo, final String questionId) {
+    Criteria queryCriteria(final AnswerVo answerVo, final String questionId) {
         //设置查询条件
         Criteria criteria = buildExerciseBook(answerVo);
 
@@ -62,7 +62,7 @@ public class BaseExerciseAnswerService {
         return criteria;
     }
 
-     Update updateQuery(final AnswerVo answerVo) {
+    Update updateQuery(final AnswerVo answerVo) {
         // 修改答题记录
         Update update = Update.update("uDate", DateUtil.formatDateTime(new Date()));
         if (StrUtil.isNotBlank(answerVo.getExeBookType())) {

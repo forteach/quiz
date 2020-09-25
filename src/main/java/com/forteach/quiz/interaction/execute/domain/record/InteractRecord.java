@@ -78,19 +78,19 @@ public class InteractRecord extends BaseEntity {
     public InteractRecord() {
     }
 
-    public InteractRecord(final String circleId, final String teacherId, final Long number,final String chapterId) {
+    public InteractRecord(final String circleId, final String teacherId, final Long number, final String chapterId) {
         this.teacherId = teacherId;
         this.id = circleId;
-        this.chapterId=chapterId;
+        this.chapterId = chapterId;
         this.createTime = DataUtil.format(new Date());
-        this.uDate=DataUtil.format(new Date());
+        this.uDate = DataUtil.format(new Date());
         this.number = number.intValue();
     }
 
-    public InteractRecord( String teacherId, Long number) {
+    public InteractRecord(String teacherId, Long number) {
         this.teacherId = teacherId;
         this.createTime = DataUtil.format(new Date());
-        this.uDate=DataUtil.format(new Date());
+        this.uDate = DataUtil.format(new Date());
         this.number = number.intValue();
     }
 }

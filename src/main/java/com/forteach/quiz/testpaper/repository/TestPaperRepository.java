@@ -18,6 +18,7 @@ public interface TestPaperRepository extends ReactiveMongoRepository<TestPaper, 
 
     /**
      * 查询试卷根据课程
+     *
      * @param courseId
      * @param sort
      * @return
@@ -27,6 +28,7 @@ public interface TestPaperRepository extends ReactiveMongoRepository<TestPaper, 
 
     /**
      * 查询试卷根据教师
+     *
      * @param teacherId
      * @param sort
      * @return
@@ -36,7 +38,8 @@ public interface TestPaperRepository extends ReactiveMongoRepository<TestPaper, 
 
     /**
      * 查询试卷信息，教师id和课程id
-     * @param courseId 课程Id
+     *
+     * @param courseId  课程Id
      * @param teacherId 教师id
      * @param sort
      * @return

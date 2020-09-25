@@ -22,7 +22,7 @@ public class TeamChangeService {
 
     private final StudentsService studentsService;
 
-    public TeamChangeService(StudentsService studentsService){
+    public TeamChangeService(StudentsService studentsService) {
         this.studentsService = studentsService;
     }
 
@@ -51,7 +51,7 @@ public class TeamChangeService {
                 });
     }
 
-    Mono<List<Students>> lessJoinStudents(final String studentsLess, final String stringJoin){
+    Mono<List<Students>> lessJoinStudents(final String studentsLess, final String stringJoin) {
         return lessJoinTeamStudentStr(studentsLess, stringJoin)
                 .flatMap(studentsService::exchangeStudents);
     }
@@ -72,7 +72,7 @@ public class TeamChangeService {
                 });
     }
 
-    Mono<List<Students>> moreJoinTeamStudents(final String studentsAdd, final String studentsJoin){
+    Mono<List<Students>> moreJoinTeamStudents(final String studentsAdd, final String studentsJoin) {
         return moreJoinTeamStudentStr(studentsAdd, studentsJoin)
                 .flatMap(studentsService::exchangeStudents);
     }

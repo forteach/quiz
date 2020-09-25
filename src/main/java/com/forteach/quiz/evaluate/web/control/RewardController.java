@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 
 /**
- * @Description:  老师奖励小红花
+ * @Description: 老师奖励小红花
  * @author: zjw
  * @version: V1.0
  * @date: 2019/5/20  10:24
@@ -50,7 +50,7 @@ public class RewardController {
             @ApiImplicitParam(value = "奖励类型：红花：flower", name = "rewardType", dataType = "string", required = true, paramType = "from")
     })
     public Mono<WebResult> rewardAdd(@ApiParam(value = "对学生奖励累加", required = true) @Valid @RequestBody CumulativeReq req) {
-        return rewardService.cumulative(req.getCircleId(),req.getStudentId(), Integer.valueOf(req.getNum())).map(WebResult::okResult);
+        return rewardService.cumulative(req.getCircleId(), req.getStudentId(), Integer.valueOf(req.getNum())).map(WebResult::okResult);
     }
 
 

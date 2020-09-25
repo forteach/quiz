@@ -36,7 +36,6 @@ public class AskAnswerExercise extends AbstractAnswer {
     private String questionId;
 
 
-
     /**
      * 学生答案
      */

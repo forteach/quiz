@@ -31,6 +31,8 @@ import static java.util.stream.Collectors.toList;
 @SpringBootTest
 public class JsonTest {
 
+    private List<String> list;
+
     @Test
     public void jsonTest() {
 
@@ -138,8 +140,6 @@ public class JsonTest {
     public Mono<String> zt(final String a) {
         return Mono.just(a.concat("c"));
     }
-
-    private List<String> list;
 
     @Test
     public void classTest() throws NoSuchFieldException {

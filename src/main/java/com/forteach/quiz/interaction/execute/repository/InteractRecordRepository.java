@@ -2,6 +2,7 @@ package com.forteach.quiz.interaction.execute.repository;
 
 import com.forteach.quiz.interaction.execute.domain.record.InteractRecord;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+
 /**
  * @Description: 记录课堂的交互情况 学生回答情况
  * @author: liu zhenming
@@ -50,7 +51,7 @@ public interface InteractRecordRepository extends ReactiveMongoRepository<Intera
      * @param id 课堂id
      * @param recordName 记录名字 questions
      * @return
-     * db.interactRecord.find({"_id" : "bd4a84e4a61943e6b07e02947ecc85f1"},{"students":1, _id: 0})
+     * db.interactRecord.find({ " _id " : " bd4a84e4a61943e6b07e02947ecc85f1 " }, { " students " : 1, _id : 0 })
      */
 //    @Transactional(readOnly = true)
 //    @Query(value = "{'_id': ?0, ?1 : {$exists:true}}")

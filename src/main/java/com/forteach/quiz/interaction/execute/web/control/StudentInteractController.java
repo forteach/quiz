@@ -71,20 +71,20 @@ public class StudentInteractController {
 //            InteractRecordQuestionsService interactRecordQuestionsService,
 //                                     InteractRecordExerciseBookService interactRecordExerciseBookService,
 //                                     SendQuestService sendQuestService,
-                                     SendAnswerService sendAnswerService,
-                                     RaiseHandService raiseHandService,
+            SendAnswerService sendAnswerService,
+            RaiseHandService raiseHandService,
 //                                     FabuQuestService fabuQuestService,
 //                                     SendQuestBookService sendQuestBookService,
-                                     SendAnswerQuestBookService sendAnswerQuestBookService,
-                                     TokenService tokenService) {
+            SendAnswerQuestBookService sendAnswerQuestBookService,
+            TokenService tokenService) {
 //        this.interactRecordQuestionsService = interactRecordQuestionsService;
 //        this.interactRecordExerciseBookService = interactRecordExerciseBookService;
         this.tokenService = tokenService;
 //        this.sendQuestService = sendQuestService;
-        this.sendAnswerService= sendAnswerService;
-        this.raiseHandService=raiseHandService;
+        this.sendAnswerService = sendAnswerService;
+        this.raiseHandService = raiseHandService;
 //        this.fabuQuestService=fabuQuestService;
-        this.sendAnswerQuestBookService=sendAnswerQuestBookService;
+        this.sendAnswerQuestBookService = sendAnswerQuestBookService;
 //        this.sendQuestBookService=sendQuestBookService;
     }
 //******************教师端*************************************
@@ -165,6 +165,7 @@ public class StudentInteractController {
 
 
 //###########################学生端##############################################
+
     /**
      * 课堂提问
      * 学生举手
@@ -180,12 +181,12 @@ public class StudentInteractController {
             @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
     })
     public Mono<WebResult> raiseHand(@ApiParam(value = "学生举手", required = true) @RequestBody RaisehandVo raisehandVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
-        MyAssert.blank(raisehandVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
-        MyAssert.blank(raisehandVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
-        MyAssert.blank(raisehandVo.getQuestionType(), DefineCode.ERR0010,"题目提问类型不能为空");
+        MyAssert.blank(raisehandVo.getCircleId(), DefineCode.ERR0010, "课堂编号不能为空");
+        MyAssert.blank(raisehandVo.getQuestionId(), DefineCode.ERR0010, "课堂问题ID不能为空");
+        MyAssert.blank(raisehandVo.getQuestionType(), DefineCode.ERR0010, "题目提问类型不能为空");
 
         raisehandVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        return raiseHandService.raiseHand(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId(),raisehandVo.getQuestionType()).map(WebResult::okResult);
+        return raiseHandService.raiseHand(raisehandVo.getCircleId(), raisehandVo.getExamineeId(), raisehandVo.getQuestionId(), raisehandVo.getQuestionType()).map(WebResult::okResult);
     }
 
     /**
@@ -202,7 +203,7 @@ public class StudentInteractController {
             @ApiImplicitParam(value = "举手的题目id", name = "questionId", dataType = "string", paramType = "from", required = true)
     })
     public Mono<WebResult> launchRaise(@ApiParam(value = "课堂提问 重新发起举手", required = true) @RequestBody RaisehandVo raisehandVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
-        return raiseHandService.launchRaise(raisehandVo.getCircleId(),raisehandVo.getExamineeId(),raisehandVo.getQuestionId(),raisehandVo.getQuestionType()).map(WebResult::okResult);
+        return raiseHandService.launchRaise(raisehandVo.getCircleId(), raisehandVo.getExamineeId(), raisehandVo.getQuestionId(), raisehandVo.getQuestionType()).map(WebResult::okResult);
     }
 
     /**
@@ -222,15 +223,15 @@ public class StudentInteractController {
     })
     public Mono<WebResult> sendAnswer(@ApiParam(value = "提交答案", required = true) @RequestBody InteractAnswerVo interactAnswerVo, @ApiIgnore ServerHttpRequest serverHttpRequest) {
         interactAnswerVo.setExamineeId(tokenService.getStudentId(serverHttpRequest));
-        MyAssert.blank(interactAnswerVo.getCircleId(), DefineCode.ERR0010,"课堂编号不能为空");
-        MyAssert.blank(interactAnswerVo.getQuestionId(), DefineCode.ERR0010,"课堂问题ID不能为空");
-        MyAssert.blank(interactAnswerVo.getAnswer(), DefineCode.ERR0010,"题目回答内容不能为空");
+        MyAssert.blank(interactAnswerVo.getCircleId(), DefineCode.ERR0010, "课堂编号不能为空");
+        MyAssert.blank(interactAnswerVo.getQuestionId(), DefineCode.ERR0010, "课堂问题ID不能为空");
+        MyAssert.blank(interactAnswerVo.getAnswer(), DefineCode.ERR0010, "题目回答内容不能为空");
         return sendAnswerService.sendAnswer(interactAnswerVo.getCircleId(),
                 interactAnswerVo.getExamineeId(),
                 interactAnswerVo.getQuestionId(),
                 interactAnswerVo.getAnswer(),
                 interactAnswerVo.getQuestionType(),
-                interactAnswerVo.getFileList()).map(r-> String.valueOf(r)).map(WebResult::okResult);
+                interactAnswerVo.getFileList()).map(r -> String.valueOf(r)).map(WebResult::okResult);
     }
 
     /**
@@ -259,7 +260,7 @@ public class StudentInteractController {
                 interactAnswerVo.getQuestionId(),
                 interactAnswerVo.getAnswer(),
                 interactAnswerVo.getFileList()
-                ).map(WebResult::okResult);
+        ).map(WebResult::okResult);
     }
-    
+
 }

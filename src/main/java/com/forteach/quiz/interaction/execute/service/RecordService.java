@@ -32,29 +32,30 @@ public class RecordService {
     private final StudentsService studentsService;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public RecordService(ReactiveMongoTemplate reactiveMongoTemplate, StudentsService studentsService){
+    public RecordService(ReactiveMongoTemplate reactiveMongoTemplate, StudentsService studentsService) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.studentsService = studentsService;
     }
 
     /**
      * 查询答题结果历史记录
+     *
      * @param circleId
      * @param questionsId
      * @return
      */
     public Mono<InteractRecordResp> findQuestionRecord(final String circleId, final String questionsId, final String examineeId, final String questionType, final String interactive) {
         Criteria criteria = Criteria.where("circleId").is(circleId);
-        if (StrUtil.isNotBlank(questionsId)){
+        if (StrUtil.isNotBlank(questionsId)) {
             criteria.and("questionId").is(questionsId);
         }
-        if (StrUtil.isNotBlank(examineeId)){
+        if (StrUtil.isNotBlank(examineeId)) {
             criteria.and("examineeId").is(examineeId);
         }
-        if (StrUtil.isNotBlank(questionType)){
+        if (StrUtil.isNotBlank(questionType)) {
             criteria.and("questionType").is(questionType);
         }
-        if (StrUtil.isNotBlank(interactive)){
+        if (StrUtil.isNotBlank(interactive)) {
             criteria.and("interactive").is(interactive);
         }
 
@@ -82,19 +83,20 @@ public class RecordService {
 
     /**
      * 查询大题历史记录
+     *
      * @param circleId
      * @param questionId
      * @return
      */
     public Mono<List<ActivityAskAnswerResp>> findAskRecord(final String circleId, final String questionId, final String examineeId, final String questionType) {
         Criteria criteria = Criteria.where("circleId").is(circleId);
-        if (StrUtil.isNotBlank(examineeId)){
+        if (StrUtil.isNotBlank(examineeId)) {
             criteria.and("examineeId").is(examineeId);
         }
-        if (StrUtil.isNotBlank(questionType)){
+        if (StrUtil.isNotBlank(questionType)) {
             criteria.and("questionType").is(questionType);
         }
-        if (StrUtil.isNotBlank(questionId)){
+        if (StrUtil.isNotBlank(questionId)) {
             criteria.and("answList.questionId").is(questionId);
         }
         Query query = Query.query(criteria);
@@ -111,6 +113,7 @@ public class RecordService {
 
     /**
      * 数据对象进行转换
+     *
      * @param activityAskAnswer
      * @return
      */

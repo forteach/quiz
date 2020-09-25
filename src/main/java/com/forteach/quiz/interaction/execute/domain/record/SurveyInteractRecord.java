@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Description:   问卷记录(发布了哪些题目 发布顺序 发布时间 发布次数 选择了哪些人 哪些人进行了回答 回答情况 回答答案)
+ * @Description: 问卷记录(发布了哪些题目 发布顺序 发布时间 发布次数 选择了哪些人 哪些人进行了回答 回答情况 回答答案)
  * @author: liu zhenming
  * @version: V1.0
  * @date: 2019/1/14  17:16

@@ -26,7 +26,7 @@ public class TestPaperResultRepositoryTest {
 
 
     @Test
-    public void save(){
+    public void save() {
         TestPaperResult testPaperResult = new TestPaperResult();
         testPaperResult.setClassId("1934");
         testPaperResult.setClassName("1934班");

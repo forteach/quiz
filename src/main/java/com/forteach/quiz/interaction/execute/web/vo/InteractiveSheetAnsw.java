@@ -44,7 +44,7 @@ public class InteractiveSheetAnsw {
 
     private String date;
 
-    public InteractiveSheetAnsw(String questionId, String answer,List<DataDatumVo> fileList, String answerRight) {
+    public InteractiveSheetAnsw(String questionId, String answer, List<DataDatumVo> fileList, String answerRight) {
         this.questionId = questionId;
         this.answer = answer;
         this.answerRight = answerRight;

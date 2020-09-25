@@ -4,6 +4,8 @@ import com.forteach.quiz.questionlibrary.domain.BigQuestion;
 import com.forteach.quiz.questionlibrary.repository.base.QuestionMongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Description:
  * @author: liu zhenming
@@ -12,4 +14,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BigQuestionRepository extends QuestionMongoRepository<BigQuestion> {
+    //    List<BigQuestion> findAllByGro
+//    @Query(value = "$group: {}")
+    List findGroupByCourseId();
 }

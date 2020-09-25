@@ -8,7 +8,7 @@
     <!-- noSql mongodb sql show debug-->
     <logger name="org.springframework.data.mongodb.core" level="DEBUG"/>
 
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
     <!-- ch.qos.logback.core.ConsoleAppender 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

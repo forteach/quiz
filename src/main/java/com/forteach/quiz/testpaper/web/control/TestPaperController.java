@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -32,7 +29,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Slf4j
 @RestController
-@Api(value = "试卷记录", tags = {"试卷信息"}, description = "试卷信息")
+@Api(value = "试卷信息", tags = {"试卷信息"}, description = "试卷信息")
 @RequestMapping(path = "/testPaper", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class TestPaperController {
     private final TokenService tokenService;
@@ -45,10 +42,10 @@ public class TestPaperController {
 
     @PostMapping("/update")
     @ApiOperation(value = "保存更新试卷信息")
-    public Mono<WebResult> update(@RequestBody @Validated UpdateTestPaperReq req, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> update(@RequestBody @Validated UpdateTestPaperReq req, @ApiIgnore ServerHttpRequest request) {
         TestPaper testPaper = new TestPaper();
         BeanUtil.copyProperties(req, testPaper);
-        if (StrUtil.isBlank(req.getId())){
+        if (StrUtil.isBlank(req.getId())) {
             testPaper.setId(IdUtil.objectId());
         }
         return testPaperService.updateSave(testPaper).map(WebResult::okResult);
@@ -56,8 +53,14 @@ public class TestPaperController {
 
     @ApiOperation(value = "查询试卷信息")
     @PostMapping(path = "/findAll")
-    public Mono<WebResult> findAll(@RequestBody @Validated FindTestPaperReq req, @ApiIgnore ServerHttpRequest request){
+    public Mono<WebResult> findAll(@RequestBody @Validated FindTestPaperReq req, @ApiIgnore ServerHttpRequest request) {
         String teacherId = tokenService.getTeacherId(request).get();
         return testPaperService.findAll(teacherId, req.getCourseId()).collectList().map(WebResult::okResult);
+    }
+
+    @GetMapping(path = "/{id}")
+    @ApiOperation(value = "查询试卷详情")
+    public Mono<WebResult> findById(@PathVariable String id) {
+        return testPaperService.findById(id).map(WebResult::okResult);
     }
 }

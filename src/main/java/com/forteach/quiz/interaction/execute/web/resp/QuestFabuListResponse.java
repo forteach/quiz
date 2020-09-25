@@ -20,12 +20,12 @@ public class QuestFabuListResponse implements Serializable {
     /**
      * 已发布题目的列表
      */
-    @ApiModelProperty(value="已发布题目的列表")
+    @ApiModelProperty(value = "已发布题目的列表")
     private List<String> fabuQuest;
     /**
      * 当前题目Id
      */
-    @ApiModelProperty(value="当前题目Id")
+    @ApiModelProperty(value = "当前题目Id")
     private String nowQuestId;
 
 }

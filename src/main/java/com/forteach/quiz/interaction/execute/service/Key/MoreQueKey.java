@@ -44,10 +44,11 @@ public class MoreQueKey {
 
     /**
      * 课堂练习测题目
+     *
      * @param circleId
      * @return
      */
-    public static String bookQuestionMap(final String typeName,final String circleId){
+    public static String bookQuestionMap(final String typeName, final String circleId) {
         return circleId.concat(CLASSROOM_BOOK_QUESTIONS_MAP).concat(typeName);
     }
 
@@ -62,12 +63,13 @@ public class MoreQueKey {
 
     /**
      * 加入课堂，已推送过的学生题目回答
+     *
      * @param circleId
-     * @param questBookId  册子ID
-     * @param pushType  推送类型  pushQe：提问   pushAw：回答
+     * @param questBookId 册子ID
+     * @param pushType    推送类型  pushQe：提问   pushAw：回答
      * @return
      */
-    public static String cleanTuiSong(String circleId,String questBookId,String pushType,String questionType){
+    public static String cleanTuiSong(String circleId, String questBookId, String pushType, String questionType) {
         return circleId.concat(questBookId).concat(ROOM_JOIN_MORE_TS).concat(questionType).concat(pushType);
     }
 

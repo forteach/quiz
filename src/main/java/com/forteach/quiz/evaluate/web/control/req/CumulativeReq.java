@@ -14,7 +14,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "奖励累加", description = "对学生进行奖励累加")
-public class CumulativeReq  {
+public class CumulativeReq {
 
     private String circleId;
 
