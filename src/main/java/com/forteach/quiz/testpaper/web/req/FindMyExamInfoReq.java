@@ -91,7 +91,7 @@ public class FindMyExamInfoReq implements Serializable {
 
     public void setEndDateTime(String endDateTime) {
         if (StrUtil.isBlank(endDateTime)){
-            endDateTime = DateUtil.offsetDay(new Date(), 30).toString();
+            endDateTime = DateUtil.offsetDay(new Date(), 90).toString();
         }
         this.endDateTime = endDateTime;
     }

@@ -63,6 +63,13 @@ public class QuestionExamEntity<T> extends BaseEntity {
     protected String chapterId;
 
     /**
+     * 课程id
+     */
+    @JsonView(BigQuestionView.Summary.class)
+    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
+    private String courseId;
+
+    /**
      * 是否修改应用到所有的练习册
      * 1 : 应用到所有练习册    0  :  只修改本题
      */

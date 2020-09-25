@@ -20,6 +20,11 @@ import java.io.Serializable;
 public class QuestionBankReq extends SortVo implements Serializable {
 
     /**
+     * 课程id
+     */
+    @ApiModelProperty(name = "courseId", value = "课程id", dataType = "string")
+    private String courseId;
+    /**
      * 章节id
      */
     @ApiModelProperty(value = "章节id", name = "chapterId", example = "463bcd8e5fed4a33883850c14f877271")

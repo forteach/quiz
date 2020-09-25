@@ -1,5 +1,6 @@
 package com.forteach.quiz.questionlibrary.service.base;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.forteach.quiz.common.DataUtil;
 import com.forteach.quiz.exceptions.CustomException;
@@ -210,6 +211,7 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
         query.fields()
                 .include(MONGDB_ID)
                 .include("chapterId")
+                .include("courseId")
                 .include("levelId")
                 .include("knowledgeId")
                 .include("examType")
@@ -252,6 +254,9 @@ public abstract class BaseQuestionServiceImpl<T extends QuestionExamEntity> impl
         }
         if (isNotEmpty(sortVo.getChapterId())) {
             criteria.and("chapterId").is(sortVo.getChapterId());
+        }
+        if (StrUtil.isNotBlank(sortVo.getCourseId())){
+            criteria.and("courseId").is(sortVo.getCourseId());
         }
         if (isNotEmpty(sortVo.getKnowledgeId())) {
             criteria.and("knowledgeId").is(sortVo.getKnowledgeId());
