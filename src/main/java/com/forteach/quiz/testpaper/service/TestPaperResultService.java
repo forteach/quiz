@@ -140,7 +140,7 @@ public class TestPaperResultService {
             criteria.and("testPaperId").is(req.getTestPaperId());
         }
         if (StrUtil.isNotBlank(req.getStudentId())) {
-            criteria.and("studentId").and(req.getStudentId());
+            criteria.and("studentId").is(req.getStudentId());
         }
         if (StrUtil.isNotBlank(req.getClassName())) {
             Pattern pattern = Pattern.compile("^.*" + req.getClassName() + ".*$", Pattern.CASE_INSENSITIVE);
