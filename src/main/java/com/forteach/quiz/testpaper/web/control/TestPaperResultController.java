@@ -11,12 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * @Author: zhangyy
@@ -52,5 +51,11 @@ public class TestPaperResultController {
     @ApiOperation(value = "查询成绩")
     public Mono<WebResult> findAllPage(@RequestBody @Validated TestPaperPageReq req) {
         return testPaperResultService.findAllPage(req).map(WebResult::okResult);
+    }
+
+    @ApiOperation(value = "查询学生成绩信息")
+    @GetMapping(path = "/testScore/{studentId}")
+    public Mono<WebResult> findResultByStudentId(@PathVariable @NotBlank(message = "学生Id不为空") String studentId){
+        return testPaperResultService.findResultByStudentId(studentId).map(WebResult::okResult);
     }
 }

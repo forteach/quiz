@@ -10,8 +10,10 @@ import com.forteach.quiz.questionlibrary.service.BigQuestionService;
 import com.forteach.quiz.service.CorrectService;
 import com.forteach.quiz.testpaper.domain.TestPaper;
 import com.forteach.quiz.testpaper.domain.TestPaperResult;
+import com.forteach.quiz.testpaper.repository.TestPaperResultRepository;
 import com.forteach.quiz.testpaper.web.req.AddResultReq;
 import com.forteach.quiz.testpaper.web.req.TestPaperPageReq;
+import com.forteach.quiz.testpaper.web.resp.TestPaperResp;
 import com.forteach.quiz.testpaper.web.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -46,14 +48,19 @@ public class TestPaperResultService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final BigQuestionService bigQuestionService;
     private final ExamInfoService examInfoService;
+    private final TestPaperResultRepository testPaperResultRepository;
 
 
-    public TestPaperResultService(TestPaperService testPaperService, CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate, BigQuestionService bigQuestionService, ExamInfoService examInfoService) {
+    public TestPaperResultService(TestPaperService testPaperService,
+                                  CorrectService correctService, ReactiveMongoTemplate reactiveMongoTemplate,
+                                  BigQuestionService bigQuestionService, ExamInfoService examInfoService,
+                                  TestPaperResultRepository testPaperResultRepository) {
         this.testPaperService = testPaperService;
         this.correctService = correctService;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.bigQuestionService = bigQuestionService;
         this.examInfoService = examInfoService;
+        this.testPaperResultRepository = testPaperResultRepository;
     }
 
 
@@ -173,5 +180,9 @@ public class TestPaperResultService {
         }
         query.addCriteria(criteria).with(PageRequest.of(req.getPage(), req.getSize(), sort));
         return reactiveMongoTemplate.find(query, TestPaperResult.class).collectList();
+    }
+
+    public Mono<List<TestPaperResp>> findResultByStudentId(final String studentId) {
+        return testPaperResultRepository.findAllByStudentId(studentId).collectList();
     }
 }
