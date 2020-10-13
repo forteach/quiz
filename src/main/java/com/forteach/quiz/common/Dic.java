@@ -201,4 +201,8 @@ public class Dic {
     public final static String INTERACT_RECORD_EXERCISEBOOKS = "exerciseBooks";
 
 
+    /**
+     * 统计课程数据 包含 课程id,名称，章节数，资料数，习题数等。
+     */
+    public final static String COUNT_COURSE_INFO ="count_course_info#";
 }

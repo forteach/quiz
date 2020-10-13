@@ -14,6 +14,5 @@ import java.io.Serializable;
 @Data
 public class QuestionNumVo implements Serializable {
     private String courseId;
-    //    private String courseName;
     private Long questionNum;
 }
