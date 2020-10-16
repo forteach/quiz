@@ -66,7 +66,7 @@ public class TestPaperResultService {
 
     public Mono<Boolean> addResult(final AddResultReq addResultReq) {
         return examInfoService.decide(addResultReq.getClassId(), addResultReq.getTestPaperId())
-                .filterWhen(b -> MyAssert.isFalse(b, DefineCode.ERR0013, "您没有对应的权限"))
+                .filterWhen(b -> MyAssert.isFalse(b, DefineCode.ERR0013, "请到考试时间再答题"))
                 .flatMap(b -> testPaperService.findById(addResultReq.getTestPaperId())
                         .switchIfEmpty(Mono.error(new CustomException("没有找到试卷")))
                         .flatMap(testPaper -> {
