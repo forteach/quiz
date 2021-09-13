@@ -55,7 +55,7 @@ public class TestPaperResultController {
 
     @ApiOperation(value = "查询学生成绩信息")
     @GetMapping(path = "/testScore/{studentId}")
-    public Mono<WebResult> findResultByStudentId(@PathVariable @NotBlank(message = "学生Id不为空") String studentId){
+    public Mono<WebResult> findResultByStudentId(@PathVariable @NotBlank(message = "学生Id不为空") String studentId) {
         return testPaperResultService.findResultByStudentId(studentId).map(WebResult::okResult);
     }
 }

@@ -35,6 +35,7 @@ public class WebConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/swagger-ui.html**", "/webjars/**")
+                .addResourceLocations("/doc.html")
                 .addResourceLocations("classpath:/META-INF/resources/", "classpath:/META-INF/resources/webjars/");
     }
 
